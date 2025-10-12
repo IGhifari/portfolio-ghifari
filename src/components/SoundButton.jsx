@@ -13,11 +13,19 @@ const songs = [
         color: "#FF6B6B"
     },
     {
-        title: "Swørn",
-        artist: "Keep Going",
-        cover: "sound.jpg",
-        audio: "sound3.mp3",
-        duration: 150, // 3:18
+        title: "Salvatore",
+        artist: "Lana De Rey",
+        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
+        audio: "Salvatore.mp3",
+        duration: 281, // 3:18
+        color: "#4ECDC4"
+    },
+    {
+        title: "Ultraviolence",
+        artist: "Lana De Rey",
+        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUBqbWTV_PaMn06j_KFUAK49Su7gXHKV5cDORcr98dHw&s=10",
+        audio: "ultraviolence.mp3",
+        duration: 263, // 3:18
         color: "#4ECDC4"
     },
     {
@@ -29,8 +37,16 @@ const songs = [
         color: "#96CEB4"
     },
     {
-        title: "Justin Bieber",
-        artist: "Sorry",
+        title: "Summertime Sadness",
+        artist: "Lana De Rey",
+        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0xDTVAz0wVKvO6Y32DEC_3kSWJqLEjnZPN5VNZ-ZFA&s=10",
+        audio: "summertime.mp3",
+        duration: 265, // 3:18
+        color: "#4ECDC4"
+    },
+    {
+        title: "Sorry",
+        artist: "Justin Bieber",
         cover: "sound3.png",
         audio: "sound5.mp3",
         duration: 205, // 2:51

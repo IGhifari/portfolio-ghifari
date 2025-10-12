@@ -7,7 +7,7 @@ const Project = () => {
         {
             title: "Portfolio Website",
             description: "Personal portfolio website built with React and Tailwind CSS",
-            image: "portfolio.png", // Add your project image
+            image: "portfolio.png", 
             tags: ["ReactJS", "Tailwind CSS"],
             github: "https://github.com/IGhifari/Portfolio-ghifari",
             live: window.location.href
@@ -15,7 +15,7 @@ const Project = () => {
         {
             title: "Game Ecovoyage-PulauHarapan",
             description: "An interactive educational game developed collaboratively with friends, exploring the beauty and environmental sustainability of Pulau Harapan. This game teaches players about conservation and eco-friendly practices through engaging gameplay.",
-            image: "pulauharapan.png", // Add your dashboard image
+            image: "pulauharapan.png", 
             tags: ["HTML", "Javascript", "CSS"],
             github: "https://github.com/IGhifari/EcoVoyage-PulauHarapan",
             live: "https://ighifari.github.io/EcoVoyage-PulauHarapan/views/halamanAwal.html"
@@ -24,7 +24,7 @@ const Project = () => {
             title: "Internship Journal Siswa",
             description: "A web-based internship journal system designed to help students record, manage, and track their internship activities efficiently. Built with React JS, Laravel, and MySQL to provide a seamless and organized experience.",
             image: "internship.png", 
-            tags: ["ReactJS", "Laravel", "MySQL"],
+            tags: ["ReactJS", "Laravel", "MySQL" , "Tailwind CSS"],
             github: "https://github.com/IGhifari/internship-journal",
             live: "https://your-internship-journal.com"
         },
@@ -43,7 +43,18 @@ const Project = () => {
             tags: ["ReactJS", "ExpressJS", "Prisma", "Tailwind CSS", "MySQL"],
             github: "https://github.com/IGhifari/Website-DesaKita",
             live: "https://desaku.com"
+        },
+        {
+            title: "Food",
+            description:
+                "Food is a modern web-based e-commerce platform for fruits and vegetables. It features product catalogs, cart and checkout systems, customer reviews, and user-admin chat functionality. The frontend is built with React, Tailwind CSS, and shadcn/ui, while the backend uses Express, Prisma, and PostgreSQL (Neon). The entire project is deployed on Vercel for seamless performance and scalability.",
+            image: "food.png",
+            tags: ["React", "TypeScript", "Tailwind CSS", "shadcn/ui", "Express", "Prisma", "PostgreSQL", "Vercel"],
+            github: "https://github.com/IGhifari/web-food", 
+            live: "https://food-liart-one.vercel.app"
         }
+
+        
 
 
         
