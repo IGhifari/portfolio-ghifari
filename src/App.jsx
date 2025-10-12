@@ -46,7 +46,7 @@ const App = () => {
             <section className="h-screen text-white flex text-center justify-center mt-44">
                 <Story/>
             </section>
-            <section id="AcademicBackground" className="h-full mt-96 text-white flex items-center justify-center academic-background">
+            <section id="AcademicBackground" className="h-full mt-80 text-white flex items-center justify-center academic-background">
                 <AcademicBackground/>
             </section>
             <section id="contact2" className="h-full text-white mt-">
