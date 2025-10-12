@@ -59,7 +59,7 @@ const Timeline = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-12 sm:my-16 lg:my-20 pt-96 lg:pt-96">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-12 sm:my-16 lg:my-20 pt-72 lg:pt-96">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-10 md:mb-12 hover:text-cyan-400 duration-500 transition-colors ease-in-out">
         <TypeIt
           options={{ loop: false, speed: 100 }}
