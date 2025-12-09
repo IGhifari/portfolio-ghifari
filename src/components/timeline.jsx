@@ -1,6 +1,6 @@
 import React from 'react';
 import TypeIt from "typeit-react";
-import './components.css';
+import '../styles/Components.css';
 
 const Timeline = () => {
   const event = {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { IoLogoGithub, IoMenu, IoClose } from "react-icons/io5";
 import { Link } from 'react-scroll';
-import './components.css';
+import '../styles/Components.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

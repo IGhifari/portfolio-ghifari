@@ -6,7 +6,7 @@ import { FaInstagram } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
 import { IoLogoGithub } from "react-icons/io";
 import { FaTiktok } from "react-icons/fa";
-import './components.css';
+import '../styles/Components.css';
 const Contact = () => {
   
     const Igclick = () =>{

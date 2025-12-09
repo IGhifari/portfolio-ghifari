@@ -4,7 +4,7 @@
     import 'swiper/css/effect-cards';
     import { EffectCards } from 'swiper/modules';
     import { IoLogoGithub } from "react-icons/io";
-    import './skill.css'
+    import '../styles/Skill.css'
     import { FaHtml5, FaNode } from "react-icons/fa";
     import { FaCss3Alt } from "react-icons/fa";
     import { FaJs } from "react-icons/fa";

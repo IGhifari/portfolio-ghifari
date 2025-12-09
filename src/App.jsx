@@ -1,17 +1,17 @@
 import React from 'react';
-import './App.css'
-import './components/components.css'
-import Navbar from './components/navbar'
-import Home from './components/profile'
-import Project from './components/project'
-import Certificate from './components/certificate'
-import AcademicBackground from './components/education'
-import Contact from './components/contact'
-import Skills from './components/skill'
-import Story from './components/story';
-import ParticlesBackground from './components/particlesBackground';
+import './styles/App.css';
+import './styles/Components.css';
+import Navbar from './components/Navbar';
+import Home from './components/Profile';
+import Project from './components/Project';
+import Certificate from './components/Certificate';
+import AcademicBackground from './components/AcademicBackground';
+import Contact from './components/Contact';
+import Skills from './components/Skill';
+import Story from './components/Story';
+import ParticlesBackground from './components/ParticlesBackground';
 import LastUpdated from './components/LastUpdated';
-import ContactMe from './components/contactMe';
+import ContactMe from './components/ContactMe';
 import SoundButton from './components/SoundButton';
 const App = () => {
     return (
@@ -32,11 +32,11 @@ const App = () => {
             <section id="certificates" className="h-full text-white">
                 <Certificate/>
             </section>
-            <section style={{height:'700px'}} className='text-white pb-48 '>
-                <div className='mt-72 md:mt-10'>
-                    <div className='flex items-center pl-14 '>
-                        <div style={{border:'2px solid white'}} className='rounded-md w-12 h-0'></div>
-                        <h3 style={{fontSize:'1.2rem'}} className='pl-3'>Skills</h3>
+            <section className="text-white pb-48 min-h-[700px]">
+                <div className="mt-72 md:mt-10">
+                    <div className="flex items-center pl-14">
+                        <div className="w-12 border-b-2 border-white" />
+                        <h3 className="pl-3 text-xl">Skills</h3>
                     </div>
                     <div>
                         <Skills/>
@@ -49,7 +49,7 @@ const App = () => {
             <section id="AcademicBackground" className="h-full mt-80 text-white flex items-center justify-center academic-background">
                 <AcademicBackground/>
             </section>
-            <section id="contact2" className="h-full text-white mt-">
+            <section id="contact2" className="h-full text-white mt-20">
                 <ContactMe />
             </section>
             <section id="contact" className="h-full text-white mt-80">
@@ -57,11 +57,11 @@ const App = () => {
             </section>
 
             {/* Footer */}
-            <footer style={{fontSize:'0.9rem'}} className='text-white h-20 mt-36 footer'>
-                <div className='text-center'>
-                    <h1 className='font-montserrat'>Ghifari</h1>
-                    <h1>Web Developer</h1>
-                    <p className='text-sm'>Copyright &#169; {new Date().getFullYear()} Ghifari. All rights reserved.</p>
+            <footer className="text-white h-20 mt-36 footer text-sm">
+                <div className="text-center space-y-1">
+                    <h1 className="font-montserrat text-base">Ghifari</h1>
+                    <h1 className="text-base">Web Developer</h1>
+                    <p>Copyright &#169; {new Date().getFullYear()} Ghifari. All rights reserved.</p>
                 </div>
             </footer>
         </div>

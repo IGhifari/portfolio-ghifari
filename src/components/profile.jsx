@@ -1,6 +1,6 @@
 import React from 'react';
 import TypeIt from "typeit-react";
-import './components.css';
+import '../styles/Components.css';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { Link } from 'react-scroll';
 const Home = () => {

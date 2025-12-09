@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import TypeIt from 'typeit-react';
 import { FaUserGraduate, FaCode, FaLaptopCode, FaRocket, FaStar } from 'react-icons/fa';
-import './components.css';
+import '../styles/Components.css';
 
 /** Hitung umur agar selalu up-to-date */
 function calcAge(birth = '2007-06-05') {

@@ -1,7 +1,7 @@
 import React from 'react';
 import TypeIt from "typeit-react";
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
-import './project.css';
+import '../styles/Project.css';
 const Project = () => {
     const projects = [
         {
