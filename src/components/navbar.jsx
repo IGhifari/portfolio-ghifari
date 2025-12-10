@@ -11,6 +11,7 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  
   return (
     <nav className="fixed top-0 left-0 w-full h-20 flex justify-between items-center bg-black/5 text-white pt-5 shadow-lg z-50 backdrop-blur-sm pb-5">
       <div className="flex gap-5">
