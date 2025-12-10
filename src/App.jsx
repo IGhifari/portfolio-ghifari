@@ -1,18 +1,20 @@
 import React from 'react';
 import './styles/App.css';
 import './styles/Components.css';
-import Navbar from './components/Navbar';
-import Home from './components/Profile';
-import Project from './components/Project';
-import Certificate from './components/Certificate';
+
+import Navbar from './components/navbar';
+import Home from './components/profile';
+import Project from './components/project';
+import Certificate from './components/certificate';
 import AcademicBackground from './components/AcademicBackground';
-import Contact from './components/Contact';
-import Skills from './components/Skill';
-import Story from './components/Story';
-import ParticlesBackground from './components/ParticlesBackground';
+import Contact from './components/contact';
+import Skills from './components/skill';
+import Story from './components/story';
+import ParticlesBackground from './components/particlesBackground';
 import LastUpdated from './components/LastUpdated';
-import ContactMe from './components/ContactMe';
+import ContactMe from './components/contactMe';
 import SoundButton from './components/SoundButton';
+
 const App = () => {
     return (
         <div className='tampilan'>
