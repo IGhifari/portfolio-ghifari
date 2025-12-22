@@ -123,8 +123,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Ghifari**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [@IGhifari](https://github.com/IGhifari)
 
 ---
 
