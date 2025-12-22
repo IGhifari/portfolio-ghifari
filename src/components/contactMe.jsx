@@ -6,6 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import emailjs from "@emailjs/browser";
 
 const ContactMe = () => {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
     const [formData, setFormData] = useState({
         emailto: "Ghifari",
         name: "",
@@ -26,11 +29,24 @@ const ContactMe = () => {
         setIsSubmitting(true);
 
         try {
+            if (!serviceId || !templateId || !publicKey) {
+                toast.error("Email service is not configured.", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+                return;
+            }
             await emailjs.send(
-                "service_6o774kk",
-                "template_bnv8u1l",
+                serviceId,
+                templateId,
                 formData,
-                "GqVOYhFpjcBlS7ZsT"
+                publicKey
             );
 
             toast.success('Message sent successfully! 🎉', {
