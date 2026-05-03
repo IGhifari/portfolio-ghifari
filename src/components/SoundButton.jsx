@@ -46,6 +46,14 @@ const songs = [
         color: "#FFE500",
     },
     {
+        title: "Monolog",
+        artist: "Pamungkas",
+        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8qVUgkHMIz72PLnsBgHLQb8Iz3x0tLTr56OjBXFOx2w&s=10",
+        audio: "monolog.mp3",
+        duration: 281,
+        color: "#FFE500",
+    },
+    {
         title: "Salvatore",
         artist: "Lana Del Rey",
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
