@@ -52,6 +52,14 @@ const Project = () => {
             tags: ["React", "TypeScript", "Express", "Prisma", "PostgreSQL"],
             github: "https://github.com/IGhifari/web-food",
             live: "https://food-liart-one.vercel.app"
+        },
+        {
+            title: "Project Management",
+            description: "A comprehensive project management tool designed to streamline team collaboration, task tracking, and workflow optimization.",
+            image: "project_management.png",
+            tags: ["React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "ExpressJS"],
+            github: "https://github.com/user/project-management-system",
+            live: "-"
         }
     ];
 

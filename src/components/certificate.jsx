@@ -27,6 +27,23 @@ const Certificate = () => {
             date: "2023",
             image: "idn.jpg",
             skills: ["HTML", "CSS", "PHP"]
+        },
+        {
+            title: "Internship - Frontend Developer",
+            issuer: "PT. AMA Salam Indonesia",
+            date: "1 October 2025 - 27 February 2026",
+            image: "ama_salam.jpeg",
+            skills: [
+                "React",
+                "Tailwind CSS",
+                "Typescript",
+                "PostgreSQL",
+                "Web Development",
+                "Project Management System",
+                "Website Optimization",
+                "Refactoring",
+                "Lighthouse"
+            ],
         }
     ];
 
