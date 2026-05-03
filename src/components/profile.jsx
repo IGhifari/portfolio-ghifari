@@ -3,8 +3,10 @@ import TypeIt from "typeit-react";
 import '../styles/Components.css';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { Link } from 'react-scroll';
+import { useTheme } from '../context/ThemeContext';
 
 const Home = () => {
+    const { isDark } = useTheme();
     return (
         <div className='min-h-screen w-full flex items-center' style={{ paddingTop: '64px' }}>
             <div className='profile z-10 w-full max-w-5xl mx-auto px-6 md:px-12 py-16'>
@@ -46,8 +48,8 @@ const Home = () => {
                     <p
                         className='text-lg max-w-2xl leading-relaxed font-grotesk'
                         style={{
-                            color: 'var(--nb-black)',
-                            borderLeft: '4px solid var(--nb-black)',
+                            color: isDark ? '#E0E0E0' : 'var(--nb-black)',
+                            borderLeft: isDark ? '4px solid #E0E0E0' : '4px solid var(--nb-black)',
                             paddingLeft: '16px',
                             marginTop: '8px',
                         }}
@@ -93,22 +95,22 @@ const Home = () => {
                                 aria-label={label}
                                 className="w-10 h-10 flex items-center justify-center transition-all duration-150"
                                 style={{
-                                    border: 'var(--nb-border)',
-                                    background: 'var(--nb-white)',
-                                    boxShadow: 'var(--nb-shadow-hover)',
-                                    color: 'var(--nb-black)',
+                                    border: isDark ? '3px solid #E0E0E0' : 'var(--nb-border)',
+                                    background: isDark ? '#1C1C1C' : 'var(--nb-white)',
+                                    boxShadow: isDark ? '2px 2px 0px #CC0000' : 'var(--nb-shadow-hover)',
+                                    color: isDark ? '#E0E0E0' : 'var(--nb-black)',
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.background = 'var(--nb-black)';
-                                    e.currentTarget.style.color = 'var(--nb-yellow)';
+                                    e.currentTarget.style.background = isDark ? '#CC0000' : 'var(--nb-black)';
+                                    e.currentTarget.style.color = '#fff';
                                     e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                                    e.currentTarget.style.boxShadow = 'var(--nb-shadow)';
+                                    e.currentTarget.style.boxShadow = isDark ? '4px 4px 0px #CC0000' : 'var(--nb-shadow)';
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.background = 'var(--nb-white)';
-                                    e.currentTarget.style.color = 'var(--nb-black)';
+                                    e.currentTarget.style.background = isDark ? '#1C1C1C' : 'var(--nb-white)';
+                                    e.currentTarget.style.color = isDark ? '#E0E0E0' : 'var(--nb-black)';
                                     e.currentTarget.style.transform = 'translate(0,0)';
-                                    e.currentTarget.style.boxShadow = 'var(--nb-shadow-hover)';
+                                    e.currentTarget.style.boxShadow = isDark ? '2px 2px 0px #CC0000' : 'var(--nb-shadow-hover)';
                                 }}
                             >
                                 {icon}

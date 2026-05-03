@@ -102,8 +102,8 @@ const Certificate = () => {
                                     {cert.title}
                                 </h3>
                             </div>
-                            <p className="text-sm font-bold font-mono mb-1" style={{ color: '#333' }}>{cert.issuer}</p>
-                            <p className="text-xs font-mono mb-4 opacity-60" style={{ color: 'var(--nb-black)' }}>{cert.date}</p>
+                            <p className="text-sm font-bold font-mono mb-1" style={{ color: 'inherit' }}>{cert.issuer}</p>
+                            <p className="text-xs font-mono mb-4 opacity-60" style={{ color: 'inherit' }}>{cert.date}</p>
                             <div className="flex flex-wrap gap-2">
                                 {cert.skills.map((skill, skillIndex) => (
                                     <span key={skillIndex} className="nb-tag">{skill}</span>

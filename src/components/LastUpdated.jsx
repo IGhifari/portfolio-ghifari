@@ -3,7 +3,7 @@ import { FaClock } from 'react-icons/fa';
 
 const LastUpdated = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const [lastUpdated, setLastUpdated] = useState('2025-12-10');
+    const [lastUpdated, setLastUpdated] = useState('2026-05-03');
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -12,7 +12,7 @@ const LastUpdated = () => {
     };
 
     return (
-        <div className="last-updated-container">
+        <div className="last-updated-container sm:ml-3 pl-8 md:ml-2">
             <div className={`last-updated-content ${isVisible ? 'show-update' : ''}`}>
                 <FaClock
                     className="clock-icon cursor-pointer"

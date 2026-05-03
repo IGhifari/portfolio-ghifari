@@ -67,7 +67,7 @@ const Project = () => {
                         boxShadow: 'var(--nb-shadow)',
                         display: 'inline-block',
                         padding: '8px 24px',
-                        color: 'var(--nb-black)',
+                        color: 'inherit',
                     }}
                 >
                     <TypeIt
@@ -142,13 +142,13 @@ const Project = () => {
                         <div className="p-5">
                             <h3
                                 className="text-lg font-black font-grotesk mb-2"
-                                style={{ color: 'var(--nb-black)' }}
+                                style={{ color: 'inherit' }}
                             >
                                 {project.title}
                             </h3>
                             <p
                                 className="text-sm mb-4 leading-relaxed"
-                                style={{ color: '#333' }}
+                                style={{ color: 'inherit' }}
                             >
                                 {project.description}
                             </p>

@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 /* ============================================
-   NEO-BRUTALISM DESIGN SYSTEM
+   NEO-BRUTALISM DESIGN SYSTEM — LIGHT MODE
    ============================================ */
-:root {
+:root,
+[data-theme="light"] {
   --nb-cream: #FFFBF0;
   --nb-yellow: #FFE500;
   --nb-red: #FF3B3B;
@@ -16,6 +17,166 @@
   --nb-shadow-lg: 6px 6px 0px #0a0a0a;
   --nb-shadow-hover: 2px 2px 0px #0a0a0a;
 }
+
+/* ============================================
+   DARK MODE — Rocky battlefield: #0D0D0D bg,
+   red (#CC0000) shadows, white text/borders.
+   --nb-black stays #0a0a0a (true black).
+   --nb-yellow → #F0F0F0 (white highlight).
+   ============================================ */
+[data-theme="dark"] {
+  --nb-cream:        #0D0D0D;
+  --nb-yellow:       #F0F0F0;   /* white — yellow elements become clean white */
+  --nb-red:          #CC0000;   /* blood red accent */
+  --nb-black:        #0a0a0a;   /* stays true black */
+  --nb-white:        #1C1C1C;   /* dark cards */
+  --nb-border:       3px solid #E0E0E0;
+  --nb-shadow:       4px 4px 0px #CC0000;
+  --nb-shadow-lg:    6px 6px 0px #CC0000;
+  --nb-shadow-hover: 2px 2px 0px #CC0000;
+}
+
+[data-theme="dark"] body {
+  background-color: #0D0D0D;
+  color: #E0E0E0;
+}
+
+/* Fix: body color var uses --nb-black which stays black in dark — override explicitly */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ---- dot sections ---- */
+[data-theme="dark"] .nb-dot-pattern {
+  background-color: #111111;
+  background-image: radial-gradient(circle, #2a2a2a 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ---- footer ---- */
+[data-theme="dark"] .nb-footer {
+  background: #0a0a0a;
+  border-top: 3px solid #E0E0E0;
+}
+[data-theme="dark"] .nb-footer h1,
+[data-theme="dark"] .nb-footer p { color: #F0F0F0; }
+
+/* ---- last updated ---- */
+[data-theme="dark"] .last-updated-content {
+  background: #1C1C1C;
+  border: 2px solid #E0E0E0;
+  color: #F0F0F0;
+}
+[data-theme="dark"] .last-updated-content:hover {
+  background: #CC0000;
+  color: #fff;
+}
+
+/* ---- inputs ---- */
+[data-theme="dark"] .nb-input {
+  background: #1C1C1C;
+  border: 3px solid #E0E0E0;
+  color: #E0E0E0;
+  box-shadow: inset 2px 2px 0px rgba(255,255,255,0.04);
+}
+[data-theme="dark"] .nb-input:focus {
+  box-shadow: inset 2px 2px 0px rgba(255,255,255,0.08), 0 0 0 3px #CC0000;
+}
+[data-theme="dark"] .nb-input::placeholder { color: #555; }
+
+/* ---- timeline line ---- */
+[data-theme="dark"] .timeline-container::before { background: #E0E0E0; }
+
+/* ---- tags: red on dark ---- */
+[data-theme="dark"] .nb-tag {
+  background: #CC0000;
+  border: 2px solid #E0E0E0;
+  color: #fff;
+}
+
+/* ---- hero badge: white bg + dark text ---- */
+[data-theme="dark"] .nb-hero-badge {
+  background: #F0F0F0;
+  color: #0a0a0a;
+  border: 3px solid #E0E0E0;
+}
+
+/* ---- section headers that use yellow bg ---- */
+[data-theme="dark"] .nb-section-header {
+  background: #CC0000;
+  color: #fff;
+  border-color: #E0E0E0;
+}
+
+/* ---- project / certificate cards ---- */
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .certificate-card {
+  background: #1C1C1C;
+  border: 3px solid #E0E0E0;
+  box-shadow: 6px 6px 0px #CC0000;
+}
+[data-theme="dark"] .project-card:hover,
+[data-theme="dark"] .certificate-card:hover {
+  box-shadow: 9px 9px 0px #CC0000;
+}
+
+/* ---- skill swiper ---- */
+[data-theme="dark"] .swiper-slide {
+  background: #1C1C1C !important;
+  border: 3px solid #E0E0E0 !important;
+  box-shadow: 6px 6px 0px #CC0000 !important;
+}
+
+/* ---- timeline content cards ---- */
+[data-theme="dark"] .timeline-content {
+  background: #1C1C1C;
+  border: 3px solid #E0E0E0;
+  box-shadow: 4px 4px 0px #CC0000;
+}
+[data-theme="dark"] .timeline-icon {
+  border: 3px solid #E0E0E0;
+}
+
+/* ---- contact items ---- */
+[data-theme="dark"] .nb-contact-item {
+  background: #1C1C1C;
+  border: 3px solid #E0E0E0;
+  box-shadow: 4px 4px 0px #CC0000;
+}
+
+/* ---- GLOBAL TEXT FIX — !important overrides inline styles ---- */
+/* Hero name */
+[data-theme="dark"] .nb-hero-name { color: #F0F0F0 !important; }
+
+/* Generic headings/text inside dark bg sections */
+[data-theme="dark"] .project-card h3,
+[data-theme="dark"] .certificate-card h3 { color: #F0F0F0 !important; }
+
+[data-theme="dark"] .project-card p,
+[data-theme="dark"] .certificate-card p  { color: #bbb !important; }
+
+/* Skill swiper text */
+[data-theme="dark"] .swiper-slide h1,
+[data-theme="dark"] .swiper-slide h2,
+[data-theme="dark"] .swiper-slide span { color: #E0E0E0 !important; }
+[data-theme="dark"] .swiper-slide li   { color: #E0E0E0 !important; border-color: #444 !important; }
+
+/* Timeline story cards */
+[data-theme="dark"] .timeline-content p,
+[data-theme="dark"] .timeline-content strong { color: #D0D0D0 !important; }
+
+/* Contact section */
+[data-theme="dark"] .nb-contact-item h3 { color: #F0F0F0 !important; }
+[data-theme="dark"] .nb-contact-item p  { color: #aaa !important; }
+
+/* Academic section */
+[data-theme="dark"] .container h2 { color: #F0F0F0 !important; }
+[data-theme="dark"] .container p,
+[data-theme="dark"] .container li,
+[data-theme="dark"] .container div { color: #D0D0D0; }
+
+/* Section sub-text */
+[data-theme="dark"] .font-grotesk { color: inherit; }
 
 *,
 *::before,
@@ -40,6 +201,11 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+}
+
+/* dark mode: --nb-black stays #0a0a0a, so override text explicitly */
+[data-theme="dark"] body {
+  color: #E0E0E0;
 }
 
 /* ============================================
