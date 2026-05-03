@@ -1,26 +1,16 @@
-.swiper {
-    width: 300px;
-    height: 440px;
+/* Skill Swiper Neo-Brutalism */
+.mySwiper {
+  width: 280px;
+  height: 400px;
 }
 
 .swiper-slide {
-    display: flex;
-    border-radius: 15px;
-    color: #fff;
+  background: #FFFFFF !important;
+  border: 3px solid #0a0a0a !important;
+  box-shadow: 6px 6px 0px #0a0a0a !important;
+  border-radius: 0 !important;
 }
 
-.swiper-slide:nth-child(1n) {
-    background-color:  #191919;
-    }
-    
-    .swiper-slide:nth-child(2n) {
-        background-color:  #191919;
-    }
-    
-    .swiper-slide:nth-child(3n) {
-        background-color:  #191919;
-    }
-    
-    .swiper-slide:nth-child(4n) {
-        background-color:  #191919;
-    }
+.swiper-slide-active {
+  box-shadow: 8px 8px 0px #0a0a0a !important;
+}

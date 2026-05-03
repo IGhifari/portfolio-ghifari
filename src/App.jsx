@@ -10,60 +10,74 @@ import AcademicBackground from './components/AcademicBackground';
 import Contact from './components/contact';
 import Skills from './components/skill';
 import Story from './components/story';
-import ParticlesBackground from './components/particlesBackground';
 import LastUpdated from './components/LastUpdated';
 import ContactMe from './components/contactMe';
 import SoundButton from './components/SoundButton';
 
 const App = () => {
     return (
-        <div className='tampilan'>
-            <div className="absolute top-0 left-0 w-full h-full -z-10">
-                <ParticlesBackground />
-            </div>
+        <div className='tampilan' style={{ background: 'var(--nb-cream)', minHeight: '100vh' }}>
 
             <LastUpdated />
             <SoundButton />
             <Navbar />
-            <section id="profile" className="h-full text-white">
+
+            {/* Hero */}
+            <section id="profile" className="min-h-screen">
                 <Home/>
             </section>
-            <section id="projects" className="h-full text-white">
+
+            {/* Projects */}
+            <section id="projects" className="py-16 nb-dot-pattern">
                 <Project/>
             </section>
-            <section id="certificates" className="h-full text-white">
+
+            {/* Certificates */}
+            <section id="certificates" className="py-16" style={{ background: 'var(--nb-cream)' }}>
                 <Certificate/>
             </section>
-            <section className="text-white pb-48 min-h-[700px]">
-                <div className="mt-72 md:mt-10">
-                    <div className="flex items-center pl-14">
-                        <div className="w-12 border-b-2 border-white" />
-                        <h3 className="pl-3 text-xl">Skills</h3>
+
+            {/* Skills */}
+            <section className="py-16 nb-dot-pattern">
+                <div className="mt-10 md:mt-10">
+                    <div className="flex items-center pl-8 md:pl-14 mb-6">
+                        <div className="w-8 h-1 bg-nb-black mr-3" style={{ background: 'var(--nb-black)' }} />
+                        <h3 className="text-xl font-bold font-grotesk" style={{ color: 'var(--nb-black)' }}>SKILLS</h3>
                     </div>
                     <div>
                         <Skills/>
                     </div>
                 </div>
             </section>
-            <section className="h-screen text-white flex text-center justify-center mt-44">
+
+            {/* Story / Career Path */}
+            <section className="min-h-screen flex text-center justify-center" style={{ background: 'var(--nb-cream)' }}>
                 <Story/>
             </section>
-            <section id="AcademicBackground" className="h-full mt-80 text-white flex items-center justify-center academic-background">
+
+            {/* Academic Background */}
+            <section id="AcademicBackground" className="min-h-screen flex items-center justify-center academic-background nb-dot-pattern">
                 <AcademicBackground/>
             </section>
-            <section id="contact2" className="h-full text-white mt-20">
+
+            {/* Contact Form */}
+            <section id="contact2" className="py-16" style={{ background: 'var(--nb-cream)' }}>
                 <ContactMe />
             </section>
-            <section id="contact" className="h-full text-white mt-80">
+
+            {/* Contact Info */}
+            <section id="contact" className="py-16 nb-dot-pattern">
                 <Contact/>
             </section>
 
             {/* Footer */}
-            <footer className="text-white h-20 mt-36 footer text-sm">
+            <footer className="nb-footer h-24 flex items-center justify-center">
                 <div className="text-center space-y-1">
-                    <h1 className="font-montserrat text-base">Ghifari</h1>
-                    <h1 className="text-base">Web Developer</h1>
-                    <p>Copyright &#169; {new Date().getFullYear()} Ghifari. All rights reserved.</p>
+                    <h1 className="font-grotesk font-bold text-lg" style={{ color: 'var(--nb-yellow)' }}>GHIFARI</h1>
+                    <p className="font-mono text-sm" style={{ color: 'var(--nb-yellow)' }}>Web Developer</p>
+                    <p className="font-mono text-xs opacity-60" style={{ color: 'var(--nb-yellow)' }}>
+                        © {new Date().getFullYear()} Ghifari. All rights reserved.
+                    </p>
                 </div>
             </footer>
         </div>

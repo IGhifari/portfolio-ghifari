@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import TypeIt from "typeit-react";
 import { FaAward, FaExternalLinkAlt, FaTimes } from 'react-icons/fa';
 import '../styles/Certificate.css';
-import { div } from 'framer-motion/client';
 
 const Certificate = () => {
     const [selectedImage, setSelectedImage] = useState(null);
-    
+
     const certificates = [
         {
             title: "National Game Creation Competition",
@@ -31,70 +30,83 @@ const Certificate = () => {
         }
     ];
 
-    const handleImageClick = (image) => {
-        setSelectedImage(image);
-    };
-
     return (
-        <div className="container mx-auto px-4 py-16 relative">
-            <h1 className="text-4xl font-bold text-center mb-12 hover:text-cyan-400 duration-500 transition-all ease-in-out">
-                <TypeIt
-                    options={{ loop: true, loopDelay: 2000, speed: 100 }}
-                    getBeforeInit={(instance) => {
-                        instance
-                            .type("Certificates")
-                            .pause(750)
-                            .delete(12)
-                            .pause(700)
-                            .type("Sertifikat")
-                            .pause(750)
-                            .delete(10)
-                            .pause(700)
-                            .type("証明書")
-                        return instance;
+        <div className="container mx-auto px-6 py-16 relative">
+            {/* Section header */}
+            <div className="mb-12 flex flex-col items-center">
+                <h1
+                    className="text-4xl md:text-5xl font-black font-grotesk text-center"
+                    style={{
+                        background: 'var(--nb-red)',
+                        border: 'var(--nb-border)',
+                        boxShadow: 'var(--nb-shadow)',
+                        display: 'inline-block',
+                        padding: '8px 24px',
+                        color: 'white',
                     }}
-                />
-            </h1>
+                >
+                    <TypeIt
+                        options={{ loop: true, loopDelay: 2000, speed: 100 }}
+                        getBeforeInit={(instance) => {
+                            instance
+                                .type("CERTIFICATES")
+                                .pause(750)
+                                .delete(12)
+                                .pause(700)
+                                .type("SERTIFIKAT")
+                                .pause(750)
+                                .delete(10)
+                                .pause(700)
+                                .type("証明書")
+                            return instance;
+                        }}
+                    />
+                </h1>
+                <div style={{ width: '100%', height: '3px', background: 'var(--nb-black)', marginTop: '4px', maxWidth: '220px' }} />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {certificates.map((cert, index) => (
-                    <div
-                        key={index}
-                        className="certificate-card bg-black/30 backdrop-blur-sm rounded-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 border border-cyan-500/20"
-                    >
-                        <div className="relative group">
+                    <div key={index} className="certificate-card">
+                        <div className="relative group" style={{ borderBottom: 'var(--nb-border)' }}>
                             <img
                                 src={cert.image}
                                 alt={cert.title}
                                 className="w-full h-48 object-cover"
                             />
-                            <div className="absolute inset-0 bg-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                                style={{ background: 'rgba(255,59,59,0.85)' }}
+                            >
                                 <button
-                                    onClick={() => handleImageClick(cert.image)}
-                                    className="bg-black/70 p-3 rounded-full hover:bg-cyan-500 transition-colors duration-300"
+                                    onClick={() => setSelectedImage(cert.image)}
+                                    className="w-12 h-12 flex items-center justify-center transition-all duration-150"
+                                    style={{
+                                        background: 'var(--nb-white)',
+                                        border: 'var(--nb-border)',
+                                        boxShadow: 'var(--nb-shadow-hover)',
+                                        color: 'var(--nb-black)',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow-hover)'; }}
                                 >
-                                    <FaExternalLinkAlt className="text-white text-xl" />
+                                    <FaExternalLinkAlt size={16} />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="p-6">
-                            <div className="flex items-center gap-2 mb-2">
-                                <FaAward className="text-cyan-400" />
-                                <h3 className="text-xl font-semibold text-cyan-400">
+                        <div className="p-5">
+                            <div className="flex items-start gap-2 mb-2">
+                                <FaAward size={20} style={{ color: 'var(--nb-red)', marginTop: '2px', flexShrink: 0 }} />
+                                <h3 className="text-base font-black font-grotesk" style={{ color: 'var(--nb-black)' }}>
                                     {cert.title}
                                 </h3>
                             </div>
-                            <p className="text-gray-300 mb-2">{cert.issuer}</p>
-                            <p className="text-gray-400 text-sm mb-4">{cert.date}</p>
+                            <p className="text-sm font-bold font-mono mb-1" style={{ color: '#333' }}>{cert.issuer}</p>
+                            <p className="text-xs font-mono mb-4 opacity-60" style={{ color: 'var(--nb-black)' }}>{cert.date}</p>
                             <div className="flex flex-wrap gap-2">
                                 {cert.skills.map((skill, skillIndex) => (
-                                    <span
-                                        key={skillIndex}
-                                        className="px-3 py-1 text-sm bg-cyan-500/20 text-cyan-400 rounded-full"
-                                    >
-                                        {skill}
-                                    </span>
+                                    <span key={skillIndex} className="nb-tag">{skill}</span>
                                 ))}
                             </div>
                         </div>
@@ -102,20 +114,29 @@ const Certificate = () => {
                 ))}
             </div>
 
-            {/* Modal for displaying full certificate */}
+            {/* Modal */}
             {selectedImage && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-                    <div className="relative max-w-4xl w-full mx-4">
+                <div
+                    className="fixed inset-0 flex items-center justify-center z-50"
+                    style={{ background: 'rgba(10,10,10,0.85)' }}
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div
+                        className="relative max-w-4xl w-full mx-4"
+                        style={{ border: '4px solid var(--nb-black)', boxShadow: '8px 8px 0px var(--nb-yellow)' }}
+                        onClick={e => e.stopPropagation()}
+                    >
                         <button
                             onClick={() => setSelectedImage(null)}
-                            className="absolute -top-12 right-0 text-white hover:text-cyan-400 transition-colors"
+                            className="absolute -top-12 right-0 flex items-center gap-2 font-mono font-bold text-sm"
+                            style={{ color: 'var(--nb-yellow)' }}
                         >
-                            <FaTimes size={24} />
+                            <FaTimes size={20} /> CLOSE
                         </button>
                         <img
                             src={selectedImage}
-                            alt="Certificate"
-                            className="w-full h-auto rounded-lg"
+                            alt="Certificate full view"
+                            className="w-full h-auto"
                         />
                     </div>
                 </div>

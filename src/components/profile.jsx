@@ -3,65 +3,124 @@ import TypeIt from "typeit-react";
 import '../styles/Components.css';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { Link } from 'react-scroll';
-const Home = () => {
 
-  
+const Home = () => {
     return (
-        <div className='min-h-screen w-full relative flex items-center justify-center'>
-            <div className='text-white profile z-10 max-w-4xl mx-auto px-4 py-16'>
+        <div className='min-h-screen w-full flex items-center' style={{ paddingTop: '64px' }}>
+            <div className='profile z-10 w-full max-w-5xl mx-auto px-6 md:px-12 py-16'>
                 <div className='space-y-6'>
-                    <div className='space-y-2'>
-                        <h3 className='text-cyan-400 text-xl'>Hello, I'm</h3>
-                        <h3 className='text-4xl font-bold tracking-wider'>M.Ghifari Bima Khadafi</h3>
-                        <h1 className='text-3xl font-montserrat text-gray-300'>
-                            <TypeIt  
-                                options={{ loop: true, loopDelay: 2000, speed: 100 }} 
+
+                    {/* Badge */}
+                    <div>
+                        <span className="nb-hero-badge">
+                            👋 Hello, I'm
+                        </span>
+                    </div>
+
+                    {/* Name */}
+                    <div>
+                        <h1 className="nb-hero-name">
+                            M.Ghifari<br/>Bima Khadafi
+                        </h1>
+                    </div>
+
+                    {/* TypeIt Role */}
+                    <div>
+                        <div className="nb-typeit-wrapper inline-block">
+                            <TypeIt
+                                options={{ loop: true, loopDelay: 2000, speed: 100 }}
                                 getBeforeInit={(instance) => {
                                     instance
-                                        .type("Web Developer") 
+                                        .type("Web Developer")
                                         .pause(750)
-                                        .delete(19)
+                                        .delete(13)
                                         .pause(700)
                                         .type("Student")
                                     return instance;
                                 }}
-                            /> 
-                        </h1>
+                            />
+                        </div>
                     </div>
-                    
-                    <p className='text-lg text-gray-300 max-w-2xl leading-relaxed'>
-                        A passionate beginer web developer focused on creating beautiful, 
-                        responsive websites. Currently exploring new technologies 
+
+                    {/* Description */}
+                    <p
+                        className='text-lg max-w-2xl leading-relaxed font-grotesk'
+                        style={{
+                            color: 'var(--nb-black)',
+                            borderLeft: '4px solid var(--nb-black)',
+                            paddingLeft: '16px',
+                            marginTop: '8px',
+                        }}
+                    >
+                        A passionate beginner web developer focused on creating beautiful,
+                        responsive websites. Currently exploring new technologies
                         and expanding my skillset.
                     </p>
 
-                    <div className='flex gap-6 pt-4'>
-                        <button className='px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-all duration-300'>
-                            Download CV
-                        </button>
-                        <Link 
-                            to="contact2" 
-                            smooth={true} 
-                            duration={500} 
-                            className='px-6 py-3 border border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-white rounded-lg transition-all duration-300 cursor-pointer'
+                    {/* CTA Buttons */}
+                    <div className='flex flex-wrap gap-4 pt-2'>
+                        <a
+                            href="/cv.pdf"
+                            download
+                            className="nb-btn px-6 py-3 font-grotesk font-bold text-sm"
+                            style={{ background: 'var(--nb-black)', color: 'var(--nb-yellow)' }}
                         >
-                            Contact Me
+                            ↓ Download CV
+                        </a>
+                        <Link
+                            to="contact2"
+                            smooth={true}
+                            duration={500}
+                            className='nb-btn px-6 py-3 font-grotesk font-bold text-sm cursor-pointer'
+                            style={{ background: 'var(--nb-yellow)', color: 'var(--nb-black)' }}
+                        >
+                            Contact Me →
                         </Link>
                     </div>
 
-                    <div className='flex gap-4 pt-6'>
-                        <a href="https://github.com/IGhifari" target="_blank" rel="noopener noreferrer"
-                           className='text-gray-400 hover:text-white transition-colors duration-300'>
-                            <FaGithub size={24} />
-                        </a>
-                        <a href="https://www.linkedin.com/in/ighifari/" target="_blank" rel="noopener noreferrer"
-                           className='text-gray-400 hover:text-white transition-colors duration-300'>
-                            <FaLinkedin size={24} />
-                        </a>
-                        <a href="https://www.instagram.com/ghfrriii/" target="_blank" rel="noopener noreferrer"
-                           className='text-gray-400 hover:text-white transition-colors duration-300'>
-                            <FaInstagram size={24} />
-                        </a>
+                    {/* Social Icons */}
+                    <div className='flex gap-3 pt-4'>
+                        {[
+                            { href: "https://github.com/IGhifari", icon: <FaGithub size={20} />, label: "GitHub" },
+                            { href: "https://www.linkedin.com/in/ighifari/", icon: <FaLinkedin size={20} />, label: "LinkedIn" },
+                            { href: "https://www.instagram.com/ghfrriii/", icon: <FaInstagram size={20} />, label: "Instagram" },
+                        ].map(({ href, icon, label }) => (
+                            <a
+                                key={href}
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={label}
+                                className="w-10 h-10 flex items-center justify-center transition-all duration-150"
+                                style={{
+                                    border: 'var(--nb-border)',
+                                    background: 'var(--nb-white)',
+                                    boxShadow: 'var(--nb-shadow-hover)',
+                                    color: 'var(--nb-black)',
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.background = 'var(--nb-black)';
+                                    e.currentTarget.style.color = 'var(--nb-yellow)';
+                                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                                    e.currentTarget.style.boxShadow = 'var(--nb-shadow)';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.background = 'var(--nb-white)';
+                                    e.currentTarget.style.color = 'var(--nb-black)';
+                                    e.currentTarget.style.transform = 'translate(0,0)';
+                                    e.currentTarget.style.boxShadow = 'var(--nb-shadow-hover)';
+                                }}
+                            >
+                                {icon}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Decorative block */}
+                    <div className="flex items-center gap-4 pt-4">
+                        <div style={{ width: '48px', height: '6px', background: 'var(--nb-red)', border: '2px solid var(--nb-black)' }} />
+                        <div style={{ width: '24px', height: '6px', background: 'var(--nb-yellow)', border: '2px solid var(--nb-black)' }} />
+                        <div style={{ width: '12px', height: '6px', background: 'var(--nb-black)' }} />
                     </div>
                 </div>
             </div>

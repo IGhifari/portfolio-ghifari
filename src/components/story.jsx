@@ -3,7 +3,6 @@ import TypeIt from 'typeit-react';
 import { FaUserGraduate, FaCode, FaLaptopCode, FaRocket, FaStar } from 'react-icons/fa';
 import '../styles/Components.css';
 
-/** Hitung umur agar selalu up-to-date */
 function calcAge(birth = '2007-06-05') {
   const b = new Date(birth);
   const now = new Date();
@@ -13,10 +12,11 @@ function calcAge(birth = '2007-06-05') {
   return age;
 }
 
+const iconColors = ['var(--nb-yellow)', 'var(--nb-red)', 'var(--nb-black)', 'var(--nb-yellow)'];
+
 const Story = () => {
   const timelineRef = useRef(null);
 
-  /** Data timeline versi profesional */
   const items = useMemo(
     () => [
       {
@@ -25,9 +25,9 @@ const Story = () => {
         title: 'About Me',
         content: (
           <>
-            I’m <span className="text-cyan-400">M. Ghifari Bima Khadafi</span> ({calcAge()} y.o.), a Web Developer
-            focusing on building responsive and accessible interfaces with <span className="text-cyan-400">React</span> and
-            robust backends using <span className="text-cyan-400">Express + Prisma</span>. Passionate about clean UI,
+            I'm <strong>M. Ghifari Bima Khadafi</strong> ({calcAge()} y.o.), a Web Developer
+            focusing on building responsive and accessible interfaces with <strong>React</strong> and
+            robust backends using <strong>Express + Prisma</strong>. Passionate about clean UI,
             predictable state, and developer-friendly environments.
           </>
         ),
@@ -39,7 +39,7 @@ const Story = () => {
         content: (
           <>
             Developed core skills in HTML, CSS, JavaScript, and PHP during vocational school at{' '}
-            <span className="text-cyan-400">SMKN 1 Cibinong</span>. Built first projects that sparked an interest in
+            <strong>SMKN 1 Cibinong</strong>. Built first projects that sparked an interest in
             full-stack development and problem-solving.
           </>
         ),
@@ -50,11 +50,9 @@ const Story = () => {
         title: 'Recent Work',
         content: (
           <>
-            <span className="text-cyan-400">Project Food</span> — a menu planning and recipe management app using React,
-            Tailwind, Express, Prisma, and MySQL. Implemented authentication (JWT), React Query for server-state, and
-            form handling with React Hook Form. Also contributed to{' '}
-            <span className="text-cyan-400">Desaku</span>, a village administration platform improving CRUD workflows and
-            UX clarity.
+            <strong>Project Food</strong> — a menu planning and recipe management app using React,
+            Tailwind, Express, Prisma, and MySQL. Also contributed to{' '}
+            <strong>Desaku</strong>, a village administration platform improving CRUD workflows and UX clarity.
           </>
         ),
       },
@@ -64,10 +62,9 @@ const Story = () => {
         title: 'Next Goals',
         content: (
           <>
-            Deepen expertise in <span className="text-cyan-400">Node.js</span> by exploring scalable architecture patterns,
+            Deepen expertise in <strong>Node.js</strong> by exploring scalable architecture patterns,
             performance optimization, and advanced API design. Begin mastering{' '}
-            <span className="text-cyan-400">TypeScript</span> to enhance type safety, maintainability, and code clarity
-            across both frontend and backend projects.
+            <strong>TypeScript</strong> to enhance type safety and code clarity across projects.
           </>
         ),
       },
@@ -75,7 +72,6 @@ const Story = () => {
     []
   );
 
-  /** Intersection Observer untuk animasi scroll masuk */
   useEffect(() => {
     const prefersReduced =
       typeof window !== 'undefined' &&
@@ -102,42 +98,67 @@ const Story = () => {
 
   return (
     <section
-      className="container mx-auto px-4 py-16 story-container bg-gradient-to-b from-transparent to-black/30"
+      className="container mx-auto px-4 py-16 story-container w-full"
       aria-labelledby="story-title"
     >
       <div className="max-w-4xl mx-auto">
-        <header className="glowing-title mb-12 text-center">
+        {/* Header */}
+        <header className="glowing-title mb-16 text-center">
           <h1
             id="story-title"
-            className="text-4xl md:text-5xl font-bold mb-2 hover:text-cyan-400 duration-500 transition-colors ease-in-out"
+            className="text-4xl md:text-5xl font-black font-grotesk inline-block"
+            style={{
+              background: 'var(--nb-black)',
+              color: 'var(--nb-yellow)',
+              border: 'var(--nb-border)',
+              boxShadow: 'var(--nb-shadow)',
+              padding: '8px 24px',
+            }}
             aria-live="polite"
           >
             <TypeIt
               options={{ loop: false, speed: 100 }}
               getBeforeInit={(instance) => {
-                instance.type('Career Path').pause(500).type(' · ').type('Development Journey');
+                instance.type('CAREER PATH').pause(500).type(' · JOURNEY');
                 return instance;
               }}
             />
           </h1>
-          <FaStar className="inline-block text-cyan-400 animate-pulse" aria-hidden="true" />
         </header>
 
         <ol className="timeline-container" ref={timelineRef}>
-          {items.map((item) => (
+          {items.map((item, idx) => (
             <li
               key={item.key}
-              className="timeline-item group focus-within:ring-2 focus-within:ring-cyan-400 rounded-lg outline-none"
+              className="timeline-item group"
             >
-              <div className="timeline-icon">
-                <div className="text-cyan-400 text-2xl group-hover:scale-110 transition-transform" aria-hidden="true">
+              {/* Icon bubble */}
+              <div
+                className="timeline-icon"
+                style={{ background: iconColors[idx], color: idx === 2 ? 'var(--nb-yellow)' : 'var(--nb-black)' }}
+              >
+                <div className="text-xl group-hover:scale-110 transition-transform">
                   {item.icon}
                 </div>
               </div>
 
-              <article className="timeline-content backdrop-blur-sm/30 bg-white/5 border border-white/10 rounded-xl p-4">
-                <h3 className="text-xl font-semibold text-cyan-400 mb-2">{item.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{item.content}</p>
+              {/* Content card */}
+              <article className="timeline-content">
+                <h3
+                  className="text-lg font-black font-grotesk mb-2"
+                  style={{
+                    background: iconColors[idx],
+                    color: idx === 2 ? 'var(--nb-yellow)' : 'var(--nb-black)',
+                    display: 'inline-block',
+                    padding: '2px 10px',
+                    border: '2px solid var(--nb-black)',
+                  }}
+                >
+                  {item.title.toUpperCase()}
+                </h3>
+                <p className="text-sm leading-relaxed font-grotesk mt-3" style={{ color: '#222' }}>
+                  {item.content}
+                </p>
               </article>
             </li>
           ))}

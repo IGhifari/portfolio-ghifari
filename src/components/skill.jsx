@@ -1,183 +1,148 @@
-    import React, { useEffect, useRef } from 'react';
-    import { Swiper, SwiperSlide, } from 'swiper/react';
-    import 'swiper/css';
-    import 'swiper/css/effect-cards';
-    import { EffectCards } from 'swiper/modules';
-    import { IoLogoGithub } from "react-icons/io";
-    import '../styles/Skill.css'
-    import { FaHtml5, FaNode } from "react-icons/fa";
-    import { FaCss3Alt } from "react-icons/fa";
-    import { FaJs } from "react-icons/fa";
-    import { FaReact } from "react-icons/fa";
-    import { TbBrandMysql } from "react-icons/tb";
-    import { RiTailwindCssFill } from "react-icons/ri";
-    import { AiFillOpenAI } from "react-icons/ai";
-    import { FaQuestion } from "react-icons/fa";
-    import { DiVisualstudio } from "react-icons/di";
-    import { FaLaravel } from "react-icons/fa";
-    import { SiPhp } from "react-icons/si";
-    import { SiPostman } from "react-icons/si";
-    import { SiExpress } from "react-icons/si";
-    import { FaNodeJs } from "react-icons/fa";
-    import { BiLogoPostgresql } from "react-icons/bi";
-    const Skills = () =>{
-        return(
-            <div className='mt-10'>
-                <div className='text-sm font-montserrat text-center'>
-                    <h1>LIST OF MY SKILL SET</h1>
-                </div>
-                <Swiper
-                    effect={'cards'}
-                    grabCursor={true}
-                    modules={[EffectCards]}
-                    className="mySwiper mt-7"
-                    >
-                    <SwiperSlide className=' '>
-                        <div className='w-full'>
-                            <div className='mt-7 mb-7'>
-                                <div className=' w-full flex justify-center items-center '>
-                                    <h1 className='font-bold text-3xl'>Frontend</h1>
-                                </div>
-                                <div style={{fontSize:'0.5rem'}} className='w-full flex justify-center text-sm font-montserrat text-yellow-400'>
-                                    <h1>SCROLL LIST TO SEE MORE</h1>
-                                </div>
+import React, { useEffect, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/effect-cards';
+import { EffectCards } from 'swiper/modules';
+import { IoLogoGithub } from "react-icons/io";
+import '../styles/Skill.css';
+import { FaHtml5, FaNode } from "react-icons/fa";
+import { FaCss3Alt } from "react-icons/fa";
+import { FaJs } from "react-icons/fa";
+import { FaReact } from "react-icons/fa";
+import { TbBrandMysql } from "react-icons/tb";
+import { RiTailwindCssFill } from "react-icons/ri";
+import { AiFillOpenAI } from "react-icons/ai";
+import { FaQuestion } from "react-icons/fa";
+import { DiVisualstudio } from "react-icons/di";
+import { FaLaravel } from "react-icons/fa";
+import { SiPhp } from "react-icons/si";
+import { SiPostman } from "react-icons/si";
+import { SiExpress } from "react-icons/si";
+import { FaNodeJs } from "react-icons/fa";
+import { BiLogoPostgresql } from "react-icons/bi";
+
+const sliderHeaderStyle = {
+    background: 'var(--nb-yellow)',
+    border: 'var(--nb-border)',
+    boxShadow: 'var(--nb-shadow-hover)',
+    display: 'inline-block',
+    padding: '4px 16px',
+    fontFamily: 'Space Grotesk, sans-serif',
+    fontWeight: 800,
+    fontSize: '1.5rem',
+    color: 'var(--nb-black)',
+};
+
+const listItemStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '8px 0',
+    borderBottom: '2px solid var(--nb-black)',
+    color: 'var(--nb-black)',
+    fontFamily: 'Space Grotesk, sans-serif',
+    fontWeight: 600,
+};
+
+const Skills = () => {
+    const slides = [
+        {
+            title: 'Frontend',
+            color: 'var(--nb-yellow)',
+            items: [
+                { icon: <FaHtml5 size={24} />, name: 'HTML' },
+                { icon: <FaCss3Alt size={24} />, name: 'CSS' },
+                { icon: <FaJs size={24} />, name: 'JavaScript' },
+                { icon: <FaReact size={24} />, name: 'React' },
+                { icon: <RiTailwindCssFill size={24} />, name: 'Tailwind CSS' },
+                { icon: <SiPhp size={23} />, name: 'PHP' },
+                { icon: <FaLaravel size={23} />, name: 'Laravel' },
+            ],
+            description: 'Building responsive UIs with modern frameworks and tools.',
+        },
+        {
+            title: 'Backend',
+            color: 'var(--nb-red)',
+            items: [
+                { icon: <TbBrandMysql size={24} />, name: 'MySQL' },
+                { icon: <SiExpress size={24} />, name: 'Express.JS' },
+                { icon: <FaNode size={24} />, name: 'Node.JS' },
+                { icon: <BiLogoPostgresql size={24} />, name: 'PostgreSQL' },
+                { icon: <FaLaravel size={24} />, name: 'Laravel' },
+                { icon: <FaQuestion size={24} />, name: 'Soon...' },
+            ],
+            description: 'Handling server-side logic and database interactions securely.',
+        },
+        {
+            title: 'Utilities',
+            color: 'var(--nb-black)',
+            textColor: 'var(--nb-yellow)',
+            items: [
+                { icon: <AiFillOpenAI size={24} />, name: 'Open AI' },
+                { icon: <DiVisualstudio size={24} />, name: 'VS Code' },
+                { icon: <IoLogoGithub size={24} />, name: 'GitHub' },
+                { icon: <SiPostman size={24} />, name: 'Postman' },
+                { icon: <FaQuestion size={24} />, name: 'Soon...' },
+                { icon: <FaQuestion size={24} />, name: 'Soon...' },
+            ],
+            description: 'Tools and utilities for efficient development workflows.',
+        },
+    ];
+
+    return (
+        <div className='mt-6 flex flex-col items-center'>
+            <p className='text-xs font-mono font-bold text-center mb-6' style={{ color: 'var(--nb-black)', letterSpacing: '0.1em' }}>
+                — SWIPE CARDS TO SEE MORE —
+            </p>
+            <Swiper
+                effect={'cards'}
+                grabCursor={true}
+                modules={[EffectCards]}
+                className="mySwiper"
+            >
+                {slides.map((slide, idx) => (
+                    <SwiperSlide key={idx}>
+                        <div className='w-full h-full flex flex-col' style={{ background: 'var(--nb-white)' }}>
+                            {/* Card header */}
+                            <div
+                                className='flex items-center justify-center py-5'
+                                style={{ background: slide.color, borderBottom: 'var(--nb-border)' }}
+                            >
+                                <h2
+                                    className='font-black text-2xl font-grotesk'
+                                    style={{ color: slide.textColor || 'var(--nb-black)' }}
+                                >
+                                    {slide.title.toUpperCase()}
+                                </h2>
                             </div>
-                            <div className=' m-2 h-60 overflow-y-auto text-sm'>
-                                <div className=" h-56 overflow-y-auto  border-yellow-300 text-sm ">
-                                <ul className="space-y-4 border-t-2 border-b-2 border-yellow-300 scroll-smooth duration-200">
-                                    <li  className="flex items-center space-x-2 mt-5  justify-center">
-                                        <FaHtml5 size={27}/>
-                                        <h1 className='text-1xl'>HTML</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <FaCss3Alt size={27}/>
-                                        <h1 className='text-1xl'>CSS</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <FaJs size={27}/>
-                                        <h1 className='text-1xl'>Java Script</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <FaReact size={27}/>
-                                        <h1 className='text-1xl'>React</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <RiTailwindCssFill size={27}/>
-                                        <h1 className='text-1xl'>Tailwind CSS</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <SiPhp size={25}/>
-                                    <h1 className='text-1xl'>PHP</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 pb-5 justify-center">
-                                        <FaLaravel size={25}/>
-                                        <h1 className='text-1xl'>Laravel</h1>
-                                    </li>
+
+                            {/* Skill list */}
+                            <div className='flex-1 overflow-y-auto px-5 py-2'>
+                                <ul>
+                                    {slide.items.map((item, i) => (
+                                        <li key={i} style={listItemStyle}>
+                                            <span style={{ color: slide.color === 'var(--nb-black)' ? 'var(--nb-yellow)' : slide.color }}>
+                                                {item.icon}
+                                            </span>
+                                            <span style={{ color: 'var(--nb-black)' }}>{item.name}</span>
+                                        </li>
+                                    ))}
                                 </ul>
-                                </div>
                             </div>
-                            <div style={{fontSize:'0.6rem'}} className='text-start pl-3 pr-1'>
-                                The frontend of the application is responsible for creating the user interface (UI) and providing a seamless user experience (UX). It involves technologies like HTML, CSS, JavaScript, and frameworks such as React or Vue.js to render dynamic and responsive content.
+
+                            {/* Description */}
+                            <div
+                                className='px-4 py-3 font-mono text-xs'
+                                style={{ borderTop: 'var(--nb-border)', color: '#444', background: '#f8f8f0' }}
+                            >
+                                {slide.description}
                             </div>
                         </div>
                     </SwiperSlide>
-                    <SwiperSlide>
-                    <div className='w-full'>
-                            <div className='mt-7 mb-7'>
-                                <div className=' w-full flex justify-center items-center '>
-                                    <h1 className='font-bold text-3xl'>Backend</h1>
-                                </div>
-                                <div style={{fontSize:'0.5rem'}} className='w-full flex justify-center text-sm font-montserrat text-yellow-400'>
-                                    <h1>SCROLL LIST TO SEE MORE</h1>
-                                </div>
-                            </div>
-                            <div className=' m-2 h-60 overflow-y-auto text-sm'>
-                                <div className=" h-56 overflow-y-auto  border-yellow-300 text-sm ">
-                                <ul className="space-y-4  border-t-2 border-b-2 border-yellow-300 scroll-smooth duration-500">
-                                
-                                <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <TbBrandMysql size={25}/>
-                                    <h1 className='text-1xl'>MySQL</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <SiExpress size={25}/>
-                                    <h1 className='text-1xl'>Express.JS</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <FaNode size={25}/>
-                                    <h1 className='text-1xl'>Node.JS</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <BiLogoPostgresql size={25}/>
-                                    <h1 className='text-1xl'>PostgreSQL</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <FaLaravel size={25}/>
-                                    <h1 className='text-1xl'>Laravel</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 pb-5 justify-center">
-                                    <FaQuestion size={25}/>
-                                    <h1 className='text-1xl'>Soon</h1>
-                                    </li>
-                                    
-                                </ul>
-                                </div>
-                            </div>
-                            <div style={{fontSize:'0.7rem'}} className='text-start pl-3 pr-1'>
-                                The backend handles the server-side logic and database interactions, ensuring data is processed and stored securely.
-                            </div>
+                ))}
+            </Swiper>
+        </div>
+    );
+};
 
-                    </div>
-                    </SwiperSlide>
-                    <SwiperSlide>
-                    <div className='w-full'>
-                            <div className='mt-7 mb-7'>
-                                <div className=' w-full flex justify-center items-center '>
-                                    <h1 className='font-bold text-3xl'>Utilities</h1>
-                                </div>
-                                <div style={{fontSize:'0.5rem'}} className='w-full flex justify-center text-sm font-montserrat text-yellow-400'>
-                                    <h1>SCROLL LIST TO SEE MORE</h1>
-                                </div>
-                            </div>
-                            <div className=' m-2 h-64 overflow-y-auto text-sm'>
-                                <div className=" h-60 overflow-y-auto  border-yellow-300 text-sm ">
-                                <ul className="space-y-4  border-t-2 border-yellow-300 border-b-2 scroll-smooth duration-200">
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <AiFillOpenAI size={27}/>
-                                        <h1 className='text-1xl'>Open AI</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <DiVisualstudio size={27}/>
-                                        <h1 className='text-1xl'>Visual Studio Code</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                        <IoLogoGithub size={27}/>
-                                        <h1 className='text-1xl'>Github</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <SiPostman size={25}/>
-                                    <h1 className='text-1xl'>Postman</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 justify-center">
-                                    <FaQuestion size={25}/>
-                                    <h1 className='text-1xl'>Soon</h1>
-                                    </li>
-                                    <li  className="flex items-center space-x-2 mt-5 pb-5 justify-center">
-                                    <FaQuestion size={25}/>
-                                    <h1 className='text-1xl'>Soon</h1>
-                                    </li>
-                                </ul>
-                                </div>
-                            </div>
-                            <div style={{fontSize:'0.7rem'}} className='text-start pl-3 pr-1'>
-                                    Utilities provide helpful tools and libraries that assist in managing common tasks such as formatting data, caching, logging, and testing.
-                            </div>
-
-                    </div>
-                    </SwiperSlide>
-                    </Swiper>
-                </div>
-        )
-    }
-
-    export default Skills
+export default Skills;
