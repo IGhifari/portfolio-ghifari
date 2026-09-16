@@ -38,8 +38,8 @@ const listItemStyle = {
     alignItems: 'center',
     gap: '10px',
     padding: '8px 0',
-    borderBottom: '2px solid var(--nb-black)',
-    color: 'var(--nb-black)',
+    borderBottom: '2px solid var(--nb-line)',
+    color: 'var(--nb-ink)',
     fontFamily: 'Space Grotesk, sans-serif',
     fontWeight: 600,
 };
@@ -91,7 +91,7 @@ const Skills = () => {
 
     return (
         <div className='mt-6 flex flex-col items-center'>
-            <p className='text-xs font-mono font-bold text-center mb-6' style={{ color: 'var(--nb-black)', letterSpacing: '0.1em' }}>
+            <p className='text-xs font-mono font-bold text-center mb-6' style={{ color: 'var(--nb-muted)', letterSpacing: '0.1em' }}>
                 — SWIPE CARDS TO SEE MORE —
             </p>
             <Swiper
@@ -124,7 +124,7 @@ const Skills = () => {
                                             <span style={{ color: slide.color === 'var(--nb-black)' ? 'var(--nb-yellow)' : slide.color }}>
                                                 {item.icon}
                                             </span>
-                                            <span style={{ color: 'var(--nb-black)' }}>{item.name}</span>
+                                            <span style={{ color: 'var(--nb-ink)' }}>{item.name}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -133,7 +133,7 @@ const Skills = () => {
                             {/* Description */}
                             <div
                                 className='px-4 py-3 font-mono text-xs'
-                                style={{ borderTop: 'var(--nb-border)', color: '#444', background: '#f8f8f0' }}
+                                style={{ borderTop: 'var(--nb-border)', color: 'var(--nb-muted)', background: 'var(--nb-inset)' }}
                             >
                                 {slide.description}
                             </div>

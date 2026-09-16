@@ -4,8 +4,11 @@ import { IoMdMail } from "react-icons/io";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import emailjs from "@emailjs/browser";
+import { useTheme } from "../context/ThemeContext";
 
 const ContactMe = () => {
+    const { isDark } = useTheme();
+    const toastTheme = isDark ? "dark" : "light";
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -27,14 +30,14 @@ const ContactMe = () => {
         setIsSubmitting(true);
         try {
             if (!serviceId || !templateId || !publicKey) {
-                toast.error("Email service is not configured.", { theme: "dark" });
+                toast.error("Email service is not configured.", { theme: toastTheme });
                 return;
             }
             await emailjs.send(serviceId, templateId, formData, publicKey);
-            toast.success('Message sent successfully! 🎉', { theme: "dark" });
+            toast.success('Message sent successfully! 🎉', { theme: toastTheme });
             setFormData({ emailto: "Ghifari", name: "", email: "", message: "" });
         } catch (error) {
-            toast.error('Failed to send message. Please try again! 😕', { theme: "dark" });
+            toast.error('Failed to send message. Please try again! 😕', { theme: toastTheme });
             console.error("FAILED...", error);
         } finally {
             setIsSubmitting(false);
@@ -67,7 +70,7 @@ const ContactMe = () => {
                             }}
                         />
                     </h1>
-                    <p className="font-grotesk text-base mt-4" style={{ color: '#555' }}>
+                    <p className="font-grotesk text-base mt-4" style={{ color: 'var(--nb-muted)' }}>
                         Feel free to reach out for any questions or opportunities!
                     </p>
                 </div>
@@ -96,9 +99,9 @@ const ContactMe = () => {
                         <a
                             href="mailto:ighifarii05@gmail.com"
                             className="flex items-center gap-3 font-grotesk font-semibold transition-all duration-150"
-                            style={{ color: 'var(--nb-black)', textDecoration: 'none' }}
+                            style={{ color: 'var(--nb-ink)', textDecoration: 'none' }}
                             onMouseEnter={e => e.currentTarget.style.color = 'var(--nb-red)'}
-                            onMouseLeave={e => e.currentTarget.style.color = 'var(--nb-black)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--nb-ink)'}
                         >
                             <div
                                 className="w-10 h-10 flex items-center justify-center"
@@ -111,8 +114,8 @@ const ContactMe = () => {
 
                         {/* Decorative blocks */}
                         <div className="mt-auto flex gap-2">
-                            <div style={{ flex: 1, height: '8px', background: 'var(--nb-yellow)', border: '2px solid var(--nb-black)' }} />
-                            <div style={{ flex: 1, height: '8px', background: 'var(--nb-red)', border: '2px solid var(--nb-black)' }} />
+                            <div style={{ flex: 1, height: '8px', background: 'var(--nb-yellow)', border: '2px solid var(--nb-line)' }} />
+                            <div style={{ flex: 1, height: '8px', background: 'var(--nb-red)', border: '2px solid var(--nb-line)' }} />
                             <div style={{ flex: 1, height: '8px', background: 'var(--nb-black)' }} />
                         </div>
                     </div>
@@ -132,7 +135,7 @@ const ContactMe = () => {
                                 <label
                                     htmlFor="name"
                                     className="block font-grotesk font-bold text-sm mb-1"
-                                    style={{ color: 'var(--nb-black)' }}
+                                    style={{ color: 'var(--nb-ink)' }}
                                 >
                                     NAME *
                                 </label>
@@ -153,7 +156,7 @@ const ContactMe = () => {
                                 <label
                                     htmlFor="email"
                                     className="block font-grotesk font-bold text-sm mb-1"
-                                    style={{ color: 'var(--nb-black)' }}
+                                    style={{ color: 'var(--nb-ink)' }}
                                 >
                                     EMAIL *
                                 </label>
@@ -174,7 +177,7 @@ const ContactMe = () => {
                                 <label
                                     htmlFor="message"
                                     className="block font-grotesk font-bold text-sm mb-1"
-                                    style={{ color: 'var(--nb-black)' }}
+                                    style={{ color: 'var(--nb-ink)' }}
                                 >
                                     MESSAGE *
                                 </label>

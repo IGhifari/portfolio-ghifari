@@ -127,7 +127,7 @@ const SoundButton = () => {
                         </span>
                         <span
                             className="text-xs font-mono"
-                            style={{ color: '#aaa', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                            style={{ color: 'var(--nb-muted)', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
                             {currentTrack.artist}
                         </span>
@@ -210,13 +210,13 @@ const SoundButton = () => {
                         <div>
                             <h5
                                 className="font-black font-grotesk text-sm leading-tight"
-                                style={{ color: 'var(--nb-black)' }}
+                                style={{ color: 'var(--nb-ink)' }}
                             >
                                 {currentTrack.title}
                             </h5>
                             <p
                                 className="font-mono text-xs mt-1"
-                                style={{ color: '#555' }}
+                                style={{ color: 'var(--nb-muted)' }}
                             >
                                 {currentTrack.artist}
                             </p>
@@ -224,7 +224,7 @@ const SoundButton = () => {
 
                         {/* Progress bar */}
                         <div className="space-y-1">
-                            <div className="relative w-full h-3" style={{ background: '#ddd', border: '2px solid var(--nb-black)' }}>
+                            <div className="relative w-full h-3" style={{ background: 'var(--nb-inset)', border: '2px solid var(--nb-line)' }}>
                                 {/* Filled bar */}
                                 <div
                                     className="absolute top-0 left-0 h-full"
@@ -247,7 +247,7 @@ const SoundButton = () => {
                             </div>
                             <div
                                 className="flex justify-between font-mono text-xs"
-                                style={{ color: '#666' }}
+                                style={{ color: 'var(--nb-muted)' }}
                             >
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration || currentTrack.duration)}</span>

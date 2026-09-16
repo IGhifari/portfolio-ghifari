@@ -33,7 +33,7 @@ const LastUpdated = () => {
                         onChange={(e) => setLastUpdated(e.target.value)}
                         className="p-1"
                         style={{
-                            border: '2px solid var(--nb-black)',
+                            border: '2px solid var(--nb-line)',
                             background: 'var(--nb-yellow)',
                             fontFamily: 'Space Mono, monospace',
                             color: 'var(--nb-black)',

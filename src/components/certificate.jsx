@@ -116,7 +116,7 @@ const Certificate = () => {
                         <div className="p-5">
                             <div className="flex items-start gap-2 mb-2">
                                 <FaAward size={20} style={{ color: 'var(--nb-red)', marginTop: '2px', flexShrink: 0 }} />
-                                <h3 className="text-base font-black font-grotesk" style={{ color: 'var(--nb-black)' }}>
+                                <h3 className="text-base font-black font-grotesk" style={{ color: 'var(--nb-ink)' }}>
                                     {cert.title}
                                 </h3>
                             </div>

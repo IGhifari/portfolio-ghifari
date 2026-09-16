@@ -88,7 +88,7 @@ const Contact = () => {
                         }}
                     />
                 </h1>
-                <div style={{ width: '100%', height: '3px', background: 'var(--nb-black)', marginTop: '4px', maxWidth: '220px' }} />
+                <div style={{ width: '100%', height: '3px', background: 'var(--nb-line)', marginTop: '4px', maxWidth: '220px' }} />
             </div>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto'>
@@ -113,10 +113,10 @@ const Contact = () => {
 
                         {/* Text */}
                         <div>
-                            <h3 className="font-black font-grotesk text-base mb-1" style={{ color: 'var(--nb-black)' }}>
+                            <h3 className="font-black font-grotesk text-base mb-1" style={{ color: 'var(--nb-ink)' }}>
                                 {item.label.toUpperCase()}
                             </h3>
-                            <p className="text-xs font-grotesk leading-relaxed" style={{ color: '#444' }}>
+                            <p className="text-xs font-grotesk leading-relaxed" style={{ color: 'var(--nb-muted)' }}>
                                 {item.desc}
                             </p>
                         </div>

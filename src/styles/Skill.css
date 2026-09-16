@@ -5,12 +5,13 @@
 }
 
 .swiper-slide {
-  background: #FFFFFF !important;
-  border: 3px solid #0a0a0a !important;
-  box-shadow: 6px 6px 0px #0a0a0a !important;
+  background: var(--nb-white) !important;
+  border: var(--nb-border) !important;
+  box-shadow: var(--nb-shadow-lg) !important;
   border-radius: 0 !important;
+  color: var(--nb-ink);
 }
 
 .swiper-slide-active {
-  box-shadow: 8px 8px 0px #0a0a0a !important;
+  box-shadow: 8px 8px 0px var(--nb-shadow-color) !important;
 }

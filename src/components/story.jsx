@@ -151,12 +151,12 @@ const Story = () => {
                     color: idx === 2 ? 'var(--nb-yellow)' : 'var(--nb-black)',
                     display: 'inline-block',
                     padding: '2px 10px',
-                    border: '2px solid var(--nb-black)',
+                    border: '2px solid var(--nb-line)',
                   }}
                 >
                   {item.title.toUpperCase()}
                 </h3>
-                <p className="text-sm leading-relaxed font-grotesk mt-3" style={{ color: '#222' }}>
+                <p className="text-sm leading-relaxed font-grotesk mt-3" style={{ color: 'var(--nb-ink)' }}>
                   {item.content}
                 </p>
               </article>

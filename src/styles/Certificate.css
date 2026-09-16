@@ -1,14 +1,15 @@
 /* Certificate Card Neo-Brutalism */
 .certificate-card {
-  background: #FFFFFF;
-  border: 3px solid #0a0a0a;
-  box-shadow: 6px 6px 0px #0a0a0a;
+  background: var(--nb-white);
+  border: var(--nb-border);
+  box-shadow: var(--nb-shadow-lg);
   border-radius: 0;
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  color: var(--nb-ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.28s ease, color 0.28s ease;
 }
 
 .certificate-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px #0a0a0a;
+  box-shadow: 9px 9px 0px var(--nb-shadow-color);
 }

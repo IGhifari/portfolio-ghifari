@@ -43,8 +43,8 @@ const App = () => {
             <section className="py-16 nb-dot-pattern">
                 <div className="mt-10 md:mt-10">
                     <div className="flex items-center pl-8 md:pl-14 mb-6">
-                        <div className="w-8 h-1 bg-nb-black mr-3" style={{ background: 'var(--nb-black)' }} />
-                        <h3 className="text-xl font-bold font-grotesk" style={{ color: 'var(--nb-black)' }}>SKILLS</h3>
+                        <div className="w-8 h-1 mr-3" style={{ background: 'var(--nb-line)' }} />
+                        <h3 className="text-xl font-bold font-grotesk" style={{ color: 'var(--nb-ink)' }}>SKILLS</h3>
                     </div>
                     <div>
                         <Skills/>
