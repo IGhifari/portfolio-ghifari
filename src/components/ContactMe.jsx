@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { z } from "zod";
 import TypeIt from "typeit-react";
 import { IoMdMail } from "react-icons/io";
 import { toast, ToastContainer } from 'react-toastify';
@@ -6,10 +7,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import emailjs from "@emailjs/browser";
 
 const ContactMe = () => {
-    const toastTheme = "light"; // Since we removed dark mode
+    const toastTheme = "light";
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    const formSchema = z.object({
+        name: z.string().min(2, "Nama minimal 2 karakter"),
+        email: z.string().email("Masukkan email yang valid"),
+        message: z.string().min(10, "Pesan minimal 10 karakter"),
+    });
 
     const [formData, setFormData] = useState({
         emailto: "Ghifari",
@@ -17,6 +24,7 @@ const ContactMe = () => {
         email: "",
         message: "",
     });
+    const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
@@ -26,9 +34,19 @@ const ContactMe = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setErrors({});
+
+        const validate = formSchema.safeParse(formData);
+        if (!validate.success) {
+            setErrors(validate.error.format());
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
             if (!serviceId || !templateId || !publicKey) {
                 toast.error("Email service is not configured.", { theme: toastTheme });
+                setIsSubmitting(false);
                 return;
             }
             await emailjs.send(serviceId, templateId, formData, publicKey);
@@ -135,8 +153,10 @@ const ContactMe = () => {
                                     onChange={handleChange}
                                     placeholder="Enter your full name"
                                     className={inputClass}
-                                    required
                                 />
+                                {errors.name && (
+                                    <p className="text-red-500 text-xs mt-1 font-mono">{errors.name._errors[0]}</p>
+                                )}
                             </div>
 
                             {/* Email */}
@@ -156,8 +176,10 @@ const ContactMe = () => {
                                     onChange={handleChange}
                                     placeholder="Enter your active email"
                                     className={inputClass}
-                                    required
                                 />
+                                {errors.email && (
+                                    <p className="text-red-500 text-xs mt-1 font-mono">{errors.email._errors[0]}</p>
+                                )}
                             </div>
 
                             {/* Message */}
@@ -177,8 +199,10 @@ const ContactMe = () => {
                                     rows="4"
                                     placeholder="Type your message here..."
                                     className={inputClass}
-                                    required
                                 />
+                                {errors.message && (
+                                    <p className="text-red-500 text-xs mt-1 font-mono">{errors.message._errors[0]}</p>
+                                )}
                             </div>
 
                             {/* Submit */}

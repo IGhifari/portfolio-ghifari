@@ -27,7 +27,8 @@
     "three": "^0.160.0",
     "tsparticles": "^3.8.1",
     "tsparticles-slim": "^2.12.0",
-    "typeit-react": "^2.6.4"
+    "typeit-react": "^2.6.4",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
