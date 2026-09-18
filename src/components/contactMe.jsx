@@ -78,12 +78,7 @@ const ContactMe = () => {
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Contact Info Card */}
                     <div
-                        className="p-6 flex flex-col gap-4"
-                        style={{
-                            background: 'var(--nb-white)',
-                            border: 'var(--nb-border)',
-                            boxShadow: 'var(--nb-shadow-lg)',
-                        }}
+                        className="nb-panel p-6 flex flex-col gap-4"
                     >
                         <h2
                             className="font-black font-grotesk text-xl inline-block"
@@ -98,7 +93,7 @@ const ContactMe = () => {
                         </h2>
                         <a
                             href="mailto:ighifarii05@gmail.com"
-                            className="flex items-center gap-3 font-grotesk font-semibold transition-all duration-150"
+                            className="flex items-center gap-3 font-grotesk font-semibold transition-all duration-200"
                             style={{ color: 'var(--nb-ink)', textDecoration: 'none' }}
                             onMouseEnter={e => e.currentTarget.style.color = 'var(--nb-red)'}
                             onMouseLeave={e => e.currentTarget.style.color = 'var(--nb-ink)'}
@@ -122,12 +117,7 @@ const ContactMe = () => {
 
                     {/* Contact Form */}
                     <div
-                        className="p-6"
-                        style={{
-                            background: 'var(--nb-white)',
-                            border: 'var(--nb-border)',
-                            boxShadow: 'var(--nb-shadow-lg)',
-                        }}
+                        className="nb-panel p-6"
                     >
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Name */}

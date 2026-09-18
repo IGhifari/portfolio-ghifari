@@ -93,12 +93,12 @@ const Certificate = () => {
                                 loading='lazy'
                             />
                             <div
-                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-                                style={{ background: 'rgba(255,59,59,0.85)' }}
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+                                style={{ background: 'color-mix(in srgb, var(--nb-red) 85%, transparent)' }}
                             >
                                 <button
                                     onClick={() => setSelectedImage(cert.image)}
-                                    className="w-12 h-12 flex items-center justify-center transition-all duration-150"
+                                    className="w-12 h-12 flex items-center justify-center transition-all duration-200"
                                     style={{
                                         background: 'var(--nb-white)',
                                         border: 'var(--nb-border)',

@@ -4,56 +4,32 @@
 
 /* ============================================
    NEO-BRUTALISM DESIGN SYSTEM
-   --nb-black stays dark (fills / text on yellow)
+   --nb-black stays dark (fills / text on accent)
+   --nb-yellow is the accent: cyan in light, gold in dark
    --nb-ink follows the theme (page text)
    ============================================ */
-:root,
-[data-theme="light"] {
+:root {
   color-scheme: light;
-  --nb-cream: #FFF6E8;
-  --nb-yellow: #FFD60A;
-  --nb-red: #FF3B3B;
-  --nb-black: #14120F;
-  --nb-white: #FFFAF3;
-  --nb-ink: #14120F;
-  --nb-muted: #5C564C;
-  --nb-line: #14120F;
-  --nb-inset: #F3EAD8;
-  --nb-dot: #14120F;
-  --nb-nav-bg: #FFD60A;
-  --nb-nav-hover-bg: #14120F;
-  --nb-nav-hover-text: #FFD60A;
-  --nb-shadow-color: #14120F;
-  --nb-border: 3px solid var(--nb-line);
-  --nb-shadow: 4px 4px 0px var(--nb-shadow-color);
-  --nb-shadow-lg: 6px 6px 0px var(--nb-shadow-color);
+  --nb-cream: #FFFFFF;
+  --nb-yellow: #3B82F6; /* Electric Blue */
+  --nb-red: #FF4757;
+  --nb-black: #000000;
+  --nb-white: #F1F2F6;
+  --nb-ink: #000000;
+  --nb-muted: #57606F;
+  --nb-line: #000000;
+  --nb-inset: #E1E2E7;
+  --nb-dot: #CED6E0;
+  --nb-nav-bg: #3B82F6;
+  --nb-nav-hover-bg: #000000;
+  --nb-nav-hover-text: #FFFFFF;
+  --nb-shadow-color: #000000;
+  --nb-border: 4px solid var(--nb-line);
+  --nb-shadow: 5px 5px 0px var(--nb-shadow-color);
+  --nb-shadow-lg: 8px 8px 0px var(--nb-shadow-color);
   --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
-  --nb-input-inset: inset 2px 2px 0px rgba(20, 18, 15, 0.08);
-  --nb-input-focus: inset 2px 2px 0px rgba(20, 18, 15, 0.12), 0 0 0 3px var(--nb-yellow);
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --nb-cream: #12110E;
-  --nb-yellow: #F5C400;
-  --nb-red: #FF5A4D;
-  --nb-black: #0C0B09;
-  --nb-white: #1C1A16;
-  --nb-ink: #F4F0E4;
-  --nb-muted: #B7B0A2;
-  --nb-line: #E8E2D4;
-  --nb-inset: #16140F;
-  --nb-dot: #3A372F;
-  --nb-nav-bg: #1A1814;
-  --nb-nav-hover-bg: #F5C400;
-  --nb-nav-hover-text: #14120F;
-  --nb-shadow-color: #F5C400;
-  --nb-border: 3px solid var(--nb-line);
-  --nb-shadow: 4px 4px 0px var(--nb-shadow-color);
-  --nb-shadow-lg: 6px 6px 0px var(--nb-shadow-color);
-  --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
-  --nb-input-inset: inset 2px 2px 0px rgba(255, 255, 255, 0.04);
-  --nb-input-focus: inset 2px 2px 0px rgba(255, 255, 255, 0.08), 0 0 0 3px var(--nb-yellow);
+  --nb-input-inset: inset 3px 3px 0px rgba(0, 0, 0, 0.1);
+  --nb-input-focus: inset 3px 3px 0px rgba(0, 0, 0, 0.15), 0 0 0 4px var(--nb-yellow);
 }
 
 *,
@@ -79,7 +55,7 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  transition: background-color 0.28s ease, color 0.28s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tampilan,
@@ -118,7 +94,7 @@ body {
   border: var(--nb-border);
   box-shadow: var(--nb-shadow);
   color: var(--nb-ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.28s ease, color 0.28s ease;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .nb-card:hover {

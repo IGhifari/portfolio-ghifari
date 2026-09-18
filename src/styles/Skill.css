@@ -10,6 +10,7 @@
   box-shadow: var(--nb-shadow-lg) !important;
   border-radius: 0 !important;
   color: var(--nb-ink);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
 }
 
 .swiper-slide-active {

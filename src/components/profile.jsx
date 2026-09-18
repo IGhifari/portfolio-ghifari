@@ -12,7 +12,7 @@ const Home = () => {
 
                     <div>
                         <span className="nb-hero-badge">
-                            👋 Hello, I'm
+                            Hello, I'm
                         </span>
                     </div>
 
@@ -50,7 +50,7 @@ const Home = () => {
                             href="/cv.pdf"
                             download
                             className="nb-btn px-6 py-3 font-grotesk font-bold text-sm"
-                            style={{ background: 'var(--nb-black)', color: 'var(--nb-yellow)' }}
+                            style={{ background: 'var(--nb-white)', color: 'var(--nb-ink)' }}
                         >
                             ↓ Download CV
                         </a>
@@ -59,7 +59,7 @@ const Home = () => {
                             smooth={true}
                             duration={500}
                             className='nb-btn px-6 py-3 font-grotesk font-bold text-sm cursor-pointer'
-                            style={{ background: 'var(--nb-yellow)', color: 'var(--nb-black)' }}
+                            style={{ background: 'var(--nb-yellow)', color: 'var(--nb-nav-hover-text)' }}
                         >
                             Contact Me →
                         </Link>

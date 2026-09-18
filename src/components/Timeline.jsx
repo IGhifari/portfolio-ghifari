@@ -29,7 +29,7 @@ const Timeline = () => {
               href={href}
               target="_blank"
               rel="noreferrer"
-              className="font-mono font-bold text-xs px-2 py-1 transition-all duration-150"
+              className="font-mono font-bold text-xs px-2 py-1 transition-all duration-200"
               style={{
                 background: 'var(--nb-yellow)',
                 border: '2px solid var(--nb-line)',
@@ -109,12 +109,7 @@ const Timeline = () => {
 
             {/* Card */}
             <div
-              className="p-5"
-              style={{
-                background: 'var(--nb-white)',
-                border: 'var(--nb-border)',
-                boxShadow: 'var(--nb-shadow-lg)',
-              }}
+              className="nb-panel p-5"
             >
               <h2
                 className="text-lg sm:text-xl font-black font-grotesk mb-1"

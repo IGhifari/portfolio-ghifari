@@ -108,14 +108,14 @@ const Project = () => {
                                 className="w-full h-48 object-cover"
                             />
                             <div
-                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4"
-                                style={{ background: 'rgba(255, 229, 0, 0.88)' }}
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4"
+                                style={{ background: 'color-mix(in srgb, var(--nb-yellow) 88%, transparent)' }}
                             >
                                 <a
                                     href={project.github}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-150"
+                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-200"
                                     style={{
                                         background: 'var(--nb-black)',
                                         border: 'var(--nb-border)',
@@ -131,7 +131,7 @@ const Project = () => {
                                     href={project.live}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-150"
+                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-200"
                                     style={{
                                         background: 'var(--nb-red)',
                                         border: 'var(--nb-border)',
