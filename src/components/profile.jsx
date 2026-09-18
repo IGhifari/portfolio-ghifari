@@ -4,7 +4,7 @@ import '../styles/Components.css';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { Link } from 'react-scroll';
 
-const Home = () => {
+const Profile = () => {
     return (
         <div className='min-h-screen w-full flex items-center' style={{ paddingTop: '64px' }}>
             <div className='profile z-10 w-full max-w-5xl mx-auto px-6 md:px-12 py-16'>
@@ -95,4 +95,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default Profile;

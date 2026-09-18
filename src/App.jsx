@@ -2,15 +2,15 @@ import './styles/Index.css';
 import './styles/Components.css';
 
 import Navbar from './components/Navbar';
-import Profile from './components/Profile';
-import Project from './components/Project';
+import Profile from './components/profile';
+import Project from './components/project';
 import Certificate from './components/Certificate';
 import AcademicBackground from './components/AcademicBackground';
 import Contact from './components/Contact';
 import Skills from './components/Skill';
 import Story from './components/Story';
 import LastUpdated from './components/LastUpdated';
-import ContactMe from './components/ContactMe';
+import ContactMe from './components/contactMe';
 import SoundButton from './components/SoundButton';
 
 const App = () => {
