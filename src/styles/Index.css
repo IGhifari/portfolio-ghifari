@@ -4,14 +4,15 @@
 
 /* ============================================
    NEO-BRUTALISM DESIGN SYSTEM
-   --nb-black stays dark (fills / text on accent)
-   --nb-yellow is the accent: cyan in light, gold in dark
-   --nb-ink follows the theme (page text)
+   Light: Electric Blue + Black on White
+   Dark:  Electric Blue + Light Blue on Deep Navy
    ============================================ */
-:root {
+
+:root,
+[data-theme="light"] {
   color-scheme: light;
   --nb-cream: #FFFFFF;
-  --nb-yellow: #3B82F6; /* Electric Blue */
+  --nb-yellow: #3B82F6;
   --nb-red: #FF4757;
   --nb-black: #000000;
   --nb-white: #F1F2F6;
@@ -30,6 +31,30 @@
   --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
   --nb-input-inset: inset 3px 3px 0px rgba(0, 0, 0, 0.1);
   --nb-input-focus: inset 3px 3px 0px rgba(0, 0, 0, 0.15), 0 0 0 4px var(--nb-yellow);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --nb-cream: #0A0F1E;
+  --nb-yellow: #60A5FA;
+  --nb-red: #F87171;
+  --nb-black: #05070D;
+  --nb-white: #131C31;
+  --nb-ink: #E6EDF7;
+  --nb-muted: #8CA3C3;
+  --nb-line: #1E2A45;
+  --nb-inset: #0B1224;
+  --nb-dot: #1A2440;
+  --nb-nav-bg: #131C31;
+  --nb-nav-hover-bg: #60A5FA;
+  --nb-nav-hover-text: #0A0F1E;
+  --nb-shadow-color: #60A5FA;
+  --nb-border: 3px solid var(--nb-line);
+  --nb-shadow: 4px 4px 0px var(--nb-shadow-color);
+  --nb-shadow-lg: 7px 7px 0px var(--nb-shadow-color);
+  --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
+  --nb-input-inset: inset 2px 2px 0px rgba(96, 165, 250, 0.06);
+  --nb-input-focus: inset 2px 2px 0px rgba(96, 165, 250, 0.12), 0 0 0 3px var(--nb-yellow);
 }
 
 *,

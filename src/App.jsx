@@ -1,6 +1,7 @@
 import './styles/Index.css';
 import './styles/Components.css';
 
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
 import Project from './components/Project';
@@ -15,6 +16,7 @@ import SoundButton from './components/SoundButton';
 
 const App = () => {
     return (
+        <ThemeProvider>
         <div className='tampilan' style={{ background: 'var(--nb-cream)', minHeight: '100vh' }}>
 
             <LastUpdated />
@@ -80,6 +82,7 @@ const App = () => {
                 </div>
             </footer>
         </div>
+        </ThemeProvider>
     );
 };
 
