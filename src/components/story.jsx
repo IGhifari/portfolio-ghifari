@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import TypeIt from 'typeit-react';
-import { FaUserGraduate, FaCode, FaLaptopCode, FaRocket, FaStar } from 'react-icons/fa';
+import { FaUserGraduate, FaCode, FaLaptopCode, FaRocket } from 'react-icons/fa';
 import '../styles/Components.css';
 
 function calcAge(birth = '2007-06-05') {

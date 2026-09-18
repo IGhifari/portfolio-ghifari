@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { IoMenu, IoClose } from "react-icons/io5";
 import { Link } from 'react-scroll';
 import '../styles/Components.css';

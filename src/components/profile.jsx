@@ -1,4 +1,4 @@
-import React from 'react';
+
 import TypeIt from "typeit-react";
 import '../styles/Components.css';
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
@@ -12,7 +12,7 @@ const Home = () => {
 
                     <div>
                         <span className="nb-hero-badge">
-                            Hello, I'm
+                            Hello, I&apos;m
                         </span>
                     </div>
 

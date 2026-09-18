@@ -1,23 +1,20 @@
-import React from 'react';
-import './styles/App.css';
+import './styles/Index.css';
 import './styles/Components.css';
-import { ThemeProvider } from './context/ThemeContext';
 
-import Navbar from './components/navbar';
-import Home from './components/profile';
-import Project from './components/project';
-import Certificate from './components/certificate';
+import Navbar from './components/Navbar';
+import Profile from './components/Profile';
+import Project from './components/Project';
+import Certificate from './components/Certificate';
 import AcademicBackground from './components/AcademicBackground';
-import Contact from './components/contact';
-import Skills from './components/skill';
-import Story from './components/story';
+import Contact from './components/Contact';
+import Skills from './components/Skill';
+import Story from './components/Story';
 import LastUpdated from './components/LastUpdated';
-import ContactMe from './components/contactMe';
+import ContactMe from './components/ContactMe';
 import SoundButton from './components/SoundButton';
 
 const App = () => {
     return (
-        <ThemeProvider>
         <div className='tampilan' style={{ background: 'var(--nb-cream)', minHeight: '100vh' }}>
 
             <LastUpdated />
@@ -26,7 +23,7 @@ const App = () => {
 
             {/* Hero */}
             <section id="profile" className="min-h-screen">
-                <Home/>
+                <Profile/>
             </section>
 
             {/* Projects */}
@@ -83,7 +80,6 @@ const App = () => {
                 </div>
             </footer>
         </div>
-        </ThemeProvider>
     );
 };
 
