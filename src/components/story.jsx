@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import TypeIt from 'typeit-react';
 import { FaUserGraduate, FaCode, FaLaptopCode, FaRocket } from 'react-icons/fa';
 import '../styles/Components.css';

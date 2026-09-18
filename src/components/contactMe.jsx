@@ -35,7 +35,7 @@ const ContactMe = () => {
             toast.success('Message sent successfully! 🎉', { theme: toastTheme });
             setFormData({ emailto: "Ghifari", name: "", email: "", message: "" });
         } catch (error) {
-            toast.error('Failed to send message. Please try again! 😕', { theme: toastTheme });
+            toast.error('Failed to send message. Please try again! ', { theme: toastTheme });
             console.error("FAILED...", error);
         } finally {
             setIsSubmitting(false);
