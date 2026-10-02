@@ -8,8 +8,8 @@ import '../styles/Components.css';
 const NAV_ITEMS = [
   { to: 'projects', label: 'WORK' },
   { to: 'about', label: 'ABOUT' },
-  { to: 'skills', label: 'STACK' },
   { to: 'journey', label: 'JOURNEY' },
+  { to: 'stack', label: 'STACK' },
   { to: 'contact', label: 'CONTACT' },
 ];
 

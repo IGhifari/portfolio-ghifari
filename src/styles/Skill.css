@@ -1,18 +1,63 @@
-/* Skill Swiper Neo-Brutalism */
-.mySwiper {
-  width: 280px;
-  height: 400px;
+/* ============================================
+   TECH STACK / SKILLS SECTION (DARK EDITORIAL)
+   ============================================ */
+
+.tech-card {
+  background-color: #101012;
+  border: 1px solid #27272A;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
-.swiper-slide {
-  background: var(--nb-white) !important;
-  border: var(--nb-border) !important;
-  box-shadow: var(--nb-shadow-lg) !important;
-  border-radius: 0 !important;
-  color: var(--nb-ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+.tech-card:hover {
+  border-color: #3F3F46;
+  background-color: #141417;
+  transform: translateY(-2px);
 }
 
-.swiper-slide-active {
-  box-shadow: 8px 8px 0px var(--nb-shadow-color) !important;
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.375rem;
+  background-color: #121215;
+  border: 1px solid #222226;
+  color: #A1A1AA;
+  transition: all 0.15s ease;
+}
+
+.tech-item:hover {
+  border-color: #3F3F46;
+  background-color: #18181C;
+  color: #F5F5F5;
+  transform: translateY(-1px);
+}
+
+/* Infinite Marquee Strip */
+@keyframes techMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-tech-marquee {
+  display: flex;
+  width: max-content;
+  animation: techMarquee 32s linear infinite;
+}
+
+.animate-tech-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tech-marquee {
+    animation: none;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }

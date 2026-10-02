@@ -1,134 +1,228 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/effect-cards';
-import { EffectCards } from 'swiper/modules';
-import { IoLogoGithub } from "react-icons/io";
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  FaReact,
+  FaJs,
+  FaHtml5,
+  FaCss3Alt,
+  FaNode,
+  FaLaravel,
+  FaGitAlt,
+} from 'react-icons/fa';
+import {
+  SiTypescript,
+  SiVite,
+  SiExpress,
+  SiPrisma,
+  SiPhp,
+  SiPostman,
+} from 'react-icons/si';
+import { RiTailwindCssFill } from 'react-icons/ri';
+import { BiLogoPostgresql } from 'react-icons/bi';
+import { TbBrandMysql } from 'react-icons/tb';
+import { IoLogoGithub } from 'react-icons/io';
+import { DiVisualstudio } from 'react-icons/di';
 import '../styles/Skill.css';
-import { FaHtml5, FaNode } from "react-icons/fa";
-import { FaCss3Alt } from "react-icons/fa";
-import { FaJs } from "react-icons/fa";
-import { FaReact } from "react-icons/fa";
-import { TbBrandMysql } from "react-icons/tb";
-import { RiTailwindCssFill } from "react-icons/ri";
-import { AiFillOpenAI } from "react-icons/ai";
-import { FaQuestion } from "react-icons/fa";
-import { DiVisualstudio } from "react-icons/di";
-import { FaLaravel } from "react-icons/fa";
-import { SiPhp } from "react-icons/si";
-import { SiPostman } from "react-icons/si";
-import { SiExpress } from "react-icons/si";
-import { BiLogoPostgresql } from "react-icons/bi";
 
-const listItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '8px 0',
-    borderBottom: '2px solid var(--nb-line)',
-    color: 'var(--nb-ink)',
-    fontFamily: 'Space Grotesk, sans-serif',
-    fontWeight: 600,
-};
+const techCategories = [
+  {
+    id: 'frontend',
+    title: 'FRONTEND',
+    badge: 'CLIENT-SIDE',
+    description: 'Building responsive, accessible interfaces with modern component architectures.',
+    skills: [
+      { name: 'React', icon: <FaReact size={18} aria-hidden="true" />, highlight: true },
+      { name: 'TypeScript', icon: <SiTypescript size={16} aria-hidden="true" />, highlight: true },
+      { name: 'JavaScript', icon: <FaJs size={17} aria-hidden="true" />, highlight: false },
+      { name: 'Tailwind CSS', icon: <RiTailwindCssFill size={18} aria-hidden="true" />, highlight: true },
+      { name: 'HTML5', icon: <FaHtml5 size={18} aria-hidden="true" />, highlight: false },
+      { name: 'CSS3', icon: <FaCss3Alt size={18} aria-hidden="true" />, highlight: false },
+      { name: 'Vite', icon: <SiVite size={17} aria-hidden="true" />, highlight: false },
+    ],
+  },
+  {
+    id: 'backend',
+    title: 'BACKEND',
+    badge: 'SERVER-SIDE',
+    description: 'Developing structured RESTful APIs, business logic, and authentication services.',
+    skills: [
+      { name: 'Node.js', icon: <FaNode size={20} aria-hidden="true" />, highlight: true },
+      { name: 'Express', icon: <SiExpress size={18} aria-hidden="true" />, highlight: true },
+      { name: 'Prisma ORM', icon: <SiPrisma size={17} aria-hidden="true" />, highlight: true },
+      { name: 'Laravel', icon: <FaLaravel size={18} aria-hidden="true" />, highlight: false },
+      { name: 'PHP', icon: <SiPhp size={20} aria-hidden="true" />, highlight: false },
+    ],
+  },
+  {
+    id: 'database',
+    title: 'DATABASE',
+    badge: 'PERSISTENCE',
+    description: 'Designing normalized relational schemas and data querying pipelines.',
+    skills: [
+      { name: 'PostgreSQL', icon: <BiLogoPostgresql size={20} aria-hidden="true" />, highlight: true },
+      { name: 'MySQL', icon: <TbBrandMysql size={20} aria-hidden="true" />, highlight: true },
+    ],
+  },
+  {
+    id: 'tools',
+    title: 'TOOLS & WORKFLOW',
+    badge: 'ENVIRONMENT',
+    description: 'Developer tooling, version control, endpoint testing, and code quality workflows.',
+    skills: [
+      { name: 'Git', icon: <FaGitAlt size={18} aria-hidden="true" />, highlight: true },
+      { name: 'GitHub', icon: <IoLogoGithub size={18} aria-hidden="true" />, highlight: true },
+      { name: 'VS Code', icon: <DiVisualstudio size={20} aria-hidden="true" />, highlight: false },
+      { name: 'Postman', icon: <SiPostman size={17} aria-hidden="true" />, highlight: false },
+    ],
+  },
+];
+
+const marqueeTechnologies = [
+  'REACT',
+  'TYPESCRIPT',
+  'NODE.JS',
+  'POSTGRESQL',
+  'PRISMA',
+  'TAILWIND CSS',
+  'EXPRESS',
+  'VITE',
+  'MYSQL',
+  'GIT',
+  'GITHUB',
+  'POSTMAN',
+];
 
 const Skills = () => {
-    const slides = [
-        {
-            title: 'Frontend',
-            color: 'var(--nb-yellow)',
-            items: [
-                { icon: <FaHtml5 size={24} />, name: 'HTML' },
-                { icon: <FaCss3Alt size={24} />, name: 'CSS' },
-                { icon: <FaJs size={24} />, name: 'JavaScript' },
-                { icon: <FaReact size={24} />, name: 'React' },
-                { icon: <RiTailwindCssFill size={24} />, name: 'Tailwind CSS' },
-                { icon: <SiPhp size={23} />, name: 'PHP' },
-                { icon: <FaLaravel size={23} />, name: 'Laravel' },
-            ],
-            description: 'Building responsive UIs with modern frameworks and tools.',
-        },
-        {
-            title: 'Backend',
-            color: 'var(--nb-red)',
-            items: [
-                { icon: <TbBrandMysql size={24} />, name: 'MySQL' },
-                { icon: <SiExpress size={24} />, name: 'Express.JS' },
-                { icon: <FaNode size={24} />, name: 'Node.JS' },
-                { icon: <BiLogoPostgresql size={24} />, name: 'PostgreSQL' },
-                { icon: <FaLaravel size={24} />, name: 'Laravel' },
-                { icon: <FaQuestion size={24} />, name: 'Soon...' },
-            ],
-            description: 'Handling server-side logic and database interactions securely.',
-        },
-        {
-            title: 'Utilities',
-            color: 'var(--nb-black)',
-            textColor: 'var(--nb-yellow)',
-            items: [
-                { icon: <AiFillOpenAI size={24} />, name: 'Open AI' },
-                { icon: <DiVisualstudio size={24} />, name: 'VS Code' },
-                { icon: <IoLogoGithub size={24} />, name: 'GitHub' },
-                { icon: <SiPostman size={24} />, name: 'Postman' },
-                { icon: <FaQuestion size={24} />, name: 'Soon...' },
-                { icon: <FaQuestion size={24} />, name: 'Soon...' },
-            ],
-            description: 'Tools and utilities for efficient development workflows.',
-        },
-    ];
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-        <div className='mt-6 flex flex-col items-center'>
-            <p className='text-xs font-mono font-bold text-center mb-6' style={{ color: 'var(--nb-muted)', letterSpacing: '0.1em' }}>
-                — SWIPE CARDS TO SEE MORE —
-            </p>
-            <Swiper
-                effect={'cards'}
-                grabCursor={true}
-                modules={[EffectCards]}
-                className="mySwiper"
+  const easeCurve = [0.16, 1, 0.3, 1];
+
+  const getFadeMotion = (delay = 0) => {
+    if (shouldReduceMotion) {
+      return {
+        initial: { opacity: 1, y: 0 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      initial: { opacity: 0, y: 22 },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, amount: 0.2 },
+      transition: { duration: 0.45, delay, ease: easeCurve },
+    };
+  };
+
+  return (
+    <div className="w-full text-[#F5F5F5]">
+      {/* Main Content Container */}
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+        {/* ==================================================
+            SECTION HEADER: 04 / TECH STACK
+            ================================================== */}
+        <motion.div {...getFadeMotion(0)} className="mb-14 md:mb-20">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="font-mono text-xs text-[#FACC15] tracking-[0.25em] uppercase font-semibold">
+              04 / TECH STACK
+            </span>
+            <span className="h-[1px] w-12 bg-[#27272A]" aria-hidden="true" />
+          </div>
+          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#F5F5F5] uppercase tracking-tight leading-none">
+            TOOLS I WORK WITH<span className="text-[#FACC15]">.</span>
+          </h2>
+          <p className="font-mono text-xs sm:text-sm text-[#A1A1AA] mt-3 max-w-xl leading-relaxed">
+            A practical stack for designing, building, and deploying modern web applications from interface to database.
+          </p>
+        </motion.div>
+
+        {/* ==================================================
+            CATEGORIZED TECH STACK GRID
+            ================================================== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {techCategories.map((category, index) => (
+            <motion.div
+              key={category.id}
+              {...getFadeMotion(index * 0.08)}
+              className="tech-card rounded-lg p-5 sm:p-6 flex flex-col justify-between"
             >
-                {slides.map((slide, idx) => (
-                    <SwiperSlide key={idx}>
-                        <div className='w-full h-full flex flex-col' style={{ background: 'var(--nb-white)' }}>
-                            {/* Card header */}
-                            <div
-                                className='flex items-center justify-center py-5'
-                                style={{ background: slide.color, borderBottom: 'var(--nb-border)' }}
-                            >
-                                <h2
-                                    className='font-black text-2xl font-grotesk'
-                                    style={{ color: slide.textColor || 'var(--nb-black)' }}
-                                >
-                                    {slide.title.toUpperCase()}
-                                </h2>
-                            </div>
+              <div>
+                {/* Category Header */}
+                <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#222226]">
+                  <h3 className="font-grotesk font-bold text-sm sm:text-base text-[#F5F5F5] tracking-wider uppercase">
+                    {category.title}
+                  </h3>
+                  <span className="font-mono text-[10px] text-[#FACC15] px-2 py-0.5 rounded bg-[#18181C] border border-[#2A2A30] tracking-wider">
+                    {category.badge}
+                  </span>
+                </div>
 
-                            {/* Skill list */}
-                            <div className='flex-1 overflow-y-auto px-5 py-2'>
-                                <ul>
-                                    {slide.items.map((item, i) => (
-                                        <li key={i} style={listItemStyle}>
-                                            <span style={{ color: slide.color === 'var(--nb-black)' ? 'var(--nb-yellow)' : slide.color }}>
-                                                {item.icon}
-                                            </span>
-                                            <span style={{ color: 'var(--nb-ink)' }}>{item.name}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                {/* Category Brief */}
+                <p className="font-mono text-[11px] text-[#71717A] leading-relaxed mt-2.5 mb-4">
+                  {category.description}
+                </p>
 
-                            {/* Description */}
-                            <div
-                                className='px-4 py-3 font-mono text-xs'
-                                style={{ borderTop: 'var(--nb-border)', color: 'var(--nb-muted)', background: 'var(--nb-inset)' }}
-                            >
-                                {slide.description}
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+                {/* Technology List */}
+                <ul className="space-y-2 list-none p-0 m-0">
+                  {category.skills.map((skill) => (
+                    <li
+                      key={skill.name}
+                      className="tech-item group cursor-default"
+                    >
+                      <span className="text-[#71717A] group-hover:text-[#FACC15] group-hover:scale-110 transition-all duration-150 flex items-center justify-center flex-shrink-0">
+                        {skill.icon}
+                      </span>
+                      <span className="font-mono text-xs text-[#D4D4D8] group-hover:text-[#F5F5F5] transition-colors flex-1 tracking-wide">
+                        {skill.name}
+                      </span>
+                      {skill.highlight && (
+                        <span
+                          className="w-1.5 h-1.5 rounded-full bg-[#FACC15]/70 opacity-60 group-hover:opacity-100 transition-opacity"
+                          title="Core Technology"
+                          aria-label="Core Technology"
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
         </div>
-    );
+      </div>
+
+      {/* ==================================================
+          SECONDARY VISUAL: INFINITE LOGO / TECH STRIP
+          ================================================== */}
+      <div className="w-full border-y border-[#1F1F23] bg-[#0A0A0C] py-3.5 overflow-hidden select-none">
+        <div className="relative w-full overflow-hidden flex">
+          {/* Subtle horizontal gradient vignettes */}
+          <div
+            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A0A0C] to-transparent z-10 pointer-events-none"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A0A0C] to-transparent z-10 pointer-events-none"
+            aria-hidden="true"
+          />
+
+          {/* Marquee Content track duplicated for seamless continuous loop */}
+          <div className="animate-tech-marquee items-center gap-8 md:gap-12">
+            {[...marqueeTechnologies, ...marqueeTechnologies].map((tech, idx) => (
+              <div
+                key={`${tech}-${idx}`}
+                className="flex items-center gap-8 md:gap-12 text-[#52525B] hover:text-[#FACC15] transition-colors"
+              >
+                <span className="font-mono text-xs md:text-sm font-bold tracking-[0.2em] whitespace-nowrap">
+                  {tech}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#27272A]" aria-hidden="true" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Skills;

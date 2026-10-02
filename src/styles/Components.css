@@ -112,22 +112,7 @@ body {
   box-shadow: 8px 8px 0px var(--nb-shadow-color);
 }
 
-/* ============================================
-   SKILL (SWIPER)
-   ============================================ */
-.mySwiper {
-  width: 260px;
-  height: 390px;
-}
 
-.swiper-slide {
-  background: var(--nb-white);
-  border: var(--nb-border);
-  box-shadow: var(--nb-shadow-lg);
-  border-radius: 0 !important;
-  overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
-}
 
 /* ============================================
    TIMELINE (STORY)
