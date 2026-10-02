@@ -50,15 +50,15 @@ const App = () => {
             </section>
 
             {/* Certificates */}
-            <section id="certificates" className="py-16" style={{ background: 'var(--nb-cream)' }}>
+            <section id="certificates" className="bg-[#080808] border-t border-[#1C1C20]">
                 <Certificate/>
             </section>
 
-            {/* Academic Background */}
-            <section id="academic" className="min-h-screen flex items-center justify-center academic-background nb-dot-pattern">
-                <div id="AcademicBackground" className="w-full flex items-center justify-center">
-                    <AcademicBackground/>
-                </div>
+            {/* Academic Background / Education */}
+            <section id="education" className="bg-[#080808] border-t border-[#1C1C20]">
+                <div id="academic" aria-hidden="true" />
+                <div id="AcademicBackground" aria-hidden="true" />
+                <AcademicBackground/>
             </section>
 
             {/* Contact Form */}

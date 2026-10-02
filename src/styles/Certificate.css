@@ -1,15 +1,53 @@
-/* Certificate Card Neo-Brutalism */
-.certificate-card {
-  background: var(--nb-white);
-  border: var(--nb-border);
-  box-shadow: var(--nb-shadow-lg);
-  border-radius: 0;
-  overflow: hidden;
-  color: var(--nb-ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+/* ========================================================
+   CERTIFICATE SECTION & MODAL STYLES (DARK EDITORIAL)
+   ======================================================== */
+
+.cert-card {
+  background: #101012;
+  border: 1px solid #1C1C20;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.certificate-card:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px var(--nb-shadow-color);
+.cert-card:hover {
+  border-color: #2E2E34;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+}
+
+.cert-image-container {
+  position: relative;
+  background: #0B0B0D;
+  overflow: hidden;
+}
+
+.cert-image-container img {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+}
+
+.cert-card:hover .cert-image-container img {
+  transform: scale(1.025);
+}
+
+/* Lightbox Modal */
+.cert-modal-backdrop {
+  background: rgba(4, 4, 6, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cert-modal-container {
+  background: #0F0F12;
+  border: 1px solid #27272A;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .cert-card,
+  .cert-card:hover,
+  .cert-image-container img,
+  .cert-card:hover .cert-image-container img {
+    transform: none !important;
+    transition: none !important;
+  }
 }
