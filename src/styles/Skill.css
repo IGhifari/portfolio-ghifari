@@ -1,18 +1,65 @@
-/* Skill Swiper Neo-Brutalism */
-.mySwiper {
-  width: 280px;
-  height: 400px;
+/* ============================================
+   TECH STACK / SKILLS SECTION (THEME AWARE EDITORIAL)
+   ============================================ */
+
+.tech-card {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.swiper-slide {
-  background: var(--nb-white) !important;
-  border: var(--nb-border) !important;
-  box-shadow: var(--nb-shadow-lg) !important;
-  border-radius: 0 !important;
-  color: var(--nb-ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+.tech-card:hover {
+  border-color: var(--border-hover);
 }
 
-.swiper-slide-active {
-  box-shadow: 8px 8px 0px var(--nb-shadow-color) !important;
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.4rem;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: color 0.15s ease, background-color 0.15s ease, padding 0.15s ease;
+}
+
+.tech-item:last-child {
+  border-bottom: none;
+}
+
+.tech-item:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+  padding-left: 0.65rem;
+}
+
+/* Infinite Marquee Strip */
+@keyframes techMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-tech-marquee {
+  display: flex;
+  width: max-content;
+  animation: techMarquee 32s linear infinite;
+}
+
+.animate-tech-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tech-marquee {
+    animation: none;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }

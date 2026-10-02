@@ -23,7 +23,7 @@
         try {
           var t = localStorage.getItem('nb-theme');
           if (t !== 'dark' && t !== 'light') {
-            t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            t = 'dark';
           }
           document.documentElement.setAttribute('data-theme', t);
         } catch (e) {}

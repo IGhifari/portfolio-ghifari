@@ -1,15 +1,26 @@
-/* Project Card Neo-Brutalism */
-.project-card {
-  background: var(--nb-white);
-  border: var(--nb-border);
-  box-shadow: var(--nb-shadow-lg);
-  border-radius: 0;
-  overflow: hidden;
-  color: var(--nb-ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+/* ============================================
+   PROJECTS SECTION (THEME AWARE EDITORIAL STYLING)
+   ============================================ */
+
+.project-preview-frame {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.project-card:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px var(--nb-shadow-color);
+.project-preview-frame:hover {
+  border-color: var(--border-hover);
+}
+
+.other-project-card {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.other-project-card:hover {
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
+  transform: translateY(-2px);
 }
