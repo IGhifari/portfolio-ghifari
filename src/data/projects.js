@@ -58,6 +58,16 @@ export const selectedProjects = [
 
 export const otherProjects = [
   {
+    id: "class-1ia08",
+    title: "Class 1IA08 Website",
+    category: "Web Application",
+    description: "A class information platform designed to manage and display announcements, coursework assignments, schedules, and academic information for Class 1IA08.",
+    image: "/class1ia08.png", // Image reference: add final screenshot to /public/class1ia08.png
+    tags: ["React", "Vite", "JavaScript", "Tailwind CSS", "shadcn/ui", "Supabase", "React Router", "Framer Motion"],
+    github: "https://github.com/ikmalz/class-1IA08",
+    live: "https://class-gokilll.vercel.app/",
+  },
+  {
     id: "ecovoyage",
     title: "Game EcoVoyage - Pulau Harapan",
     description: "An interactive educational web game built to educate players on marine ecosystem sustainability and environmental conservation around Pulau Harapan.",
