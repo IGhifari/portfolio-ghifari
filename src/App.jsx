@@ -9,7 +9,8 @@ import Certificate from './components/Certificate';
 import AcademicBackground from './components/AcademicBackground';
 import Contact from './components/Contact';
 import Skills from './components/Skill';
-import Story from './components/Story';
+import About from './components/About';
+import Journey from './components/Journey';
 import LastUpdated from './components/LastUpdated';
 import ContactMe from './components/ContactMe';
 import SoundButton from './components/SoundButton';
@@ -32,9 +33,14 @@ const App = () => {
                 <Project/>
             </section>
 
-            {/* Certificates */}
-            <section id="certificates" className="py-16" style={{ background: 'var(--nb-cream)' }}>
-                <Certificate/>
+            {/* About */}
+            <section id="about" className="bg-[#080808] border-t border-[#1C1C20]">
+                <About/>
+            </section>
+
+            {/* Journey */}
+            <section id="journey" className="bg-[#080808] border-t border-[#1C1C20]">
+                <Journey/>
             </section>
 
             {/* Skills */}
@@ -50,13 +56,13 @@ const App = () => {
                 </div>
             </section>
 
-            {/* Story / Career Path */}
-            <section id="about" className="min-h-screen flex text-center justify-center" style={{ background: 'var(--nb-cream)' }}>
-                <Story/>
+            {/* Certificates */}
+            <section id="certificates" className="py-16" style={{ background: 'var(--nb-cream)' }}>
+                <Certificate/>
             </section>
 
-            {/* Academic Background / Journey */}
-            <section id="journey" className="min-h-screen flex items-center justify-center academic-background nb-dot-pattern">
+            {/* Academic Background */}
+            <section id="academic" className="min-h-screen flex items-center justify-center academic-background nb-dot-pattern">
                 <div id="AcademicBackground" className="w-full flex items-center justify-center">
                     <AcademicBackground/>
                 </div>
