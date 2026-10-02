@@ -79,7 +79,7 @@ const Contact = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const directEmail = 'ighifarii05@gmail.com';
@@ -87,7 +87,7 @@ const Contact = () => {
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
       setCopiedEmail(true);
-      toast.success('Email copied to clipboard!', { theme: 'dark' });
+      toast.success('Email copied to clipboard!');
       setTimeout(() => setCopiedEmail(false), 2500);
     });
   };
@@ -95,7 +95,6 @@ const Contact = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear specific field error when user modifies it
     if (errors[name]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -128,17 +127,14 @@ const Contact = () => {
     try {
       if (!serviceId || !templateId || !publicKey) {
         setSubmitStatus('error');
-        toast.error(
-          'Email service is temporarily offline. Please write to ighifarii05@gmail.com directly.',
-          { theme: 'dark' }
-        );
+        toast.error('Email service is temporarily offline. Please write to ighifarii05@gmail.com directly.');
         setIsSubmitting(false);
         return;
       }
 
       await emailjs.send(serviceId, templateId, formData, publicKey);
       setSubmitStatus('success');
-      toast.success('Message delivered successfully! 🎉', { theme: 'dark' });
+      toast.success('Message delivered successfully! 🎉');
       setFormData({
         emailto: 'Ghifari',
         name: '',
@@ -149,16 +145,14 @@ const Contact = () => {
     } catch (error) {
       console.error('EmailJS submission failure:', error);
       setSubmitStatus('error');
-      toast.error('Failed to send message. Please reach out directly via email.', {
-        theme: 'dark',
-      });
+      toast.error('Failed to send message. Please reach out directly via email.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24">
+    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24 text-[var(--text-primary)]">
       <ToastContainer position="bottom-right" autoClose={4000} />
 
       {/* Section Header */}
@@ -170,20 +164,20 @@ const Contact = () => {
         className="mb-12 md:mb-16"
       >
         <div className="flex items-center gap-3 mb-3">
-          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[#FACC15] uppercase">
+          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
             07 / CONTACT
           </span>
-          <span className="h-px w-8 bg-[#27272A]" aria-hidden="true" />
-          <span className="font-mono text-xs text-[#71717A] uppercase">
+          <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
+          <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
             GET IN TOUCH
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#F5F5F5] uppercase">
-            LET&apos;S BUILD SOMETHING USEFUL<span className="text-[#FACC15]">.</span>
+          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
+            LET&apos;S BUILD SOMETHING USEFUL<span className="text-[var(--accent)]">.</span>
           </h2>
-          <p className="font-sans text-sm md:text-base text-[#A1A1AA] max-w-xl leading-relaxed">
+          <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
             Have a project, opportunity, or collaboration in mind? Feel free to send a message directly or connect via my channels.
           </p>
         </div>
@@ -197,28 +191,28 @@ const Contact = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-7 bg-[#101012] border border-[#1C1C20] rounded-lg p-6 sm:p-8"
+          className="lg:col-span-7 bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-8"
         >
-          <div className="flex items-center justify-between pb-5 mb-6 border-b border-[#1C1C20]">
+          <div className="flex items-center justify-between pb-5 mb-6 border-b border-[var(--border-subtle)]">
             <div>
-              <span className="font-mono text-[11px] text-[#FACC15] uppercase tracking-wider block">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider block">
                 Direct Dispatch
               </span>
-              <h3 className="font-grotesk font-bold text-xl text-[#F5F5F5]">
+              <h3 className="font-grotesk font-bold text-xl text-[var(--text-primary)]">
                 Send a Message
               </h3>
             </div>
-            <span className="font-mono text-xs text-[#71717A]">
+            <span className="font-mono text-xs text-[var(--text-muted)]">
               * Required fields
             </span>
           </div>
 
           {/* Success Banner */}
           {submitStatus === 'success' && (
-            <div className="mb-6 p-4 rounded-md bg-[#132A1C] border border-[#22543D] text-[#86EFAC] flex items-start gap-3">
-              <FiCheckCircle size={18} className="mt-0.5 shrink-0 text-[#4ADE80]" aria-hidden="true" />
+            <div className="mb-6 p-4 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 flex items-start gap-3">
+              <FiCheckCircle size={18} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden="true" />
               <div className="text-xs sm:text-sm leading-relaxed">
-                <strong className="font-semibold block text-white mb-0.5">Message dispatched successfully!</strong>
+                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">Message dispatched successfully!</strong>
                 Thank you for reaching out. I have received your note and will reply as soon as possible.
               </div>
             </div>
@@ -226,12 +220,12 @@ const Contact = () => {
 
           {/* Error Banner */}
           {submitStatus === 'error' && (
-            <div className="mb-6 p-4 rounded-md bg-[#2D1515] border border-[#7F1D1D] text-[#FCA5A5] flex items-start gap-3">
-              <FiAlertCircle size={18} className="mt-0.5 shrink-0 text-[#EF4444]" aria-hidden="true" />
+            <div className="mb-6 p-4 rounded-md bg-rose-950/40 border border-rose-500/30 text-rose-400 flex items-start gap-3">
+              <FiAlertCircle size={18} className="mt-0.5 shrink-0 text-rose-400" aria-hidden="true" />
               <div className="text-xs sm:text-sm leading-relaxed">
-                <strong className="font-semibold block text-white mb-0.5">Unable to send via automated dispatch</strong>
+                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">Unable to send via automated dispatch</strong>
                 Please feel free to email me directly at{' '}
-                <a href={`mailto:${directEmail}`} className="underline font-mono text-white">
+                <a href={`mailto:${directEmail}`} className="underline font-mono text-[var(--text-primary)]">
                   {directEmail}
                 </a>.
               </div>
@@ -244,9 +238,9 @@ const Contact = () => {
               <div>
                 <label
                   htmlFor="contact-name"
-                  className="block font-mono text-xs text-[#A1A1AA] uppercase tracking-wider mb-2"
+                  className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
                 >
-                  Your Name <span className="text-[#FACC15]">*</span>
+                  Your Name <span className="text-[var(--accent)]">*</span>
                 </label>
                 <input
                   type="text"
@@ -261,7 +255,7 @@ const Contact = () => {
                   aria-describedby={errors.name ? 'name-error' : undefined}
                 />
                 {errors.name && (
-                  <p id="name-error" className="font-mono text-xs text-[#EF4444] mt-1.5 flex items-center gap-1">
+                  <p id="name-error" className="font-mono text-xs text-rose-500 mt-1.5 flex items-center gap-1">
                     <FiAlertCircle size={12} aria-hidden="true" /> {errors.name}
                   </p>
                 )}
@@ -270,9 +264,9 @@ const Contact = () => {
               <div>
                 <label
                   htmlFor="contact-email"
-                  className="block font-mono text-xs text-[#A1A1AA] uppercase tracking-wider mb-2"
+                  className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
                 >
-                  Your Email <span className="text-[#FACC15]">*</span>
+                  Your Email <span className="text-[var(--accent)]">*</span>
                 </label>
                 <input
                   type="email"
@@ -287,7 +281,7 @@ const Contact = () => {
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p id="email-error" className="font-mono text-xs text-[#EF4444] mt-1.5 flex items-center gap-1">
+                  <p id="email-error" className="font-mono text-xs text-rose-500 mt-1.5 flex items-center gap-1">
                     <FiAlertCircle size={12} aria-hidden="true" /> {errors.email}
                   </p>
                 )}
@@ -298,9 +292,9 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="contact-subject"
-                className="block font-mono text-xs text-[#A1A1AA] uppercase tracking-wider mb-2"
+                className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
               >
-                Subject <span className="text-[#71717A] text-[10px] normal-case">(optional)</span>
+                Subject <span className="text-[var(--text-muted)] text-[10px] normal-case">(optional)</span>
               </label>
               <input
                 type="text"
@@ -318,9 +312,9 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="contact-message"
-                className="block font-mono text-xs text-[#A1A1AA] uppercase tracking-wider mb-2"
+                className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
               >
-                Message <span className="text-[#FACC15]">*</span>
+                Message <span className="text-[var(--accent)]">*</span>
               </label>
               <textarea
                 id="contact-message"
@@ -335,7 +329,7 @@ const Contact = () => {
                 aria-describedby={errors.message ? 'message-error' : undefined}
               />
               {errors.message && (
-                <p id="message-error" className="font-mono text-xs text-[#EF4444] mt-1.5 flex items-center gap-1">
+                <p id="message-error" className="font-mono text-xs text-rose-500 mt-1.5 flex items-center gap-1">
                   <FiAlertCircle size={12} aria-hidden="true" /> {errors.message}
                 </p>
               )}
@@ -347,11 +341,11 @@ const Contact = () => {
                 type="submit"
                 id="contact-submit-btn"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-md bg-[#FACC15] hover:bg-[#FDE047] text-[#080808] font-grotesk font-black text-sm tracking-wide transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FACC15] focus-visible:ring-offset-2 focus-visible:ring-offset-[#101012] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-black text-sm tracking-wide transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin h-4 w-4 text-[#080808]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
@@ -377,42 +371,42 @@ const Contact = () => {
           className="lg:col-span-5 space-y-6"
         >
           {/* Quick Direct Email Card */}
-          <div className="bg-[#101012] border border-[#1C1C20] rounded-lg p-6 space-y-4">
+          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-[#FACC15] uppercase tracking-wider">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider">
                 Primary Channel
               </span>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-[#4ADE80]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 AVAILABLE FOR HIRE
               </span>
             </div>
 
             <div>
-              <h4 className="font-grotesk font-bold text-lg text-[#F5F5F5] mb-1">
+              <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] mb-1">
                 Direct Email
               </h4>
-              <p className="font-sans text-xs text-[#71717A] leading-relaxed mb-3">
+              <p className="font-sans text-xs text-[var(--text-muted)] leading-relaxed mb-3">
                 For contract inquiries, freelance work, software roles, or casual developer chats.
               </p>
 
-              <div className="flex items-center gap-2 p-2.5 rounded bg-[#141417] border border-[#232328]">
-                <FiMail size={16} className="text-[#FACC15] shrink-0" aria-hidden="true" />
+              <div className="flex items-center gap-2 p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
+                <FiMail size={16} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
                 <a
                   href={`mailto:${directEmail}`}
-                  className="font-mono text-xs sm:text-sm text-[#F5F5F5] hover:text-[#FACC15] transition-colors truncate flex-1 focus-visible:outline-none"
+                  className="font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
                 >
                   {directEmail}
                 </a>
                 <button
                   type="button"
                   onClick={copyEmailToClipboard}
-                  className="p-1.5 rounded text-[#A1A1AA] hover:text-white bg-[#1A1A1F] hover:bg-[#27272A] border border-[#27272A] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
+                  className="p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
                   title="Copy email address"
                   aria-label="Copy email address"
                 >
                   {copiedEmail ? (
-                    <FiCheck size={14} className="text-[#4ADE80]" />
+                    <FiCheck size={14} className="text-emerald-500" />
                   ) : (
                     <FiCopy size={14} />
                   )}
@@ -420,13 +414,13 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#1C1C20] grid grid-cols-2 gap-3 font-mono text-[11px] text-[#A1A1AA]">
+            <div className="pt-3 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-3 font-mono text-[11px] text-[var(--text-secondary)]">
               <div className="flex items-center gap-1.5">
-                <FiMapPin size={12} className="text-[#71717A] shrink-0" aria-hidden="true" />
+                <FiMapPin size={12} className="text-[var(--text-muted)] shrink-0" aria-hidden="true" />
                 <span>Bogor, Indonesia</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <FiClock size={12} className="text-[#71717A] shrink-0" aria-hidden="true" />
+                <FiClock size={12} className="text-[var(--text-muted)] shrink-0" aria-hidden="true" />
                 <span>UTC+7 (WIB)</span>
               </div>
             </div>
@@ -434,7 +428,7 @@ const Contact = () => {
 
           {/* Social & Developer Channels */}
           <div className="space-y-3">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-[#71717A] px-1">
+            <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] px-1">
               Verified Profiles & Networks
             </h4>
 
@@ -445,22 +439,22 @@ const Contact = () => {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact-channel-item p-3.5 rounded-lg flex items-center justify-between group no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                  className="contact-channel-item p-3.5 rounded-lg flex items-center justify-between group no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-9 h-9 rounded-md bg-[#18181C] border border-[#27272A] flex items-center justify-center text-[#A1A1AA] group-hover:text-[#FACC15] group-hover:border-[#3F3F46] transition-colors shrink-0">
+                    <div className="w-9 h-9 rounded-md bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent)] group-hover:border-[var(--accent)] transition-colors shrink-0">
                       {item.icon}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-grotesk font-bold text-sm text-[#F5F5F5] group-hover:text-white transition-colors">
+                        <span className="font-grotesk font-bold text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
                           {item.name}
                         </span>
-                        <span className="font-mono text-xs text-[#71717A]">
+                        <span className="font-mono text-xs text-[var(--text-muted)]">
                           {item.handle}
                         </span>
                       </div>
-                      <p className="font-sans text-xs text-[#71717A] truncate">
+                      <p className="font-sans text-xs text-[var(--text-secondary)] truncate">
                         {item.desc}
                       </p>
                     </div>
@@ -468,7 +462,7 @@ const Contact = () => {
 
                   <FiExternalLink
                     size={14}
-                    className="text-[#52525B] group-hover:text-[#FACC15] transition-colors shrink-0 ml-2"
+                    className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2"
                     aria-hidden="true"
                   />
                 </a>

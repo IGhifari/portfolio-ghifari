@@ -40,7 +40,7 @@ const AcademicBackground = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24">
+    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24 text-[var(--text-primary)]">
       {/* Section Header */}
       <motion.header
         initial={{ opacity: 0, y: 16 }}
@@ -50,20 +50,20 @@ const AcademicBackground = () => {
         className="mb-12 md:mb-16"
       >
         <div className="flex items-center gap-3 mb-3">
-          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[#FACC15] uppercase">
+          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
             06 / EDUCATION
           </span>
-          <span className="h-px w-8 bg-[#27272A]" aria-hidden="true" />
-          <span className="font-mono text-xs text-[#71717A] uppercase">
+          <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
+          <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
             ACADEMIC BACKGROUND
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#F5F5F5] uppercase">
-            FORMAL EDUCATION<span className="text-[#FACC15]">.</span>
+          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
+            FORMAL EDUCATION<span className="text-[var(--accent)]">.</span>
           </h2>
-          <p className="font-sans text-sm md:text-base text-[#A1A1AA] max-w-xl leading-relaxed">
+          <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
             Foundational software engineering curriculum emphasizing practical programming, system architecture, and modern development standards.
           </p>
         </div>
@@ -79,49 +79,49 @@ const AcademicBackground = () => {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="lg:col-span-4 space-y-6"
         >
-          <div className="bg-[#101012] border border-[#1C1C20] rounded-lg p-6 space-y-5">
+          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-5">
             <div>
-              <span className="font-mono text-[11px] text-[#71717A] uppercase tracking-wider block mb-1.5">
+              <span className="font-mono text-[11px] text-[var(--text-muted)] uppercase tracking-wider block mb-1.5">
                 Current Program
               </span>
-              <p className="font-grotesk font-bold text-lg text-[#F5F5F5]">
+              <p className="font-grotesk font-bold text-lg text-[var(--text-primary)]">
                 Vocational High School
               </p>
-              <p className="font-mono text-xs text-[#FACC15] mt-0.5">
+              <p className="font-mono text-xs text-[var(--accent)] mt-0.5 font-semibold">
                 Software Engineering (RPL)
               </p>
             </div>
 
-            <div className="pt-4 border-t border-[#1C1C20] space-y-3 font-mono text-xs text-[#A1A1AA]">
+            <div className="pt-4 border-t border-[var(--border-subtle)] space-y-3 font-mono text-xs text-[var(--text-secondary)]">
               <div className="flex items-start gap-2.5">
-                <FiCalendar size={14} className="text-[#FACC15] shrink-0 mt-0.5" aria-hidden="true" />
+                <FiCalendar size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[#71717A] block text-[10px] uppercase">Timeline</span>
-                  <span className="text-[#F5F5F5]">{educationData.period}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Timeline</span>
+                  <span className="text-[var(--text-primary)]">{educationData.period}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
-                <FiMapPin size={14} className="text-[#FACC15] shrink-0 mt-0.5" aria-hidden="true" />
+                <FiMapPin size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[#71717A] block text-[10px] uppercase">Campus Location</span>
-                  <span className="text-[#F5F5F5]">{educationData.location}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Campus Location</span>
+                  <span className="text-[var(--text-primary)]">{educationData.location}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
-                <FiBookOpen size={14} className="text-[#FACC15] shrink-0 mt-0.5" aria-hidden="true" />
+                <FiBookOpen size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[#71717A] block text-[10px] uppercase">Status</span>
-                  <span className="text-[#FACC15] font-semibold">{educationData.status}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Status</span>
+                  <span className="text-[var(--accent)] font-semibold">{educationData.status}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Editorial Note */}
-          <div className="p-5 border-l-2 border-[#FACC15]/60 bg-[#101012]/40 rounded-r-lg">
-            <p className="font-sans text-xs text-[#A1A1AA] leading-relaxed">
+          <div className="p-5 border-l-2 border-[var(--accent)]/70 bg-[var(--surface-alt)]/60 rounded-r-lg">
+            <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed">
               Curriculum is complemented by active production work, professional frontend internship experience, and independent full-stack software development.
             </p>
           </div>
@@ -133,36 +133,36 @@ const AcademicBackground = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-8 bg-[#101012] border border-[#1C1C20] hover:border-[#27272A] rounded-lg p-6 sm:p-8 transition-colors space-y-6"
+          className="lg:col-span-8 bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg p-6 sm:p-8 transition-colors space-y-6"
         >
           {/* Card Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[#1C1C20]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[var(--border-subtle)]">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[#18181B] text-[#FACC15] border border-[#27272A]">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]">
                   SMK / VOCATIONAL
                 </span>
-                <span className="text-xs font-mono text-[#71717A]">
+                <span className="text-xs font-mono text-[var(--text-muted)]">
                   INDONESIAN NATIONAL CURRICULUM
                 </span>
               </div>
-              <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[#F5F5F5] tracking-tight">
+              <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
                 {educationData.institution}
               </h3>
             </div>
-            <span className="font-mono text-xs text-[#71717A] bg-[#141417] px-3 py-1.5 rounded border border-[#232328] self-start sm:self-auto">
+            <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto">
               2023 — 2026
             </span>
           </div>
 
           {/* Overview */}
-          <p className="font-sans text-sm sm:text-base text-[#A1A1AA] leading-relaxed">
+          <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
             {educationData.overview}
           </p>
 
           {/* Curriculum Focus Areas */}
           <div className="space-y-3 pt-2">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-[#71717A]">
+            <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
               Core Competencies & Academic Pillars
             </h4>
 
@@ -170,15 +170,15 @@ const AcademicBackground = () => {
               {educationData.competencies.map((item) => (
                 <div
                   key={item.title}
-                  className="bg-[#141417] border border-[#1F1F24] rounded-md p-3.5 flex flex-col justify-between"
+                  className="bg-[var(--surface-alt)] border border-[var(--border-subtle)] rounded-md p-3.5 flex flex-col justify-between"
                 >
                   <div className="flex items-start gap-2 mb-1">
-                    <FiCheckCircle size={14} className="text-[#FACC15] mt-0.5 shrink-0" aria-hidden="true" />
-                    <span className="font-grotesk font-bold text-xs sm:text-sm text-[#F5F5F5]">
+                    <FiCheckCircle size={14} className="text-[var(--accent)] mt-0.5 shrink-0" aria-hidden="true" />
+                    <span className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)]">
                       {item.title}
                     </span>
                   </div>
-                  <p className="font-sans text-xs text-[#71717A] leading-relaxed pl-5.5">
+                  <p className="font-sans text-xs text-[var(--text-muted)] leading-relaxed pl-5.5">
                     {item.desc}
                   </p>
                 </div>
@@ -187,14 +187,14 @@ const AcademicBackground = () => {
           </div>
 
           {/* Curriculum Tags */}
-          <div className="pt-4 border-t border-[#1C1C20] flex flex-wrap items-center gap-1.5">
-            <span className="font-mono text-[11px] text-[#71717A] mr-1">
+          <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
+            <span className="font-mono text-[11px] text-[var(--text-muted)] mr-1">
               Curriculum Scope:
             </span>
             {educationData.curriculumTags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 rounded text-[11px] font-mono bg-[#161619] border border-[#232328] text-[#A1A1AA]"
+                className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--tag-bg)] border border-[var(--tag-border)] text-[var(--tag-text)]"
               >
                 {tag}
               </span>

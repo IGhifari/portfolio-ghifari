@@ -67,10 +67,10 @@ const Navbar = () => {
           smooth={true}
           duration={600}
           offset={-80}
-          className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[#F5F5F5] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+          className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           aria-label="Ghifari - Home"
         >
-          GHIFARI<span className="text-[#FACC15]">.</span>
+          GHIFARI<span className="text-[var(--accent)]">.</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -83,8 +83,8 @@ const Navbar = () => {
               duration={600}
               offset={-70}
               spy={true}
-              activeClass="!text-[#FACC15]"
-              className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+              activeClass="!text-[var(--accent)]"
+              className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               {label}
             </Link>
@@ -98,7 +98,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[#A1A1AA] hover:text-[#FACC15] bg-[#101012]/60 hover:bg-[#18181B] border border-[#27272A]/70 hover:border-[#3F3F46] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
@@ -111,7 +111,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[#A1A1AA] hover:text-[#FACC15] bg-[#101012]/60 hover:bg-[#18181B] border border-[#27272A]/70 transition-all focus-visible:outline-none"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
@@ -122,7 +122,7 @@ const Navbar = () => {
             onClick={toggleMenu}
             aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMenuOpen}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[#F5F5F5] hover:text-[#FACC15] bg-[#101012]/60 hover:bg-[#18181B] border border-[#27272A]/70 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
             {isMenuOpen ? <IoClose size={22} /> : <IoMenu size={22} />}
           </button>
@@ -131,7 +131,7 @@ const Navbar = () => {
 
       {/* Mobile Menu Overlay / Drawer */}
       <div
-        className={`md:hidden fixed inset-x-0 top-16 bg-[#080808]/98 backdrop-blur-xl border-b border-[#27272A] transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`md:hidden fixed inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)] transition-all duration-300 ease-in-out overflow-hidden ${
           isMenuOpen ? 'h-[calc(100vh-4rem)] opacity-100 py-6' : 'h-0 opacity-0 py-0'
         }`}
         style={{ pointerEvents: isMenuOpen ? 'auto' : 'none' }}
@@ -147,8 +147,8 @@ const Navbar = () => {
               offset={-70}
               onClick={closeMenu}
               spy={true}
-              activeClass="!text-[#FACC15] !bg-[#141417]"
-              className="py-3 px-4 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#141417] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
+              activeClass="!text-[var(--accent)] !bg-[var(--surface-alt)]"
+              className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
             >
               {label}
             </Link>

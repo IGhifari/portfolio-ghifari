@@ -1,16 +1,16 @@
 /* ============================================
-   TECH STACK / SKILLS SECTION (DARK EDITORIAL)
+   TECH STACK / SKILLS SECTION (THEME AWARE EDITORIAL)
    ============================================ */
 
 .tech-card {
-  background-color: #101012;
-  border: 1px solid #27272A;
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
 .tech-card:hover {
-  border-color: #3F3F46;
-  background-color: #141417;
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
   transform: translateY(-2px);
 }
 
@@ -20,16 +20,16 @@
   gap: 0.65rem;
   padding: 0.6rem 0.85rem;
   border-radius: 0.375rem;
-  background-color: #121215;
-  border: 1px solid #222226;
-  color: #A1A1AA;
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   transition: all 0.15s ease;
 }
 
 .tech-item:hover {
-  border-color: #3F3F46;
-  background-color: #18181C;
-  color: #F5F5F5;
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
   transform: translateY(-1px);
 }
 

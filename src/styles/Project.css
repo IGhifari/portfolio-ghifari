@@ -1,27 +1,26 @@
 /* ============================================
-   PROJECTS SECTION (DARK EDITORIAL STYLING)
+   PROJECTS SECTION (THEME AWARE EDITORIAL STYLING)
    ============================================ */
 
 .project-preview-frame {
-  background-color: #101012;
-  border: 1px solid #27272A;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .project-preview-frame:hover {
-  border-color: #3F3F46;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+  border-color: var(--border-hover);
 }
 
 .other-project-card {
-  background-color: #101012;
-  border: 1px solid #27272A;
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
   transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 }
 
 .other-project-card:hover {
-  border-color: #3F3F46;
-  background-color: #141417;
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
   transform: translateY(-2px);
 }

@@ -27,21 +27,21 @@ const Project = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[#F5F5F5]">
+    <div className="w-full max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
       {/* ==================================================
           SECTION HEADER: 01 / SELECTED WORK
           ================================================== */}
       <motion.div {...getFadeMotion(0)} className="mb-16 md:mb-24">
         <div className="flex items-center gap-3 mb-3">
-          <span className="font-mono text-xs text-[#FACC15] tracking-[0.25em] uppercase font-semibold">
+          <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
             01 / SELECTED WORK
           </span>
-          <span className="h-[1px] w-12 bg-[#27272A]" aria-hidden="true" />
+          <span className="h-[1px] w-12 bg-[var(--border)]" aria-hidden="true" />
         </div>
-        <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#F5F5F5] uppercase tracking-tight leading-none">
-          SELECTED PROJECTS<span className="text-[#FACC15]">.</span>
+        <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--text-primary)] uppercase tracking-tight leading-none">
+          SELECTED PROJECTS<span className="text-[var(--accent)]">.</span>
         </h2>
-        <p className="font-mono text-xs sm:text-sm text-[#A1A1AA] mt-3 max-w-xl leading-relaxed">
+        <p className="font-mono text-xs sm:text-sm text-[var(--text-secondary)] mt-3 max-w-xl leading-relaxed">
           A curated selection of applications and systems I&apos;ve designed and built.
         </p>
       </motion.div>
@@ -73,20 +73,20 @@ const Project = () => {
                     className="project-preview-frame rounded-lg overflow-hidden"
                   >
                     {/* Window Header Frame */}
-                    <div className="px-3.5 py-2.5 bg-[#141417] border-b border-[#27272A] flex items-center justify-between select-none">
+                    <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
                       <div className="flex items-center gap-1.5" aria-hidden="true">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
                       </div>
-                      <span className="font-mono text-[10px] text-[#71717A] tracking-wider uppercase">
+                      <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wider uppercase">
                         {project.title.toLowerCase().replace(/\s+/g, '-')}.app
                       </span>
                       <div className="w-10" aria-hidden="true" />
                     </div>
 
                     {/* Screenshot Preview */}
-                    <div className="relative aspect-video w-full bg-[#0D0D0F] overflow-hidden">
+                    <div className="relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden">
                       <img
                         src={project.image}
                         alt={`${project.title} interface preview`}
@@ -105,27 +105,27 @@ const Project = () => {
                 >
                   {/* Category & Project Index */}
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-[#FACC15] tracking-[0.2em]">
+                    <span className="font-mono text-xs font-bold text-[var(--accent)] tracking-[0.2em]">
                       {project.number}
                     </span>
-                    <span className="text-[#3F3F46]" aria-hidden="true">/</span>
-                    <span className="font-mono text-[11px] text-[#A1A1AA] tracking-[0.16em] uppercase">
+                    <span className="text-[var(--border)]" aria-hidden="true">/</span>
+                    <span className="font-mono text-[11px] text-[var(--text-secondary)] tracking-[0.16em] uppercase">
                       {project.category}
                     </span>
                   </div>
 
                   {/* Project Title */}
-                  <h3 className="font-grotesk font-black text-2xl sm:text-3xl lg:text-4xl text-[#F5F5F5] uppercase tracking-tight mt-2.5 leading-none">
+                  <h3 className="font-grotesk font-black text-2xl sm:text-3xl lg:text-4xl text-[var(--text-primary)] uppercase tracking-tight mt-2.5 leading-none">
                     {project.title}
                   </h3>
 
                   {/* Subtitle */}
-                  <p className="font-mono text-xs text-[#A1A1AA] tracking-wider uppercase mt-1.5">
+                  <p className="font-mono text-xs text-[var(--text-secondary)] tracking-wider uppercase mt-1.5">
                     {project.subtitle}
                   </p>
 
                   {/* Description */}
-                  <p className="text-sm md:text-base text-[#A1A1AA] leading-relaxed mt-4 font-normal">
+                  <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed mt-4 font-normal">
                     {project.description}
                   </p>
 
@@ -134,21 +134,21 @@ const Project = () => {
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2.5 py-1 text-xs font-mono text-[#D4D4D8] bg-[#141416] border border-[#27272A] rounded tracking-wide"
+                        className="px-2.5 py-1 text-xs font-mono text-[var(--tag-text)] bg-[var(--tag-bg)] border border-[var(--tag-border)] rounded tracking-wide"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
 
-                  {/* Verified Links (Omit fake or placeholder links) */}
+                  {/* Verified Links */}
                   <div className="flex items-center gap-3 sm:gap-4 mt-7 pt-1">
                     {project.github && (
                       <a
                         href={project.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#141416] hover:bg-[#1C1C20] text-[#F5F5F5] hover:text-[#FACC15] border border-[#27272A] hover:border-[#FACC15] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`View ${project.title} source code on GitHub`}
                       >
                         <FiGithub size={15} />
@@ -161,7 +161,7 @@ const Project = () => {
                         href={project.live}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FACC15] hover:bg-[#FACC15]/90 text-[#080808] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`Open ${project.title} live demo`}
                       >
                         <span>LIVE DEMO</span>
@@ -179,22 +179,22 @@ const Project = () => {
       {/* ==================================================
           SECTION DIVIDER
           ================================================== */}
-      <div className="w-full h-[1px] bg-[#1F1F23] my-20 md:my-28" aria-hidden="true" />
+      <div className="w-full h-[1px] bg-[var(--border-subtle)] my-20 md:my-28" aria-hidden="true" />
 
       {/* ==================================================
           OTHER PROJECTS (COMPACT SECONDARY ARCHIVE)
           ================================================== */}
       <motion.div {...getFadeMotion(0)} className="mb-10 sm:mb-12">
         <div className="flex items-center gap-3 mb-2">
-          <span className="font-mono text-xs text-[#71717A] tracking-[0.2em] uppercase font-semibold">
+          <span className="font-mono text-xs text-[var(--text-muted)] tracking-[0.2em] uppercase font-semibold">
             02 / ARCHIVE
           </span>
-          <span className="h-[1px] w-8 bg-[#27272A]" aria-hidden="true" />
+          <span className="h-[1px] w-8 bg-[var(--border)]" aria-hidden="true" />
         </div>
-        <h3 className="font-grotesk font-bold text-2xl sm:text-3xl text-[#F5F5F5] uppercase tracking-tight">
-          OTHER PROJECTS<span className="text-[#FACC15]">.</span>
+        <h3 className="font-grotesk font-bold text-2xl sm:text-3xl text-[var(--text-primary)] uppercase tracking-tight">
+          OTHER PROJECTS<span className="text-[var(--accent)]">.</span>
         </h3>
-        <p className="font-mono text-xs text-[#71717A] mt-1.5">
+        <p className="font-mono text-xs text-[var(--text-muted)] mt-1.5">
           Selected earlier experiments, educational web games, and digital management tools.
         </p>
       </motion.div>
@@ -208,7 +208,7 @@ const Project = () => {
             className="other-project-card rounded-lg overflow-hidden flex flex-col justify-between group"
           >
             {/* Project Image Preview */}
-            <div className="relative aspect-video w-full bg-[#0D0D0F] overflow-hidden border-b border-[#27272A]">
+            <div className="relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden border-b border-[var(--border)]">
               <img
                 src={project.image}
                 alt={`${project.title} thumbnail`}
@@ -220,21 +220,21 @@ const Project = () => {
             {/* Card Content */}
             <div className="p-5 flex-1 flex flex-col justify-between">
               <div>
-                <h4 className="font-grotesk font-bold text-lg text-[#F5F5F5] group-hover:text-[#FACC15] transition-colors leading-snug">
+                <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
                   {project.title}
                 </h4>
-                <p className="text-xs text-[#A1A1AA] leading-relaxed mt-2 line-clamp-2">
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2 line-clamp-2">
                   {project.description}
                 </p>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-[#1C1C20] flex items-center justify-between gap-3">
+              <div className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
                 {/* Tech tags */}
                 <div className="flex flex-wrap gap-1.5">
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-[10px] font-mono text-[#8E8E93] bg-[#161619] border border-[#27272A] rounded"
+                      className="px-2 py-0.5 text-[10px] font-mono text-[var(--tag-text)] bg-[var(--tag-bg)] border border-[var(--tag-border)] rounded"
                     >
                       {tag}
                     </span>
@@ -248,7 +248,7 @@ const Project = () => {
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#1A1A1E] rounded transition-colors focus-visible:outline-none"
+                      className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
                       aria-label={`View ${project.title} source code`}
                       title="GitHub Repository"
                     >
@@ -260,7 +260,7 @@ const Project = () => {
                       href={project.live}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#1A1A1E] rounded transition-colors focus-visible:outline-none"
+                      className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
                       aria-label={`Open ${project.title} live demo`}
                       title="Live Deployment"
                     >

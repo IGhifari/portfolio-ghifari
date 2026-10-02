@@ -20,17 +20,17 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[#080808] border-t border-[#1C1C20] py-12 lg:py-16 text-[#A1A1AA]">
+    <footer className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)] py-12 lg:py-16 text-[var(--text-secondary)]">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 space-y-10">
         {/* Top Tier: Identity & Back to Top */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-[#1C1C20]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-[var(--border-subtle)]">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="font-grotesk font-black text-2xl tracking-tight text-[#F5F5F5]">
-                GHIFARI<span className="text-[#FACC15]">.</span>
+              <span className="font-grotesk font-black text-2xl tracking-tight text-[var(--text-primary)]">
+                GHIFARI<span className="text-[var(--accent)]">.</span>
               </span>
             </div>
-            <p className="font-mono text-xs uppercase tracking-wider text-[#71717A]">
+            <p className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
               Web Developer · Software Engineer
             </p>
           </div>
@@ -39,11 +39,11 @@ const Footer = () => {
             <button
               type="button"
               onClick={scrollToTop}
-              className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#101012] border border-[#27272A] hover:border-[#3F3F46] text-xs font-mono text-[#D4D4D8] hover:text-[#FACC15] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+              className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               aria-label="Scroll back to top of the page"
             >
               <span>BACK TO TOP</span>
-              <FiArrowUp size={13} className="text-[#FACC15] group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
+              <FiArrowUp size={13} className="text-[var(--accent)] group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -57,7 +57,7 @@ const Footer = () => {
                 href={link.href}
                 target={link.href.startsWith('mailto:') ? undefined : '_blank'}
                 rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center gap-1.5 text-[#A1A1AA] hover:text-[#FACC15] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15] py-1 rounded"
+                className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
               >
                 {link.icon}
                 <span>{link.label}</span>
@@ -65,13 +65,13 @@ const Footer = () => {
             ))}
           </nav>
 
-          <p className="text-[#71717A] text-xs">
-            Engineered with <span className="text-[#D4D4D8]">React 18</span>, <span className="text-[#D4D4D8]">Vite</span> &amp; <span className="text-[#D4D4D8]">Tailwind CSS</span>
+          <p className="text-[var(--text-muted)] text-xs">
+            Engineered with <span className="text-[var(--text-primary)]">React 18</span>, <span className="text-[var(--text-primary)]">Vite</span> &amp; <span className="text-[var(--text-primary)]">Tailwind CSS</span>
           </p>
         </div>
 
         {/* Bottom Tier: Copyright & Last Updated */}
-        <div className="pt-6 border-t border-[#141418] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-[#71717A]">
+        <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-[var(--text-muted)]">
           <p>
             &copy; {currentYear} M. Ghifari Bima Khadafi. All rights reserved.
           </p>

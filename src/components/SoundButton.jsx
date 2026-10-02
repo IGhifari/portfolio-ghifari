@@ -91,15 +91,15 @@ const SoundButton = () => {
                         type="button"
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
-                        className="sm:hidden w-9 h-9 rounded-full bg-[#111113]/90 backdrop-blur-md border border-[#27272A] hover:border-[#FACC15] flex items-center justify-center text-[#A1A1AA] hover:text-[#FACC15] transition-all shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        className="sm:hidden w-9 h-9 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={isPlaying ? `Now playing: ${currentTrack.title}. Open music player` : "Open music player"}
                         title={isPlaying ? `Now playing: ${currentTrack.title}` : "Open music player"}
                     >
                         {isPlaying ? (
                             <div className="flex items-center gap-[2px] h-3">
-                                <span className="w-[2px] h-full bg-[#FACC15] animate-pulse" />
-                                <span className="w-[2px] h-2 bg-[#FACC15] animate-pulse delay-75" />
-                                <span className="w-[2px] h-full bg-[#FACC15] animate-pulse delay-150" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse" />
+                                <span className="w-[2px] h-2 bg-[var(--accent)] animate-pulse delay-75" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150" />
                             </div>
                         ) : (
                             <FiMusic size={15} />
@@ -108,7 +108,7 @@ const SoundButton = () => {
 
                     {/* Desktop: Quiet compact pill (>=640px) */}
                     <div
-                        className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[#111113]/85 backdrop-blur-md border border-[#27272A] hover:border-[#3F3F46] shadow-sm transition-all duration-200 group"
+                        className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[var(--surface-muted)]/85 backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] shadow-sm transition-all duration-200 group"
                     >
                         {/* Spinning mini album thumbnail or quick play toggle */}
                         <button
@@ -136,7 +136,7 @@ const SoundButton = () => {
                             className="flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
                             aria-label={`Now playing ${currentTrack.title} by ${currentTrack.artist}. Expand player`}
                         >
-                            <span className="text-[11px] font-mono text-[#D4D4D8] group-hover:text-[#FACC15] transition-colors max-w-[95px] truncate">
+                            <span className="text-[11px] font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors max-w-[95px] truncate">
                                 {currentTrack.title}
                             </span>
 
@@ -147,7 +147,7 @@ const SoundButton = () => {
                                         key={b}
                                         style={{
                                             width: '2px',
-                                            background: isPlaying ? '#FACC15' : '#52525B',
+                                            background: isPlaying ? 'var(--accent)' : 'var(--text-muted)',
                                             height: isPlaying ? '100%' : '3px',
                                             animation: isPlaying ? `nbBar${b} 0.${5 + b}s ease-in-out infinite alternate` : 'none',
                                             transition: 'height 0.2s',
@@ -156,7 +156,7 @@ const SoundButton = () => {
                                 ))}
                             </div>
 
-                            <FiChevronUp size={12} className="text-[#71717A] group-hover:text-[#A1A1AA] transition-colors" />
+                            <FiChevronUp size={12} className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors" />
                         </button>
                     </div>
                 </div>
@@ -165,13 +165,13 @@ const SoundButton = () => {
             {/* Expanded Player Card */}
             {isExpanded && (
                 <div
-                    className="w-56 sm:w-60 rounded-lg overflow-hidden bg-[#101012]/95 backdrop-blur-xl border border-[#27272A] shadow-2xl animate-fadeIn transition-all duration-200"
+                    className="w-56 sm:w-60 rounded-lg overflow-hidden bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] shadow-2xl animate-fadeIn transition-all duration-200"
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between px-3 py-2 border-b border-[#27272A] bg-[#141417]/80">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border)] bg-[var(--surface-muted)]/80">
                         <div className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#FACC15]" />
-                            <span className="font-mono text-[10px] tracking-wider uppercase text-[#A1A1AA]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                            <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--text-secondary)]">
                                 NOW PLAYING
                             </span>
                         </div>
@@ -179,7 +179,7 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
-                            className="w-6 h-6 flex items-center justify-center rounded text-[#71717A] hover:text-[#F5F5F5] hover:bg-[#1F1F23] transition-colors cursor-pointer focus-visible:outline-none"
+                            className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
                             aria-label="Close music player"
                         >
                             <IoClose size={15} />
@@ -188,7 +188,7 @@ const SoundButton = () => {
 
                     <div className="p-3.5 space-y-3">
                         {/* Album Artwork */}
-                        <div className="w-full aspect-square rounded overflow-hidden border border-[#27272A] relative bg-[#18181B]">
+                        <div className="w-full aspect-square rounded overflow-hidden border border-[var(--border)] relative bg-[var(--surface-alt)]">
                             <img
                                 src={currentTrack.cover}
                                 alt={`${currentTrack.title} cover`}
@@ -198,19 +198,19 @@ const SoundButton = () => {
 
                         {/* Title & Artist */}
                         <div className="text-center px-1">
-                            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-[#F5F5F5] truncate">
+                            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
                                 {currentTrack.title}
                             </h5>
-                            <p className="font-mono text-[11px] text-[#A1A1AA] truncate mt-0.5">
+                            <p className="font-mono text-[11px] text-[var(--text-secondary)] truncate mt-0.5">
                                 {currentTrack.artist}
                             </p>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="space-y-1">
-                            <div className="relative w-full h-1.5 rounded-full bg-[#27272A] overflow-hidden">
+                            <div className="relative w-full h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
                                 <div
-                                    className="absolute top-0 left-0 h-full bg-[#FACC15] rounded-full transition-all"
+                                    className="absolute top-0 left-0 h-full bg-[var(--accent)] rounded-full transition-all"
                                     style={{ width: `${progressPercent}%` }}
                                 />
                                 <input
@@ -223,7 +223,7 @@ const SoundButton = () => {
                                     aria-label="Seek track position"
                                 />
                             </div>
-                            <div className="flex justify-between font-mono text-[10px] text-[#71717A]">
+                            <div className="flex justify-between font-mono text-[10px] text-[var(--text-muted)]">
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration || currentTrack.duration)}</span>
                             </div>
@@ -235,7 +235,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-prev"
                                 onClick={prev}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[#18181B] border border-[#27272A] text-[#A1A1AA] hover:text-[#F5F5F5] hover:border-[#3F3F46] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
                                 aria-label="Previous track"
                             >
                                 <FaStepBackward size={11} />
@@ -245,7 +245,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FACC15] text-[#080808] hover:bg-[#FACC15]/90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
                                 aria-label={isPlaying ? "Pause track" : "Play track"}
                             >
                                 {isPlaying ? (
@@ -259,7 +259,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-next"
                                 onClick={next}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[#18181B] border border-[#27272A] text-[#A1A1AA] hover:text-[#F5F5F5] hover:border-[#3F3F46] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
                                 aria-label="Next track"
                             >
                                 <FaStepForward size={11} />

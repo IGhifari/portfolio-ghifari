@@ -1,11 +1,13 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-scroll';
 import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeContext';
 import Threads from './reactbits/Threads';
 import '../styles/Components.css';
 
 const Profile = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { isDark } = useTheme();
   const { scrollY } = useScroll();
 
   // Controlled, subtle scroll transformations away from hero
@@ -36,20 +38,22 @@ const Profile = () => {
   };
 
   return (
-    <div className="hero-wrapper bg-[#080808] relative min-h-screen w-full flex items-center justify-center overflow-hidden">
-      {/* Background layer: ReactBits Threads WebGL animation */}
+    <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+      {/* Background layer: ReactBits Threads WebGL animation with theme-aware color */}
       <Threads
-        color={[0.98, 0.8, 0.08]}
+        color={isDark ? [0.98, 0.8, 0.08] : [0.72, 0.55, 0.08]}
         amplitude={1.1}
         distance={0.38}
         enableMouseInteraction={true}
       />
 
-      {/* Subtle radial vignette overlay to preserve high text contrast */}
+      {/* Subtle radial vignette overlay to preserve high text contrast in both themes */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 50%, rgba(8, 8, 8, 0.12) 0%, rgba(8, 8, 8, 0.78) 100%)',
+          background: isDark
+            ? 'radial-gradient(ellipse at 50% 50%, rgba(8, 8, 8, 0.12) 0%, rgba(8, 8, 8, 0.78) 100%)'
+            : 'radial-gradient(ellipse at 50% 50%, rgba(247, 247, 245, 0.12) 0%, rgba(247, 247, 245, 0.82) 100%)',
           zIndex: 1,
         }}
         aria-hidden="true"
@@ -68,7 +72,7 @@ const Profile = () => {
         <div className="space-y-4 sm:space-y-6 md:space-y-7 w-full flex flex-col items-center">
           {/* Status Indicator */}
           <motion.div {...getMotionProps(0.05, -8)}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#27272A] bg-[#101012]/90 backdrop-blur-md text-[11px] font-mono tracking-wider text-[#A1A1AA]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>AVAILABLE FOR WORK</span>
             </div>
@@ -77,13 +81,13 @@ const Profile = () => {
           {/* Person's Name: Primary Visual Element */}
           <div className="space-y-0.5 sm:space-y-1 w-full">
             <motion.h1
-              className="hero-name-clamp tracking-tight font-extrabold text-[#F5F5F5] uppercase select-none"
+              className="hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase select-none"
               {...getMotionProps(0.12, 16)}
             >
               M. GHIFARI
             </motion.h1>
             <motion.h1
-              className="hero-name-clamp tracking-tight font-extrabold text-[#D4D4D8] uppercase select-none"
+              className="hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase select-none"
               {...getMotionProps(0.2, 16)}
             >
               BIMA KHADAFI
@@ -96,21 +100,21 @@ const Profile = () => {
             {...getMotionProps(0.28, 12)}
           >
             <span
-              className="h-[1px] w-6 sm:w-10 bg-gradient-to-r from-transparent to-[#3F3F46]/80 hidden xs:inline-block"
+              className="h-[1px] w-6 sm:w-10 bg-gradient-to-r from-transparent to-[var(--border)] hidden xs:inline-block"
               aria-hidden="true"
             />
-            <p className="font-mono text-[11px] xs:text-xs sm:text-sm md:text-base tracking-[0.16em] sm:tracking-[0.22em] text-[#FACC15] uppercase font-semibold text-center">
+            <p className="font-mono text-[11px] xs:text-xs sm:text-sm md:text-base tracking-[0.16em] sm:tracking-[0.22em] text-[var(--accent)] uppercase font-semibold text-center">
               WEB DEVELOPER / SOFTWARE ENGINEER
             </p>
             <span
-              className="h-[1px] w-6 sm:w-10 bg-gradient-to-l from-transparent to-[#3F3F46]/80 hidden xs:inline-block"
+              className="h-[1px] w-6 sm:w-10 bg-gradient-to-l from-transparent to-[var(--border)] hidden xs:inline-block"
               aria-hidden="true"
             />
           </motion.div>
 
           {/* Value Proposition */}
           <motion.p
-            className="text-[#A1A1AA] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4"
+            className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4"
             {...getMotionProps(0.36, 12)}
           >
             I build modern web applications with thoughtful interfaces and reliable systems.
@@ -127,7 +131,7 @@ const Profile = () => {
                 smooth={true}
                 duration={600}
                 offset={-70}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[#FACC15] text-[#080808] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[#FACC15]/90 hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FACC15] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080808]"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
               >
                 EXPLORE WORK
               </Link>
@@ -136,7 +140,7 @@ const Profile = () => {
                 href="https://github.com/IGhifari"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-transparent border border-[#27272A] text-[#F5F5F5] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[#FACC15] hover:text-[#FACC15] hover:bg-[#141414]/60 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FACC15] focus-visible:ring-offset-2 focus-visible:ring-offset-[#080808]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-transparent border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
               >
                 <span>GITHUB</span>
                 <FiArrowUpRight size={16} />
@@ -144,23 +148,23 @@ const Profile = () => {
             </div>
 
             {/* Subtle Social Links */}
-            <div className="flex items-center gap-2.5 text-[#A1A1AA] pt-0.5">
+            <div className="flex items-center gap-2.5 text-[var(--text-secondary)] pt-0.5">
               <a
                 href="https://github.com/IGhifari"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Profile"
-                className="p-2 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#18181B] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiGithub size={17} />
               </a>
-              <span className="text-[#3F3F46] select-none text-xs" aria-hidden="true">/</span>
+              <span className="text-[var(--border)] select-none text-xs" aria-hidden="true">/</span>
               <a
                 href="https://www.linkedin.com/in/ighifari/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn Profile"
-                className="p-2 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#18181B] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiLinkedin size={17} />
               </a>
@@ -179,7 +183,7 @@ const Profile = () => {
           smooth={true}
           duration={600}
           offset={-70}
-          className="flex flex-col items-center gap-1.5 text-[#71717A] hover:text-[#FACC15] transition-colors cursor-pointer group focus-visible:outline-none"
+          className="flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
           aria-label="Scroll down to explore work"
         >
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase">SCROLL</span>
@@ -187,7 +191,7 @@ const Profile = () => {
             animate={shouldReduceMotion ? {} : { y: [0, 4, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
           >
-            <FiArrowDown size={14} className="group-hover:text-[#FACC15] transition-colors" />
+            <FiArrowDown size={14} className="group-hover:text-[var(--accent)] transition-colors" />
           </motion.div>
         </Link>
       </motion.div>

@@ -36,7 +36,7 @@ const Certificate = () => {
   }, [activeCert]);
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24">
+    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24 text-[var(--text-primary)]">
       {/* Section Header */}
       <motion.header
         initial={{ opacity: 0, y: 16 }}
@@ -46,20 +46,20 @@ const Certificate = () => {
         className="mb-12 md:mb-16"
       >
         <div className="flex items-center gap-3 mb-3">
-          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[#FACC15] uppercase">
+          <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
             05 / CERTIFICATES
           </span>
-          <span className="h-px w-8 bg-[#27272A]" aria-hidden="true" />
-          <span className="font-mono text-xs text-[#71717A] uppercase">
+          <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
+          <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
             CREDENTIALS
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#F5F5F5] uppercase">
-            TECHNICAL CERTIFICATIONS<span className="text-[#FACC15]">.</span>
+          <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
+            TECHNICAL CERTIFICATIONS<span className="text-[var(--accent)]">.</span>
           </h2>
-          <p className="font-sans text-sm md:text-base text-[#A1A1AA] max-w-xl leading-relaxed">
+          <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
             Verified vocational training, practical internship credentials, and competitive software development achievements.
           </p>
         </div>
@@ -103,24 +103,24 @@ const Certificate = () => {
 
               {/* Gradient Scrim & Category Indicator */}
               <div
-                className="absolute inset-0 bg-gradient-to-t from-[#101012] via-transparent to-transparent opacity-80"
+                className="absolute inset-0 bg-gradient-to-t from-[var(--surface-muted)] via-transparent to-transparent opacity-80"
                 aria-hidden="true"
               />
 
               {/* Number Tag & Category Badge */}
               <div className="absolute top-3 left-3 flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#080808]/90 text-[#FACC15] border border-[#27272A]/80 backdrop-blur-sm">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[var(--surface-muted)]/90 text-[var(--accent)] border border-[var(--border)] backdrop-blur-sm">
                   {"// "}{cert.number}
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#101012]/80 text-[#A1A1AA] border border-[#27272A]/60 backdrop-blur-sm uppercase">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[var(--surface-alt)]/90 text-[var(--text-secondary)] border border-[var(--border-subtle)] backdrop-blur-sm uppercase">
                   {cert.category}
                 </span>
               </div>
 
               {/* Hover Inspect Action Prompt */}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#18181B]/90 border border-[#3F3F46] text-[#F5F5F5] font-mono text-xs tracking-wider backdrop-blur-sm shadow-lg">
-                  <FiMaximize2 size={13} className="text-[#FACC15]" />
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--surface-hover)] border border-[var(--border-hover)] text-[var(--text-primary)] font-mono text-xs tracking-wider backdrop-blur-sm shadow-lg">
+                  <FiMaximize2 size={13} className="text-[var(--accent)]" />
                   PREVIEW FULL
                 </span>
               </div>
@@ -129,8 +129,8 @@ const Certificate = () => {
             {/* Bottom: Metadata & Details */}
             <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between gap-4">
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between text-xs text-[#71717A] font-mono">
-                  <span className="flex items-center gap-1.5 text-[#FACC15] font-semibold">
+                <div className="flex items-center justify-between text-xs text-[var(--text-muted)] font-mono">
+                  <span className="flex items-center gap-1.5 text-[var(--accent)] font-semibold">
                     <FiAward size={13} aria-hidden="true" />
                     {cert.issuer}
                   </span>
@@ -140,7 +140,7 @@ const Certificate = () => {
                   </span>
                 </div>
 
-                <h3 className="font-grotesk font-bold text-lg sm:text-xl text-[#F5F5F5] group-hover:text-white transition-colors leading-snug">
+                <h3 className="font-grotesk font-bold text-lg sm:text-xl text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
                   {cert.title}
                 </h3>
 
@@ -149,7 +149,7 @@ const Certificate = () => {
                   {cert.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-2 py-0.5 rounded text-[11px] font-mono bg-[#161619] border border-[#232328] text-[#A1A1AA]"
+                      className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--tag-bg)] border border-[var(--tag-border)] text-[var(--tag-text)]"
                     >
                       {skill}
                     </span>
@@ -158,11 +158,11 @@ const Certificate = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-[#1C1C20] flex items-center justify-between gap-3">
+              <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setActiveCert(cert)}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[#A1A1AA] hover:text-[#FACC15] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15] py-1 rounded"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
                 >
                   <FiMaximize2 size={12} aria-hidden="true" />
                   <span>VIEW CERTIFICATE</span>
@@ -173,13 +173,13 @@ const Certificate = () => {
                     href={cert.credentialUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-mono font-medium text-[#FACC15] hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-mono font-medium text-[var(--accent)] hover:underline"
                   >
                     <span>VERIFY CREDENTIAL</span>
                     <FiExternalLink size={12} aria-hidden="true" />
                   </a>
                 ) : (
-                  <span className="text-[11px] font-mono text-[#52525B]">
+                  <span className="text-[11px] font-mono text-[var(--text-muted)]">
                     ARCHIVAL COPY
                   </span>
                 )}
@@ -189,7 +189,7 @@ const Certificate = () => {
         ))}
       </div>
 
-      {/* Accessible Dark Lightbox Modal */}
+      {/* Accessible Lightbox Modal */}
       <AnimatePresence>
         {activeCert && (
           <div
@@ -208,14 +208,14 @@ const Certificate = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="px-5 py-4 border-b border-[#27272A] flex items-center justify-between bg-[#121216] gap-4">
+              <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--surface-muted)] gap-4">
                 <div className="min-w-0">
-                  <span className="font-mono text-[11px] text-[#FACC15] uppercase tracking-wider block">
+                  <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider block">
                     {activeCert.issuer} · {activeCert.period}
                   </span>
                   <h3
                     id="cert-modal-title"
-                    className="font-grotesk font-bold text-base sm:text-lg text-[#F5F5F5] truncate"
+                    className="font-grotesk font-bold text-base sm:text-lg text-[var(--text-primary)] truncate"
                   >
                     {activeCert.title}
                   </h3>
@@ -224,7 +224,7 @@ const Certificate = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-3 py-1.5 rounded-md bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] hover:border-[#3F3F46] text-[#A1A1AA] hover:text-[#F5F5F5] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15] cursor-pointer shrink-0"
+                  className="px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
                   aria-label="Close certificate preview"
                 >
                   <FiX size={15} aria-hidden="true" />
@@ -233,20 +233,20 @@ const Certificate = () => {
               </div>
 
               {/* Modal Body: Image View */}
-              <div className="p-4 sm:p-6 overflow-y-auto flex items-center justify-center bg-[#09090B]">
+              <div className="p-4 sm:p-6 overflow-y-auto flex items-center justify-center bg-[var(--bg-primary)]">
                 <img
                   src={activeCert.image}
                   alt={`${activeCert.title} full certificate view`}
-                  className="max-h-[70vh] w-auto max-w-full object-contain rounded border border-[#1C1C20] shadow-md"
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded border border-[var(--border-subtle)] shadow-md"
                 />
               </div>
 
               {/* Modal Footer */}
-              <div className="px-5 py-3 border-t border-[#1C1C20] bg-[#101012] flex items-center justify-between text-xs font-mono text-[#71717A]">
+              <div className="px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--surface-muted)] flex items-center justify-between text-xs font-mono text-[var(--text-muted)]">
                 <span className="truncate">
-                  Category: <strong className="text-[#A1A1AA] font-normal">{activeCert.category}</strong>
+                  Category: <strong className="text-[var(--text-secondary)] font-normal">{activeCert.category}</strong>
                 </span>
-                <span className="text-[#52525B]">Press ESC or click outside to dismiss</span>
+                <span className="text-[var(--text-muted)]">Press ESC or click outside to dismiss</span>
               </div>
             </motion.div>
           </div>

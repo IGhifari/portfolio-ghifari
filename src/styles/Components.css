@@ -19,7 +19,7 @@ body {
 }
 
 .dark-navbar-scrolled {
-  background-color: rgba(8, 8, 8, 0.85);
+  background-color: var(--nav-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
