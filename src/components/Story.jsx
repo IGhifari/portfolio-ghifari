@@ -25,7 +25,7 @@ const Story = () => {
         title: 'About Me',
         content: (
           <>
-            I'm <strong>M. Ghifari Bima Khadafi</strong> ({calcAge()} y.o.), a Web Developer
+            I&apos;m <strong>M. Ghifari Bima Khadafi</strong> ({calcAge()} y.o.), a Web Developer
             focusing on building responsive and accessible interfaces with <strong>React</strong> and
             robust backends using <strong>Express + Prisma</strong>. Passionate about clean UI,
             predictable state, and developer-friendly environments.

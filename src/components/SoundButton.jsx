@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaPause, FaPlay, FaStepBackward, FaStepForward } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { FiMusic, FiChevronUp } from "react-icons/fi";
 import "../styles/Components.css";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 
@@ -11,7 +12,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyhwdaRdmssjL5ImhqFjuV0U0bADjt6_MUiDf0XWavnw&s=10",
         audio: "born_to_die.mp3",
         duration: 265,
-        color: "#FF3B3B",
+        color: "#FACC15",
     },
     {
         title: "Risk It All",
@@ -19,7 +20,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_iGgvKbRt8FcjYF6VUTVjPZtKPz2K38qLLGs7wvi_YQ&s=10",
         audio: "risk_it_all.mp3",
         duration: 265,
-        color: "#FF3B3B",
+        color: "#FACC15",
     },
     {
         title: "Ultraviolence",
@@ -27,7 +28,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUBqbWTV_PaMn06j_KFUAK49Su7gXHKV5cDORcr98dHw&s=10",
         audio: "ultraviolence.mp3",
         duration: 263,
-        color: "#FFE500",
+        color: "#FACC15",
     },
     {
         title: "One Of The Girls",
@@ -35,7 +36,7 @@ const songs = [
         cover: "sound2.jpeg",
         audio: "sound4.mp3",
         duration: 242,
-        color: "#FF3B3B",
+        color: "#FACC15",
     },
     {
         title: "Summertime Sadness",
@@ -43,7 +44,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0xDTVAz0wVKvO6Y32DEC_3kSWJqLEjnZPN5VNZ-ZFA&s=10",
         audio: "summertime_sad.mp3",
         duration: 264,
-        color: "#FFE500",
+        color: "#FACC15",
     },
     {
         title: "Monolog",
@@ -51,7 +52,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8qVUgkHMIz72PLnsBgHLQb8Iz3x0tLTr56OjBXFOx2w&s=10",
         audio: "monolog.mp3",
         duration: 281,
-        color: "#FFE500",
+        color: "#FACC15",
     },
     {
         title: "Salvatore",
@@ -59,7 +60,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
         audio: "Salvatore.mp3",
         duration: 281,
-        color: "#FFE500",
+        color: "#FACC15",
     },
 ];
 
@@ -81,160 +82,137 @@ const SoundButton = () => {
     const progressPercent = duration ? Math.min((currentTime / duration) * 100, 100) : 0;
 
     return (
-        <div className="fixed top-20 right-5 z-40" style={{ paddingTop: '4px' }}>
-
-            {/* Collapsed — mini pill */}
+        <div className="fixed top-20 right-4 sm:right-6 z-40 select-none">
+            {/* Collapsed View */}
             {!isExpanded && (
-                <button
-                    type="button"
-                    id="sound-button-mini"
-                    onClick={() => setIsExpanded(true)}
-                    className="flex items-center gap-0 cursor-pointer animate-fadeIn"
-                    style={{
-                        background: 'var(--nb-black)',
-                        border: 'var(--nb-border)',
-                        boxShadow: 'var(--nb-shadow)',
-                        transition: 'transform 0.12s ease, box-shadow 0.12s ease',
-                    }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.transform = 'translate(-2px,-2px)';
-                        e.currentTarget.style.boxShadow = 'var(--nb-shadow-lg)';
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.transform = 'translate(0,0)';
-                        e.currentTarget.style.boxShadow = 'var(--nb-shadow)';
-                    }}
-                >
-                    {/* Album art */}
-                    <div
-                        className="w-10 h-10 overflow-hidden flex-shrink-0"
-                        style={{ borderRight: 'var(--nb-border)' }}
+                <div className="flex items-center">
+                    {/* Mobile: Ultra-compact circle button (<640px) */}
+                    <button
+                        type="button"
+                        id="sound-button-mini-mobile"
+                        onClick={() => setIsExpanded(true)}
+                        className="sm:hidden w-9 h-9 rounded-full bg-[#111113]/90 backdrop-blur-md border border-[#27272A] hover:border-[#FACC15] flex items-center justify-center text-[#A1A1AA] hover:text-[#FACC15] transition-all shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        aria-label={isPlaying ? `Now playing: ${currentTrack.title}. Open music player` : "Open music player"}
+                        title={isPlaying ? `Now playing: ${currentTrack.title}` : "Open music player"}
                     >
-                        <img
-                            src={currentTrack.cover}
-                            alt="Album Cover"
-                            className={`w-full h-full object-cover ${isPlaying ? "album-spin playing" : "album-spin"}`}
-                        />
-                    </div>
+                        {isPlaying ? (
+                            <div className="flex items-center gap-[2px] h-3">
+                                <span className="w-[2px] h-full bg-[#FACC15] animate-pulse" />
+                                <span className="w-[2px] h-2 bg-[#FACC15] animate-pulse delay-75" />
+                                <span className="w-[2px] h-full bg-[#FACC15] animate-pulse delay-150" />
+                            </div>
+                        ) : (
+                            <FiMusic size={15} />
+                        )}
+                    </button>
 
-                    {/* Track info */}
-                    <div className="flex flex-col px-3 py-2 text-left">
-                        <span
-                            className="text-xs font-black font-grotesk leading-tight"
-                            style={{ color: 'var(--nb-yellow)', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        >
-                            {currentTrack.title}
-                        </span>
-                        <span
-                            className="text-xs font-mono"
-                            style={{ color: 'var(--nb-muted)', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        >
-                            {currentTrack.artist}
-                        </span>
-                    </div>
-
-                    {/* Playing indicator */}
+                    {/* Desktop: Quiet compact pill (>=640px) */}
                     <div
-                        className="flex items-center gap-[2px] mr-3"
-                        style={{ height: '16px' }}
+                        className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[#111113]/85 backdrop-blur-md border border-[#27272A] hover:border-[#3F3F46] shadow-sm transition-all duration-200 group"
                     >
-                        {[1, 2, 3].map((b) => (
-                            <div
-                                key={b}
-                                style={{
-                                    width: '3px',
-                                    background: isPlaying ? currentTrack.color : '#555',
-                                    borderRadius: '0',
-                                    animation: isPlaying ? `nbBar${b} 0.${5 + b}s ease-in-out infinite alternate` : 'none',
-                                    height: isPlaying ? '100%' : '4px',
-                                    transition: 'height 0.2s',
-                                }}
+                        {/* Spinning mini album thumbnail or quick play toggle */}
+                        <button
+                            type="button"
+                            onClick={togglePlayback}
+                            className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative group/btn cursor-pointer focus-visible:outline-none"
+                            aria-label={isPlaying ? "Pause music" : "Play music"}
+                            title={isPlaying ? "Click to pause" : "Click to play"}
+                        >
+                            <img
+                                src={currentTrack.cover}
+                                alt="Album Art"
+                                className={`w-full h-full object-cover transition-opacity ${isPlaying ? "album-spin playing" : "album-spin"}`}
                             />
-                        ))}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/btn:opacity-100 flex items-center justify-center transition-opacity text-white text-[10px]">
+                                {isPlaying ? <FaPause size={8} /> : <FaPlay size={8} className="ml-[1px]" />}
+                            </div>
+                        </button>
+
+                        {/* Track Info (clickable to expand) */}
+                        <button
+                            type="button"
+                            id="sound-button-mini-desktop"
+                            onClick={() => setIsExpanded(true)}
+                            className="flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
+                            aria-label={`Now playing ${currentTrack.title} by ${currentTrack.artist}. Expand player`}
+                        >
+                            <span className="text-[11px] font-mono text-[#D4D4D8] group-hover:text-[#FACC15] transition-colors max-w-[95px] truncate">
+                                {currentTrack.title}
+                            </span>
+
+                            {/* Equalizer bars */}
+                            <div className="flex items-center gap-[2px] h-3 px-0.5">
+                                {[1, 2, 3].map((b) => (
+                                    <div
+                                        key={b}
+                                        style={{
+                                            width: '2px',
+                                            background: isPlaying ? '#FACC15' : '#52525B',
+                                            height: isPlaying ? '100%' : '3px',
+                                            animation: isPlaying ? `nbBar${b} 0.${5 + b}s ease-in-out infinite alternate` : 'none',
+                                            transition: 'height 0.2s',
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            <FiChevronUp size={12} className="text-[#71717A] group-hover:text-[#A1A1AA] transition-colors" />
+                        </button>
                     </div>
-                </button>
+                </div>
             )}
 
-            {/* Expanded — full player */}
+            {/* Expanded Player Card */}
             {isExpanded && (
                 <div
-                    className="absolute top-0 right-0 w-60 animate-slideDown"
-                    style={{
-                        background: 'var(--nb-cream)',
-                        border: 'var(--nb-border)',
-                        boxShadow: 'var(--nb-shadow-lg)',
-                    }}
+                    className="w-56 sm:w-60 rounded-lg overflow-hidden bg-[#101012]/95 backdrop-blur-xl border border-[#27272A] shadow-2xl animate-fadeIn transition-all duration-200"
                 >
-                    {/* Header bar */}
-                    <div
-                        className="flex items-center justify-between px-3 py-2"
-                        style={{
-                            background: 'var(--nb-yellow)',
-                            borderBottom: 'var(--nb-border)',
-                        }}
-                    >
-                        <span className="font-black font-mono text-xs" style={{ color: 'var(--nb-black)', letterSpacing: '0.08em' }}>
-                            ♪ NOW PLAYING
-                        </span>
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-[#27272A] bg-[#141417]/80">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#FACC15]" />
+                            <span className="font-mono text-[10px] tracking-wider uppercase text-[#A1A1AA]">
+                                NOW PLAYING
+                            </span>
+                        </div>
                         <button
                             type="button"
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
-                            className="flex items-center justify-center transition-all duration-100"
-                            style={{ color: 'var(--nb-black)' }}
-                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            className="w-6 h-6 flex items-center justify-center rounded text-[#71717A] hover:text-[#F5F5F5] hover:bg-[#1F1F23] transition-colors cursor-pointer focus-visible:outline-none"
+                            aria-label="Close music player"
                         >
-                            <IoClose size={18} />
+                            <IoClose size={15} />
                         </button>
                     </div>
 
-                    <div className="p-4 flex flex-col gap-4">
-                        {/* Album art */}
-                        <div
-                            className="w-full overflow-hidden"
-                            style={{
-                                border: 'var(--nb-border)',
-                                boxShadow: 'var(--nb-shadow)',
-                                aspectRatio: '1 / 1',
-                            }}
-                        >
+                    <div className="p-3.5 space-y-3">
+                        {/* Album Artwork */}
+                        <div className="w-full aspect-square rounded overflow-hidden border border-[#27272A] relative bg-[#18181B]">
                             <img
                                 src={currentTrack.cover}
-                                alt="Album Cover"
-                                className={`w-full h-full object-cover ${isPlaying ? "animate-pulse-slow" : ""}`}
+                                alt={`${currentTrack.title} cover`}
+                                className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? "scale-105" : "scale-100"}`}
                             />
                         </div>
 
-                        {/* Track info */}
-                        <div>
-                            <h5
-                                className="font-black font-grotesk text-sm leading-tight"
-                                style={{ color: 'var(--nb-ink)' }}
-                            >
+                        {/* Title & Artist */}
+                        <div className="text-center px-1">
+                            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-[#F5F5F5] truncate">
                                 {currentTrack.title}
                             </h5>
-                            <p
-                                className="font-mono text-xs mt-1"
-                                style={{ color: 'var(--nb-muted)' }}
-                            >
+                            <p className="font-mono text-[11px] text-[#A1A1AA] truncate mt-0.5">
                                 {currentTrack.artist}
                             </p>
                         </div>
 
-                        {/* Progress bar */}
+                        {/* Progress Bar */}
                         <div className="space-y-1">
-                            <div className="relative w-full h-3" style={{ background: 'var(--nb-inset)', border: '2px solid var(--nb-line)' }}>
-                                {/* Filled bar */}
+                            <div className="relative w-full h-1.5 rounded-full bg-[#27272A] overflow-hidden">
                                 <div
-                                    className="absolute top-0 left-0 h-full"
-                                    style={{
-                                        width: `${progressPercent}%`,
-                                        background: currentTrack.color,
-                                        borderRight: progressPercent > 0 ? '2px solid var(--nb-black)' : 'none',
-                                    }}
+                                    className="absolute top-0 left-0 h-full bg-[#FACC15] rounded-full transition-all"
+                                    style={{ width: `${progressPercent}%` }}
                                 />
-                                {/* Invisible range input for interaction */}
                                 <input
                                     type="range"
                                     min="0"
@@ -242,102 +220,60 @@ const SoundButton = () => {
                                     value={currentTime}
                                     onChange={(e) => seek(Number(e.target.value))}
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    style={{ margin: 0 }}
+                                    aria-label="Seek track position"
                                 />
                             </div>
-                            <div
-                                className="flex justify-between font-mono text-xs"
-                                style={{ color: 'var(--nb-muted)' }}
-                            >
+                            <div className="flex justify-between font-mono text-[10px] text-[#71717A]">
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration || currentTrack.duration)}</span>
                             </div>
                         </div>
 
-                        {/* Controls */}
-                        <div className="flex items-center justify-center gap-3">
-                            {/* Prev */}
+                        {/* Playback Controls */}
+                        <div className="flex items-center justify-center gap-3 pt-1">
                             <button
                                 type="button"
                                 id="sound-prev"
                                 onClick={prev}
-                                className="w-9 h-9 flex items-center justify-center transition-all duration-100"
-                                style={{
-                                    background: 'var(--nb-white)',
-                                    border: 'var(--nb-border)',
-                                    boxShadow: '2px 2px 0px var(--nb-black)',
-                                    color: 'var(--nb-black)',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--nb-black)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px var(--nb-black)'; }}
-                                onMouseDown={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none'; }}
-                                onMouseUp={e => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--nb-black)'; }}
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[#18181B] border border-[#27272A] text-[#A1A1AA] hover:text-[#F5F5F5] hover:border-[#3F3F46] transition-all cursor-pointer focus-visible:outline-none"
+                                aria-label="Previous track"
                             >
-                                <FaStepBackward size={14} />
+                                <FaStepBackward size={11} />
                             </button>
 
-                            {/* Play/Pause */}
                             <button
                                 type="button"
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
-                                className="w-14 h-14 flex items-center justify-center transition-all duration-100"
-                                style={{
-                                    background: 'var(--nb-black)',
-                                    border: 'var(--nb-border)',
-                                    boxShadow: '4px 4px 0px ' + currentTrack.color,
-                                    color: 'var(--nb-yellow)',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = `6px 6px 0px ${currentTrack.color}`; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = `4px 4px 0px ${currentTrack.color}`; }}
-                                onMouseDown={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none'; }}
-                                onMouseUp={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = `6px 6px 0px ${currentTrack.color}`; }}
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FACC15] text-[#080808] hover:bg-[#FACC15]/90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
+                                aria-label={isPlaying ? "Pause track" : "Play track"}
                             >
                                 {isPlaying ? (
-                                    <FaPause size={20} />
+                                    <FaPause size={13} />
                                 ) : (
-                                    <FaPlay size={20} style={{ marginLeft: '3px' }} />
+                                    <FaPlay size={13} className="ml-[2px]" />
                                 )}
                             </button>
 
-                            {/* Next */}
                             <button
                                 type="button"
                                 id="sound-next"
                                 onClick={next}
-                                className="w-9 h-9 flex items-center justify-center transition-all duration-100"
-                                style={{
-                                    background: 'var(--nb-white)',
-                                    border: 'var(--nb-border)',
-                                    boxShadow: '2px 2px 0px var(--nb-black)',
-                                    color: 'var(--nb-black)',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--nb-black)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px var(--nb-black)'; }}
-                                onMouseDown={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none'; }}
-                                onMouseUp={e => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--nb-black)'; }}
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[#18181B] border border-[#27272A] text-[#A1A1AA] hover:text-[#F5F5F5] hover:border-[#3F3F46] transition-all cursor-pointer focus-visible:outline-none"
+                                aria-label="Next track"
                             >
-                                <FaStepForward size={14} />
+                                <FaStepForward size={11} />
                             </button>
                         </div>
                     </div>
-
-                    {/* Bottom color stripe */}
-                    <div
-                        style={{
-                            height: '6px',
-                            background: currentTrack.color,
-                            borderTop: 'var(--nb-border)',
-                        }}
-                    />
                 </div>
             )}
 
-            {/* Keyframes for bar animation */}
+            {/* Equalizer animation keyframes */}
             <style>{`
-                @keyframes nbBar1 { from { height: 4px; } to { height: 14px; } }
-                @keyframes nbBar2 { from { height: 8px; } to { height: 14px; } }
-                @keyframes nbBar3 { from { height: 4px; } to { height: 10px; } }
+                @keyframes nbBar1 { from { height: 3px; } to { height: 12px; } }
+                @keyframes nbBar2 { from { height: 6px; } to { height: 12px; } }
+                @keyframes nbBar3 { from { height: 3px; } to { height: 9px; } }
             `}</style>
         </div>
     );

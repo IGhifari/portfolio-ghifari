@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import { Renderer, Camera, Geometry, Program, Mesh } from "ogl";
 
 const defaultColors = ["#ffffff", "#ffffff", "#ffffff"];
@@ -227,6 +228,21 @@ const Particles = ({
       className={`relative w-full h-full ${className}`}
     />
   );
+};
+
+Particles.propTypes = {
+  particleCount: PropTypes.number,
+  particleSpread: PropTypes.number,
+  speed: PropTypes.number,
+  particleColors: PropTypes.arrayOf(PropTypes.string),
+  moveParticlesOnHover: PropTypes.bool,
+  particleHoverFactor: PropTypes.number,
+  alphaParticles: PropTypes.bool,
+  particleBaseSize: PropTypes.number,
+  sizeRandomness: PropTypes.number,
+  cameraDistance: PropTypes.number,
+  disableRotation: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 export default Particles;

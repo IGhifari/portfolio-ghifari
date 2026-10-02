@@ -12,33 +12,30 @@ const LastUpdated = () => {
     };
 
     return (
-        <div className="last-updated-container sm:ml-3 pl-8 md:ml-2">
-            <div className={`last-updated-content ${isVisible ? 'show-update' : ''}`}>
-                <FaClock
-                    className="clock-icon cursor-pointer"
-                    onClick={() => setIsVisible(!isVisible)}
-                />
-                <span className="update-text font-mono">
-                    <span className="font-bold">UPDATED</span>
-                    <span className="ml-1">—</span>
-                    <span className="ml-1">{formatDate(lastUpdated)}</span>
+        <div className="inline-flex flex-col items-center py-0.5">
+            <button
+                type="button"
+                onClick={() => setIsVisible(!isVisible)}
+                className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[#71717A] hover:text-[#FACC15] transition-colors cursor-pointer group focus-visible:outline-none"
+                title="Click to view/change update date"
+                aria-label="Last updated date"
+            >
+                <FaClock className="text-[10px] group-hover:text-[#FACC15] transition-colors" />
+                <span>
+                    <span className="font-semibold tracking-wider">UPDATED</span>
+                    <span className="mx-1.5 opacity-40">—</span>
+                    <span>{formatDate(lastUpdated)}</span>
                 </span>
-            </div>
+            </button>
 
             {isVisible && (
-                <div className="mt-2">
+                <div className="mt-1.5">
                     <input
                         type="date"
                         value={lastUpdated}
                         onChange={(e) => setLastUpdated(e.target.value)}
-                        className="p-1"
-                        style={{
-                            border: '2px solid var(--nb-line)',
-                            background: 'var(--nb-yellow)',
-                            fontFamily: 'Space Mono, monospace',
-                            color: 'var(--nb-black)',
-                            fontSize: '0.7rem',
-                        }}
+                        className="px-2 py-0.5 rounded text-[11px] font-mono bg-[#141416] border border-[#27272A] text-[#F5F5F5] focus:border-[#FACC15] focus:outline-none"
+                        aria-label="Edit last updated date"
                     />
                 </div>
             )}

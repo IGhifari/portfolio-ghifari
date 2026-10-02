@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-cards';
@@ -18,20 +17,7 @@ import { FaLaravel } from "react-icons/fa";
 import { SiPhp } from "react-icons/si";
 import { SiPostman } from "react-icons/si";
 import { SiExpress } from "react-icons/si";
-import { FaNodeJs } from "react-icons/fa";
 import { BiLogoPostgresql } from "react-icons/bi";
-
-const sliderHeaderStyle = {
-    background: 'var(--nb-yellow)',
-    border: 'var(--nb-border)',
-    boxShadow: 'var(--nb-shadow-hover)',
-    display: 'inline-block',
-    padding: '4px 16px',
-    fontFamily: 'Space Grotesk, sans-serif',
-    fontWeight: 800,
-    fontSize: '1.5rem',
-    color: 'var(--nb-black)',
-};
 
 const listItemStyle = {
     display: 'flex',

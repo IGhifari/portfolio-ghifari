@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import TypeIt from "typeit-react";
 import { FaAward, FaExternalLinkAlt, FaTimes } from 'react-icons/fa';
 import '../styles/Certificate.css';

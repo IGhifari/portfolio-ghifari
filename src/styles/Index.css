@@ -8,9 +8,70 @@
    Dark:  Electric Blue + Light Blue on Deep Navy
    ============================================ */
 
+:root {
+  /* Dark Interactive Design Tokens */
+  --bg-primary: #080808;
+  --bg-secondary: #101010;
+  --bg-surface: #141414;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --border-subtle: #27272A;
+  --accent-primary: #FACC15;
+  --accent-hover: #EAB308;
+  --accent-muted: rgba(250, 204, 21, 0.12);
+}
+
 :root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-primary: #080808;
+  --bg-secondary: #101010;
+  --bg-surface: #141414;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --border-subtle: #27272A;
+  --accent-primary: #FACC15;
+  --accent-hover: #EAB308;
+  --accent-muted: rgba(250, 204, 21, 0.12);
+
+  /* Compatibility variables for other sections until their redesign */
+  --nb-cream: #080808;
+  --nb-yellow: #FACC15;
+  --nb-red: #F87171;
+  --nb-black: #05070D;
+  --nb-white: #141414;
+  --nb-ink: #F5F5F5;
+  --nb-muted: #A1A1AA;
+  --nb-line: #27272A;
+  --nb-inset: #0F0F12;
+  --nb-dot: #1F1F24;
+  --nb-nav-bg: #080808;
+  --nb-nav-hover-bg: #141414;
+  --nb-nav-hover-text: #FACC15;
+  --nb-shadow-color: #27272A;
+  --nb-border: 1px solid var(--nb-line);
+  --nb-shadow: 2px 2px 0px var(--nb-shadow-color);
+  --nb-shadow-lg: 4px 4px 0px var(--nb-shadow-color);
+  --nb-shadow-hover: 1px 1px 0px var(--nb-shadow-color);
+  --nb-input-inset: inset 2px 2px 0px rgba(0, 0, 0, 0.3);
+  --nb-input-focus: 0 0 0 2px var(--nb-yellow);
+}
+
 [data-theme="light"] {
   color-scheme: light;
+  --bg-primary: #080808;
+  --bg-secondary: #101010;
+  --bg-surface: #141414;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --border-subtle: #27272A;
+  --accent-primary: #FACC15;
+  --accent-hover: #EAB308;
+  --accent-muted: rgba(250, 204, 21, 0.12);
+
   --nb-cream: #FFFFFF;
   --nb-yellow: #3B82F6;
   --nb-red: #FF4757;
@@ -31,30 +92,6 @@
   --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
   --nb-input-inset: inset 3px 3px 0px rgba(0, 0, 0, 0.1);
   --nb-input-focus: inset 3px 3px 0px rgba(0, 0, 0, 0.15), 0 0 0 4px var(--nb-yellow);
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --nb-cream: #0A0F1E;
-  --nb-yellow: #60A5FA;
-  --nb-red: #F87171;
-  --nb-black: #05070D;
-  --nb-white: #131C31;
-  --nb-ink: #E6EDF7;
-  --nb-muted: #8CA3C3;
-  --nb-line: #1E2A45;
-  --nb-inset: #0B1224;
-  --nb-dot: #1A2440;
-  --nb-nav-bg: #131C31;
-  --nb-nav-hover-bg: #60A5FA;
-  --nb-nav-hover-text: #0A0F1E;
-  --nb-shadow-color: #60A5FA;
-  --nb-border: 3px solid var(--nb-line);
-  --nb-shadow: 4px 4px 0px var(--nb-shadow-color);
-  --nb-shadow-lg: 7px 7px 0px var(--nb-shadow-color);
-  --nb-shadow-hover: 2px 2px 0px var(--nb-shadow-color);
-  --nb-input-inset: inset 2px 2px 0px rgba(96, 165, 250, 0.06);
-  --nb-input-focus: inset 2px 2px 0px rgba(96, 165, 250, 0.12), 0 0 0 3px var(--nb-yellow);
 }
 
 *,
