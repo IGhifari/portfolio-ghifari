@@ -152,7 +152,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24 text-[var(--text-primary)]">
+    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
       <ToastContainer position="bottom-right" autoClose={4000} />
 
       {/* Section Header */}
@@ -368,103 +368,95 @@ const Contact = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-5 space-y-6"
+          className="lg:col-span-5 bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-7 space-y-6"
         >
-          {/* Quick Direct Email Card */}
-          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider">
-                Primary Channel
-              </span>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-500">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                AVAILABLE FOR HIRE
-              </span>
-            </div>
+          {/* Top Tier: Channel Header & Availability */}
+          <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
+            <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
+              DIRECT REACH
+            </span>
+            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              AVAILABLE FOR HIRE
+            </span>
+          </div>
 
-            <div>
-              <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] mb-1">
-                Direct Email
-              </h4>
-              <p className="font-sans text-xs text-[var(--text-muted)] leading-relaxed mb-3">
-                For contract inquiries, freelance work, software roles, or casual developer chats.
-              </p>
+          {/* Email Info */}
+          <div>
+            <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] mb-1">
+              Direct Inquiries
+            </h4>
+            <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mb-3">
+              For contract inquiries, freelance work, software roles, or casual developer chats.
+            </p>
 
-              <div className="flex items-center gap-2 p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
-                <FiMail size={16} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
-                <a
-                  href={`mailto:${directEmail}`}
-                  className="font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
-                >
-                  {directEmail}
-                </a>
-                <button
-                  type="button"
-                  onClick={copyEmailToClipboard}
-                  className="p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
-                  title="Copy email address"
-                  aria-label="Copy email address"
-                >
-                  {copiedEmail ? (
-                    <FiCheck size={14} className="text-emerald-500" />
-                  ) : (
-                    <FiCopy size={14} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-3 font-mono text-[11px] text-[var(--text-secondary)]">
-              <div className="flex items-center gap-1.5">
-                <FiMapPin size={12} className="text-[var(--text-muted)] shrink-0" aria-hidden="true" />
-                <span>Bogor, Indonesia</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <FiClock size={12} className="text-[var(--text-muted)] shrink-0" aria-hidden="true" />
-                <span>UTC+7 (WIB)</span>
-              </div>
+            <div className="flex items-center gap-2 p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
+              <FiMail size={16} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
+              <a
+                href={`mailto:${directEmail}`}
+                className="font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
+              >
+                {directEmail}
+              </a>
+              <button
+                type="button"
+                onClick={copyEmailToClipboard}
+                className="p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
+                title="Copy email address"
+                aria-label="Copy email address"
+              >
+                {copiedEmail ? (
+                  <FiCheck size={14} className="text-emerald-500" />
+                ) : (
+                  <FiCopy size={14} />
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Social & Developer Channels */}
-          <div className="space-y-3">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] px-1">
-              Verified Profiles & Networks
-            </h4>
+          {/* Location & Timezone Metadata */}
+          <div className="py-3 border-y border-[var(--border-subtle)] grid grid-cols-2 gap-3 font-mono text-[11px] text-[var(--text-secondary)]">
+            <div className="flex items-center gap-1.5">
+              <FiMapPin size={12} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
+              <span>Bogor, Indonesia</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <FiClock size={12} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
+              <span>UTC+7 (WIB)</span>
+            </div>
+          </div>
 
-            <div className="space-y-2">
+          {/* Verified Profiles & Networks - Simplified Editorial List */}
+          <div className="space-y-1">
+            <h5 className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2">
+              Verified Profiles &amp; Networks
+            </h5>
+
+            <div className="divide-y divide-[var(--border-subtle)]">
               {contactChannels.map((item) => (
                 <a
                   key={item.name}
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact-channel-item p-3.5 rounded-lg flex items-center justify-between group no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-9 h-9 rounded-md bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent)] group-hover:border-[var(--accent)] transition-colors shrink-0">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
                       {item.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-grotesk font-bold text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
-                          {item.name}
-                        </span>
-                        <span className="font-mono text-xs text-[var(--text-muted)]">
-                          {item.handle}
-                        </span>
-                      </div>
-                      <p className="font-sans text-xs text-[var(--text-secondary)] truncate">
-                        {item.desc}
-                      </p>
-                    </div>
+                    </span>
+                    <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
+                      {item.name}
+                    </span>
+                    <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
+                      {item.handle}
+                    </span>
                   </div>
 
-                  <FiExternalLink
-                    size={14}
-                    className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2"
-                    aria-hidden="true"
-                  />
+                  <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
+                    <span className="font-mono text-[10px] hidden md:inline uppercase">CONNECT</span>
+                    <FiExternalLink size={13} aria-hidden="true" />
+                  </div>
                 </a>
               ))}
             </div>

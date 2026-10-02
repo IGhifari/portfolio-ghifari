@@ -147,24 +147,24 @@ const Skills = () => {
                   <h3 className="font-grotesk font-bold text-sm sm:text-base text-[var(--text-primary)] tracking-wider uppercase">
                     {category.title}
                   </h3>
-                  <span className="font-mono text-[10px] text-[var(--accent)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border)] tracking-wider">
+                  <span className="font-mono text-[10px] text-[var(--accent)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] tracking-wider">
                     {category.badge}
                   </span>
                 </div>
 
-                {/* Category Brief */}
-                <p className="font-mono text-[11px] text-[var(--text-muted)] leading-relaxed mt-2.5 mb-4">
+                {/* Category Brief - Improved contrast & readability */}
+                <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mt-3 mb-5">
                   {category.description}
                 </p>
 
-                {/* Technology List */}
-                <ul className="space-y-2 list-none p-0 m-0">
+                {/* Technology List - Editorial Rows */}
+                <ul className="space-y-1 list-none p-0 m-0">
                   {category.skills.map((skill) => (
                     <li
                       key={skill.name}
                       className="tech-item group cursor-default"
                     >
-                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:scale-110 transition-all duration-150 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors flex items-center justify-center flex-shrink-0">
                         {skill.icon}
                       </span>
                       <span className="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors flex-1 tracking-wide">

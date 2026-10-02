@@ -36,7 +36,7 @@ const Certificate = () => {
   }, [activeCert]);
 
   return (
-    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 lg:py-24 text-[var(--text-primary)]">
+    <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
       {/* Section Header */}
       <motion.header
         initial={{ opacity: 0, y: 16 }}

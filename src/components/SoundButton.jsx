@@ -82,7 +82,7 @@ const SoundButton = () => {
     const progressPercent = duration ? Math.min((currentTime / duration) * 100, 100) : 0;
 
     return (
-        <div className="fixed top-20 right-4 sm:right-6 z-40 select-none">
+        <div className="fixed top-20 right-4 sm:right-6 xl:right-[calc((100vw-72rem)/2+1.5rem)] z-40 select-none">
             {/* Collapsed View */}
             {!isExpanded && (
                 <div className="flex items-center">
@@ -91,7 +91,7 @@ const SoundButton = () => {
                         type="button"
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
-                        className="sm:hidden w-9 h-9 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        className="sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={isPlaying ? `Now playing: ${currentTrack.title}. Open music player` : "Open music player"}
                         title={isPlaying ? `Now playing: ${currentTrack.title}` : "Open music player"}
                     >
@@ -102,13 +102,13 @@ const SoundButton = () => {
                                 <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150" />
                             </div>
                         ) : (
-                            <FiMusic size={15} />
+                            <FiMusic size={14} />
                         )}
                     </button>
 
                     {/* Desktop: Quiet compact pill (>=640px) */}
                     <div
-                        className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[var(--surface-muted)]/85 backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] shadow-sm transition-all duration-200 group"
+                        className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[var(--surface-muted)]/80 backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] shadow-sm transition-all duration-200 group"
                     >
                         {/* Spinning mini album thumbnail or quick play toggle */}
                         <button

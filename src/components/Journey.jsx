@@ -69,7 +69,7 @@ const Journey = () => {
       {/* ==================================================
           SECTION HEADER: 03 / JOURNEY
           ================================================== */}
-      <motion.div {...getFadeMotion(0)} className="mb-16 md:mb-24">
+      <motion.div {...getFadeMotion(0)} className="mb-10 md:mb-16">
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
             03 / JOURNEY

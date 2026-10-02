@@ -31,7 +31,7 @@ const Project = () => {
       {/* ==================================================
           SECTION HEADER: 01 / SELECTED WORK
           ================================================== */}
-      <motion.div {...getFadeMotion(0)} className="mb-16 md:mb-24">
+      <motion.div {...getFadeMotion(0)} className="mb-10 md:mb-16">
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
             01 / SELECTED WORK
@@ -129,12 +129,12 @@ const Project = () => {
                     {project.description}
                   </p>
 
-                  {/* Technologies */}
+                  {/* Technologies - Subtle Editorial Tags */}
                   <div className="flex flex-wrap gap-2 mt-5">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2.5 py-1 text-xs font-mono text-[var(--tag-text)] bg-[var(--tag-bg)] border border-[var(--tag-border)] rounded tracking-wide"
+                        className="px-2 py-0.5 text-xs font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/70 border border-[var(--border-subtle)] rounded-sm tracking-wide"
                       >
                         {tag}
                       </span>
@@ -194,7 +194,7 @@ const Project = () => {
         <h3 className="font-grotesk font-bold text-2xl sm:text-3xl text-[var(--text-primary)] uppercase tracking-tight">
           OTHER PROJECTS<span className="text-[var(--accent)]">.</span>
         </h3>
-        <p className="font-mono text-xs text-[var(--text-muted)] mt-1.5">
+        <p className="font-mono text-xs text-[var(--text-secondary)] mt-1.5">
           Selected earlier experiments, educational web games, and digital management tools.
         </p>
       </motion.div>
@@ -229,12 +229,12 @@ const Project = () => {
               </div>
 
               <div className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
-                {/* Tech tags */}
+                {/* Tech tags - Subtle Editorial Badges */}
                 <div className="flex flex-wrap gap-1.5">
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-[10px] font-mono text-[var(--tag-text)] bg-[var(--tag-bg)] border border-[var(--tag-border)] rounded"
+                      className="px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/70 border border-[var(--border-subtle)] rounded-sm"
                     >
                       {tag}
                     </span>
