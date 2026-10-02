@@ -28,7 +28,7 @@ const App = () => {
             </section>
 
             {/* Projects */}
-            <section id="projects" className="py-16 nb-dot-pattern">
+            <section id="projects" className="bg-[#080808]">
                 <Project/>
             </section>
 

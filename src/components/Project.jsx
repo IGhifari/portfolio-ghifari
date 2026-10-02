@@ -1,181 +1,280 @@
-
-import TypeIt from "typeit-react";
-import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
+import { motion, useReducedMotion } from 'framer-motion';
+import { FiGithub, FiArrowUpRight } from 'react-icons/fi';
+import TiltedCard from './reactbits/TiltedCard';
+import { selectedProjects, otherProjects } from '../data/projects';
 import '../styles/Project.css';
 
 const Project = () => {
-    const projects = [
-        {
-            title: "Portfolio Website",
-            description: "Personal portfolio website built with React and Tailwind CSS",
-            image: "portfolio.png",
-            tags: ["ReactJS", "Tailwind CSS"],
-            github: "https://github.com/IGhifari/Portfolio-ghifari",
-            live: window.location.href
-        },
-        {
-            title: "Game Ecovoyage-PulauHarapan",
-            description: "An interactive educational game developed collaboratively with friends, exploring the beauty and environmental sustainability of Pulau Harapan.",
-            image: "pulauharapan.png",
-            tags: ["HTML", "Javascript", "CSS"],
-            github: "https://github.com/IGhifari/EcoVoyage-PulauHarapan",
-            live: "https://ighifari.github.io/EcoVoyage-PulauHarapan/views/halamanAwal.html"
-        },
-        {
-            title: "Internship Journal Siswa",
-            description: "A web-based internship journal system designed to help students record, manage, and track their internship activities efficiently.",
-            image: "internship.png",
-            tags: ["ReactJS", "Laravel", "MySQL", "Tailwind CSS"],
-            github: "https://github.com/IGhifari/internship-journal",
-            live: "https://your-internship-journal.com"
-        },
-        {
-            title: "A Day At Home",
-            description: "A web-based game created with my friend, designed specifically for deaf children. It aims to support learning through engaging visual interactions.",
-            image: "seharidirumah.png",
-            tags: ["ReactJS", "Tailwind CSS"],
-            github: "https://github.com/IGhifari/Project-Game-Clevio-SLB",
-            live: "https://bendaditempatku.netlify.app/"
-        },
-        {
-            title: "Desaku",
-            description: "A web-based platform specifically designed for village administration. Helps manage family data and village information digitally.",
-            image: "desaku.png",
-            tags: ["ReactJS", "ExpressJS", "Prisma", "Tailwind CSS", "MySQL"],
-            github: "https://github.com/IGhifari/Website-DesaKita",
-            live: "https://desaku.com"
-        },
-        {
-            title: "Food",
-            description: "A modern web-based e-commerce platform for fruits and vegetables. Features product catalogs, cart, checkout, customer reviews, and user-admin chat.",
-            image: "food.png",
-            tags: ["React", "TypeScript", "Express", "Prisma", "PostgreSQL"],
-            github: "https://github.com/IGhifari/web-food",
-            live: "https://food-liart-one.vercel.app"
-        },
-        {
-            title: "Project Management",
-            description: "A comprehensive project management tool designed to streamline team collaboration, task tracking, and workflow optimization.",
-            image: "project_management.png",
-            tags: ["React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "ExpressJS"],
-            github: "https://github.com/user/project-management-system",
-            live: "-"
-        }
-    ];
+  const shouldReduceMotion = useReducedMotion();
 
-    return (
-        <div className='container mx-auto px-6 py-16'>
-            {/* Section header */}
-            <div className="mb-12 flex flex-col items-center">
-                <h1
-                    className="text-4xl md:text-5xl font-black font-grotesk text-center"
-                    style={{
-                        background: 'var(--nb-yellow)',
-                        border: 'var(--nb-border)',
-                        boxShadow: 'var(--nb-shadow)',
-                        display: 'inline-block',
-                        padding: '8px 24px',
-                        color: 'inherit',
-                    }}
-                >
-                    <TypeIt
-                        options={{ loop: true, loopDelay: 2000, speed: 100 }}
-                        getBeforeInit={(instance) => {
-                            instance
-                                .type("MY PROJECTS")
-                                .pause(750)
-                                .delete(11)
-                                .pause(700)
-                                .type("プロジェクト")
-                            return instance;
-                        }}
-                    />
-                </h1>
-                <div style={{ width: '100%', height: '3px', background: 'var(--nb-black)', marginTop: '4px', maxWidth: '220px' }} />
-            </div>
+  const easeCurve = [0.16, 1, 0.3, 1];
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {projects.map((project, index) => (
-                    <div
-                        key={index}
-                        className="project-card"
-                    >
-                        {/* Image + hover overlay */}
-                        <div className="relative group" style={{ borderBottom: 'var(--nb-border)' }}>
-                            <img
-                                src={project.image}
-                                alt={project.title}
-                                className="w-full h-48 object-cover"
-                            />
-                            <div
-                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4"
-                                style={{ background: 'color-mix(in srgb, var(--nb-yellow) 88%, transparent)' }}
-                            >
-                                <a
-                                    href={project.github}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-200"
-                                    style={{
-                                        background: 'var(--nb-black)',
-                                        border: 'var(--nb-border)',
-                                        boxShadow: 'var(--nb-shadow-hover)',
-                                        color: 'var(--nb-yellow)',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow-hover)'; }}
-                                >
-                                    <FaGithub size={20} />
-                                </a>
-                                <a
-                                    href={project.live}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-12 h-12 flex items-center justify-center font-bold transition-all duration-200"
-                                    style={{
-                                        background: 'var(--nb-red)',
-                                        border: 'var(--nb-border)',
-                                        boxShadow: 'var(--nb-shadow-hover)',
-                                        color: 'white',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = 'var(--nb-shadow-hover)'; }}
-                                >
-                                    <FaExternalLinkAlt size={16} />
-                                </a>
-                            </div>
-                        </div>
+  const getFadeMotion = (delay = 0) => {
+    if (shouldReduceMotion) {
+      return {
+        initial: { opacity: 1, y: 0 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      initial: { opacity: 0, y: 24 },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, amount: 0.2 },
+      transition: { duration: 0.5, delay, ease: easeCurve },
+    };
+  };
 
-                        {/* Card body */}
-                        <div className="p-5">
-                            <h3
-                                className="text-lg font-black font-grotesk mb-2"
-                                style={{ color: 'inherit' }}
-                            >
-                                {project.title}
-                            </h3>
-                            <p
-                                className="text-sm mb-4 leading-relaxed"
-                                style={{ color: 'inherit' }}
-                            >
-                                {project.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                                {project.tags.map((tag, tagIndex) => (
-                                    <span
-                                        key={tagIndex}
-                                        className="nb-tag"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+  return (
+    <div className="w-full max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[#F5F5F5]">
+      {/* ==================================================
+          SECTION HEADER: 01 / SELECTED WORK
+          ================================================== */}
+      <motion.div {...getFadeMotion(0)} className="mb-16 md:mb-24">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="font-mono text-xs text-[#FACC15] tracking-[0.25em] uppercase font-semibold">
+            01 / SELECTED WORK
+          </span>
+          <span className="h-[1px] w-12 bg-[#27272A]" aria-hidden="true" />
         </div>
-    );
+        <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#F5F5F5] uppercase tracking-tight leading-none">
+          SELECTED PROJECTS<span className="text-[#FACC15]">.</span>
+        </h2>
+        <p className="font-mono text-xs sm:text-sm text-[#A1A1AA] mt-3 max-w-xl leading-relaxed">
+          A curated selection of applications and systems I&apos;ve designed and built.
+        </p>
+      </motion.div>
+
+      {/* ==================================================
+          FEATURED PROJECTS (EDITORIAL ALTERNATING SHOWCASE)
+          ================================================== */}
+      <div className="space-y-20 md:space-y-32">
+        {selectedProjects.map((project, index) => {
+          const isEven = index % 2 === 1;
+
+          return (
+            <motion.article
+              key={project.id}
+              {...getFadeMotion(0.1)}
+              className="group"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Visual Screenshot (Desktop Alternating Order) */}
+                <div
+                  className={`w-full lg:col-span-7 ${
+                    isEven ? 'lg:order-2' : 'lg:order-1'
+                  }`}
+                >
+                  <TiltedCard
+                    maxTilt={2.8}
+                    scale={1.012}
+                    showGlare={true}
+                    className="project-preview-frame rounded-lg overflow-hidden"
+                  >
+                    {/* Window Header Frame */}
+                    <div className="px-3.5 py-2.5 bg-[#141417] border-b border-[#27272A] flex items-center justify-between select-none">
+                      <div className="flex items-center gap-1.5" aria-hidden="true">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
+                      </div>
+                      <span className="font-mono text-[10px] text-[#71717A] tracking-wider uppercase">
+                        {project.title.toLowerCase().replace(/\s+/g, '-')}.app
+                      </span>
+                      <div className="w-10" aria-hidden="true" />
+                    </div>
+
+                    {/* Screenshot Preview */}
+                    <div className="relative aspect-video w-full bg-[#0D0D0F] overflow-hidden">
+                      <img
+                        src={project.image}
+                        alt={`${project.title} interface preview`}
+                        loading="lazy"
+                        className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.015]"
+                      />
+                    </div>
+                  </TiltedCard>
+                </div>
+
+                {/* Metadata & Description */}
+                <div
+                  className={`w-full lg:col-span-5 flex flex-col justify-center ${
+                    isEven ? 'lg:order-1' : 'lg:order-2'
+                  }`}
+                >
+                  {/* Category & Project Index */}
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-[#FACC15] tracking-[0.2em]">
+                      {project.number}
+                    </span>
+                    <span className="text-[#3F3F46]" aria-hidden="true">/</span>
+                    <span className="font-mono text-[11px] text-[#A1A1AA] tracking-[0.16em] uppercase">
+                      {project.category}
+                    </span>
+                  </div>
+
+                  {/* Project Title */}
+                  <h3 className="font-grotesk font-black text-2xl sm:text-3xl lg:text-4xl text-[#F5F5F5] uppercase tracking-tight mt-2.5 leading-none">
+                    {project.title}
+                  </h3>
+
+                  {/* Subtitle */}
+                  <p className="font-mono text-xs text-[#A1A1AA] tracking-wider uppercase mt-1.5">
+                    {project.subtitle}
+                  </p>
+
+                  {/* Description */}
+                  <p className="text-sm md:text-base text-[#A1A1AA] leading-relaxed mt-4 font-normal">
+                    {project.description}
+                  </p>
+
+                  {/* Technologies */}
+                  <div className="flex flex-wrap gap-2 mt-5">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2.5 py-1 text-xs font-mono text-[#D4D4D8] bg-[#141416] border border-[#27272A] rounded tracking-wide"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Verified Links (Omit fake or placeholder links) */}
+                  <div className="flex items-center gap-3 sm:gap-4 mt-7 pt-1">
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#141416] hover:bg-[#1C1C20] text-[#F5F5F5] hover:text-[#FACC15] border border-[#27272A] hover:border-[#FACC15] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        aria-label={`View ${project.title} source code on GitHub`}
+                      >
+                        <FiGithub size={15} />
+                        <span>SOURCE CODE</span>
+                      </a>
+                    )}
+
+                    {project.live && (
+                      <a
+                        href={project.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FACC15] hover:bg-[#FACC15]/90 text-[#080808] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
+                        aria-label={`Open ${project.title} live demo`}
+                      >
+                        <span>LIVE DEMO</span>
+                        <FiArrowUpRight size={15} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.article>
+          );
+        })}
+      </div>
+
+      {/* ==================================================
+          SECTION DIVIDER
+          ================================================== */}
+      <div className="w-full h-[1px] bg-[#1F1F23] my-20 md:my-28" aria-hidden="true" />
+
+      {/* ==================================================
+          OTHER PROJECTS (COMPACT SECONDARY ARCHIVE)
+          ================================================== */}
+      <motion.div {...getFadeMotion(0)} className="mb-10 sm:mb-12">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="font-mono text-xs text-[#71717A] tracking-[0.2em] uppercase font-semibold">
+            02 / ARCHIVE
+          </span>
+          <span className="h-[1px] w-8 bg-[#27272A]" aria-hidden="true" />
+        </div>
+        <h3 className="font-grotesk font-bold text-2xl sm:text-3xl text-[#F5F5F5] uppercase tracking-tight">
+          OTHER PROJECTS<span className="text-[#FACC15]">.</span>
+        </h3>
+        <p className="font-mono text-xs text-[#71717A] mt-1.5">
+          Selected earlier experiments, educational web games, and digital management tools.
+        </p>
+      </motion.div>
+
+      {/* 2-Column Responsive Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-7">
+        {otherProjects.map((project, index) => (
+          <motion.div
+            key={project.id}
+            {...getFadeMotion(index * 0.08)}
+            className="other-project-card rounded-lg overflow-hidden flex flex-col justify-between group"
+          >
+            {/* Project Image Preview */}
+            <div className="relative aspect-video w-full bg-[#0D0D0F] overflow-hidden border-b border-[#27272A]">
+              <img
+                src={project.image}
+                alt={`${project.title} thumbnail`}
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Card Content */}
+            <div className="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 className="font-grotesk font-bold text-lg text-[#F5F5F5] group-hover:text-[#FACC15] transition-colors leading-snug">
+                  {project.title}
+                </h4>
+                <p className="text-xs text-[#A1A1AA] leading-relaxed mt-2 line-clamp-2">
+                  {project.description}
+                </p>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-[#1C1C20] flex items-center justify-between gap-3">
+                {/* Tech tags */}
+                <div className="flex flex-wrap gap-1.5">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 text-[10px] font-mono text-[#8E8E93] bg-[#161619] border border-[#27272A] rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {project.github && (
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#1A1A1E] rounded transition-colors focus-visible:outline-none"
+                      aria-label={`View ${project.title} source code`}
+                      title="GitHub Repository"
+                    >
+                      <FiGithub size={16} />
+                    </a>
+                  )}
+                  {project.live && (
+                    <a
+                      href={project.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-[#A1A1AA] hover:text-[#FACC15] hover:bg-[#1A1A1E] rounded transition-colors focus-visible:outline-none"
+                      aria-label={`Open ${project.title} live demo`}
+                      title="Live Deployment"
+                    >
+                      <FiArrowUpRight size={17} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Project;

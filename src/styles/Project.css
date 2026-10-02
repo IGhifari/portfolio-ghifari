@@ -1,15 +1,27 @@
-/* Project Card Neo-Brutalism */
-.project-card {
-  background: var(--nb-white);
-  border: var(--nb-border);
-  box-shadow: var(--nb-shadow-lg);
-  border-radius: 0;
-  overflow: hidden;
-  color: var(--nb-ink);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+/* ============================================
+   PROJECTS SECTION (DARK EDITORIAL STYLING)
+   ============================================ */
+
+.project-preview-frame {
+  background-color: #101012;
+  border: 1px solid #27272A;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.project-card:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px var(--nb-shadow-color);
+.project-preview-frame:hover {
+  border-color: #3F3F46;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}
+
+.other-project-card {
+  background-color: #101012;
+  border: 1px solid #27272A;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.other-project-card:hover {
+  border-color: #3F3F46;
+  background-color: #141417;
+  transform: translateY(-2px);
 }
