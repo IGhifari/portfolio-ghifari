@@ -14,10 +14,14 @@ import {
   SiPostman,
   SiVite,
   SiHtml5,
+  SiBruno,
+  SiClaude,
+  SiGooglegemini,
 } from 'react-icons/si';
 import { BiLogoPostgresql } from 'react-icons/bi';
 import { GrMysql } from 'react-icons/gr';
-import { VscVscode } from 'react-icons/vsc';
+import { VscVscode, VscSparkle } from 'react-icons/vsc';
+import { TbTablePlus } from 'react-icons/tb';
 import '../styles/Skill.css';
 
 const techCategories = [
@@ -67,7 +71,12 @@ const techCategories = [
       { name: 'Git', icon: <SiGit size={18} /> },
       { name: 'GitHub', icon: <SiGithub size={18} />, highlight: true },
       { name: 'VS Code', icon: <VscVscode size={18} /> },
+      { name: 'Antigravity', icon: <VscSparkle size={18} /> },
+      { name: 'TablePlus', icon: <TbTablePlus size={18} /> },
       { name: 'Postman', icon: <SiPostman size={18} /> },
+      { name: 'Bruno', icon: <SiBruno size={18} /> },
+      { name: 'Claude', icon: <SiClaude size={18} /> },
+      { name: 'Gemini', icon: <SiGooglegemini size={18} /> },
     ],
   },
 ];
