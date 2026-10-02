@@ -11,9 +11,8 @@ import Contact from './components/Contact';
 import Skills from './components/Skill';
 import About from './components/About';
 import Journey from './components/Journey';
-import LastUpdated from './components/LastUpdated';
-import ContactMe from './components/ContactMe';
 import SoundButton from './components/SoundButton';
+import Footer from './components/Footer';
 
 const App = () => {
     return (
@@ -61,27 +60,14 @@ const App = () => {
                 <AcademicBackground/>
             </section>
 
-            {/* Contact Form */}
-            <section id="contact2" className="py-16" style={{ background: 'var(--nb-cream)' }}>
-                <ContactMe />
-            </section>
-
-            {/* Contact Info */}
-            <section id="contact" className="py-16 nb-dot-pattern">
+            {/* Contact */}
+            <section id="contact" className="bg-[#080808] border-t border-[#1C1C20]">
+                <div id="contact2" aria-hidden="true" />
                 <Contact/>
             </section>
 
             {/* Footer */}
-            <footer className="nb-footer py-8 flex items-center justify-center">
-                <div className="text-center space-y-1.5 flex flex-col items-center">
-                    <h1 className="font-grotesk font-bold text-lg" style={{ color: 'var(--nb-yellow)' }}>GHIFARI</h1>
-                    <p className="font-mono text-sm" style={{ color: 'var(--nb-yellow)' }}>Web Developer</p>
-                    <LastUpdated />
-                    <p className="font-mono text-xs opacity-60" style={{ color: 'var(--nb-yellow)' }}>
-                        © {new Date().getFullYear()} Ghifari. All rights reserved.
-                    </p>
-                </div>
-            </footer>
+            <Footer />
         </div>
         </ThemeProvider>
     );

@@ -1,0 +1,82 @@
+/* ========================================================
+   CONTACT SECTION & FORM STYLES (DARK EDITORIAL)
+   ======================================================== */
+
+.contact-card {
+  background: #101012;
+  border: 1px solid #1C1C20;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-card:hover {
+  border-color: #2E2E34;
+}
+
+.contact-channel-item {
+  background: #121215;
+  border: 1px solid #1F1F24;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-channel-item:hover {
+  background: #16161A;
+  border-color: #2E2E36;
+  transform: translateX(3px);
+}
+
+.dark-form-input {
+  width: 100%;
+  background-color: #121215;
+  border: 1px solid #27272A;
+  color: #F5F5F5;
+  font-family: inherit;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.dark-form-input:focus {
+  outline: none;
+  border-color: #FACC15;
+  box-shadow: 0 0 0 1px #FACC15;
+  background-color: #161619;
+}
+
+.dark-form-input::placeholder {
+  color: #52525B;
+}
+
+.dark-form-input.has-error {
+  border-color: #EF4444;
+}
+
+.dark-form-input.has-error:focus {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 1px #EF4444;
+}
+
+/* Toastify Dark Overrides */
+.Toastify__toast-theme--dark {
+  background: #141417 !important;
+  color: #F5F5F5 !important;
+  border: 1px solid #27272A !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.8125rem !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8) !important;
+}
+
+.Toastify__progress-bar--dark {
+  background: #FACC15 !important;
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .contact-card,
+  .contact-channel-item,
+  .contact-channel-item:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+}
