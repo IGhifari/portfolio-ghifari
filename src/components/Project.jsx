@@ -2,10 +2,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FiGithub, FiArrowUpRight } from 'react-icons/fi';
 import TiltedCard from './reactbits/TiltedCard';
 import { selectedProjects, otherProjects } from '../data/projects';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/Project.css';
 
 const Project = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { t, resolve } = useLanguage();
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -34,15 +36,15 @@ const Project = () => {
       <motion.div {...getFadeMotion(0)} className="mb-10 md:mb-16">
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
-            01 / SELECTED WORK
+            {t('projects.sectionTag')}
           </span>
           <span className="h-[1px] w-12 bg-[var(--border)]" aria-hidden="true" />
         </div>
         <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--text-primary)] uppercase tracking-tight leading-none">
-          SELECTED PROJECTS<span className="text-[var(--accent)]">.</span>
+          {t('projects.heading')}<span className="text-[var(--accent)]">.</span>
         </h2>
         <p className="font-mono text-xs sm:text-sm text-[var(--text-secondary)] mt-3 max-w-xl leading-relaxed">
-          A curated selection of applications and systems I&apos;ve designed and built.
+          {t('projects.intro')}
         </p>
       </motion.div>
 
@@ -110,7 +112,7 @@ const Project = () => {
                     </span>
                     <span className="text-[var(--border)]" aria-hidden="true">/</span>
                     <span className="font-mono text-[11px] text-[var(--text-secondary)] tracking-[0.16em] uppercase">
-                      {project.category}
+                      {resolve(project.category)}
                     </span>
                   </div>
 
@@ -121,12 +123,12 @@ const Project = () => {
 
                   {/* Subtitle */}
                   <p className="font-mono text-xs text-[var(--text-secondary)] tracking-wider uppercase mt-1.5">
-                    {project.subtitle}
+                    {resolve(project.subtitle)}
                   </p>
 
                   {/* Description */}
                   <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed mt-4 font-normal">
-                    {project.description}
+                    {resolve(project.description)}
                   </p>
 
                   {/* Technologies - Subtle Editorial Tags */}
@@ -149,10 +151,10 @@ const Project = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={`View ${project.title} source code on GitHub`}
+                        aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
                       >
                         <FiGithub size={15} />
-                        <span>SOURCE CODE</span>
+                        <span>{t('projects.sourceCode')}</span>
                       </a>
                     )}
 
@@ -162,9 +164,9 @@ const Project = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={`Open ${project.title} live demo`}
+                        aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
                       >
-                        <span>LIVE DEMO</span>
+                        <span>{t('projects.liveDemo')}</span>
                         <FiArrowUpRight size={15} />
                       </a>
                     )}
@@ -187,15 +189,15 @@ const Project = () => {
       <motion.div {...getFadeMotion(0)} className="mb-10 sm:mb-12">
         <div className="flex items-center gap-3 mb-2">
           <span className="font-mono text-xs text-[var(--text-muted)] tracking-[0.2em] uppercase font-semibold">
-            02 / ARCHIVE
+            {t('projects.archiveTag')}
           </span>
           <span className="h-[1px] w-8 bg-[var(--border)]" aria-hidden="true" />
         </div>
         <h3 className="font-grotesk font-bold text-2xl sm:text-3xl text-[var(--text-primary)] uppercase tracking-tight">
-          OTHER PROJECTS<span className="text-[var(--accent)]">.</span>
+          {t('projects.archiveHeading')}<span className="text-[var(--accent)]">.</span>
         </h3>
         <p className="font-mono text-xs text-[var(--text-secondary)] mt-1.5">
-          Selected earlier experiments, educational web games, and digital management tools.
+          {t('projects.archiveIntro')}
         </p>
       </motion.div>
 
@@ -224,7 +226,7 @@ const Project = () => {
                   {project.title}
                 </h4>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2 line-clamp-2">
-                  {project.description}
+                  {resolve(project.description)}
                 </p>
               </div>
 
@@ -249,8 +251,8 @@ const Project = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
-                      aria-label={`View ${project.title} source code`}
-                      title="GitHub Repository"
+                      aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
+                      title={t('projects.githubRepo')}
                     >
                       <FiGithub size={16} />
                     </a>
@@ -261,8 +263,8 @@ const Project = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
-                      aria-label={`Open ${project.title} live demo`}
-                      title="Live Deployment"
+                      aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
+                      title={t('projects.liveDeployment')}
                     >
                       <FiArrowUpRight size={17} />
                     </a>

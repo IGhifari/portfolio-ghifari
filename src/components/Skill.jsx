@@ -22,6 +22,7 @@ import { BiLogoPostgresql } from 'react-icons/bi';
 import { GrMysql } from 'react-icons/gr';
 import { VscVscode, VscSparkle } from 'react-icons/vsc';
 import { TbTablePlus } from 'react-icons/tb';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/Skill.css';
 
 const techCategories = [
@@ -98,6 +99,7 @@ const marqueeTechnologies = [
 
 const Skills = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useLanguage();
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -128,15 +130,15 @@ const Skills = () => {
         <motion.div {...getFadeMotion(0)} className="mb-14 md:mb-20">
           <div className="flex items-center gap-3 mb-3">
             <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
-              04 / TECH STACK
+              {t('stack.sectionTag')}
             </span>
             <span className="h-[1px] w-12 bg-[var(--border)]" aria-hidden="true" />
           </div>
           <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--text-primary)] uppercase tracking-tight leading-none">
-            TOOLS I WORK WITH<span className="text-[var(--accent)]">.</span>
+            {t('stack.heading')}<span className="text-[var(--accent)]">.</span>
           </h2>
           <p className="font-mono text-xs sm:text-sm text-[var(--text-secondary)] mt-3 max-w-xl leading-relaxed">
-            A practical stack for designing, building, and deploying modern web applications from interface to database.
+            {t('stack.intro')}
           </p>
         </motion.div>
 
@@ -154,7 +156,7 @@ const Skills = () => {
                 {/* Category Header */}
                 <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
                   <h3 className="font-grotesk font-bold text-sm sm:text-base text-[var(--text-primary)] tracking-wider uppercase">
-                    {category.title}
+                    {t(`stack.categories.${category.id}.title`, category.title)}
                   </h3>
                   <span className="font-mono text-[10px] text-[var(--accent)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] tracking-wider">
                     {category.badge}
@@ -163,7 +165,7 @@ const Skills = () => {
 
                 {/* Category Brief - Improved contrast & readability */}
                 <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mt-3 mb-5">
-                  {category.description}
+                  {t(`stack.categories.${category.id}.description`, category.description)}
                 </p>
 
                 {/* Technology List - Editorial Rows */}
@@ -182,8 +184,8 @@ const Skills = () => {
                       {skill.highlight && (
                         <span
                           className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-70 group-hover:opacity-100 transition-opacity"
-                          title="Core Technology"
-                          aria-label="Core Technology"
+                          title={t('stack.coreTech')}
+                          aria-label={t('stack.coreTech')}
                         />
                       )}
                     </li>

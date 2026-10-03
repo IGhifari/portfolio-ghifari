@@ -1,43 +1,12 @@
 import { motion } from 'framer-motion';
 import { FiBookOpen, FiCalendar, FiMapPin, FiCheckCircle } from 'react-icons/fi';
+import { useLanguage } from '../context/LanguageContext';
 
 const AcademicBackground = () => {
-  const educationData = {
-    institution: "SMKN 1 Cibinong",
-    degree: "Vocational High School Diploma",
-    major: "Software Engineering (Rekayasa Perangkat Lunak / RPL)",
-    location: "Cibinong, Bogor Regency, West Java, Indonesia",
-    period: "July 2023 — June 2026 (Expected)",
-    status: "Currently Enrolled · Senior Year",
-    overview:
-      "Formal three-year vocational engineering curriculum combining fundamental computer science concepts with intensive practical software and web application development.",
-    competencies: [
-      {
-        title: "Web Systems & Architecture",
-        desc: "Building structured client-server applications, responsive interfaces, and RESTful API integration.",
-      },
-      {
-        title: "Relational Database Design",
-        desc: "Schema design, table normalization, SQL queries, and ORM data modeling with MySQL and PostgreSQL.",
-      },
-      {
-        title: "Programming Fundamentals",
-        desc: "Object-oriented programming, data structures, algorithms, and modular code design.",
-      },
-      {
-        title: "Engineering Workflows",
-        desc: "Distributed version control with Git/GitHub, collaborative code review, and structured documentation.",
-      },
-    ],
-    curriculumTags: [
-      "Software Engineering",
-      "Web Development",
-      "Database Architecture",
-      "OOP & Algorithms",
-      "API Design",
-      "Git / Version Control",
-    ],
-  };
+  const { t } = useLanguage();
+
+  const competencies = t('education.competencies') || [];
+  const curriculumTags = t('education.scopeTags') || [];
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
@@ -51,20 +20,20 @@ const AcademicBackground = () => {
       >
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
-            06 / EDUCATION
+            {t('education.sectionTag')}
           </span>
           <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
           <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
-            ACADEMIC BACKGROUND
+            {t('education.subTag')}
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
-            FORMAL EDUCATION<span className="text-[var(--accent)]">.</span>
+            {t('education.heading')}<span className="text-[var(--accent)]">.</span>
           </h2>
           <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
-            Foundational software engineering curriculum emphasizing practical programming, system architecture, and modern development standards.
+            {t('education.intro')}
           </p>
         </div>
       </motion.header>
@@ -82,13 +51,13 @@ const AcademicBackground = () => {
           <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-5">
             <div>
               <span className="font-mono text-[11px] text-[var(--text-muted)] uppercase tracking-wider block mb-1.5">
-                Current Program
+                {t('education.currentProgram')}
               </span>
               <p className="font-grotesk font-bold text-lg text-[var(--text-primary)]">
-                Vocational High School
+                {t('education.schoolLevel')}
               </p>
               <p className="font-mono text-xs text-[var(--accent)] mt-0.5 font-semibold">
-                Software Engineering (RPL)
+                {t('education.major')}
               </p>
             </div>
 
@@ -96,24 +65,24 @@ const AcademicBackground = () => {
               <div className="flex items-start gap-2.5">
                 <FiCalendar size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Timeline</span>
-                  <span className="text-[var(--text-primary)]">{educationData.period}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">{t('education.timelineLabel')}</span>
+                  <span className="text-[var(--text-primary)]">{t('education.timelineValue')}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <FiMapPin size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Campus Location</span>
-                  <span className="text-[var(--text-primary)]">{educationData.location}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">{t('education.campusLabel')}</span>
+                  <span className="text-[var(--text-primary)]">{t('education.campusValue')}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <FiBookOpen size={14} className="text-[var(--accent)] shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">Status</span>
-                  <span className="text-[var(--accent)] font-semibold">{educationData.status}</span>
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase">{t('education.statusLabel')}</span>
+                  <span className="text-[var(--accent)] font-semibold">{t('education.statusValue')}</span>
                 </div>
               </div>
             </div>
@@ -122,7 +91,7 @@ const AcademicBackground = () => {
           {/* Editorial Note */}
           <div className="p-5 border-l-2 border-[var(--accent)]/70 bg-[var(--surface-alt)]/60 rounded-r-lg">
             <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed">
-              Curriculum is complemented by active production work, professional frontend internship experience, and independent full-stack software development.
+              {t('education.note')}
             </p>
           </div>
         </motion.div>
@@ -140,14 +109,14 @@ const AcademicBackground = () => {
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]">
-                  SMK / VOCATIONAL
+                  {t('education.badgeVocational')}
                 </span>
                 <span className="text-xs font-mono text-[var(--text-muted)]">
-                  INDONESIAN NATIONAL CURRICULUM
+                  {t('education.badgeCurriculum')}
                 </span>
               </div>
               <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
-                {educationData.institution}
+                {t('education.institution')}
               </h3>
             </div>
             <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto">
@@ -157,17 +126,17 @@ const AcademicBackground = () => {
 
           {/* Overview */}
           <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-            {educationData.overview}
+            {t('education.overview')}
           </p>
 
           {/* Curriculum Focus Areas */}
           <div className="space-y-3 pt-2">
             <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Core Competencies & Academic Pillars
+              {t('education.competenciesHeader')}
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-              {educationData.competencies.map((item) => (
+              {competencies.map((item) => (
                 <div
                   key={item.title}
                   className="bg-[var(--surface-alt)] border border-[var(--border-subtle)] rounded-md p-3.5 flex flex-col justify-between"
@@ -189,9 +158,9 @@ const AcademicBackground = () => {
           {/* Curriculum Tags */}
           <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
             <span className="font-mono text-[11px] text-[var(--text-muted)] mr-1">
-              Curriculum Scope:
+              {t('education.scopeLabel')}
             </span>
-            {educationData.curriculumTags.map((tag) => (
+            {curriculumTags.map((tag) => (
               <span
                 key={tag}
                 className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--tag-bg)] border border-[var(--tag-border)] text-[var(--tag-text)]"

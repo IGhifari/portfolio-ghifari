@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
@@ -17,10 +17,12 @@ import {
 } from 'react-icons/fi';
 import { IoLogoGithub } from 'react-icons/io';
 import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/Contact.css';
 
 const contactChannels = [
   {
+    key: 'github',
     name: 'GitHub',
     handle: '@IGhifari',
     desc: 'Public code, project repositories & contributions',
@@ -28,6 +30,7 @@ const contactChannels = [
     icon: <IoLogoGithub size={18} aria-hidden="true" />,
   },
   {
+    key: 'linkedin',
     name: 'LinkedIn',
     handle: 'in/ighifari',
     desc: 'Professional network, career background & credentials',
@@ -35,6 +38,7 @@ const contactChannels = [
     icon: <FaLinkedin size={18} aria-hidden="true" />,
   },
   {
+    key: 'instagram',
     name: 'Instagram',
     handle: '@ghfrriii',
     desc: 'Personal activities, design experiments & updates',
@@ -42,6 +46,7 @@ const contactChannels = [
     icon: <FaInstagram size={18} aria-hidden="true" />,
   },
   {
+    key: 'discord',
     name: 'Discord',
     handle: 'ghifari#7471',
     desc: 'Real-time developer chat and collaboration',
@@ -49,6 +54,7 @@ const contactChannels = [
     icon: <FaDiscord size={18} aria-hidden="true" />,
   },
   {
+    key: 'tiktok',
     name: 'TikTok',
     handle: '@ghrfiii',
     desc: 'Short-form coding clips and creative uploads',
@@ -57,14 +63,8 @@ const contactChannels = [
   },
 ];
 
-const formSchema = z.object({
-  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
-  email: z.string().trim().email('Please enter a valid email address'),
-  subject: z.string().trim().optional(),
-  message: z.string().trim().min(10, 'Message must be at least 10 characters'),
-});
-
 const Contact = () => {
+  const { t } = useLanguage();
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -84,10 +84,21 @@ const Contact = () => {
 
   const directEmail = 'ighifarii05@gmail.com';
 
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().trim().min(2, t('contact.validation.nameMin')),
+        email: z.string().trim().email(t('contact.validation.emailValid')),
+        subject: z.string().trim().optional(),
+        message: z.string().trim().min(10, t('contact.validation.messageMin')),
+      }),
+    [t]
+  );
+
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
       setCopiedEmail(true);
-      toast.success('Email copied to clipboard!');
+      toast.success(t('contact.toastCopied'));
       setTimeout(() => setCopiedEmail(false), 2500);
     });
   };
@@ -127,14 +138,14 @@ const Contact = () => {
     try {
       if (!serviceId || !templateId || !publicKey) {
         setSubmitStatus('error');
-        toast.error('Email service is temporarily offline. Please write to ighifarii05@gmail.com directly.');
+        toast.error(t('contact.toastOffline'));
         setIsSubmitting(false);
         return;
       }
 
       await emailjs.send(serviceId, templateId, formData, publicKey);
       setSubmitStatus('success');
-      toast.success('Message delivered successfully! 🎉');
+      toast.success(t('contact.toastSuccess'));
       setFormData({
         emailto: 'Ghifari',
         name: '',
@@ -145,7 +156,7 @@ const Contact = () => {
     } catch (error) {
       console.error('EmailJS submission failure:', error);
       setSubmitStatus('error');
-      toast.error('Failed to send message. Please reach out directly via email.');
+      toast.error(t('contact.toastError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -165,20 +176,20 @@ const Contact = () => {
       >
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
-            07 / CONTACT
+            {t('contact.sectionTag')}
           </span>
           <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
           <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
-            GET IN TOUCH
+            {t('contact.subTag')}
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
-            LET&apos;S BUILD SOMETHING USEFUL<span className="text-[var(--accent)]">.</span>
+            {t('contact.heading')}<span className="text-[var(--accent)]">.</span>
           </h2>
           <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
-            Have a project, opportunity, or collaboration in mind? Feel free to send a message directly or connect via my channels.
+            {t('contact.intro')}
           </p>
         </div>
       </motion.header>
@@ -196,14 +207,14 @@ const Contact = () => {
           <div className="flex items-center justify-between pb-5 mb-6 border-b border-[var(--border-subtle)]">
             <div>
               <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider block">
-                Direct Dispatch
+                {t('contact.formBadge')}
               </span>
               <h3 className="font-grotesk font-bold text-xl text-[var(--text-primary)]">
-                Send a Message
+                {t('contact.formTitle')}
               </h3>
             </div>
             <span className="font-mono text-xs text-[var(--text-muted)]">
-              * Required fields
+              {t('contact.requiredHint')}
             </span>
           </div>
 
@@ -212,8 +223,8 @@ const Contact = () => {
             <div className="mb-6 p-4 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 flex items-start gap-3">
               <FiCheckCircle size={18} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden="true" />
               <div className="text-xs sm:text-sm leading-relaxed">
-                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">Message dispatched successfully!</strong>
-                Thank you for reaching out. I have received your note and will reply as soon as possible.
+                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">{t('contact.successTitle')}</strong>
+                {t('contact.successBody')}
               </div>
             </div>
           )}
@@ -223,8 +234,8 @@ const Contact = () => {
             <div className="mb-6 p-4 rounded-md bg-rose-950/40 border border-rose-500/30 text-rose-400 flex items-start gap-3">
               <FiAlertCircle size={18} className="mt-0.5 shrink-0 text-rose-400" aria-hidden="true" />
               <div className="text-xs sm:text-sm leading-relaxed">
-                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">Unable to send via automated dispatch</strong>
-                Please feel free to email me directly at{' '}
+                <strong className="font-semibold block text-[var(--text-primary)] mb-0.5">{t('contact.errorTitle')}</strong>
+                {t('contact.errorBody')}{' '}
                 <a href={`mailto:${directEmail}`} className="underline font-mono text-[var(--text-primary)]">
                   {directEmail}
                 </a>.
@@ -240,7 +251,7 @@ const Contact = () => {
                   htmlFor="contact-name"
                   className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
                 >
-                  Your Name <span className="text-[var(--accent)]">*</span>
+                  {t('contact.nameLabel')} <span className="text-[var(--accent)]">*</span>
                 </label>
                 <input
                   type="text"
@@ -248,7 +259,7 @@ const Contact = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g. Alex Morgan"
+                  placeholder={t('contact.namePlaceholder')}
                   disabled={isSubmitting}
                   className={`dark-form-input ${errors.name ? 'has-error' : ''}`}
                   aria-invalid={errors.name ? 'true' : 'false'}
@@ -266,7 +277,7 @@ const Contact = () => {
                   htmlFor="contact-email"
                   className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
                 >
-                  Your Email <span className="text-[var(--accent)]">*</span>
+                  {t('contact.emailLabel')} <span className="text-[var(--accent)]">*</span>
                 </label>
                 <input
                   type="email"
@@ -274,7 +285,7 @@ const Contact = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="e.g. alex@example.com"
+                  placeholder={t('contact.emailPlaceholder')}
                   disabled={isSubmitting}
                   className={`dark-form-input ${errors.email ? 'has-error' : ''}`}
                   aria-invalid={errors.email ? 'true' : 'false'}
@@ -294,7 +305,10 @@ const Contact = () => {
                 htmlFor="contact-subject"
                 className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
               >
-                Subject <span className="text-[var(--text-muted)] text-[10px] normal-case">(optional)</span>
+                {t('contact.subjectLabel')}{' '}
+                <span className="text-[var(--text-muted)] text-[10px] normal-case">
+                  {t('contact.subjectOptional')}
+                </span>
               </label>
               <input
                 type="text"
@@ -302,7 +316,7 @@ const Contact = () => {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="e.g. Project inquiry / Full-stack collaboration"
+                placeholder={t('contact.subjectPlaceholder')}
                 disabled={isSubmitting}
                 className="dark-form-input"
               />
@@ -314,7 +328,7 @@ const Contact = () => {
                 htmlFor="contact-message"
                 className="block font-mono text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2"
               >
-                Message <span className="text-[var(--accent)]">*</span>
+                {t('contact.messageLabel')} <span className="text-[var(--accent)]">*</span>
               </label>
               <textarea
                 id="contact-message"
@@ -322,7 +336,7 @@ const Contact = () => {
                 value={formData.message}
                 onChange={handleChange}
                 rows={5}
-                placeholder="Tell me about your project, timeline, or idea..."
+                placeholder={t('contact.messagePlaceholder')}
                 disabled={isSubmitting}
                 className={`dark-form-input resize-y min-h-[120px] ${errors.message ? 'has-error' : ''}`}
                 aria-invalid={errors.message ? 'true' : 'false'}
@@ -349,11 +363,11 @@ const Contact = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span>SENDING MESSAGE...</span>
+                    <span>{t('contact.submittingBtn')}</span>
                   </>
                 ) : (
                   <>
-                    <span>SEND MESSAGE</span>
+                    <span>{t('contact.submitBtn')}</span>
                     <FiSend size={14} aria-hidden="true" />
                   </>
                 )}
@@ -373,21 +387,21 @@ const Contact = () => {
           {/* Top Tier: Channel Header & Availability */}
           <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
             <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
-              DIRECT REACH
+              {t('contact.reachBadge')}
             </span>
             <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-emerald-500">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              AVAILABLE FOR HIRE
+              {t('contact.availableBadge')}
             </span>
           </div>
 
           {/* Email Info */}
           <div>
             <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] mb-1">
-              Direct Inquiries
+              {t('contact.inquiriesTitle')}
             </h4>
             <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mb-3">
-              For contract inquiries, freelance work, software roles, or casual developer chats.
+              {t('contact.inquiriesDesc')}
             </p>
 
             <div className="flex items-center gap-2 p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
@@ -402,8 +416,8 @@ const Contact = () => {
                 type="button"
                 onClick={copyEmailToClipboard}
                 className="p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
-                title="Copy email address"
-                aria-label="Copy email address"
+                title={t('contact.copyEmailTitle')}
+                aria-label={t('contact.copyEmailTitle')}
               >
                 {copiedEmail ? (
                   <FiCheck size={14} className="text-emerald-500" />
@@ -418,18 +432,18 @@ const Contact = () => {
           <div className="py-3 border-y border-[var(--border-subtle)] grid grid-cols-2 gap-3 font-mono text-[11px] text-[var(--text-secondary)]">
             <div className="flex items-center gap-1.5">
               <FiMapPin size={12} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
-              <span>Bogor, Indonesia</span>
+              <span>{t('contact.location')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <FiClock size={12} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
-              <span>UTC+7 (WIB)</span>
+              <span>{t('contact.timezone')}</span>
             </div>
           </div>
 
           {/* Verified Profiles & Networks - Simplified Editorial List */}
           <div className="space-y-1">
             <h5 className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2">
-              Verified Profiles &amp; Networks
+              {t('contact.profilesHeader')}
             </h5>
 
             <div className="divide-y divide-[var(--border-subtle)]">
@@ -454,7 +468,7 @@ const Contact = () => {
                   </div>
 
                   <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
-                    <span className="font-mono text-[10px] hidden md:inline uppercase">CONNECT</span>
+                    <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
                     <FiExternalLink size={13} aria-hidden="true" />
                   </div>
                 </a>

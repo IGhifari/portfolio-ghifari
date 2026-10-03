@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAward, FiMaximize2, FiX, FiExternalLink, FiCalendar } from 'react-icons/fi';
 import { certificates } from '../data/certificates';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/Certificate.css';
 
 const Certificate = () => {
   const [activeCert, setActiveCert] = useState(null);
+  const { t } = useLanguage();
 
   // Close modal handler
   const closeModal = useCallback(() => {
@@ -47,20 +49,20 @@ const Certificate = () => {
       >
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs md:text-sm font-semibold tracking-wider text-[var(--accent)] uppercase">
-            05 / CERTIFICATES
+            {t('certificates.sectionTag')}
           </span>
           <span className="h-px w-8 bg-[var(--border)]" aria-hidden="true" />
           <span className="font-mono text-xs text-[var(--text-muted)] uppercase">
-            CREDENTIALS
+            {t('certificates.subTag')}
           </span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[var(--text-primary)] uppercase">
-            TECHNICAL CERTIFICATIONS<span className="text-[var(--accent)]">.</span>
+            {t('certificates.heading')}<span className="text-[var(--accent)]">.</span>
           </h2>
           <p className="font-sans text-sm md:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
-            Verified vocational training, practical internship credentials, and competitive software development achievements.
+            {t('certificates.intro')}
           </p>
         </div>
       </motion.header>
@@ -92,7 +94,7 @@ const Certificate = () => {
                   setActiveCert(cert);
                 }
               }}
-              aria-label={`Inspect certificate: ${cert.title}`}
+              aria-label={`${t('certificates.inspectAria')} ${cert.title}`}
             >
               <img
                 src={cert.image}
@@ -113,7 +115,7 @@ const Certificate = () => {
                   {"// "}{cert.number}
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[var(--surface-alt)]/90 text-[var(--text-secondary)] border border-[var(--border-subtle)] backdrop-blur-sm uppercase">
-                  {cert.category}
+                  {t(`certificates.categories.${cert.category}`, cert.category)}
                 </span>
               </div>
 
@@ -121,7 +123,7 @@ const Certificate = () => {
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--surface-hover)] border border-[var(--border-hover)] text-[var(--text-primary)] font-mono text-xs tracking-wider backdrop-blur-sm shadow-lg">
                   <FiMaximize2 size={13} className="text-[var(--accent)]" />
-                  PREVIEW FULL
+                  {t('certificates.previewFull')}
                 </span>
               </div>
             </div>
@@ -162,10 +164,10 @@ const Certificate = () => {
                 <button
                   type="button"
                   onClick={() => setActiveCert(cert)}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded cursor-pointer"
                 >
                   <FiMaximize2 size={12} aria-hidden="true" />
-                  <span>VIEW CERTIFICATE</span>
+                  <span>{t('certificates.viewCert')}</span>
                 </button>
 
                 {cert.credentialUrl ? (
@@ -175,12 +177,12 @@ const Certificate = () => {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-mono font-medium text-[var(--accent)] hover:underline"
                   >
-                    <span>VERIFY CREDENTIAL</span>
+                    <span>{t('certificates.verifyCred')}</span>
                     <FiExternalLink size={12} aria-hidden="true" />
                   </a>
                 ) : (
                   <span className="text-[11px] font-mono text-[var(--text-muted)]">
-                    ARCHIVAL COPY
+                    {t('certificates.archivalCopy')}
                   </span>
                 )}
               </div>
@@ -225,10 +227,10 @@ const Certificate = () => {
                   type="button"
                   onClick={closeModal}
                   className="px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
-                  aria-label="Close certificate preview"
+                  aria-label={t('certificates.modalCloseAria')}
                 >
                   <FiX size={15} aria-hidden="true" />
-                  <span className="hidden sm:inline">ESC / CLOSE</span>
+                  <span className="hidden sm:inline">{t('certificates.modalClose')}</span>
                 </button>
               </div>
 
@@ -244,9 +246,12 @@ const Certificate = () => {
               {/* Modal Footer */}
               <div className="px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--surface-muted)] flex items-center justify-between text-xs font-mono text-[var(--text-muted)]">
                 <span className="truncate">
-                  Category: <strong className="text-[var(--text-secondary)] font-normal">{activeCert.category}</strong>
+                  {t('certificates.modalCategory')}{' '}
+                  <strong className="text-[var(--text-secondary)] font-normal">
+                    {t(`certificates.categories.${activeCert.category}`, activeCert.category)}
+                  </strong>
                 </span>
-                <span className="text-[var(--text-muted)]">Press ESC or click outside to dismiss</span>
+                <span className="text-[var(--text-muted)]">{t('certificates.modalDismiss')}</span>
               </div>
             </motion.div>
           </div>

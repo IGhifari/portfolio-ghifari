@@ -3,20 +3,22 @@ import { IoMenu, IoClose } from 'react-icons/io5';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/Components.css';
-
-const NAV_ITEMS = [
-  { to: 'projects', label: 'WORK' },
-  { to: 'about', label: 'ABOUT' },
-  { to: 'journey', label: 'JOURNEY' },
-  { to: 'stack', label: 'STACK' },
-  { to: 'contact', label: 'CONTACT' },
-];
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
+
+  const navItems = [
+    { to: 'projects', label: t('nav.work') },
+    { to: 'about', label: t('nav.about') },
+    { to: 'journey', label: t('nav.journey') },
+    { to: 'stack', label: t('nav.stack') },
+    { to: 'contact', label: t('nav.contact') },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +77,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-7 lg:gap-8" aria-label="Main Navigation">
-          {NAV_ITEMS.map(({ to, label }) => (
+          {navItems.map(({ to, label }) => (
             <Link
               key={to}
               to={to}
@@ -91,28 +93,100 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Desktop Controls (Theme Toggle) */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop Controls (Language Selector + Theme Toggle) */}
+        <div className="hidden md:flex items-center gap-2.5">
+          {/* Language Selector: Compact Segmented Toggle */}
+          <div
+            role="group"
+            aria-label={t('nav.langGroup')}
+            className="flex items-center h-9 p-0.5 rounded-md bg-[var(--surface-muted)] border border-[var(--border)]"
+          >
+            <button
+              type="button"
+              onClick={() => setLanguage('id')}
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                language === 'id'
+                  ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              aria-pressed={language === 'id'}
+              aria-label="Bahasa Indonesia"
+              title="Bahasa Indonesia"
+            >
+              ID
+            </button>
+            <span className="text-[var(--border)] select-none text-[10px] px-0.5" aria-hidden="true">|</span>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                language === 'en'
+                  ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              aria-pressed={language === 'en'}
+              aria-label="English"
+              title="English"
+            >
+              EN
+            </button>
+          </div>
+
           <button
             id="theme-toggle"
             type="button"
             onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
             className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
           </button>
         </div>
 
-        {/* Mobile Actions: Theme Toggle + Menu Button */}
-        <div className="flex md:hidden items-center gap-2">
+        {/* Mobile Actions: Language Selector + Theme Toggle + Menu Button */}
+        <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+          {/* Mobile Language Selector */}
+          <div
+            role="group"
+            aria-label={t('nav.langGroup')}
+            className="flex items-center h-9 p-0.5 rounded-md bg-[var(--surface-muted)] border border-[var(--border)]"
+          >
+            <button
+              type="button"
+              onClick={() => setLanguage('id')}
+              className={`h-full px-2 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                language === 'id'
+                  ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              aria-pressed={language === 'id'}
+              aria-label="Bahasa Indonesia"
+            >
+              ID
+            </button>
+            <span className="text-[var(--border)] select-none text-[10px]" aria-hidden="true">|</span>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`h-full px-2 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                language === 'en'
+                  ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              aria-pressed={language === 'en'}
+              aria-label="English"
+            >
+              EN
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
             className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none"
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
           </button>
@@ -120,7 +194,7 @@ const Navbar = () => {
           <button
             type="button"
             onClick={toggleMenu}
-            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-label={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={isMenuOpen}
             className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
@@ -138,7 +212,7 @@ const Navbar = () => {
         aria-hidden={!isMenuOpen}
       >
         <div className="px-6 flex flex-col gap-1.5">
-          {NAV_ITEMS.map(({ to, label }) => (
+          {navItems.map(({ to, label }) => (
             <Link
               key={to}
               to={to}
@@ -153,6 +227,42 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
+
+          {/* Mobile Drawer Language Controls */}
+          <div className="pt-4 mt-2 border-t border-[var(--border-subtle)] flex items-center justify-between px-4">
+            <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">
+              {language === 'id' ? 'Bahasa' : 'Language'}
+            </span>
+            <div
+              role="group"
+              aria-label={t('nav.langGroup')}
+              className="flex items-center h-8 p-0.5 rounded-md bg-[var(--surface-muted)] border border-[var(--border)]"
+            >
+              <button
+                type="button"
+                onClick={() => setLanguage('id')}
+                className={`h-full px-3 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                  language === 'id'
+                    ? 'bg-[var(--surface-alt)] text-[var(--accent)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                ID
+              </button>
+              <span className="text-[var(--border)] select-none text-[10px]" aria-hidden="true">|</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`h-full px-3 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                  language === 'en'
+                    ? 'bg-[var(--surface-alt)] text-[var(--accent)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>

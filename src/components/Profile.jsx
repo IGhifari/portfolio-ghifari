@@ -2,12 +2,14 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion
 import { Link } from 'react-scroll';
 import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import Threads from './reactbits/Threads';
 import '../styles/Components.css';
 
 const Profile = () => {
   const shouldReduceMotion = useReducedMotion();
   const { isDark } = useTheme();
+  const { t } = useLanguage();
   const { scrollY } = useScroll();
 
   // Controlled, subtle scroll transformations away from hero
@@ -74,7 +76,7 @@ const Profile = () => {
           <motion.div {...getMotionProps(0.05, -8)}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>AVAILABLE FOR WORK</span>
+              <span>{t('hero.available')}</span>
             </div>
           </motion.div>
 
@@ -104,7 +106,7 @@ const Profile = () => {
               aria-hidden="true"
             />
             <p className="font-mono text-[11px] xs:text-xs sm:text-sm md:text-base tracking-[0.16em] sm:tracking-[0.22em] text-[var(--accent)] uppercase font-semibold text-center">
-              WEB DEVELOPER / SOFTWARE ENGINEER
+              {t('hero.role')}
             </p>
             <span
               className="h-[1px] w-6 sm:w-10 bg-gradient-to-l from-transparent to-[var(--border)] hidden xs:inline-block"
@@ -117,7 +119,7 @@ const Profile = () => {
             className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4"
             {...getMotionProps(0.36, 12)}
           >
-            I build modern web applications with thoughtful interfaces and reliable systems.
+            {t('hero.valueProp')}
           </motion.p>
 
           {/* Call to Actions & Social Links */}
@@ -133,7 +135,7 @@ const Profile = () => {
                 offset={-70}
                 className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
               >
-                EXPLORE WORK
+                {t('hero.exploreWork')}
               </Link>
 
               <a
@@ -142,7 +144,7 @@ const Profile = () => {
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-transparent border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
               >
-                <span>GITHUB</span>
+                <span>{t('hero.githubCta')}</span>
                 <FiArrowUpRight size={16} />
               </a>
             </div>
@@ -153,7 +155,7 @@ const Profile = () => {
                 href="https://github.com/IGhifari"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GitHub Profile"
+                aria-label={t('hero.githubAria')}
                 className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiGithub size={17} />
@@ -163,7 +165,7 @@ const Profile = () => {
                 href="https://www.linkedin.com/in/ighifari/"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn Profile"
+                aria-label={t('hero.linkedinAria')}
                 className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiLinkedin size={17} />
@@ -184,9 +186,9 @@ const Profile = () => {
           duration={600}
           offset={-70}
           className="flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
-          aria-label="Scroll down to explore work"
+          aria-label={t('hero.scrollAria')}
         >
-          <span className="font-mono text-[10px] tracking-[0.25em] uppercase">SCROLL</span>
+          <span className="font-mono text-[10px] tracking-[0.25em] uppercase">{t('hero.scroll')}</span>
           <motion.div
             animate={shouldReduceMotion ? {} : { y: [0, 4, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}

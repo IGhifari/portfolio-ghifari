@@ -1,5 +1,5 @@
 /**
- * Project data structure for portfolio showcase.
+ * Project data structure for portfolio showcase with bilingual support.
  * Separated into Featured Selected Works and Secondary Projects.
  */
 
@@ -7,10 +7,19 @@ export const selectedProjects = [
   {
     id: "akseskita",
     number: "01",
-    category: "WEB PLATFORM / ACCESSIBILITY",
+    category: {
+      id: "PLATFORM WEB / AKSESIBILITAS",
+      en: "WEB PLATFORM / ACCESSIBILITY",
+    },
     title: "AksesKita",
-    subtitle: "Public Accessibility Discovery System",
-    description: "An accessibility-focused web application designed to help individuals with disabilities discover and evaluate public spaces in urban areas based on verified accessibility facilities, ramps, elevators, and inclusive amenities.",
+    subtitle: {
+      id: "Sistem Penjelajahan Aksesibilitas Publik",
+      en: "Public Accessibility Discovery System",
+    },
+    description: {
+      id: "Aplikasi web berfokus aksesibilitas yang dirancang untuk membantu penyandang disabilitas menemukan dan mengevaluasi ruang publik di area perkotaan berdasarkan fasilitas aksesibilitas terverifikasi, ramp, lift, dan fasilitas inklusif.",
+      en: "An accessibility-focused web application designed to help individuals with disabilities discover and evaluate public spaces in urban areas based on verified accessibility facilities, ramps, elevators, and inclusive amenities.",
+    },
     image: "/akseskita.png",
     tags: ["React", "TypeScript", "Express", "PostgreSQL", "Prisma"],
     github: "https://github.com/IGhifari",
@@ -19,23 +28,40 @@ export const selectedProjects = [
   {
     id: "project-management",
     number: "02",
-    category: "ENTERPRISE / FULL-STACK",
+    category: {
+      id: "ENTERPRISE / FULL-STACK",
+      en: "ENTERPRISE / FULL-STACK",
+    },
     title: "Project Management System",
-    subtitle: "Team Collaboration & Task Tracking",
-    description: "A comprehensive project management platform built to streamline agile task tracking, sprint management, and cross-functional team collaboration through intuitive kanban and workflow tooling.",
+    subtitle: {
+      id: "Kolaborasi Tim & Pelacakan Tugas",
+      en: "Team Collaboration & Task Tracking",
+    },
+    description: {
+      id: "Platform manajemen proyek komprehensif yang dibangun untuk menyederhanakan pelacakan tugas agile, manajemen sprint, dan kolaborasi tim lintas fungsi melalui kanban dan alur kerja yang intuitif.",
+      en: "A comprehensive project management platform built to streamline agile task tracking, sprint management, and cross-functional team collaboration through intuitive kanban and workflow tooling.",
+    },
     image: "/project_management.png",
     tags: ["React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Express"],
-    // Omit fake "user/project-management-system" placeholder link
     github: null,
     live: null,
   },
   {
     id: "food-ecommerce",
     number: "03",
-    category: "E-COMMERCE / FULL-STACK",
+    category: {
+      id: "E-COMMERCE / FULL-STACK",
+      en: "E-COMMERCE / FULL-STACK",
+    },
     title: "Food Marketplace",
-    subtitle: "Agricultural Produce Platform",
-    description: "A modern web-based e-commerce platform for fresh agricultural produce, featuring comprehensive product catalogs, cart state management, checkout workflows, verified customer reviews, and direct user-admin messaging.",
+    subtitle: {
+      id: "Platform Produk Pertanian Segar",
+      en: "Agricultural Produce Platform",
+    },
+    description: {
+      id: "Platform e-commerce berbasis web modern untuk produk pertanian segar, menampilkan katalog produk lengkap, manajemen keranjang belanja, alur checkout, ulasan terverifikasi, dan pesan langsung pengguna-admin.",
+      en: "A modern web-based e-commerce platform for fresh agricultural produce, featuring comprehensive product catalogs, cart state management, checkout workflows, verified customer reviews, and direct user-admin messaging.",
+    },
     image: "/food.png",
     tags: ["React", "TypeScript", "Express", "Prisma", "PostgreSQL"],
     github: "https://github.com/IGhifari/web-food",
@@ -44,14 +70,22 @@ export const selectedProjects = [
   {
     id: "internship-journal",
     number: "04",
-    category: "MANAGEMENT / WEB APP",
+    category: {
+      id: "MANAJEMEN / APLIKASI WEB",
+      en: "MANAGEMENT / WEB APP",
+    },
     title: "Internship Journal Siswa",
-    subtitle: "Student Activity & Log Management",
-    description: "A web-based reporting system created to help vocational students log daily internship activities, submit progress documentation, and facilitate structured mentor reviews and performance evaluations.",
+    subtitle: {
+      id: "Manajemen Aktivitas & Log Siswa",
+      en: "Student Activity & Log Management",
+    },
+    description: {
+      id: "Sistem pelaporan berbasis web yang dibuat untuk membantu siswa kejuruan mencatat aktivitas magang harian, mengirimkan dokumentasi progres, serta memfasilitasi tinjauan terstruktur dan evaluasi performa dari mentor.",
+      en: "A web-based reporting system created to help vocational students log daily internship activities, submit progress documentation, and facilitate structured mentor reviews and performance evaluations.",
+    },
     image: "/internship.png",
     tags: ["React", "Laravel", "MySQL", "Tailwind CSS"],
     github: "https://github.com/IGhifari/internship-journal",
-    // Omit placeholder "https://your-internship-journal.com"
     live: null,
   },
 ];
@@ -60,9 +94,15 @@ export const otherProjects = [
   {
     id: "class-1ia08",
     title: "Class 1IA08 Website",
-    category: "Web Application",
-    description: "A class information platform designed to manage and display announcements, coursework assignments, schedules, and academic information for Class 1IA08.",
-    image: "/class1ia08.png", // Image reference: add final screenshot to /public/class1ia08.png
+    category: {
+      id: "Aplikasi Web",
+      en: "Web Application",
+    },
+    description: {
+      id: "Website informasi kelas untuk mengelola dan menampilkan pengumuman, tugas, mata kuliah, serta informasi akademik Class 1IA08.",
+      en: "A class information website for managing and displaying announcements, assignments, courses, and academic information for Class 1IA08.",
+    },
+    image: "/class1ia08.png",
     tags: ["React", "Vite", "JavaScript", "Tailwind CSS", "shadcn/ui", "Supabase", "React Router", "Framer Motion"],
     github: "https://github.com/ikmalz/class-1IA08",
     live: "https://class-gokilll.vercel.app/",
@@ -70,7 +110,10 @@ export const otherProjects = [
   {
     id: "ecovoyage",
     title: "Game EcoVoyage - Pulau Harapan",
-    description: "An interactive educational web game built to educate players on marine ecosystem sustainability and environmental conservation around Pulau Harapan.",
+    description: {
+      id: "Game web edukasi interaktif yang dibangun untuk mengedukasi pemain tentang keberlanjutan ekosistem laut dan konservasi lingkungan di sekitar Pulau Harapan.",
+      en: "An interactive educational web game built to educate players on marine ecosystem sustainability and environmental conservation around Pulau Harapan.",
+    },
     image: "/pulauharapan.png",
     tags: ["HTML5", "JavaScript", "CSS3"],
     github: "https://github.com/IGhifari/EcoVoyage-PulauHarapan",
@@ -79,7 +122,10 @@ export const otherProjects = [
   {
     id: "a-day-at-home",
     title: "A Day At Home",
-    description: "A visual educational web game created specifically for deaf children, leveraging interactive storytelling and visual cues to enhance cognitive engagement.",
+    description: {
+      id: "Game web visual edukatif yang dibuat khusus untuk anak-anak tunarungu, memanfaatkan penceritaan interaktif dan isyarat visual untuk meningkatkan keterlibatan kognitif.",
+      en: "A visual educational web game created specifically for deaf children, leveraging interactive storytelling and visual cues to enhance cognitive engagement.",
+    },
     image: "/seharidirumah.png",
     tags: ["React", "Tailwind CSS"],
     github: "https://github.com/IGhifari/Project-Game-Clevio-SLB",
@@ -88,17 +134,22 @@ export const otherProjects = [
   {
     id: "desaku",
     title: "Desaku",
-    description: "A digital administrative portal designed to modernize village governance, manage family registry records, and distribute public community announcements.",
+    description: {
+      id: "Portal administrasi digital yang dirancang untuk memodernisasi tata kelola desa, mengelola data kartu keluarga, dan mendistribusikan pengumuman komunitas publik.",
+      en: "A digital administrative portal designed to modernize village governance, manage family registry records, and distribute public community announcements.",
+    },
     image: "/desaku.png",
     tags: ["React", "Express", "Prisma", "MySQL", "Tailwind CSS"],
     github: "https://github.com/IGhifari/Website-DesaKita",
-    // Omit generic placeholder "desaku.com"
     live: null,
   },
   {
     id: "portfolio-ghifari",
     title: "Portfolio Website",
-    description: "Personal developer portfolio designed with modern dark editorial aesthetics, tactile micro-interactions, responsive typography, and WebGL accents.",
+    description: {
+      id: "Website portofolio pengembang pribadi yang dirancang dengan estetika editorial gelap modern, mikro-interaksi taktil, tipografi responsif, dan aksen WebGL.",
+      en: "Personal developer portfolio designed with modern dark editorial aesthetics, tactile micro-interactions, responsive typography, and WebGL accents.",
+    },
     image: "/portfolio.png",
     tags: ["React", "Tailwind CSS", "Framer Motion"],
     github: "https://github.com/IGhifari/Portfolio-ghifari",
