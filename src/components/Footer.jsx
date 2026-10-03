@@ -1,8 +1,10 @@
 import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail } from 'react-icons/fi';
 import LastUpdated from './LastUpdated';
+import { useLanguage } from '../context/LanguageContext';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   const scrollToTop = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -31,7 +33,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Web Developer · Software Engineer
+              {t('footer.role')}
             </p>
           </div>
 
@@ -40,9 +42,9 @@ const Footer = () => {
               type="button"
               onClick={scrollToTop}
               className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-              aria-label="Scroll back to top of the page"
+              aria-label={t('footer.backToTopAria')}
             >
-              <span>BACK TO TOP</span>
+              <span>{t('footer.backToTop')}</span>
               <FiArrowUp size={13} className="text-[var(--accent)] group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
             </button>
           </div>
@@ -66,14 +68,14 @@ const Footer = () => {
           </nav>
 
           <p className="text-[var(--text-muted)] text-xs">
-            Engineered with <span className="text-[var(--text-primary)]">React 18</span>, <span className="text-[var(--text-primary)]">Vite</span> &amp; <span className="text-[var(--text-primary)]">Tailwind CSS</span>
+            {t('footer.creditsText')} <span className="text-[var(--text-primary)]">React 18</span>, <span className="text-[var(--text-primary)]">Vite</span> &amp; <span className="text-[var(--text-primary)]">Tailwind CSS</span>
           </p>
         </div>
 
         {/* Bottom Tier: Copyright & Last Updated */}
         <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-[var(--text-muted)]">
           <p>
-            &copy; {currentYear} M. Ghifari Bima Khadafi. All rights reserved.
+            &copy; {currentYear} M. Ghifari Bima Khadafi. {t('footer.copyright')}
           </p>
 
           <div className="flex items-center gap-3">

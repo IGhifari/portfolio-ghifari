@@ -2,6 +2,7 @@ import './styles/Index.css';
 import './styles/Components.css';
 
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
 import Project from './components/Project';
@@ -17,7 +18,8 @@ import Footer from './components/Footer';
 const App = () => {
     return (
         <ThemeProvider>
-        <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
+          <LanguageProvider>
+            <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
 
             <SoundButton />
             <Navbar />
@@ -69,6 +71,7 @@ const App = () => {
             {/* Footer */}
             <Footer />
         </div>
+          </LanguageProvider>
         </ThemeProvider>
     );
 };

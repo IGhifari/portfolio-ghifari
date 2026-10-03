@@ -1,7 +1,9 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 const About = () => {
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useLanguage();
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -22,24 +24,7 @@ const About = () => {
     };
   };
 
-  const focusAreas = [
-    {
-      title: 'Frontend Engineering',
-      description: 'Building responsive, accessible web interfaces using React, modern JavaScript/TypeScript, and scalable component systems.',
-    },
-    {
-      title: 'Full-Stack Architecture',
-      description: 'Developing end-to-end applications with Node.js, Express, RESTful APIs, and Prisma ORM backed by relational databases.',
-    },
-    {
-      title: 'UI Craft & Accessibility',
-      description: 'Crafting thoughtful user experiences with semantic HTML, Tailwind CSS, fluid responsive typography, and WCAG accessibility awareness.',
-    },
-    {
-      title: 'Systems & Data Modeling',
-      description: 'Designing structured schema models and queries using PostgreSQL and MySQL with secure authentication and CRUD patterns.',
-    },
-  ];
+  const focusAreas = t('about.focusAreas') || [];
 
   return (
     <div className="w-full max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
@@ -51,36 +36,36 @@ const About = () => {
             {/* Section Tag */}
             <div className="flex items-center gap-3 mb-3">
               <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
-                02 / ABOUT
+                {t('about.sectionTag')}
               </span>
               <span className="h-[1px] w-12 bg-[var(--border)]" aria-hidden="true" />
             </div>
 
             {/* Heading */}
             <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl text-[var(--text-primary)] uppercase tracking-tight leading-none">
-              ABOUT ME<span className="text-[var(--accent)]">.</span>
+              {t('about.heading')}<span className="text-[var(--accent)]">.</span>
             </h2>
 
             {/* Editorial Statement */}
             <p className="font-grotesk font-bold text-xl sm:text-2xl text-[var(--text-primary)] leading-snug mt-6">
-              I build web applications that balance intuitive interfaces with reliable software engineering.
+              {t('about.statement')}
             </p>
 
             {/* Technical Metadata Card */}
             <div className="mt-8 p-5 rounded-lg bg-[var(--surface-muted)] border border-[var(--border)] space-y-3 font-mono text-xs">
               <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-muted)]">ROLE</span>
-                <span className="text-[var(--text-primary)] font-semibold">Web Developer / Software Engineer</span>
+                <span className="text-[var(--text-muted)]">{t('about.metaRoleLabel')}</span>
+                <span className="text-[var(--text-primary)] font-semibold">{t('about.metaRoleValue')}</span>
               </div>
               <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-muted)]">LOCATION</span>
-                <span className="text-[var(--text-secondary)]">Bogor / Jakarta, Indonesia</span>
+                <span className="text-[var(--text-muted)]">{t('about.metaLocationLabel')}</span>
+                <span className="text-[var(--text-secondary)]">{t('about.metaLocationValue')}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[var(--text-muted)]">STATUS</span>
+                <span className="text-[var(--text-muted)]">{t('about.metaStatusLabel')}</span>
                 <span className="inline-flex items-center gap-1.5 text-emerald-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Available for Projects
+                  {t('about.metaStatusValue')}
                 </span>
               </div>
             </div>
@@ -91,15 +76,9 @@ const About = () => {
         <div className="lg:col-span-7 space-y-8">
           {/* Narrative Paragraphs */}
           <motion.div {...getFadeMotion(0.1)} className="space-y-4 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed font-normal">
-            <p>
-              I&apos;m a web developer focused on building practical, dependable web applications with React and modern backend technologies. I enjoy turning product ideas into structured interfaces, maintainable system architectures, and reliable user experiences.
-            </p>
-            <p>
-              My development foundation was established through hands-on software engineering education and strengthened by building end-to-end full-stack projects—including accessibility platforms, project management tools, and e-commerce applications.
-            </p>
-            <p>
-              I value clean code organization, predictable state management, and clear UI ergonomics. I believe software should not only look refined but also perform smoothly and remain maintainable over time.
-            </p>
+            <p>{t('about.p1')}</p>
+            <p>{t('about.p2')}</p>
+            <p>{t('about.p3')}</p>
           </motion.div>
 
           {/* Divider */}
@@ -110,7 +89,7 @@ const About = () => {
             <div className="flex items-center gap-2 mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
               <h3 className="font-mono text-xs text-[var(--accent)] tracking-[0.2em] uppercase font-semibold">
-                CURRENT FOCUS & EXPERTISE
+                {t('about.focusHeader')}
               </h3>
             </div>
 

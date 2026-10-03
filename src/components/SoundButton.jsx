@@ -4,6 +4,7 @@ import { IoClose } from "react-icons/io5";
 import { FiMusic, FiChevronUp } from "react-icons/fi";
 import "../styles/Components.css";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
+import { useLanguage } from "../context/LanguageContext";
 
 const songs = [
     {
@@ -73,6 +74,7 @@ const formatTime = (time) => {
 
 const SoundButton = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { t } = useLanguage();
 
     const { currentTrack, isPlaying, currentTime, duration, togglePlayback, seek, next, prev } =
         useAudioPlayer(songs);
@@ -92,8 +94,8 @@ const SoundButton = () => {
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
                         className="sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={isPlaying ? `Now playing: ${currentTrack.title}. Open music player` : "Open music player"}
-                        title={isPlaying ? `Now playing: ${currentTrack.title}` : "Open music player"}
+                        aria-label={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}. ${t('sound.openPlayer')}` : t('sound.openPlayer')}
+                        title={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}` : t('sound.openPlayer')}
                     >
                         {isPlaying ? (
                             <div className="flex items-center gap-[2px] h-3">
@@ -115,8 +117,8 @@ const SoundButton = () => {
                             type="button"
                             onClick={togglePlayback}
                             className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative group/btn cursor-pointer focus-visible:outline-none"
-                            aria-label={isPlaying ? "Pause music" : "Play music"}
-                            title={isPlaying ? "Click to pause" : "Click to play"}
+                            aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
+                            title={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                         >
                             <img
                                 src={currentTrack.cover}
@@ -134,7 +136,7 @@ const SoundButton = () => {
                             id="sound-button-mini-desktop"
                             onClick={() => setIsExpanded(true)}
                             className="flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
-                            aria-label={`Now playing ${currentTrack.title} by ${currentTrack.artist}. Expand player`}
+                            aria-label={`${t('sound.nowPlaying')} ${currentTrack.title} by ${currentTrack.artist}. ${t('sound.openPlayer')}`}
                         >
                             <span className="text-[11px] font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors max-w-[95px] truncate">
                                 {currentTrack.title}
@@ -172,7 +174,7 @@ const SoundButton = () => {
                         <div className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
                             <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--text-secondary)]">
-                                NOW PLAYING
+                                {t('sound.nowPlaying')}
                             </span>
                         </div>
                         <button
@@ -180,7 +182,7 @@ const SoundButton = () => {
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
                             className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
-                            aria-label="Close music player"
+                            aria-label={t('sound.closePlayer')}
                         >
                             <IoClose size={15} />
                         </button>
@@ -220,7 +222,7 @@ const SoundButton = () => {
                                     value={currentTime}
                                     onChange={(e) => seek(Number(e.target.value))}
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    aria-label="Seek track position"
+                                    aria-label={t('sound.seekTrack')}
                                 />
                             </div>
                             <div className="flex justify-between font-mono text-[10px] text-[var(--text-muted)]">
@@ -236,7 +238,7 @@ const SoundButton = () => {
                                 id="sound-prev"
                                 onClick={prev}
                                 className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
-                                aria-label="Previous track"
+                                aria-label={t('sound.prevTrack')}
                             >
                                 <FaStepBackward size={11} />
                             </button>
@@ -246,7 +248,7 @@ const SoundButton = () => {
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
                                 className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
-                                aria-label={isPlaying ? "Pause track" : "Play track"}
+                                aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             >
                                 {isPlaying ? (
                                     <FaPause size={13} />
@@ -260,7 +262,7 @@ const SoundButton = () => {
                                 id="sound-next"
                                 onClick={next}
                                 className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
-                                aria-label="Next track"
+                                aria-label={t('sound.nextTrack')}
                             >
                                 <FaStepForward size={11} />
                             </button>

@@ -1,44 +1,13 @@
 import { useRef } from 'react';
 import { motion, useScroll, useReducedMotion } from 'framer-motion';
-
-const milestones = [
-  {
-    number: '01',
-    stage: 'FOUNDATION',
-    focus: 'Vocational Software Engineering & Core Web',
-    description:
-      'Started the development path by mastering fundamental programming principles and web technologies—HTML5, CSS3, JavaScript, and PHP—during vocational software engineering studies at SMKN 1 Cibinong. Established structured version control workflows with Git and built initial interactive web applications.',
-    highlights: ['Semantic HTML & CSS', 'JavaScript Fundamentals', 'PHP & Relational DBs', 'Git & GitHub'],
-  },
-  {
-    number: '02',
-    stage: 'FULL-STACK TRANSITION',
-    focus: 'Modern Component Architecture & REST APIs',
-    description:
-      'Advanced from traditional multi-page sites into modern single-page applications and modular backend systems. Adopted React and Tailwind CSS for scalable UI engineering, paired with Express.js, Prisma ORM, and MySQL/PostgreSQL to build robust RESTful backends with JWT authentication.',
-    highlights: ['React & Component Systems', 'Tailwind CSS', 'Express & REST APIs', 'Prisma ORM & PostgreSQL'],
-  },
-  {
-    number: '03',
-    stage: 'SYSTEM & PRODUCT DEVELOPMENT',
-    focus: 'Scalable Applications & Inclusive Platforms',
-    description:
-      'Engineered substantial, end-to-end applications including the AksesKita accessibility discovery platform, a full-stack Project Management System, and the Food e-commerce marketplace. Focused on reliable state management, structured schema design, form validation, and accessible UI ergonomics.',
-    highlights: ['AksesKita Platform', 'Project Management System', 'Food Marketplace', 'Accessibility (a11y)'],
-  },
-  {
-    number: '04',
-    stage: 'CURRENT DIRECTION',
-    focus: 'TypeScript, Architecture & Product Engineering',
-    description:
-      'Continuing to advance engineering rigor through TypeScript adoption across full-stack applications, scalable backend architectural patterns, frontend performance optimization, and refined interface craftsmanship.',
-    highlights: ['TypeScript Adoption', 'Scalable System Architecture', 'Performance Optimization', 'Clean Code & Testing'],
-  },
-];
+import { useLanguage } from '../context/LanguageContext';
 
 const Journey = () => {
   const containerRef = useRef(null);
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useLanguage();
+
+  const milestones = t('journey.milestones') || [];
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -72,15 +41,15 @@ const Journey = () => {
       <motion.div {...getFadeMotion(0)} className="mb-10 md:mb-16">
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-xs text-[var(--accent)] tracking-[0.25em] uppercase font-semibold">
-            03 / JOURNEY
+            {t('journey.sectionTag')}
           </span>
           <span className="h-[1px] w-12 bg-[var(--border)]" aria-hidden="true" />
         </div>
         <h2 className="font-grotesk font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--text-primary)] uppercase tracking-tight leading-none">
-          DEVELOPMENT JOURNEY<span className="text-[var(--accent)]">.</span>
+          {t('journey.heading')}<span className="text-[var(--accent)]">.</span>
         </h2>
         <p className="font-mono text-xs sm:text-sm text-[var(--text-secondary)] mt-3 max-w-xl leading-relaxed">
-          A chronological progression from core fundamentals to full-stack application development.
+          {t('journey.intro')}
         </p>
       </motion.div>
 
