@@ -17,6 +17,9 @@ import {
   SiBruno,
   SiClaude,
   SiGooglegemini,
+  SiDocker,
+  SiVercel,
+  SiSupabase,
 } from 'react-icons/si';
 import { BiLogoPostgresql } from 'react-icons/bi';
 import { GrMysql } from 'react-icons/gr';
@@ -49,6 +52,7 @@ const techCategories = [
       { name: 'Node.js', icon: <SiNodedotjs size={18} />, highlight: true },
       { name: 'Express', icon: <SiExpress size={18} />, highlight: true },
       { name: 'Prisma ORM', icon: <SiPrisma size={18} />, highlight: true },
+      { name: 'Supabase', icon: <SiSupabase size={18} /> },
       { name: 'Laravel', icon: <SiLaravel size={18} /> },
       { name: 'PHP', icon: <SiPhp size={18} /> },
     ],
@@ -71,6 +75,8 @@ const techCategories = [
     skills: [
       { name: 'Git', icon: <SiGit size={18} /> },
       { name: 'GitHub', icon: <SiGithub size={18} />, highlight: true },
+      { name: 'Docker', icon: <SiDocker size={18} /> },
+      { name: 'Vercel', icon: <SiVercel size={18} /> },
       { name: 'VS Code', icon: <VscVscode size={18} /> },
       { name: 'Antigravity', icon: <VscSparkle size={18} /> },
       { name: 'TablePlus', icon: <TbTablePlus size={18} /> },
@@ -90,6 +96,9 @@ const marqueeTechnologies = [
   'PRISMA',
   'TAILWIND CSS',
   'EXPRESS',
+  'SUPABASE',
+  'DOCKER',
+  'VERCEL',
   'VITE',
   'MYSQL',
   'GIT',

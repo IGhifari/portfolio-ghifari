@@ -22,8 +22,8 @@ export const selectedProjects = [
     },
     image: "/akseskita.png",
     tags: ["React", "TypeScript", "Express", "PostgreSQL", "Prisma"],
-    github: "https://github.com/IGhifari",
-    live: null,
+    github: "https://github.com/IGhifari/akses-kita",
+    live: "https://akses-kita.vercel.app",
   },
   {
     id: "project-management",
@@ -153,6 +153,6 @@ export const otherProjects = [
     image: "/portfolio.png",
     tags: ["React", "Tailwind CSS", "Framer Motion"],
     github: "https://github.com/IGhifari/Portfolio-ghifari",
-    live: null,
+    live: "https://portfolio-ghifari.vercel.app",
   },
 ];
