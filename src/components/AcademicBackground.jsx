@@ -59,6 +59,9 @@ const AcademicBackground = () => {
               <p className="font-mono text-xs text-[var(--accent)] mt-0.5 font-semibold">
                 {t('education.major')}
               </p>
+              <p className="font-mono text-[11px] text-[var(--text-secondary)] mt-0.5">
+                {t('education.faculty')}
+              </p>
             </div>
 
             <div className="pt-4 border-t border-[var(--border-subtle)] space-y-3 font-mono text-xs text-[var(--text-secondary)]">
@@ -96,78 +99,112 @@ const AcademicBackground = () => {
           </div>
         </motion.div>
 
-        {/* Right Column: Detailed Institution & Curriculum Card */}
+        {/* Right Column: Detailed Institution & Curriculum Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-8 bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg p-6 sm:p-8 transition-colors space-y-6"
+          className="lg:col-span-8 space-y-6"
         >
-          {/* Card Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[var(--border-subtle)]">
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]">
-                  {t('education.badgeVocational')}
-                </span>
-                <span className="text-xs font-mono text-[var(--text-muted)]">
-                  {t('education.badgeCurriculum')}
-                </span>
+          {/* Card 1: Universitas Gunadarma — Current */}
+          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg p-6 sm:p-8 transition-colors space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-5 border-b border-[var(--border-subtle)]">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]">
+                    {t('education.gunadarma.badgeDegree')}
+                  </span>
+                  <span className="text-xs font-mono text-[var(--text-muted)]">
+                    {t('education.gunadarma.faculty')}
+                  </span>
+                </div>
+                <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
+                  {t('education.gunadarma.institution')}
+                </h3>
+                <p className="font-mono text-xs sm:text-sm text-[var(--accent)] mt-1 font-semibold">
+                  {t('education.gunadarma.major')}
+                </p>
               </div>
-              <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
-                {t('education.institution')}
-              </h3>
+              <span className="font-mono text-xs text-[var(--accent)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto font-semibold">
+                {t('education.gunadarma.statusBadge')}
+              </span>
             </div>
-            <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto">
-              2023 — 2026
-            </span>
+
+            <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+              {t('education.gunadarma.description')}
+            </p>
           </div>
 
-          {/* Overview */}
-          <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-            {t('education.overview')}
-          </p>
-
-          {/* Curriculum Focus Areas */}
-          <div className="space-y-3 pt-2">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              {t('education.competenciesHeader')}
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-              {competencies.map((item) => (
-                <div
-                  key={item.title}
-                  className="bg-[var(--surface-alt)] border border-[var(--border-subtle)] rounded-md p-3.5 flex flex-col justify-between"
-                >
-                  <div className="flex items-start gap-2 mb-1">
-                    <FiCheckCircle size={14} className="text-[var(--accent)] mt-0.5 shrink-0" aria-hidden="true" />
-                    <span className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)]">
-                      {item.title}
-                    </span>
-                  </div>
-                  <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed pl-5.5">
-                    {item.desc}
-                  </p>
+          {/* Card 2: SMKN 1 Cibinong — Previous */}
+          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg p-6 sm:p-8 transition-colors space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-6 border-b border-[var(--border-subtle)]">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]">
+                    {t('education.badgeVocational')}
+                  </span>
+                  <span className="text-xs font-mono text-[var(--text-muted)]">
+                    {t('education.badgeCurriculum')}
+                  </span>
                 </div>
+                <h3 className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
+                  {t('education.institution')}
+                </h3>
+                <p className="font-mono text-xs sm:text-sm text-[var(--accent)] mt-1 font-semibold">
+                  {t('education.cibinongMajor')}
+                </p>
+              </div>
+              <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto">
+                2023 — 2026
+              </span>
+            </div>
+
+            {/* Overview */}
+            <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+              {t('education.overview')}
+            </p>
+
+            {/* Curriculum Focus Areas */}
+            <div className="space-y-3 pt-2">
+              <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
+                {t('education.competenciesHeader')}
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                {competencies.map((item) => (
+                  <div
+                    key={item.title}
+                    className="bg-[var(--surface-alt)] border border-[var(--border-subtle)] rounded-md p-3.5 flex flex-col justify-between"
+                  >
+                    <div className="flex items-start gap-2 mb-1">
+                      <FiCheckCircle size={14} className="text-[var(--accent)] mt-0.5 shrink-0" aria-hidden="true" />
+                      <span className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)]">
+                        {item.title}
+                      </span>
+                    </div>
+                    <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed pl-5.5">
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Curriculum Tags */}
+            <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
+              <span className="font-mono text-[11px] text-[var(--text-muted)] mr-1">
+                {t('education.scopeLabel')}
+              </span>
+              {curriculumTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--tag-bg)] border border-[var(--tag-border)] text-[var(--tag-text)]"
+                >
+                  {tag}
+                </span>
               ))}
             </div>
-          </div>
-
-          {/* Curriculum Tags */}
-          <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
-            <span className="font-mono text-[11px] text-[var(--text-muted)] mr-1">
-              {t('education.scopeLabel')}
-            </span>
-            {curriculumTags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--tag-bg)] border border-[var(--tag-border)] text-[var(--tag-text)]"
-              >
-                {tag}
-              </span>
-            ))}
           </div>
         </motion.div>
       </div>
