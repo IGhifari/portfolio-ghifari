@@ -43,7 +43,7 @@ const Profile = () => {
     <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background layer: ReactBits Threads WebGL animation with theme-aware color */}
       <Threads
-        color={isDark ? [0.98, 0.8, 0.08] : [0.72, 0.55, 0.08]}
+        color={isDark ? [0.23, 0.51, 0.96] : [0.15, 0.39, 0.92]}
         amplitude={1.1}
         distance={0.38}
         enableMouseInteraction={true}

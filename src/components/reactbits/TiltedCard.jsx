@@ -105,7 +105,7 @@ const TiltedCard = ({
             className="absolute inset-0 pointer-events-none transition-opacity duration-300"
             style={{
               opacity: isHovered ? 0.12 : 0,
-              background: `radial-gradient(circle at ${glareX.get()}% ${glareY.get()}%, rgba(250, 204, 21, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 65%)`,
+              background: `radial-gradient(circle at ${glareX.get()}% ${glareY.get()}%, rgba(59, 130, 246, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 65%)`,
             }}
             aria-hidden="true"
           />

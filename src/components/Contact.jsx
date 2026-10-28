@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   FiMail,
@@ -14,10 +14,13 @@ import {
   FiExternalLink,
   FiMapPin,
   FiClock,
+  FiX,
+  FiInfo,
 } from 'react-icons/fi';
 import { IoLogoGithub } from 'react-icons/io';
 import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import '../styles/Contact.css';
 
 const contactChannels = [
@@ -63,8 +66,50 @@ const contactChannels = [
   },
 ];
 
+const toastTitles = {
+  id: { success: 'Berhasil', error: 'Gagal terkirim', warning: 'Perhatian', info: 'Info' },
+  en: { success: 'Success', error: 'Something went wrong', warning: 'Heads up', info: 'Info' },
+};
+
+const toastIcons = {
+  success: FiCheckCircle,
+  error: FiAlertCircle,
+  warning: FiAlertCircle,
+  info: FiInfo,
+};
+
+// eslint-disable-next-line react/prop-types
+const ToastIcon = ({ type }) => {
+  const Icon = toastIcons[type] || FiInfo;
+  return (
+    <span className="nb-toast-icon" aria-hidden="true">
+      <Icon size={18} />
+    </span>
+  );
+};
+
+// eslint-disable-next-line react/prop-types
+const ToastCloseButton = ({ closeToast }) => (
+  <button type="button" onClick={closeToast} className="nb-toast-close" aria-label="Close notification">
+    <FiX size={16} />
+  </button>
+);
+
+// eslint-disable-next-line react/prop-types
+const ToastBody = ({ title, message }) => (
+  <div className="nb-toast-body">
+    <p className="nb-toast-title">{title}</p>
+    <p className="nb-toast-message">{message}</p>
+  </div>
+);
+
 const Contact = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { isDark } = useTheme();
+  const notify = (type, message) => {
+    const titles = toastTitles[language] || toastTitles.en;
+    toast[type](<ToastBody title={titles[type]} message={message} />);
+  };
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -98,7 +143,7 @@ const Contact = () => {
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
       setCopiedEmail(true);
-      toast.success(t('contact.toastCopied'));
+      notify('success', t('contact.toastCopied'));
       setTimeout(() => setCopiedEmail(false), 2500);
     });
   };
@@ -138,14 +183,14 @@ const Contact = () => {
     try {
       if (!serviceId || !templateId || !publicKey) {
         setSubmitStatus('error');
-        toast.error(t('contact.toastOffline'));
+        notify('warning', t('contact.toastOffline'));
         setIsSubmitting(false);
         return;
       }
 
       await emailjs.send(serviceId, templateId, formData, publicKey);
       setSubmitStatus('success');
-      toast.success(t('contact.toastSuccess'));
+      notify('success', t('contact.toastSuccess'));
       setFormData({
         emailto: 'Ghifari',
         name: '',
@@ -156,7 +201,7 @@ const Contact = () => {
     } catch (error) {
       console.error('EmailJS submission failure:', error);
       setSubmitStatus('error');
-      toast.error(t('contact.toastError'));
+      notify('error', t('contact.toastError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -164,7 +209,16 @@ const Contact = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
-      <ToastContainer position="bottom-right" autoClose={4000} />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        theme={isDark ? 'dark' : 'light'}
+        transition={Slide}
+        icon={({ type }) => <ToastIcon type={type} />}
+        closeButton={ToastCloseButton}
+        newestOnTop
+        pauseOnFocusLoss={false}
+      />
 
       {/* Section Header */}
       <motion.header

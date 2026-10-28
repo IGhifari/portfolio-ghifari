@@ -28,7 +28,7 @@ Text Muted: #71717A
 
 Border: #27272A
 
-Accent Primary: #FACC15
+Accent Primary: #3B82F6
 
 ## Visual Rules
 
@@ -48,7 +48,7 @@ Prefer:
 - large whitespace
 - subtle borders
 - flat dark surfaces
-- yellow accent used selectively
+- blue accent used selectively
 - clear visual hierarchy
 
 ## Motion
