@@ -108,7 +108,7 @@ void main() {
 `;
 
 const Threads = ({
-  color = [0.98, 0.8, 0.08], // #FACC15
+  color = [0.23, 0.51, 0.96], // #3B82F6
   amplitude = 1.1,
   distance = 0.36,
   enableMouseInteraction = true,

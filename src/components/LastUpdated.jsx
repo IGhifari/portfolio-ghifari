@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 const LastUpdated = () => {
     const { language, t } = useLanguage();
     const [isVisible, setIsVisible] = useState(false);
-    const [lastUpdated, setLastUpdated] = useState('2026-10-02');
+    const [lastUpdated, setLastUpdated] = useState('2026-10-28');
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);

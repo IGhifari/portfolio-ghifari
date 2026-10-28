@@ -13,7 +13,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyhwdaRdmssjL5ImhqFjuV0U0bADjt6_MUiDf0XWavnw&s=10",
         audio: "born_to_die.mp3",
         duration: 265,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "Risk It All",
@@ -21,7 +21,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_iGgvKbRt8FcjYF6VUTVjPZtKPz2K38qLLGs7wvi_YQ&s=10",
         audio: "risk_it_all.mp3",
         duration: 265,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "Ultraviolence",
@@ -29,7 +29,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUBqbWTV_PaMn06j_KFUAK49Su7gXHKV5cDORcr98dHw&s=10",
         audio: "ultraviolence.mp3",
         duration: 263,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "One Of The Girls",
@@ -37,7 +37,7 @@ const songs = [
         cover: "sound2.jpeg",
         audio: "sound4.mp3",
         duration: 242,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "Summertime Sadness",
@@ -45,7 +45,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0xDTVAz0wVKvO6Y32DEC_3kSWJqLEjnZPN5VNZ-ZFA&s=10",
         audio: "summertime_sad.mp3",
         duration: 264,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "Monolog",
@@ -53,7 +53,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8qVUgkHMIz72PLnsBgHLQb8Iz3x0tLTr56OjBXFOx2w&s=10",
         audio: "monolog.mp3",
         duration: 281,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
     {
         title: "Salvatore",
@@ -61,7 +61,7 @@ const songs = [
         cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
         audio: "Salvatore.mp3",
         duration: 281,
-        color: "#FACC15",
+        color: "#3B82F6",
     },
 ];
 
