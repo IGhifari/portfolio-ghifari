@@ -102,8 +102,8 @@ const Certificate = () => {
                 className="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"
-                width={1280}
-                height={800}
+                width={800}
+                height={500}
               />
 
               {/* Gradient Scrim & Category Indicator */}
@@ -242,6 +242,10 @@ const Certificate = () => {
                 <img
                   src={activeCert.image}
                   alt={`${activeCert.title} full certificate view`}
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={500}
                   className="max-h-[70vh] w-auto max-w-full object-contain rounded border border-[var(--border-subtle)] shadow-md"
                 />
               </div>

@@ -120,7 +120,7 @@ const Contact = () => {
     email: '',
     subject: '',
     message: '',
-    website: '',
+    bot_field: '',
   });
   const lastSubmitRef = useMemo(() => ({ time: 0 }), []);
 
@@ -166,14 +166,14 @@ const Contact = () => {
     e.preventDefault();
 
     // Honeypot check: silently ignore automated bot fills
-    if (formData.website && formData.website.trim().length > 0) {
+    if (formData.bot_field && formData.bot_field.trim().length > 0) {
       setSubmitStatus('success');
       return;
     }
 
-    // Simple client-side cooldown (30s) to prevent accidental double-submits
+    // Client-side cooldown (60s) to prevent spam submissions
     const now = Date.now();
-    if (now - lastSubmitRef.time < 30000) {
+    if (now - lastSubmitRef.time < 60000) {
       notify('warning', t('contact.toastCooldown'));
       return;
     }
@@ -215,7 +215,7 @@ const Contact = () => {
         email: '',
         subject: '',
         message: '',
-        website: '',
+        bot_field: '',
       });
     } catch (error) {
       console.error('EmailJS submission failure:', error);
@@ -319,12 +319,12 @@ const Contact = () => {
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Honeypot field — hidden from sighted users and screen readers */}
             <div className="hidden" aria-hidden="true">
-              <label htmlFor="contact-website">Website</label>
+              <label htmlFor="bot_field">Leave this empty</label>
               <input
                 type="text"
-                id="contact-website"
-                name="website"
-                value={formData.website}
+                id="bot_field"
+                name="bot_field"
+                value={formData.bot_field}
                 onChange={handleChange}
                 tabIndex={-1}
                 autoComplete="off"
