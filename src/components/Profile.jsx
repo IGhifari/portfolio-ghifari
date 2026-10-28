@@ -1,10 +1,10 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-scroll';
-import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin } from 'react-icons/fi';
+import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import Threads from './reactbits/Threads';
-import '../styles/Components.css';
 
 const Profile = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -33,7 +33,7 @@ const Profile = () => {
       };
     }
     return {
-      initial: { opacity: 0, y: yOffset },
+      initial: { opacity: 1, y: yOffset },
       animate: { opacity: 1, y: 0 },
       transition: { duration: 0.45, delay, ease: easeCurve },
     };
@@ -80,26 +80,23 @@ const Profile = () => {
             </div>
           </motion.div>
 
-          {/* Person's Name: Primary Visual Element */}
-          <div className="space-y-0.5 sm:space-y-1 w-full">
-            <motion.h1
-              className="hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase select-none"
-              {...getMotionProps(0.12, 16)}
-            >
+          {/* Person's Name: Primary Visual Element (Single H1 for clean heading hierarchy) */}
+          <motion.h1
+            className="space-y-0.5 sm:space-y-1 w-full select-none"
+            {...getMotionProps(0.12, 16)}
+          >
+            <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase">
               M. GHIFARI
-            </motion.h1>
-            <motion.h1
-              className="hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase select-none"
-              {...getMotionProps(0.2, 16)}
-            >
+            </span>
+            <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase">
               BIMA KHADAFI
-            </motion.h1>
-          </div>
+            </span>
+          </motion.h1>
 
           {/* Role with subtle framing dividers */}
           <motion.div
             className="flex items-center justify-center gap-3 sm:gap-4 pt-0.5"
-            {...getMotionProps(0.28, 12)}
+            {...getMotionProps(0.24, 12)}
           >
             <span
               className="h-[1px] w-6 sm:w-10 bg-gradient-to-r from-transparent to-[var(--border)] hidden xs:inline-block"
@@ -117,7 +114,7 @@ const Profile = () => {
           {/* Value Proposition */}
           <motion.p
             className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4"
-            {...getMotionProps(0.36, 12)}
+            {...getMotionProps(0.32, 12)}
           >
             {t('hero.valueProp')}
           </motion.p>
@@ -125,11 +122,12 @@ const Profile = () => {
           {/* Call to Actions & Social Links */}
           <motion.div
             className="pt-2 flex flex-col items-center gap-4 sm:gap-5 w-full"
-            {...getMotionProps(0.44, 12)}
+            {...getMotionProps(0.4, 12)}
           >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
               <Link
                 to="projects"
+                href="#projects"
                 smooth={true}
                 duration={600}
                 offset={-70}
@@ -137,6 +135,20 @@ const Profile = () => {
               >
                 {t('hero.exploreWork')}
               </Link>
+
+              {RESUME_AVAILABLE && (
+                <a
+                  href={RESUME_URL}
+                  download={RESUME_FILENAME}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t('hero.downloadCvAria')}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                >
+                  <FiDownload size={15} aria-hidden="true" />
+                  <span>{t('hero.downloadCv')}</span>
+                </a>
+              )}
 
               <a
                 href="https://github.com/IGhifari"
@@ -177,11 +189,12 @@ const Profile = () => {
 
       {/* Scroll Indicator */}
       <motion.div
-        {...getMotionProps(0.55, 0)}
+        {...getMotionProps(0.5, 0)}
         className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 hidden [@media(min-height:600px)]:block"
       >
         <Link
           to="projects"
+          href="#projects"
           smooth={true}
           duration={600}
           offset={-70}

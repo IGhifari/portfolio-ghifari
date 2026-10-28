@@ -101,6 +101,9 @@ const Certificate = () => {
                 alt={`${cert.title} awarded by ${cert.issuer}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
+                width={1280}
+                height={800}
               />
 
               {/* Gradient Scrim & Category Indicator */}

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { FiSun, FiMoon, FiDownload } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import '../styles/Components.css';
+import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,6 +17,8 @@ const Navbar = () => {
     { to: 'about', label: t('nav.about') },
     { to: 'journey', label: t('nav.journey') },
     { to: 'stack', label: t('nav.stack') },
+    { to: 'certificates', label: t('nav.certificates') },
+    { to: 'education', label: t('nav.education') },
     { to: 'contact', label: t('nav.contact') },
   ];
 
@@ -66,6 +68,7 @@ const Navbar = () => {
         {/* Brand */}
         <Link
           to="profile"
+          href="#profile"
           smooth={true}
           duration={600}
           offset={-80}
@@ -76,11 +79,12 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 lg:gap-8" aria-label="Main Navigation">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Main Navigation">
           {navItems.map(({ to, label }) => (
             <Link
               key={to}
               to={to}
+              href={`#${to}`}
               smooth={true}
               duration={600}
               offset={-70}
@@ -93,8 +97,22 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Desktop Controls (Language Selector + Theme Toggle) */}
-        <div className="hidden md:flex items-center gap-2.5">
+        {/* Desktop Controls (CV + Language Selector + Theme Toggle) */}
+        <div className="hidden lg:flex items-center gap-2.5">
+          {RESUME_AVAILABLE && (
+            <a
+              href={RESUME_URL}
+              download={RESUME_FILENAME}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t('hero.downloadCvAria')}
+              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+            >
+              <FiDownload size={13} aria-hidden="true" />
+              <span>{t('nav.downloadCv')}</span>
+            </a>
+          )}
+
           {/* Language Selector: Compact Segmented Toggle */}
           <div
             role="group"
@@ -110,8 +128,7 @@ const Navbar = () => {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'id'}
-              aria-label="Bahasa Indonesia"
-              title="Bahasa Indonesia"
+              title="ID — Bahasa Indonesia"
             >
               ID
             </button>
@@ -125,8 +142,7 @@ const Navbar = () => {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'en'}
-              aria-label="English"
-              title="English"
+              title="EN — English"
             >
               EN
             </button>
@@ -144,8 +160,8 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Actions: Language Selector + Theme Toggle + Menu Button */}
-        <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+        {/* Mobile/Tablet Actions: Language Selector + Theme Toggle + Menu Button */}
+        <div className="flex lg:hidden items-center gap-1.5 sm:gap-2">
           {/* Mobile Language Selector */}
           <div
             role="group"
@@ -161,7 +177,7 @@ const Navbar = () => {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'id'}
-              aria-label="Bahasa Indonesia"
+              title="ID — Bahasa Indonesia"
             >
               ID
             </button>
@@ -175,7 +191,7 @@ const Navbar = () => {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'en'}
-              aria-label="English"
+              title="EN — English"
             >
               EN
             </button>
@@ -205,8 +221,8 @@ const Navbar = () => {
 
       {/* Mobile Menu Overlay / Drawer */}
       <div
-        className={`md:hidden fixed inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)] transition-all duration-300 ease-in-out overflow-hidden ${
-          isMenuOpen ? 'h-[calc(100vh-4rem)] opacity-100 py-6' : 'h-0 opacity-0 py-0'
+        className={`lg:hidden fixed inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)] transition-all duration-300 ease-in-out overflow-y-auto ${
+          isMenuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100 py-6 visible' : 'max-h-0 opacity-0 py-0 invisible'
         }`}
         style={{ pointerEvents: isMenuOpen ? 'auto' : 'none' }}
         aria-hidden={!isMenuOpen}
@@ -216,6 +232,7 @@ const Navbar = () => {
             <Link
               key={to}
               to={to}
+              href={`#${to}`}
               smooth={true}
               duration={600}
               offset={-70}
@@ -227,6 +244,21 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
+
+          {RESUME_AVAILABLE && (
+            <a
+              href={RESUME_URL}
+              download={RESUME_FILENAME}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeMenu}
+              aria-label={t('hero.downloadCvAria')}
+              className="mt-2 py-3 px-4 rounded-md bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-sm tracking-wider uppercase inline-flex items-center justify-center gap-2"
+            >
+              <FiDownload size={15} aria-hidden="true" />
+              <span>{t('nav.downloadCv')}</span>
+            </a>
+          )}
 
           {/* Mobile Drawer Language Controls */}
           <div className="pt-4 mt-2 border-t border-[var(--border-subtle)] flex items-center justify-between px-4">

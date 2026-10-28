@@ -2,7 +2,6 @@ import { useState } from "react";
 import { FaPause, FaPlay, FaStepBackward, FaStepForward } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { FiMusic, FiChevronUp } from "react-icons/fi";
-import "../styles/Components.css";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -34,7 +33,7 @@ const songs = [
     {
         title: "One Of The Girls",
         artist: "Jennie, Lily-Rose, The Weeknd",
-        cover: "sound2.jpeg",
+        cover: "sound2.webp",
         audio: "sound4.mp3",
         duration: 242,
         color: "#3B82F6",
@@ -112,22 +111,15 @@ const SoundButton = () => {
                     <div
                         className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[var(--surface-muted)]/80 backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] shadow-sm transition-all duration-200 group"
                     >
-                        {/* Spinning mini album thumbnail or quick play toggle */}
+                        {/* Quick play/pause toggle button (no external image on initial load) */}
                         <button
                             type="button"
                             onClick={togglePlayback}
-                            className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 relative group/btn cursor-pointer focus-visible:outline-none"
+                            className="w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none"
                             aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             title={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                         >
-                            <img
-                                src={currentTrack.cover}
-                                alt="Album Art"
-                                className={`w-full h-full object-cover transition-opacity ${isPlaying ? "album-spin playing" : "album-spin"}`}
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/btn:opacity-100 flex items-center justify-center transition-opacity text-white text-[10px]">
-                                {isPlaying ? <FaPause size={8} /> : <FaPlay size={8} className="ml-[1px]" />}
-                            </div>
+                            {isPlaying ? <FaPause size={8} /> : <FaPlay size={8} className="ml-[1px]" />}
                         </button>
 
                         {/* Track Info (clickable to expand) */}
@@ -194,6 +186,9 @@ const SoundButton = () => {
                             <img
                                 src={currentTrack.cover}
                                 alt={`${currentTrack.title} cover`}
+                                loading="lazy"
+                                width={220}
+                                height={220}
                                 className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? "scale-105" : "scale-100"}`}
                             />
                         </div>
