@@ -1,12 +1,13 @@
 import { translations } from '../src/data/translations.js';
-import { projects } from '../src/data/projects.js';
+import { selectedProjects, otherProjects } from '../src/data/projects.js';
+
+const projects = [...selectedProjects, ...otherProjects];
 
 console.log("=== TRANSLATIONS INTEGRITY TEST ===");
 
 function compareKeys(obj1, obj2, path = "") {
   let errors = [];
   const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
 
   for (const k of keys1) {
     const curPath = path ? `${path}.${k}` : k;
@@ -44,7 +45,7 @@ for (const p of projects) {
 }
 
 if (projectErrors === 0) {
-  console.log(`✓ All ${projects.length} projects have bilingual 'id' and 'en' descriptions!`);
+  console.log(`✓ All ${projects.length} projects (${selectedProjects.length} selected + ${otherProjects.length} archive) have bilingual 'id' and 'en' descriptions!`);
 } else {
   process.exit(1);
 }

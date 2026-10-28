@@ -194,7 +194,7 @@ const Skills = () => {
                         <span
                           className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-70 group-hover:opacity-100 transition-opacity"
                           title={t('stack.coreTech')}
-                          aria-label={t('stack.coreTech')}
+                          aria-hidden="true"
                         />
                       )}
                     </li>

@@ -120,7 +120,9 @@ const Contact = () => {
     email: '',
     subject: '',
     message: '',
+    website: '',
   });
+  const lastSubmitRef = useMemo(() => ({ time: 0 }), []);
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -162,6 +164,20 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Honeypot check: silently ignore automated bot fills
+    if (formData.website && formData.website.trim().length > 0) {
+      setSubmitStatus('success');
+      return;
+    }
+
+    // Simple client-side cooldown (30s) to prevent accidental double-submits
+    const now = Date.now();
+    if (now - lastSubmitRef.time < 30000) {
+      notify('warning', t('contact.toastCooldown'));
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
     setSubmitStatus(null);
@@ -188,7 +204,9 @@ const Contact = () => {
         return;
       }
 
-      await emailjs.send(serviceId, templateId, formData, publicKey);
+      const payload = { emailto: formData.emailto, name: formData.name, email: formData.email, subject: formData.subject, message: formData.message };
+      await emailjs.send(serviceId, templateId, payload, publicKey);
+      lastSubmitRef.time = Date.now();
       setSubmitStatus('success');
       notify('success', t('contact.toastSuccess'));
       setFormData({
@@ -197,6 +215,7 @@ const Contact = () => {
         email: '',
         subject: '',
         message: '',
+        website: '',
       });
     } catch (error) {
       console.error('EmailJS submission failure:', error);
@@ -298,6 +317,20 @@ const Contact = () => {
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            {/* Honeypot field — hidden from sighted users and screen readers */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="contact-website">Website</label>
+              <input
+                type="text"
+                id="contact-website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             {/* Row 1: Name and Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

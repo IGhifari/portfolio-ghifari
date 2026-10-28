@@ -4,10 +4,9 @@
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.14-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.14-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Three.js](https://img.shields.io/badge/Three.js-0.160.0-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-A modern, interactive, and responsive developer portfolio website for **M. Ghifari Bima Khadafi**, featuring 3D physics-based animations, WebGL canvas effects, dual-theme support, and bilingual internationalization.
+A modern, interactive, and responsive developer portfolio website for **M. Ghifari Bima Khadafi**, featuring WebGL shader canvas effects, dual-theme support, bilingual internationalization, and interactive case studies.
 
 🌐 **Live Website:** [https://portfolio-ghifari.vercel.app](https://portfolio-ghifari.vercel.app)
 
@@ -15,17 +14,17 @@ A modern, interactive, and responsive developer portfolio website for **M. Ghifa
 
 ## ✨ Key Features
 
-- **Interactive 3D & WebGL Canvas** — 3D physics elements using React Three Fiber (`@react-three/fiber`, `@react-three/drei`, `@react-three/rapier`) combined with dynamic background threads powered by OGL.
-- **🌐 Bilingual Support (i18n)** — Seamless one-click switching between English and Indonesian (`id` / `en`) managed via React Context (`LanguageContext`).
+- **Interactive WebGL Canvas** — Dynamic background threads powered by OGL (`Threads.jsx`) with automatic static-frame fallback on mobile and `prefers-reduced-motion`.
+- **🌐 Bilingual Support (i18n)** — Seamless one-click switching between Indonesian and English (`id` / `en`) managed via React Context (`LanguageContext`).
 - **🌓 Dark & Light Theme** — Custom theme switching engine with CSS custom properties and persistent state stored in `localStorage`.
-- **🎵 Ambient Audio Experience** — Interactive sound player button with audio state management via `useAudioPlayer`.
-- **💼 Interactive Project Showcase** — Filterable project gallery with 3D tilt effects (`TiltedCard`), tech badges, live demo links, source code repositories, and modal previews.
-- **🎓 Academic Background** — Dedicated section highlighting formal education, GPA, academic honors, and coursework.
-- **📜 Verified Certifications** — Interactive certification catalog with verification links and preview modal.
-- **🛠️ Technical Stack Matrix** — Categorized overview of frontend, backend, tools, and libraries.
-- **🧭 Career & Learning Journey** — Structured timeline tracing professional experience and milestones.
-- **📬 Validated Contact Form** — Direct messaging powered by EmailJS, robust input validation via Zod, and real-time toast feedback using React Toastify.
-- **📱 Fully Responsive & Accessible** — Crafted with fluid mobile navigation, desktop-optimized micro-interactions, and support for `prefers-reduced-motion`.
+- **🎵 Deferred Ambient Audio Player** — Interactive sound player (`useAudioPlayer`) with lazy initialization (`preload="none"`) so zero audio bytes are downloaded until requested.
+- **💼 Interactive Project Showcase & Case Studies** — Category-filterable project gallery with 3D tilt effects (`TiltedCard`), tech badges, live demo links, source code repositories, and a structured case-study detail modal.
+- **🎓 Academic Background** — Dedicated section highlighting formal education at Universitas Gunadarma and SMKN 1 Cibinong.
+- **📜 Verified Certifications** — Interactive certification catalog with high-resolution preview modal.
+- **🛠️ Technical Stack Matrix** — Categorized overview of frontend, backend, database, and developer workflow tools.
+- **🧭 Career & Learning Journey** — Structured timeline tracing development milestones.
+- **📬 Validated Contact Form** — Direct messaging powered by EmailJS, input validation via Zod, honeypot + client cooldown anti-spam layers, and theme-aware toast feedback using React Toastify.
+- **📱 Responsive, Fast & Accessible** — Section-level code splitting (`React.lazy`), WebP media assets, keyboard-accessible modals, and WCAG-compliant contrast tokens.
 
 ---
 
@@ -38,16 +37,11 @@ A modern, interactive, and responsive developer portfolio website for **M. Ghifa
 | **[Vite 5](https://vitejs.dev/)** | Next-generation frontend tooling and bundler |
 | **[Tailwind CSS](https://tailwindcss.com/)** | Utility-first styling framework |
 
-### 3D, WebGL & Animations
+### WebGL & Animations
 | Package | Description |
 |---------|-------------|
-| **[Three.js](https://threejs.org/)** | 3D graphics rendering engine |
-| **[@react-three/fiber](https://docs.pmnd.rs/react-three-fiber)** | Declarative Three.js wrapper for React |
-| **[@react-three/drei](https://github.com/pmndrs/drei)** | Functional helpers and abstractions for React Three Fiber |
-| **[@react-three/rapier](https://github.com/pmndrs/react-three-rapier)** | Real-time physics simulation engine |
-| **[OGL](https://github.com/oframe/ogl)** | Minimal WebGL library for particle/thread canvas effects |
+| **[OGL](https://github.com/oframe/ogl)** | Minimal WebGL library for interactive shader thread effects |
 | **[Framer Motion](https://www.framer.com/motion/)** | Production-ready motion and layout transitions |
-| **[TypeIt React](https://typeitjs.com/)** | Smooth typewriter text animations |
 
 ### UI & Utilities
 | Package | Description |
@@ -64,46 +58,44 @@ A modern, interactive, and responsive developer portfolio website for **M. Ghifa
 
 ```
 portfolio-ghifari/
-├── public/                     # Static public assets (icons, images, audio)
-│   ├── assets/                 # Profile, project, and certificate media
-│   └── audio/                  # Ambient background audio tracks
+├── public/                     # Static public assets (WebP/PNG images, audio, SEO files)
 ├── src/
-│   ├── assets/                 # Local image imports and graphics
 │   ├── components/             # React UI components
-│   │   ├── reactbits/          # Custom WebGL & canvas components
+│   │   ├── reactbits/          # Custom WebGL & interactive card components
 │   │   │   ├── Threads.jsx     # OGL interactive background threads
 │   │   │   └── TiltedCard.jsx  # 3D interactive card tilt component
-│   │   ├── About.jsx           # Personal biography & philosophy
-│   │   ├── AcademicBackground.jsx # Education, honors & GPA details
+│   │   ├── About.jsx           # Personal biography & focus areas
+│   │   ├── AcademicBackground.jsx # Formal education details
 │   │   ├── Certificate.jsx     # Certification catalog & viewer modal
-│   │   ├── Contact.jsx         # Contact form with Zod & EmailJS
-│   │   ├── Footer.jsx          # Footer links, social profiles & credits
-│   │   ├── Journey.jsx         # Career and learning timeline
+│   │   ├── Contact.jsx         # Contact form with Zod, honeypot & EmailJS
+│   │   ├── Footer.jsx          # Footer links, social profiles & build date
+│   │   ├── Journey.jsx         # Development progression timeline
+│   │   ├── LastUpdated.jsx     # Build-time automatic update indicator
 │   │   ├── Navbar.jsx          # Navigation header with theme & lang toggles
-│   │   ├── Particles.jsx       # Interactive background canvas
-│   │   ├── Profile.jsx         # Hero section with 3D canvas and typewriter
-│   │   ├── Project.jsx         # Projects gallery and detail modal
-│   │   ├── Skill.jsx           # Categorized tech stack & dev tools
+│   │   ├── Profile.jsx         # Hero section with WebGL threads & CTAs
+│   │   ├── Project.jsx         # Filterable project gallery & case study modal
+│   │   ├── Skill.jsx           # Categorized tech stack & marquee
 │   │   └── SoundButton.jsx     # Interactive ambient sound controller
 │   ├── context/                # Global React Context providers
 │   │   ├── LanguageContext.jsx # Bilingual (ID/EN) state and switcher
 │   │   └── ThemeContext.jsx    # Dark/Light theme state manager
 │   ├── data/                   # Static content & translation files
 │   │   ├── certificates.js     # Certificate records and credentials
-│   │   ├── projects.js         # Project showcase definitions & media
+│   │   ├── projects.js         # Project showcase & case study definitions
+│   │   ├── resume.js           # Resume / CV download configuration
 │   │   └── translations.js     # Indonesian & English language dictionaries
 │   ├── hooks/                  # Custom React hooks
-│   │   └── useAudioPlayer.js   # Background audio playback hook
+│   │   └── useAudioPlayer.js   # Deferred background audio playback hook
 │   ├── styles/                 # Modular CSS stylesheets & variables
-│   │   ├── Components.css      # Component-level styles
-│   │   ├── Index.css           # Global CSS variables and base tokens
+│   │   ├── Components.css      # Core component styles
+│   │   ├── Index.css           # Global CSS variables and theme tokens
 │   │   └── ...                 # Section-specific styles
-│   ├── App.jsx                 # Main layout and section assembler
+│   ├── App.jsx                 # Main layout and lazy-loaded section assembler
 │   └── main.jsx                # Application root entry point
 ├── .env                        # Environment variables (ignored in git)
 ├── index.html                  # HTML5 document template & SEO metadata
 ├── tailwind.config.js          # Tailwind CSS theme configuration
-├── vite.config.js              # Vite build setup
+├── vite.config.js              # Vite build & chunk splitting setup
 └── package.json                # Project dependencies and npm scripts
 ```
 

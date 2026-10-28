@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Lightweight audio player state manager.
- * Pass daftar track dan dapatkan state + kontrol untuk next/prev/play/seek.
+ * Lightweight audio player state manager with lazy audio initialization.
+ * Does not download audio files until the user explicitly requests playback.
  */
 export const useAudioPlayer = (tracks = []) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -10,7 +10,18 @@ export const useAudioPlayer = (tracks = []) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(tracks[0]?.duration || 0);
 
-    const audioRef = useRef(new Audio(tracks[0]?.audio || ""));
+    const audioRef = useRef(null);
+    const loadedTrackIndexRef = useRef(null);
+
+    const getOrCreateAudio = useCallback(() => {
+        if (!audioRef.current) {
+            const audio = new Audio();
+            audio.preload = "none";
+            audio.volume = 0.5;
+            audioRef.current = audio;
+        }
+        return audioRef.current;
+    }, []);
 
     const goToTrack = useCallback(
         (direction) => {
@@ -23,10 +34,13 @@ export const useAudioPlayer = (tracks = []) => {
     );
 
     useEffect(() => {
-        const audio = audioRef.current;
-        audio.volume = 0.5;
+        const audio = getOrCreateAudio();
 
-        const handleLoadedMetadata = () => setDuration(audio.duration || tracks[currentIndex]?.duration || 0);
+        const handleLoadedMetadata = () => {
+            if (audio.duration && !Number.isNaN(audio.duration)) {
+                setDuration(audio.duration);
+            }
+        };
         const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
         const handleEnded = () => goToTrack("next");
 
@@ -35,48 +49,90 @@ export const useAudioPlayer = (tracks = []) => {
         audio.addEventListener("ended", handleEnded);
 
         return () => {
-            audio.pause();
             audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
             audio.removeEventListener("timeupdate", handleTimeUpdate);
             audio.removeEventListener("ended", handleEnded);
         };
-    }, [currentIndex, goToTrack, tracks]);
+    }, [getOrCreateAudio, goToTrack]);
 
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
+        };
+    }, []);
+
+    // Handle track change
     useEffect(() => {
         const track = tracks[currentIndex];
         if (!track) return;
 
-        const audio = audioRef.current;
-        audio.pause();
-        audio.src = track.audio;
-        audio.load();
-        audio.currentTime = 0;
         setCurrentTime(0);
         setDuration(track.duration || 0);
 
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        // Only load and play if already playing or track was changed while initialized
         if (isPlaying) {
-            audio.play().catch((error) => console.error("Error playing audio:", error));
+            if (loadedTrackIndexRef.current !== currentIndex) {
+                audio.pause();
+                audio.src = track.audio;
+                audio.load();
+                loadedTrackIndexRef.current = currentIndex;
+            }
+            audio.currentTime = 0;
+            audio.play().catch((error) => {
+                console.error("Error playing audio:", error);
+                setIsPlaying(false);
+            });
+        } else if (loadedTrackIndexRef.current !== null && loadedTrackIndexRef.current !== currentIndex) {
+            audio.pause();
+            audio.currentTime = 0;
+            loadedTrackIndexRef.current = null;
         }
     }, [currentIndex, isPlaying, tracks]);
 
-    const togglePlayback = () => {
-        const audio = audioRef.current;
+    const togglePlayback = useCallback(() => {
+        const track = tracks[currentIndex];
+        if (!track) return;
+
+        const audio = getOrCreateAudio();
+
         setIsPlaying((prev) => {
             const shouldPlay = !prev;
             if (shouldPlay) {
-                audio.play().catch((error) => console.error("Error playing audio:", error));
+                if (loadedTrackIndexRef.current !== currentIndex || !audio.src) {
+                    audio.src = track.audio;
+                    audio.load();
+                    loadedTrackIndexRef.current = currentIndex;
+                }
+                audio.play().catch((error) => {
+                    console.error("Error playing audio:", error);
+                    setIsPlaying(false);
+                });
             } else {
                 audio.pause();
             }
             return shouldPlay;
         });
-    };
+    }, [currentIndex, getOrCreateAudio, tracks]);
 
-    const seek = (time) => {
-        const audio = audioRef.current;
-        audio.currentTime = time;
-        setCurrentTime(time);
-    };
+    const seek = useCallback(
+        (time) => {
+            const track = tracks[currentIndex];
+            const audio = getOrCreateAudio();
+            if (loadedTrackIndexRef.current !== currentIndex && track) {
+                audio.src = track.audio;
+                audio.load();
+                loadedTrackIndexRef.current = currentIndex;
+            }
+            audio.currentTime = time;
+            setCurrentTime(time);
+        },
+        [currentIndex, getOrCreateAudio, tracks]
+    );
 
     return {
         audioRef,

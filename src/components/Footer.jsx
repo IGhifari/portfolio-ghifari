@@ -42,7 +42,7 @@ const Footer = () => {
               type="button"
               onClick={scrollToTop}
               className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-              aria-label={t('footer.backToTopAria')}
+              title={t('footer.backToTopAria')}
             >
               <span>{t('footer.backToTop')}</span>
               <FiArrowUp size={13} className="text-[var(--accent)] group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
