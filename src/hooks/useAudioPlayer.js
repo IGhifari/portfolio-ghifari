@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Lightweight audio player state manager with lazy audio initialization.
- * Does not download audio files until the user explicitly requests playback.
+ * Lightweight audio player state manager with pure lazy audio initialization.
+ * Audio element is not instantiated and no network audio requests are sent
+ * until the user explicitly initiates playback or navigation.
  */
 export const useAudioPlayer = (tracks = []) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,16 +13,6 @@ export const useAudioPlayer = (tracks = []) => {
 
     const audioRef = useRef(null);
     const loadedTrackIndexRef = useRef(null);
-
-    const getOrCreateAudio = useCallback(() => {
-        if (!audioRef.current) {
-            const audio = new Audio();
-            audio.preload = "none";
-            audio.volume = 0.5;
-            audioRef.current = audio;
-        }
-        return audioRef.current;
-    }, []);
 
     const goToTrack = useCallback(
         (direction) => {
@@ -33,32 +24,35 @@ export const useAudioPlayer = (tracks = []) => {
         [tracks.length]
     );
 
-    useEffect(() => {
-        const audio = getOrCreateAudio();
+    const getOrCreateAudio = useCallback(() => {
+        if (!audioRef.current && typeof window !== "undefined") {
+            const audio = new Audio();
+            audio.preload = "none";
+            audio.volume = 0.5;
 
-        const handleLoadedMetadata = () => {
-            if (audio.duration && !Number.isNaN(audio.duration)) {
-                setDuration(audio.duration);
-            }
-        };
-        const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-        const handleEnded = () => goToTrack("next");
+            audio.addEventListener("loadedmetadata", () => {
+                if (audio.duration && !Number.isNaN(audio.duration)) {
+                    setDuration(audio.duration);
+                }
+            });
+            audio.addEventListener("timeupdate", () => {
+                setCurrentTime(audio.currentTime);
+            });
+            audio.addEventListener("ended", () => {
+                goToTrack("next");
+            });
 
-        audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-        audio.addEventListener("timeupdate", handleTimeUpdate);
-        audio.addEventListener("ended", handleEnded);
-
-        return () => {
-            audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-            audio.removeEventListener("timeupdate", handleTimeUpdate);
-            audio.removeEventListener("ended", handleEnded);
-        };
-    }, [getOrCreateAudio, goToTrack]);
+            audioRef.current = audio;
+        }
+        return audioRef.current;
+    }, [goToTrack]);
 
     useEffect(() => {
         return () => {
             if (audioRef.current) {
                 audioRef.current.pause();
+                audioRef.current.src = "";
+                audioRef.current = null;
             }
         };
     }, []);
@@ -99,6 +93,7 @@ export const useAudioPlayer = (tracks = []) => {
         if (!track) return;
 
         const audio = getOrCreateAudio();
+        if (!audio) return;
 
         setIsPlaying((prev) => {
             const shouldPlay = !prev;
@@ -123,6 +118,7 @@ export const useAudioPlayer = (tracks = []) => {
         (time) => {
             const track = tracks[currentIndex];
             const audio = getOrCreateAudio();
+            if (!audio) return;
             if (loadedTrackIndexRef.current !== currentIndex && track) {
                 audio.src = track.audio;
                 audio.load();
@@ -143,7 +139,13 @@ export const useAudioPlayer = (tracks = []) => {
         duration,
         togglePlayback,
         seek,
-        next: () => goToTrack("next"),
-        prev: () => goToTrack("prev"),
+        next: () => {
+            getOrCreateAudio();
+            goToTrack("next");
+        },
+        prev: () => {
+            getOrCreateAudio();
+            goToTrack("prev");
+        },
     };
 };

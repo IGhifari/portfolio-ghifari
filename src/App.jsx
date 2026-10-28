@@ -4,30 +4,27 @@ import './styles/Components.css';
 
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
+
+// Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
-import SoundButton from './components/SoundButton';
-import Footer from './components/Footer';
+import Project from './components/Project';
 
-const Project = lazy(() => import('./components/Project'));
+// Lazy-loaded below-the-fold components
+const SoundButton = lazy(() => import('./components/SoundButton'));
 const About = lazy(() => import('./components/About'));
 const Journey = lazy(() => import('./components/Journey'));
 const Skills = lazy(() => import('./components/Skill'));
 const Certificate = lazy(() => import('./components/Certificate'));
 const AcademicBackground = lazy(() => import('./components/AcademicBackground'));
 const Contact = lazy(() => import('./components/Contact'));
-
-const SectionFallback = () => (
-    <div className="min-h-[320px] w-full flex items-center justify-center py-20" aria-hidden="true">
-        <span className="w-5 h-5 rounded-full border-2 border-[var(--border)] border-t-[var(--accent)] animate-spin" />
-    </div>
-);
+const Footer = lazy(() => import('./components/Footer'));
 
 /**
  * Defers mounting of below-the-fold lazy sections until the user scrolls near
- * them or the browser finishes initial load / anchor navigation.
+ * them or navigation triggers, keeping fallback null to guarantee 0 CLS.
  */
-const DeferredSection = ({ children, rootMargin = '400px 0px', minHeight = 'min-h-[320px]' }) => {
+const DeferredSection = ({ children, rootMargin = '400px 0px', minHeight = 'min-h-[200px]' }) => {
     const [shouldRender, setShouldRender] = useState(false);
     const containerRef = useRef(null);
 
@@ -71,10 +68,8 @@ const DeferredSection = ({ children, rootMargin = '400px 0px', minHeight = 'min-
     return (
         <div ref={containerRef} className={shouldRender ? undefined : minHeight}>
             {shouldRender ? (
-                <Suspense fallback={<SectionFallback />}>{children}</Suspense>
-            ) : (
-                <SectionFallback />
-            )}
+                <Suspense fallback={null}>{children}</Suspense>
+            ) : null}
         </div>
     );
 };
@@ -91,7 +86,10 @@ const App = () => {
           <LanguageProvider>
             <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
 
-            <SoundButton />
+            <Suspense fallback={null}>
+                <SoundButton />
+            </Suspense>
+
             <Navbar />
 
             {/* Hero */}
@@ -99,11 +97,9 @@ const App = () => {
                 <Profile/>
             </section>
 
-            {/* Projects */}
+            {/* Projects (Eagerly rendered for immediate showcase availability) */}
             <section id="projects" className="bg-[var(--bg-primary)]">
-                <DeferredSection rootMargin="0px" minHeight="min-h-[1200px]">
-                    <Project/>
-                </DeferredSection>
+                <Project/>
             </section>
 
             {/* About */}
@@ -153,7 +149,9 @@ const App = () => {
             </section>
 
             {/* Footer */}
-            <Footer />
+            <Suspense fallback={null}>
+                <Footer />
+            </Suspense>
         </div>
           </LanguageProvider>
         </ThemeProvider>

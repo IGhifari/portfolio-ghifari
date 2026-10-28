@@ -206,7 +206,8 @@ const Project = () => {
                           <img
                             src={project.image}
                             alt={`${project.title} interface preview`}
-                            loading="lazy"
+                            loading={index === 0 ? 'eager' : 'lazy'}
+                            fetchPriority={index === 0 ? 'high' : undefined}
                             decoding="async"
                             width={1280}
                             height={720}
@@ -493,6 +494,8 @@ const Project = () => {
                   <img
                     src={activeProject.image}
                     alt={`${activeProject.title} full preview`}
+                    loading="lazy"
+                    decoding="async"
                     width={1280}
                     height={720}
                     className="w-full h-full object-cover object-top"

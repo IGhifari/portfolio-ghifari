@@ -33,7 +33,7 @@ const songs = [
     {
         title: "One Of The Girls",
         artist: "Jennie, Lily-Rose, The Weeknd",
-        cover: "sound2.webp",
+        cover: "/sound2.webp",
         audio: "sound4.mp3",
         duration: 242,
         color: "#3B82F6",
@@ -111,7 +111,18 @@ const SoundButton = () => {
                     <div
                         className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-[var(--surface-muted)]/80 backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] shadow-sm transition-all duration-200 group"
                     >
-                        {/* Quick play/pause toggle button (no external image on initial load) */}
+                        {/* Mini Track Thumbnail */}
+                        <img
+                            src={currentTrack.cover}
+                            alt=""
+                            width="24"
+                            height="24"
+                            loading="lazy"
+                            decoding="async"
+                            className="w-6 h-6 rounded-full object-cover border border-[var(--border)] flex-shrink-0"
+                        />
+
+                        {/* Quick play/pause toggle button */}
                         <button
                             type="button"
                             onClick={togglePlayback}
@@ -187,6 +198,7 @@ const SoundButton = () => {
                                 src={currentTrack.cover}
                                 alt={`${currentTrack.title} cover`}
                                 loading="lazy"
+                                decoding="async"
                                 width={220}
                                 height={220}
                                 className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? "scale-105" : "scale-100"}`}

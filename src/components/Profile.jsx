@@ -80,24 +80,19 @@ const Profile = () => {
             </div>
           </motion.div>
 
-          {/* Person's Name: Primary Visual Element (Single H1 for clean heading hierarchy) */}
-          <motion.h1
-            className="space-y-0.5 sm:space-y-1 w-full select-none"
-            {...getMotionProps(0.12, 16)}
-          >
+          {/* Person's Name: Primary Visual Element (Single semantic H1 with full name for Google Search #1 ranking) */}
+          <h1 className="space-y-0.5 sm:space-y-1 w-full select-none">
             <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase">
               M. GHIFARI
             </span>
+            {" "}
             <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase">
               BIMA KHADAFI
             </span>
-          </motion.h1>
+          </h1>
 
           {/* Role with subtle framing dividers */}
-          <motion.div
-            className="flex items-center justify-center gap-3 sm:gap-4 pt-0.5"
-            {...getMotionProps(0.24, 12)}
-          >
+          <div className="flex items-center justify-center gap-3 sm:gap-4 pt-0.5">
             <span
               className="h-[1px] w-6 sm:w-10 bg-gradient-to-r from-transparent to-[var(--border)] hidden xs:inline-block"
               aria-hidden="true"
@@ -109,15 +104,12 @@ const Profile = () => {
               className="h-[1px] w-6 sm:w-10 bg-gradient-to-l from-transparent to-[var(--border)] hidden xs:inline-block"
               aria-hidden="true"
             />
-          </motion.div>
+          </div>
 
           {/* Value Proposition */}
-          <motion.p
-            className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4"
-            {...getMotionProps(0.32, 12)}
-          >
+          <p className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2 sm:px-4">
             {t('hero.valueProp')}
-          </motion.p>
+          </p>
 
           {/* Call to Actions & Social Links */}
           <motion.div
