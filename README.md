@@ -1,6 +1,6 @@
 # Portfolio Ghifari 🚀
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-portfolio--ghifari.vercel.app-000?style=for-the-badge&logo=vercel&logoColor=white)](https://portfolio-ghifari.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-portfolio--ghifari.vercel.app-000?style=for-the-badge&logo=vercel&logoColor=white)](https://www.ighifari.my.id/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.14-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.14-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -8,7 +8,7 @@
 
 A modern, interactive, and responsive developer portfolio website for **M. Ghifari Bima Khadafi**, featuring WebGL shader canvas effects, dual-theme support, bilingual internationalization, and interactive case studies.
 
-🌐 **Live Website:** [https://portfolio-ghifari.vercel.app](https://portfolio-ghifari.vercel.app)
+🌐 **Live Website:** [ighifari.my.id](https://www.ighifari.my.id/)
 
 ---
 
@@ -171,7 +171,7 @@ You can also deploy your own clone with a single click:
 **M. Ghifari Bima Khadafi**
 
 - **GitHub:** [@IGhifari](https://github.com/IGhifari)
-- **Portfolio:** [portfolio-ghifari.vercel.app](https://portfolio-ghifari.vercel.app)
+- **Portfolio:** [ighifari.my.id](https://www.ighifari.my.id/)
 
 ---
 

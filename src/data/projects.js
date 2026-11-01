@@ -564,6 +564,6 @@ export const otherProjects = [
     image: "/portfolio.webp",
     tags: ["React", "Tailwind CSS", "Framer Motion"],
     github: "https://github.com/IGhifari/Portfolio-ghifari",
-    live: "https://portfolio-ghifari.vercel.app",
+    live: "https://www.ighifari.my.id/",
   },
 ];
