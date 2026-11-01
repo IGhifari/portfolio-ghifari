@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://portfolio-ghifari.vercel.app/sitemap.xml
+Sitemap: https://www.ighifari.my.id/sitemap.xml
