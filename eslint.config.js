@@ -39,7 +39,7 @@ export default [
     },
   },
   {
-    files: ['api/**/*.js', 'tests/**/*.js'],
+    files: ['api/**/*.js', 'tests/**/*.js', 'vite.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {

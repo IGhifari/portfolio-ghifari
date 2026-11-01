@@ -346,6 +346,38 @@ export const translations = {
       nextTrack: "Lagu berikutnya",
       seekTrack: "Atur posisi lagu",
     },
+
+    // AI Portfolio Assistant Chatbot
+    chatbot: {
+      badge: "AI ASSISTANT // STRICT KNOWLEDGE",
+      title: "Asisten Portofolio Ghifari",
+      subtitle: "Hanya menjawab dari data portofolio resmi",
+      launcherLabel: "TANYA AI",
+      openAria: "Buka Asisten AI Portofolio",
+      closeAria: "Tutup Asisten AI Portofolio",
+      clearChat: "Reset",
+      clearChatAria: "Bersihkan riwayat percakapan",
+      welcomeTitle: "Halo! Saya Asisten AI Portofolio M. Ghifari Bima Khadafi.",
+      welcomeBody:
+        "Saya bekerja dalam mode Strict Knowledge Only—seluruh jawaban hanya bersumber dari informasi resmi di website portofolio ini.",
+      suggestedLabel: "PERTANYAAN CEPAT",
+      suggestions: [
+        "Apa saja teknologi yang digunakan pada proyek AksesKita?",
+        "Apa saja keahlian frontend dan backend Ghifari?",
+        "Di mana Ghifari menempuh pendidikan saat ini?",
+        "Ceritakan pengalaman magang dan sertifikasi Ghifari.",
+        "Bagaimana cara menghubungi Ghifari untuk kolaborasi?",
+      ],
+      inputPlaceholder: "Tanyakan seputar portofolio Ghifari...",
+      sendAria: "Kirim pesan",
+      thinking: "Memeriksa Knowledge Base...",
+      sourcesLabel: "SUMBER PORTOFOLIO",
+      jumpToSection: "Buka bagian",
+      strictGuardBadge: "BATASAN PENGETAHUAN",
+      retryBtn: "Coba Lagi",
+      networkError: "Gagal terhubung ke layanan AI. Periksa koneksi Anda lalu coba lagi.",
+      charLimitHint: "Maks. 500 karakter",
+    },
   },
 
   en: {
@@ -689,6 +721,38 @@ export const translations = {
       prevTrack: "Previous track",
       nextTrack: "Next track",
       seekTrack: "Seek track position",
+    },
+
+    // AI Portfolio Assistant Chatbot
+    chatbot: {
+      badge: "AI ASSISTANT // STRICT KNOWLEDGE",
+      title: "Ghifari's Portfolio Assistant",
+      subtitle: "Grounded strictly in official portfolio data",
+      launcherLabel: "ASK AI",
+      openAria: "Open Portfolio AI Assistant",
+      closeAria: "Close Portfolio AI Assistant",
+      clearChat: "Reset",
+      clearChatAria: "Clear conversation history",
+      welcomeTitle: "Hello! I'm M. Ghifari Bima Khadafi's AI Portfolio Assistant.",
+      welcomeBody:
+        "I operate in Strict Knowledge Only mode—every response is grounded exclusively in verified information from this portfolio.",
+      suggestedLabel: "QUICK QUESTIONS",
+      suggestions: [
+        "What technologies are used in the AksesKita project?",
+        "What are Ghifari's frontend and backend skills?",
+        "Where is Ghifari currently studying?",
+        "Tell me about Ghifari's internship and certifications.",
+        "How can I contact Ghifari for collaboration?",
+      ],
+      inputPlaceholder: "Ask about Ghifari's portfolio...",
+      sendAria: "Send message",
+      thinking: "Checking Knowledge Base...",
+      sourcesLabel: "PORTFOLIO SOURCES",
+      jumpToSection: "Jump to section",
+      strictGuardBadge: "STRICT KNOWLEDGE GUARD",
+      retryBtn: "Try Again",
+      networkError: "Unable to reach the AI service. Please check your connection and try again.",
+      charLimitHint: "Max 500 characters",
     },
   },
 };

@@ -12,6 +12,7 @@ import Project from './components/Project';
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
+const ChatAssistant = lazy(() => import('./components/ChatAssistant'));
 const About = lazy(() => import('./components/About'));
 const Journey = lazy(() => import('./components/Journey'));
 const Skills = lazy(() => import('./components/Skill'));
@@ -88,6 +89,7 @@ const App = () => {
 
             <Suspense fallback={null}>
                 <SoundButton />
+                <ChatAssistant />
             </Suspense>
 
             <Navbar />
