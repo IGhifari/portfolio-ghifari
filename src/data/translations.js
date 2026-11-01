@@ -671,7 +671,7 @@ export const translations = {
       successBody: "Thank you for reaching out. I have received your note and will reply as soon as possible.",
       errorTitle: "Unable to send via automated dispatch",
       errorBody: "Please feel free to email me directly at",
-      toastSuccess: "Message delivered successfully! 🎉",
+      toastSuccess: "Message delivered successfully!",
       toastError: "Failed to send message. Please reach out directly via email.",
       toastOffline: "Email service is temporarily offline. Please write to ighifarii05@gmail.com directly.",
       toastCopied: "Email copied to clipboard!",
