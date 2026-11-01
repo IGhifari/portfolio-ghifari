@@ -5,6 +5,7 @@ import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload } from 'r
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
+import { profileData } from '../data/profile';
 import { generateLanyardTextures } from '../utils/lanyardCardGenerator';
 import Threads from './reactbits/Threads';
 
@@ -17,8 +18,8 @@ const Profile = () => {
   const { scrollY } = useScroll();
 
   const [textures, setTextures] = useState({
-    frontImage: '/ghifari.webp',
-    backImage: '/ghifari.webp',
+    frontImage: profileData.avatarImage,
+    backImage: profileData.avatarImage,
     strapImage: undefined,
   });
   const [isDesktop, setIsDesktop] = useState(() =>
@@ -144,11 +145,11 @@ const Profile = () => {
             {/* Person's Name: Primary Visual Element (Single semantic H1 with full name) */}
             <h1 className="space-y-0.5 sm:space-y-1 w-full select-none">
               <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase">
-                M. GHIFARI
+                {profileData.nameLines.first}
               </span>
               {" "}
               <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase">
-                BIMA KHADAFI
+                {profileData.nameLines.second}
               </span>
             </h1>
 
@@ -208,7 +209,7 @@ const Profile = () => {
                 )}
 
                 <a
-                  href="https://github.com/IGhifari"
+                  href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
@@ -221,7 +222,7 @@ const Profile = () => {
               {/* Subtle Social Links */}
               <div className="flex items-center gap-2.5 text-[var(--text-secondary)] pt-0.5">
                 <a
-                  href="https://github.com/IGhifari"
+                  href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('hero.githubAria')}
@@ -231,7 +232,7 @@ const Profile = () => {
                 </a>
                 <span className="text-[var(--border)] select-none text-xs" aria-hidden="true">/</span>
                 <a
-                  href="https://www.linkedin.com/in/ighifari/"
+                  href={profileData.socials.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('hero.linkedinAria')}
