@@ -1,1 +1,2 @@
-/* /index.html 200
+# Cloudflare Pages handles SPA fallback to /index.html natively when 404.html is absent.
+# Catch-all rule "/* /index.html 200" is intentionally omitted so static SEO files (/sitemap.xml, /robots.txt) are not overwritten by /index.html.
