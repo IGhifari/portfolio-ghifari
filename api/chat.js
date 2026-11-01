@@ -98,6 +98,13 @@ const sanitizeDiagnosticMessage = (rawMessage, secrets = []) => {
 /**
  * Helper to send a consistent JSON response in both Vercel Node req/res and standard test mocks.
  */
+const getByteLength = (str) => {
+  if (typeof Buffer !== 'undefined' && typeof Buffer.byteLength === 'function') {
+    return Buffer.byteLength(str, 'utf8');
+  }
+  return new TextEncoder().encode(String(str || '')).length;
+};
+
 const sendJson = (res, statusCode, payload, headers = {}) => {
   if (res && typeof res.setHeader === 'function') {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -165,12 +172,12 @@ export const createChatHandler = ({
       });
     }
 
-    if (Buffer.isBuffer(rawBody) || rawBody instanceof Uint8Array) {
-      rawBody = Buffer.from(rawBody).toString('utf8');
+    if ((typeof Buffer !== 'undefined' && Buffer.isBuffer(rawBody)) || rawBody instanceof Uint8Array) {
+      rawBody = typeof Buffer !== 'undefined' ? Buffer.from(rawBody).toString('utf8') : new TextDecoder().decode(rawBody);
     }
 
     if (typeof rawBody === 'string') {
-      if (Buffer.byteLength(rawBody, 'utf8') > MAX_PAYLOAD_BYTES) {
+      if (getByteLength(rawBody) > MAX_PAYLOAD_BYTES) {
         return sendJson(res, 413, {
           ok: false,
           error: {
@@ -191,7 +198,7 @@ export const createChatHandler = ({
         });
       }
     } else if (rawBody && typeof rawBody === 'object') {
-      const serializedLength = Buffer.byteLength(JSON.stringify(rawBody), 'utf8');
+      const serializedLength = getByteLength(JSON.stringify(rawBody));
       if (serializedLength > MAX_PAYLOAD_BYTES) {
         return sendJson(res, 413, {
           ok: false,
