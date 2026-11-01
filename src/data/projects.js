@@ -212,6 +212,122 @@ export const selectedProjects = [
     github: "https://github.com/IGhifari/internship-journal",
     live: null,
   },
+  {
+    id: "studyflow",
+    number: "05",
+    categoryKey: "fullstack",
+    category: {
+      id: "EDUTECH / FULL-STACK & AI",
+      en: "EDUTECH / FULL-STACK & AI",
+    },
+    title: "StudyFlow",
+    subtitle: {
+      id: "Platform Pembelajaran Digital & AI",
+      en: "Digital Learning & AI Platform",
+    },
+    description: {
+      id: "Platform pembelajaran digital yang dirancang untuk membantu siswa mengelola aktivitas belajar, materi, catatan, tugas, dan progres pembelajaran dalam satu tempat.",
+      en: "A digital learning platform designed to help students manage study activities, learning materials, notes, assignments, and learning progress all in one place.",
+    },
+    details: {
+      problem: {
+        id: "Materi pembelajaran, catatan, jadwal tugas, dan pemantauan progres belajar siswa sering kali terfragmentasi di berbagai aplikasi terpisah, menyulitkan siswa untuk mempertahankan alur belajar yang konsisten serta memahami dokumen materi yang padat secara efisien.",
+        en: "Learning materials, study notes, assignment schedules, and student progress tracking are often fragmented across disparate apps, making it difficult for students to maintain a consistent learning rhythm and digest dense study documents efficiently.",
+      },
+      solution: {
+        id: "Membangun platform pembelajaran terpadu dengan dashboard siswa dan admin, manajemen kursus dan tugas terstruktur, serta pemrosesan dokumen berbasis AI yang didukung antrean latar belakang BullMQ dan Redis.",
+        en: "Engineered a unified digital learning platform featuring comprehensive student and admin dashboards, structured course and assignment management, and AI-driven document processing powered by BullMQ background job queues and Redis.",
+      },
+      architecture: {
+        id: "Arsitektur full-stack modern dengan frontend Next.js 15 dan TypeScript yang terhubung ke backend Express.js, Prisma ORM, dan PostgreSQL, diperkuat sistem antrean BullMQ + Redis untuk pemrosesan Gemini AI serta validasi skema Zod.",
+        en: "Modern full-stack architecture pairing a Next.js 15 and TypeScript frontend with an Express.js backend, Prisma ORM, and PostgreSQL, enhanced by BullMQ + Redis queue workers for Gemini AI document processing and Zod schema validation.",
+      },
+      features: {
+        id: [
+          "Manajemen materi pembelajaran dan pengorganisasian modul kursus terstruktur",
+          "Catatan dan tugas belajar interaktif beserta pelacakan progres siswa",
+          "Pengelolaan kursus menyeluruh dengan dashboard siswa dan admin",
+          "Pemrosesan dan ekstraksi dokumen pembelajaran cerdas menggunakan Gemini AI secara asinkron",
+          "Sistem autentikasi aman, arsitektur REST API modular, dan validasi data ketat dengan Zod",
+        ],
+        en: [
+          "Course curriculum and learning material management with structured notes",
+          "Interactive notes and assignment workflows with student progress tracking",
+          "Comprehensive course management with dedicated student and admin dashboards",
+          "Intelligent asynchronous learning document processing and extraction using Gemini AI",
+          "Secure authentication system, modular REST API services, and strict schema validation with Zod",
+        ],
+      },
+      contribution: {
+        id: "Full-Stack & AI Developer — merancang arsitektur aplikasi Next.js 15 & Express.js, memodelkan skema database Prisma/PostgreSQL, mengintegrasikan antrean BullMQ/Redis untuk pemrosesan dokumen Gemini AI, serta membangun sistem autentikasi dan API tervalidasi Zod.",
+        en: "Full-Stack & AI Developer — designed the Next.js 15 & Express.js system architecture, modeled Prisma/PostgreSQL database schemas, integrated BullMQ/Redis worker queues for Gemini AI document parsing, and built authenticated REST APIs validated with Zod.",
+      },
+    },
+    image: "/studyflow.webp",
+    tags: ["Next.js 15", "TypeScript", "Express.js", "Prisma", "PostgreSQL", "Redis", "BullMQ", "Gemini AI", "Zod"],
+    github: "https://github.com/IGhifari/study-flow",
+    live: null,
+  },
+  {
+    id: "blue-horizon",
+    number: "06",
+    categoryKey: "webapp",
+    category: {
+      id: "LOGISTIK / APLIKASI WEB",
+      en: "LOGISTICS / WEB APPLICATION",
+    },
+    title: "Blue Horizon – Portal Logistik",
+    subtitle: {
+      id: "Manajemen Perlengkapan & Logistik Divisi",
+      en: "Divisional Equipment & Logistics Management",
+    },
+    description: {
+      id: "Aplikasi manajemen perlengkapan dan logistik untuk membantu pengelolaan pengajuan kebutuhan, rekap data, serta pemantauan timeline pekerjaan setiap divisi secara terpusat.",
+      en: "An equipment and logistics management application designed to centralize resource requisition requests, divisional data rollups, and project timeline monitoring.",
+    },
+    details: {
+      problem: {
+        id: "Koordinasi kebutuhan perlengkapan dan logistik antar-divisi yang dilakukan secara manual atau melalui grup pesan sering menyebabkan data pengajuan tercecer, bukti transaksi hilang, dan kendala transparansi pemantauan timeline kerja.",
+        en: "Coordinating equipment and logistics needs across divisions manually or via messaging groups frequently leads to scattered requisition records, lost transaction receipts, and poor visibility into job timelines.",
+      },
+      solution: {
+        id: "Mengembangkan portal logistik berbasis web terpusat untuk memfasilitasi pengajuan kebutuhan perlengkapan, rekap data divisi, upload bukti pembayaran, dan monitoring timeline pekerjaan secara transparan.",
+        en: "Built a centralized web-based logistics portal to facilitate equipment requisition submissions, divisional data rollups, payment receipt uploads, and transparent job timeline monitoring.",
+      },
+      architecture: {
+        id: "Single Page Application (SPA) berbasis React.js dan Vite yang dideploy di Vercel, terintegrasi dengan backend-as-a-service Supabase dan database PostgreSQL dengan autentikasi berbasis role dan divisi.",
+        en: "Single Page Application (SPA) built with React.js and Vite deployed on Vercel, integrated with Supabase backend services and a PostgreSQL database featuring role- and division-based authentication.",
+      },
+      features: {
+        id: [
+          "Pengajuan kebutuhan perlengkapan dinamis dengan kategorisasi per divisi",
+          "Rekapitulasi dan ringkasan data inventaris logistik berdasarkan divisi",
+          "Panel manajemen data oleh admin untuk peninjauan dan persetujuan pengajuan",
+          "Timeline dan monitoring linimasa progres pekerjaan setiap divisi secara terpusat",
+          "Autentikasi aman dengan kontrol akses berbasis peran (role) dan divisi",
+          "Integrasi database relasional dan penyimpanan data dengan Supabase & PostgreSQL",
+          "Fitur upload dan verifikasi digital bukti transaksi pembayaran",
+        ],
+        en: [
+          "Dynamic equipment requisition submissions categorized by division",
+          "Divisional data summaries and logistics inventory rollups",
+          "Administrative management panel for request review and status approval",
+          "Centralized timeline tracking and division job progress monitoring",
+          "Secure authentication with role-based and division-scoped access control",
+          "Relational database integration and data persistence powered by Supabase & PostgreSQL",
+          "Digital transaction receipt upload and verification features",
+        ],
+      },
+      contribution: {
+        id: "Web Developer — merancang antarmuka komponen React.js + Vite, mengintegrasikan autentikasi dan database Supabase/PostgreSQL, serta mengimplementasikan modul pengajuan kebutuhan, upload bukti transaksi, dan pemantauan timeline divisi.",
+        en: "Web Developer — designed the React.js + Vite component architecture, integrated Supabase/PostgreSQL authentication and database services, and implemented requisition workflows, receipt uploads, and division timeline monitoring.",
+      },
+    },
+    image: "/bluehorizon.webp",
+    tags: ["React.js", "Vite", "Supabase", "PostgreSQL", "JavaScript", "Vercel"],
+    github: null,
+    live: null,
+  },
 ];
 
 export const otherProjects = [
