@@ -21,50 +21,21 @@ import { IoLogoGithub } from 'react-icons/io';
 import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { directEmail, contactChannelsData } from '../data/contact';
 import '../styles/Contact.css';
 
-const contactChannels = [
-  {
-    key: 'github',
-    name: 'GitHub',
-    handle: '@IGhifari',
-    desc: 'Public code, project repositories & contributions',
-    url: 'https://github.com/IGhifari',
-    icon: <IoLogoGithub size={18} aria-hidden="true" />,
-  },
-  {
-    key: 'linkedin',
-    name: 'LinkedIn',
-    handle: 'in/ighifari',
-    desc: 'Professional network, career background & credentials',
-    url: 'https://www.linkedin.com/in/ighifari/',
-    icon: <FaLinkedin size={18} aria-hidden="true" />,
-  },
-  {
-    key: 'instagram',
-    name: 'Instagram',
-    handle: '@ghfrriii',
-    desc: 'Personal activities, design experiments & updates',
-    url: 'https://www.instagram.com/ghfrriii/',
-    icon: <FaInstagram size={18} aria-hidden="true" />,
-  },
-  {
-    key: 'discord',
-    name: 'Discord',
-    handle: 'ghifari#7471',
-    desc: 'Real-time developer chat and collaboration',
-    url: 'https://discord.com/channels/@ghifari#7471',
-    icon: <FaDiscord size={18} aria-hidden="true" />,
-  },
-  {
-    key: 'tiktok',
-    name: 'TikTok',
-    handle: '@ghrfiii',
-    desc: 'Short-form coding clips and creative uploads',
-    url: 'https://www.tiktok.com/@ghrfiii?',
-    icon: <FaTiktok size={18} aria-hidden="true" />,
-  },
-];
+const channelIconsByKey = {
+  github: <IoLogoGithub size={18} aria-hidden="true" />,
+  linkedin: <FaLinkedin size={18} aria-hidden="true" />,
+  instagram: <FaInstagram size={18} aria-hidden="true" />,
+  discord: <FaDiscord size={18} aria-hidden="true" />,
+  tiktok: <FaTiktok size={18} aria-hidden="true" />,
+};
+
+const contactChannels = contactChannelsData.map((channel) => ({
+  ...channel,
+  icon: channelIconsByKey[channel.key],
+}));
 
 const toastTitles = {
   id: { success: 'Berhasil', error: 'Gagal terkirim', warning: 'Perhatian', info: 'Info' },
@@ -110,9 +81,9 @@ const Contact = () => {
     const titles = toastTitles[language] || toastTitles.en;
     toast[type](<ToastBody title={titles[type]} message={message} />);
   };
-  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const serviceId = import.meta.env.EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.EMAILJS_PUBLIC_KEY;
 
   const [formData, setFormData] = useState({
     emailto: 'Ghifari',
@@ -128,8 +99,6 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const directEmail = 'ighifarii05@gmail.com';
 
   const formSchema = useMemo(
     () =>

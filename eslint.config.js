@@ -38,4 +38,13 @@ export default [
       ],
     },
   },
+  {
+    files: ['api/**/*.js', 'tests/**/*.js', 'vite.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ]

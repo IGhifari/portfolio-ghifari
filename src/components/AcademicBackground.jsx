@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { FiBookOpen, FiCalendar, FiMapPin, FiCheckCircle } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { educationMetadata } from '../data/education';
 
 const AcademicBackground = () => {
   const { t } = useLanguage();
@@ -156,7 +157,7 @@ const AcademicBackground = () => {
                 </p>
               </div>
               <span className="font-mono text-xs text-[var(--text-muted)] bg-[var(--surface-alt)] px-3 py-1.5 rounded border border-[var(--border-subtle)] self-start sm:self-auto">
-                2023 — 2026
+                {educationMetadata.smkn1Cibinong.period}
               </span>
             </div>
 

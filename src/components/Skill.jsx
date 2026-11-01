@@ -26,85 +26,44 @@ import { GrMysql } from 'react-icons/gr';
 import { VscVscode, VscSparkle } from 'react-icons/vsc';
 import { TbTablePlus } from 'react-icons/tb';
 import { useLanguage } from '../context/LanguageContext';
+import { techCategoriesData, marqueeTechnologies } from '../data/skills';
 import '../styles/Skill.css';
 
-const techCategories = [
-  {
-    id: 'frontend',
-    title: 'FRONTEND',
-    badge: '// 01',
-    description: 'Modern component architectures, fluid user interfaces, and typed client systems.',
-    skills: [
-      { name: 'React', icon: <SiReact size={18} />, highlight: true },
-      { name: 'TypeScript', icon: <SiTypescript size={18} />, highlight: true },
-      { name: 'JavaScript', icon: <SiJavascript size={18} /> },
-      { name: 'Tailwind CSS', icon: <SiTailwindcss size={18} />, highlight: true },
-      { name: 'Vite', icon: <SiVite size={18} /> },
-      { name: 'HTML5 & CSS3', icon: <SiHtml5 size={18} /> },
-    ],
-  },
-  {
-    id: 'backend',
-    title: 'BACKEND',
-    badge: '// 02',
-    description: 'Scalable RESTful services, server middleware, schema validation, and authentication.',
-    skills: [
-      { name: 'Node.js', icon: <SiNodedotjs size={18} />, highlight: true },
-      { name: 'Express', icon: <SiExpress size={18} />, highlight: true },
-      { name: 'Prisma ORM', icon: <SiPrisma size={18} />, highlight: true },
-      { name: 'Supabase', icon: <SiSupabase size={18} /> },
-      { name: 'Laravel', icon: <SiLaravel size={18} /> },
-      { name: 'PHP', icon: <SiPhp size={18} /> },
-    ],
-  },
-  {
-    id: 'database',
-    title: 'DATABASE',
-    badge: '// 03',
-    description: 'Relational database schemas, normalization, query optimizations, and migrations.',
-    skills: [
-      { name: 'PostgreSQL', icon: <BiLogoPostgresql size={20} />, highlight: true },
-      { name: 'MySQL', icon: <GrMysql size={18} /> },
-    ],
-  },
-  {
-    id: 'tools',
-    title: 'TOOLS & WORKFLOW',
-    badge: '// 04',
-    description: 'Version control, API testing workflows, developer environments, and deployment tooling.',
-    skills: [
-      { name: 'Git', icon: <SiGit size={18} /> },
-      { name: 'GitHub', icon: <SiGithub size={18} />, highlight: true },
-      { name: 'Docker', icon: <SiDocker size={18} /> },
-      { name: 'Vercel', icon: <SiVercel size={18} /> },
-      { name: 'VS Code', icon: <VscVscode size={18} /> },
-      { name: 'Antigravity', icon: <VscSparkle size={18} /> },
-      { name: 'TablePlus', icon: <TbTablePlus size={18} /> },
-      { name: 'Postman', icon: <SiPostman size={18} /> },
-      { name: 'Bruno', icon: <SiBruno size={18} /> },
-      { name: 'Claude', icon: <SiClaude size={18} /> },
-      { name: 'Gemini', icon: <SiGooglegemini size={18} /> },
-    ],
-  },
-];
+const skillIconsByName = {
+  React: <SiReact size={18} />,
+  TypeScript: <SiTypescript size={18} />,
+  JavaScript: <SiJavascript size={18} />,
+  'Tailwind CSS': <SiTailwindcss size={18} />,
+  Vite: <SiVite size={18} />,
+  'HTML5 & CSS3': <SiHtml5 size={18} />,
+  'Node.js': <SiNodedotjs size={18} />,
+  Express: <SiExpress size={18} />,
+  'Prisma ORM': <SiPrisma size={18} />,
+  Supabase: <SiSupabase size={18} />,
+  Laravel: <SiLaravel size={18} />,
+  PHP: <SiPhp size={18} />,
+  PostgreSQL: <BiLogoPostgresql size={20} />,
+  MySQL: <GrMysql size={18} />,
+  Git: <SiGit size={18} />,
+  GitHub: <SiGithub size={18} />,
+  Docker: <SiDocker size={18} />,
+  Vercel: <SiVercel size={18} />,
+  'VS Code': <VscVscode size={18} />,
+  Antigravity: <VscSparkle size={18} />,
+  TablePlus: <TbTablePlus size={18} />,
+  Postman: <SiPostman size={18} />,
+  Bruno: <SiBruno size={18} />,
+  Claude: <SiClaude size={18} />,
+  Gemini: <SiGooglegemini size={18} />,
+};
 
-const marqueeTechnologies = [
-  'REACT',
-  'TYPESCRIPT',
-  'NODE.JS',
-  'POSTGRESQL',
-  'PRISMA',
-  'TAILWIND CSS',
-  'EXPRESS',
-  'SUPABASE',
-  'DOCKER',
-  'VERCEL',
-  'VITE',
-  'MYSQL',
-  'GIT',
-  'GITHUB',
-  'POSTMAN',
-];
+const techCategories = techCategoriesData.map((category) => ({
+  ...category,
+  skills: category.skills.map((skill) => ({
+    ...skill,
+    icon: skillIconsByName[skill.name],
+  })),
+}));
 
 const Skills = () => {
   const shouldReduceMotion = useReducedMotion();
