@@ -12,7 +12,8 @@
  * 7. History percakapan (konversi format Gemini `user`/`model` & untrusted history rule)
  * 8. Gemini API timeout (`504 UPSTREAM_TIMEOUT`)
  * 9. Gemini API error (`502 GEMINI_API_ERROR`) dan Gemini rate limit (`429 GEMINI_RATE_LIMIT`)
- * 10. Upstash Redis rate limiter tetap berjalan (`429 RATE_LIMIT_EXCEEDED`)
+ * 10. Upstash Redis rate limiter tetap berjalan (`429 RATE_LIMIT_EXCEEDED`), atomic Lua EVAL,
+ *     command-level error fail-closed, validasi respons, prioritas IP header, & normalisasi IPv6 /64
  * 11. Validasi skema input & konsistensi kontrak JSON respons untuk frontend
  */
 
@@ -25,7 +26,13 @@ import {
   detectUnlistedPersonalQuery,
   MIN_RELEVANCE_SCORE,
 } from '../api/_lib/retrieval.js';
-import { createUpstashRateLimiter } from '../api/_lib/rateLimit.js';
+import {
+  createUpstashRateLimiter,
+  getClientIdentifier,
+  normalizeIpForRateLimit,
+  parseRateLimitEvalResult,
+  RATE_LIMIT_LUA_SCRIPT,
+} from '../api/_lib/rateLimit.js';
 import {
   validateAndBuildSources,
   convertHistoryToGeminiContents,
@@ -90,8 +97,19 @@ const createSimulatedUpstashFetch = () => {
   const fetchImpl = async (url, options = {}) => {
     calls.push({ url, options });
     const commands = JSON.parse(options.body || '[]');
-    const results = commands.map(([cmd, key, arg]) => {
-      const upper = cmd.toUpperCase();
+    const results = commands.map((commandArgs) => {
+      const [cmd, key, arg] = commandArgs;
+      const upper = String(cmd || '').toUpperCase();
+      if (upper === 'EVAL') {
+        const [, , , evalKey, windowArg] = commandArgs;
+        const entry = store.get(evalKey) || { count: 0, ttl: -1 };
+        entry.count += 1;
+        if (entry.count === 1 || entry.ttl <= 0) {
+          entry.ttl = Number(windowArg);
+        }
+        store.set(evalKey, entry);
+        return { result: [entry.count, entry.ttl] };
+      }
       if (upper === 'INCR') {
         const entry = store.get(key) || { count: 0, ttl: -1 };
         entry.count += 1;
@@ -561,8 +579,17 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
   // 8. UPSTASH REDIS RATE LIMITER & INPUT VALIDATION
   // =========================================================================
   describe('8. Upstash Redis Rate Limiter & Validasi Input', () => {
-    it('enforces shared rate limits via Upstash REST pipeline and returns 429 RATE_LIMIT_EXCEEDED', async () => {
+    it('enforces shared rate limits via atomic Upstash Lua EVAL and returns 429 RATE_LIMIT_EXCEEDED without calling Gemini', async () => {
       const { fetchImpl: upstashFetch, calls } = createSimulatedUpstashFetch();
+      const { factory: geminiClientFactory, calls: geminiCalls } =
+        createMockGeminiClientFactory(async () => ({
+          text: JSON.stringify({
+            canAnswer: true,
+            answer: 'AksesKita adalah proyek pilihan Ghifari.',
+            sourceIds: ['project-selected-akseskita'],
+          }),
+        }));
+
       const rateLimiter = createUpstashRateLimiter({
         restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
         restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
@@ -575,6 +602,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
         env: TEST_ENV,
         rateLimiter,
         fetchImpl: upstashFetch,
+        geminiClientFactory,
       });
 
       const r1 = createMockReqRes({ body: { message: 'Resep kue?', lang: 'id' } });
@@ -587,12 +615,511 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(r2.res.statusCode, 200);
       assert.equal(r2.res.headers['X-RateLimit-Remaining'], '0');
 
-      const r3 = createMockReqRes({ body: { message: 'Siapa Ghifari?', lang: 'id' } });
+      const r3 = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
       await handler(r3.req, r3.res);
       assert.equal(r3.res.statusCode, 429);
       assert.equal(r3.res.body.error.code, 'RATE_LIMIT_EXCEEDED');
       assert.ok(Number(r3.res.headers['Retry-After']) > 0);
-      assert.ok(calls.length >= 4);
+      assert.equal(geminiCalls.length, 0);
+
+      // Verify each check executed a single atomic Lua EVAL command rather than non-atomic multi-step commands
+      assert.equal(calls.length, 3);
+      for (const call of calls) {
+        const parsedCommands = JSON.parse(call.options.body);
+        assert.equal(parsedCommands.length, 1);
+        assert.equal(parsedCommands[0][0], 'EVAL');
+        assert.equal(parsedCommands[0][1], RATE_LIMIT_LUA_SCRIPT);
+        assert.equal(parsedCommands[0][2], '1');
+        assert.equal(parsedCommands[0][4], '60000');
+      }
+    });
+
+    it('fails closed (502 RATE_LIMIT_SERVICE_ERROR) and never calls Gemini when Upstash returns HTTP 200 with a command-level error', async () => {
+      const commandErrorFetch = async () => ({
+        ok: true,
+        status: 200,
+        async json() {
+          return [{ error: 'ERR max daily request limit exceeded' }];
+        },
+        async text() {
+          return JSON.stringify([{ error: 'ERR max daily request limit exceeded' }]);
+        },
+      });
+
+      const rateLimiter = createUpstashRateLimiter({
+        restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
+        restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
+        fetchImpl: commandErrorFetch,
+      });
+
+      await assert.rejects(
+        () => rateLimiter.check('203.0.113.10'),
+        (err) => {
+          assert.equal(err.code, 'UPSTASH_COMMAND_ERROR');
+          assert.match(err.message, /ERR max daily request limit exceeded/);
+          return true;
+        }
+      );
+
+      let geminiCalled = false;
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return { text: '{}' };
+      });
+
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: commandErrorFetch,
+        geminiClientFactory,
+      });
+
+      const { req, res } = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
+
+      await handler(req, res);
+      assert.equal(res.statusCode, 502);
+      assert.equal(res.body.ok, false);
+      assert.equal(res.body.error.code, 'RATE_LIMIT_SERVICE_ERROR');
+      assert.equal(geminiCalled, false);
+    });
+
+    it('validates Upstash EVAL response strictly (including rejecting extra EVAL array elements and non-number types) and fails closed', async () => {
+      // Direct unit checks on parseRateLimitEvalResult
+      assert.throws(
+        () => parseRateLimitEvalResult([1, 60_000, 'extra-element']),
+        (err) => err.code === 'UPSTASH_INVALID_RESPONSE'
+      );
+      assert.throws(
+        () => parseRateLimitEvalResult(['1', 60_000]),
+        (err) => err.code === 'UPSTASH_INVALID_RESPONSE'
+      );
+      assert.throws(
+        () => parseRateLimitEvalResult([1, '60000']),
+        (err) => err.code === 'UPSTASH_INVALID_RESPONSE'
+      );
+
+      const malformedPayloads = [
+        { result: 'not-an-array' },
+        [],
+        [null],
+        [{ result: null }],
+        [{ result: [1] }],
+        [{ result: [1, 60_000, 999] }], // extra element in EVAL array
+        [{ result: [1, 60_000, 'extra'] }], // extra string element in EVAL array
+        [{ result: ['1', 60_000] }], // string instead of integer
+        [{ result: [1.5, 60_000] }], // float instead of integer
+        [{ result: [0, 60_000] }], // non-positive counter
+        [{ result: [1, -1] }], // negative TTL
+        [{ result: ['NaN', 60_000] }],
+      ];
+
+      for (const badPayload of malformedPayloads) {
+        const badFetch = async () => ({
+          ok: true,
+          status: 200,
+          async json() {
+            return badPayload;
+          },
+          async text() {
+            return JSON.stringify(badPayload);
+          },
+        });
+
+        const limiter = createUpstashRateLimiter({
+          restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
+          restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
+          fetchImpl: badFetch,
+        });
+
+        await assert.rejects(
+          () => limiter.check('203.0.113.10'),
+          (err) => err.code === 'UPSTASH_INVALID_RESPONSE'
+        );
+
+        let geminiCalled = false;
+        const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+          geminiCalled = true;
+          return { text: '{}' };
+        });
+
+        const handler = createChatHandler({
+          env: TEST_ENV,
+          fetchImpl: badFetch,
+          geminiClientFactory,
+        });
+
+        const { req, res } = createMockReqRes({
+          body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+        });
+
+        await handler(req, res);
+        assert.equal(res.statusCode, 502);
+        assert.equal(res.body.error.code, 'RATE_LIMIT_SERVICE_ERROR');
+        assert.equal(geminiCalled, false);
+      }
+    });
+
+    it('handles PTTL = 0 safely without unnecessary 502 failure when under limit and without failing open when over limit', async () => {
+      // 1. PTTL = 0 while within rate limit (current = 1, maxRequests = 2) -> allowed (200), resetMs clamped to 1ms
+      const zeroTtlUnderLimitFetch = async () => ({
+        ok: true,
+        status: 200,
+        async json() {
+          return [{ result: [1, 0] }];
+        },
+        async text() {
+          return JSON.stringify([{ result: [1, 0] }]);
+        },
+      });
+
+      const limiterUnder = createUpstashRateLimiter({
+        restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
+        restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
+        maxRequests: 2,
+        windowMs: 60_000,
+        fetchImpl: zeroTtlUnderLimitFetch,
+      });
+
+      const statusUnder = await limiterUnder.check('203.0.113.10');
+      assert.equal(statusUnder.allowed, true);
+      assert.equal(statusUnder.current, 1);
+      assert.equal(statusUnder.limit, 2);
+      assert.equal(statusUnder.remaining, 1);
+      assert.equal(statusUnder.resetMs, 1);
+      assert.equal(statusUnder.retryAfterSeconds, 1);
+
+      const handlerUnder = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: limiterUnder,
+      });
+      const callUnder = createMockReqRes({ body: { message: 'Resep kue?', lang: 'id' } });
+      await handlerUnder(callUnder.req, callUnder.res);
+      assert.equal(callUnder.res.statusCode, 200);
+      assert.equal(callUnder.res.headers['X-RateLimit-Reset'], '1');
+
+      // 2. PTTL = 0 while exceeding rate limit (current = 3, maxRequests = 2) -> blocked (429), never fails open
+      const zeroTtlOverLimitFetch = async () => ({
+        ok: true,
+        status: 200,
+        async json() {
+          return [{ result: [3, 0] }];
+        },
+        async text() {
+          return JSON.stringify([{ result: [3, 0] }]);
+        },
+      });
+
+      const limiterOver = createUpstashRateLimiter({
+        restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
+        restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
+        maxRequests: 2,
+        windowMs: 60_000,
+        fetchImpl: zeroTtlOverLimitFetch,
+      });
+
+      const statusOver = await limiterOver.check('203.0.113.10');
+      assert.equal(statusOver.allowed, false);
+      assert.equal(statusOver.current, 3);
+      assert.equal(statusOver.remaining, 0);
+      assert.equal(statusOver.resetMs, 1);
+      assert.equal(statusOver.retryAfterSeconds, 1);
+
+      let geminiCalled = false;
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return { text: '{}' };
+      });
+
+      const handlerOver = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: limiterOver,
+        geminiClientFactory,
+      });
+      const callOver = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
+      await handlerOver(callOver.req, callOver.res);
+      assert.equal(callOver.res.statusCode, 429);
+      assert.equal(callOver.res.body.error.code, 'RATE_LIMIT_EXCEEDED');
+      assert.equal(callOver.res.headers['Retry-After'], '1');
+      assert.equal(geminiCalled, false);
+    });
+
+    it('fails closed on Upstash HTTP errors (502), timeouts (504), missing credentials (503), and invalid rateStatus contracts without calling Gemini', async () => {
+      let geminiCalled = false;
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return { text: '{}' };
+      });
+
+      // 1. Upstash HTTP 500 error -> 502 RATE_LIMIT_SERVICE_ERROR
+      const http500Fetch = async () => ({
+        ok: false,
+        status: 500,
+        async text() {
+          return 'Internal Upstash Error';
+        },
+      });
+      const handler500 = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: http500Fetch,
+        geminiClientFactory,
+      });
+      const call500 = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
+      await handler500(call500.req, call500.res);
+      assert.equal(call500.res.statusCode, 502);
+      assert.equal(call500.res.body.error.code, 'RATE_LIMIT_SERVICE_ERROR');
+      assert.equal(geminiCalled, false);
+
+      // 2. Upstash AbortError / timeout -> 504 UPSTREAM_TIMEOUT
+      const abortFetch = async () => {
+        const abortErr = new Error('The operation was aborted');
+        abortErr.name = 'AbortError';
+        throw abortErr;
+      };
+      const handlerTimeout = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: abortFetch,
+        geminiClientFactory,
+      });
+      const callTimeout = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
+      await handlerTimeout(callTimeout.req, callTimeout.res);
+      assert.equal(callTimeout.res.statusCode, 504);
+      assert.equal(callTimeout.res.body.error.code, 'UPSTREAM_TIMEOUT');
+      assert.equal(geminiCalled, false);
+
+      // 3. Missing Upstash config -> 503 CONFIGURATION_ERROR
+      const handlerMissingConfig = createChatHandler({
+        env: { ...TEST_ENV, UPSTASH_REDIS_REST_URL: '', UPSTASH_REDIS_REST_TOKEN: '' },
+        geminiClientFactory,
+      });
+      const callMissingConfig = createMockReqRes({
+        body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+      });
+      await handlerMissingConfig(callMissingConfig.req, callMissingConfig.res);
+      assert.equal(callMissingConfig.res.statusCode, 503);
+      assert.equal(callMissingConfig.res.body.error.code, 'CONFIGURATION_ERROR');
+      assert.equal(geminiCalled, false);
+
+      // 4. Invalid rateStatus contract in api/chat.js (e.g. non-positive current/limit/resetMs or negative remaining)
+      const invalidRateStatuses = [
+        { allowed: true, current: 0, limit: 10, remaining: 10, resetMs: 60_000 },
+        { allowed: true, current: 1, limit: 0, remaining: 0, resetMs: 60_000 },
+        { allowed: true, current: 1, limit: 10, remaining: -1, resetMs: 60_000 },
+        { allowed: true, current: 1, limit: 10, remaining: 9, resetMs: 0 },
+      ];
+
+      for (const badStatus of invalidRateStatuses) {
+        const brokenLimiter = {
+           async check() {
+            return badStatus;
+          },
+        };
+        const handlerBadStatus = createChatHandler({
+          env: TEST_ENV,
+          rateLimiter: brokenLimiter,
+          geminiClientFactory,
+        });
+        const callBad = createMockReqRes({
+          body: { message: 'Teknologi apa yang digunakan pada proyek AksesKita?', lang: 'id' },
+        });
+        await handlerBadStatus(callBad.req, callBad.res);
+        assert.equal(callBad.res.statusCode, 502);
+        assert.equal(callBad.res.body.error.code, 'RATE_LIMIT_SERVICE_ERROR');
+        assert.equal(geminiCalled, false);
+      }
+    });
+
+    it('verifies proxy IP trust model: Node runtime, Cloudflare Pages, Vercel, and invalid IP fallbacks', async () => {
+      // 1. Invalid IP strings must always normalize to 'anonymous', never arbitrary strings
+      assert.equal(normalizeIpForRateLimit('not-an-ip'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('custom-user-id-123'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('999.999.999.999'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('256.0.0.1'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('01.02.03.04'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('2001:db8::gggg'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('2001:db8::1::2'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('1.2.3.4, 5.6.7.8'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('[2001:db8::1'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('203.0.113.10:99999'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('203.0.113.10/32'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit('::'), 'anonymous');
+      assert.equal(normalizeIpForRateLimit(''), 'anonymous');
+      assert.equal(normalizeIpForRateLimit(null), 'anonymous');
+
+      // 2. Node biasa dengan spoofed cf-connecting-ip: diabaikan, gunakan socket.remoteAddress
+      const nodeSpoofedCf = {
+        headers: { 'cf-connecting-ip': '1.2.3.4' },
+        socket: { remoteAddress: '203.0.113.10' },
+      };
+      assert.equal(getClientIdentifier(nodeSpoofedCf, { env: {} }), '203.0.113.10');
+
+      // Node biasa tanpa socket: fallback ke 'anonymous', BUKAN cf-connecting-ip
+      assert.equal(getClientIdentifier({ headers: { 'cf-connecting-ip': '1.2.3.4' } }, { env: {} }), 'anonymous');
+
+      // 3. Node biasa dengan spoofed x-real-ip: diabaikan, gunakan socket.remoteAddress
+      const nodeSpoofedRealIp = {
+        headers: { 'x-real-ip': '1.2.3.4' },
+        socket: { remoteAddress: '203.0.113.20' },
+      };
+      assert.equal(getClientIdentifier(nodeSpoofedRealIp, { env: {} }), '203.0.113.20');
+      assert.equal(getClientIdentifier({ headers: { 'x-real-ip': '1.2.3.4' } }, { env: {} }), 'anonymous');
+
+      // 4. Node biasa dengan spoofed x-forwarded-for: diabaikan, gunakan socket.remoteAddress
+      const nodeSpoofedXff = {
+        headers: { 'x-forwarded-for': '1.2.3.4, 5.6.7.8' },
+        socket: { remoteAddress: '203.0.113.30' },
+      };
+      assert.equal(getClientIdentifier(nodeSpoofedXff, { env: {} }), '203.0.113.30');
+      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '1.2.3.4' } }, { env: {} }), 'anonymous');
+
+      // 5. Cloudflare Pages: cf-connecting-ip dipercaya hanya ketika runtime Cloudflare sudah terverifikasi
+      const cfPagesReq = {
+        headers: {
+          'cf-connecting-ip': '198.51.100.42',
+          'x-forwarded-for': '1.2.3.4', // spoofed XFF diabaikan
+          'x-real-ip': '5.6.7.8', // spoofed x-real-ip diabaikan
+        },
+        socket: { remoteAddress: '198.51.100.1' },
+      };
+      assert.equal(getClientIdentifier(cfPagesReq, { env: { CF_PAGES: '1' } }), '198.51.100.42');
+      assert.equal(getClientIdentifier(cfPagesReq, { trustCloudflare: true }), '198.51.100.42');
+      assert.equal(getClientIdentifier(cfPagesReq, { runtime: 'cloudflare-pages' }), '198.51.100.42');
+
+      // Cloudflare Pages: jika cf-connecting-ip tidak tersedia, TIDAK fallback ke x-forwarded-for / x-real-ip
+      const cfPagesMissingCfIp = {
+        headers: {
+          'x-forwarded-for': '1.2.3.4',
+          'x-real-ip': '5.6.7.8',
+        },
+        socket: { remoteAddress: '198.51.100.99' },
+      };
+      assert.equal(getClientIdentifier(cfPagesMissingCfIp, { env: { CF_PAGES: '1' } }), '198.51.100.99');
+      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '1.2.3.4' } }, { env: { CF_PAGES: '1' } }), 'anonymous');
+
+      // 6. Vercel: header client IP resmi (x-real-ip, x-vercel-forwarded-for, x-forwarded-for [first IP])
+      // 6a. x-real-ip resmi Vercel
+      const vercelRealIpReq = {
+        headers: {
+          'x-real-ip': '203.0.113.50',
+          'cf-connecting-ip': '1.2.3.4', // spoofed cf-connecting-ip diabaikan di Vercel
+        },
+        socket: { remoteAddress: '10.0.0.1' },
+      };
+      assert.equal(getClientIdentifier(vercelRealIpReq, { env: { VERCEL: '1' } }), '203.0.113.50');
+      assert.equal(getClientIdentifier(vercelRealIpReq, { trustVercel: true }), '203.0.113.50');
+
+      // 6b. x-vercel-forwarded-for resmi (first IP adalah client)
+      const vercelVffReq = {
+        headers: {
+          'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2',
+          'cf-connecting-ip': '1.2.3.4',
+        },
+      };
+      assert.equal(getClientIdentifier(vercelVffReq, { env: { VERCEL: '1' } }), '203.0.113.60');
+
+      // 6c. x-forwarded-for resmi Vercel (first IP adalah visitor, bukan rightmost)
+      const vercelXffReq = {
+        headers: {
+          'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6',
+          'cf-connecting-ip': '1.2.3.4',
+        },
+      };
+      assert.equal(getClientIdentifier(vercelXffReq, { env: { VERCEL: '1' } }), '203.0.113.70');
+
+      // 6d. Di Vercel: jika header resmi tidak ada, TIDAK fallback ke cf-connecting-ip
+      const vercelNoOfficial = {
+        headers: {
+          'cf-connecting-ip': '1.2.3.4',
+        },
+        socket: { remoteAddress: '203.0.113.80' },
+      };
+      assert.equal(getClientIdentifier(vercelNoOfficial, { env: { VERCEL: '1' } }), '203.0.113.80');
+      assert.equal(getClientIdentifier({ headers: { 'cf-connecting-ip': '1.2.3.4' } }, { env: { VERCEL: '1' } }), 'anonymous');
+
+      // 7. Header IP tidak valid dan fallback yang aman (Cloudflare, Vercel, Node)
+      assert.equal(
+        getClientIdentifier(
+          { headers: { 'cf-connecting-ip': 'invalid-ip' }, socket: { remoteAddress: '198.51.100.77' } },
+          { env: { CF_PAGES: '1' } }
+        ),
+        '198.51.100.77'
+      );
+      assert.equal(
+        getClientIdentifier(
+          { headers: { 'cf-connecting-ip': 'invalid-ip' } },
+          { env: { CF_PAGES: '1' } }
+        ),
+        'anonymous'
+      );
+
+      assert.equal(
+        getClientIdentifier(
+          {
+            headers: { 'x-real-ip': 'bad-ip', 'x-forwarded-for': 'also-bad' },
+            socket: { remoteAddress: '203.0.113.85' },
+          },
+          { env: { VERCEL: '1' } }
+        ),
+        '203.0.113.85'
+      );
+      assert.equal(
+        getClientIdentifier(
+          { headers: { 'x-real-ip': 'bad-ip', 'x-forwarded-for': 'also-bad' } },
+          { env: { VERCEL: '1' } }
+        ),
+        'anonymous'
+      );
+
+      assert.equal(
+        getClientIdentifier({
+          headers: { 'cf-connecting-ip': '1.2.3.4' },
+          socket: { remoteAddress: 'invalid-socket-ip' },
+        }),
+        'anonymous'
+      );
+
+      // 8. IPv4-mapped IPv6 addresses normalize to their IPv4 /32 address (not grouped together)
+      assert.equal(normalizeIpForRateLimit('::ffff:203.0.113.10'), '203.0.113.10');
+      assert.equal(normalizeIpForRateLimit('::ffff:198.51.100.5'), '198.51.100.5');
+
+      // 9. IPv6 addresses in the same /64 SLAAC network normalize to the same /64 prefix
+      const hostA = '2001:db8:85a3:0:1111:2222:3333:4444';
+      const hostB = '2001:0db8:85a3:0000:aaaa:bbbb:cccc:dddd';
+      const differentNetworkHost = '2001:db8:85a3:1::1';
+
+      assert.equal(normalizeIpForRateLimit(hostA), '2001:0db8:85a3:0000::/64');
+      assert.equal(normalizeIpForRateLimit(hostB), '2001:0db8:85a3:0000::/64');
+      assert.equal(normalizeIpForRateLimit(differentNetworkHost), '2001:0db8:85a3:0001::/64');
+
+      // Rate limiter shares counter across IID rotations in the same /64, but isolates different /64 networks
+      const { fetchImpl: upstashFetch } = createSimulatedUpstashFetch();
+      const limiter = createUpstashRateLimiter({
+        restUrl: TEST_ENV.UPSTASH_REDIS_REST_URL,
+        restToken: TEST_ENV.UPSTASH_REDIS_REST_TOKEN,
+        maxRequests: 1,
+        windowMs: 60_000,
+        fetchImpl: upstashFetch,
+      });
+
+      const checkHostA = await limiter.check(hostA);
+      assert.equal(checkHostA.allowed, true);
+      assert.equal(checkHostA.current, 1);
+
+      const checkHostB = await limiter.check(hostB);
+      assert.equal(checkHostB.allowed, false);
+      assert.equal(checkHostB.current, 2);
+
+      const checkOtherNet = await limiter.check(differentNetworkHost);
+      assert.equal(checkOtherNet.allowed, true);
+      assert.equal(checkOtherNet.current, 1);
     });
 
     it('validates HTTP method (405), empty message (400), message > 500 chars (400), payload > 16KB (413), and invalid JSON (400)', async () => {

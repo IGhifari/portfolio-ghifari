@@ -295,11 +295,31 @@ export const createChatHandler = ({
         fetchImpl,
       });
 
-    // 5. Execute Shared Rate Limiting (Upstash Redis)
-    const clientIp = getClientIdentifier(req);
+    // 5. Execute Shared Rate Limiting (Upstash Redis) — strictly fail-closed before Gemini
+    const clientIp = getClientIdentifier(req, { env });
     let rateStatus;
     try {
       rateStatus = await activeRateLimiter.check(clientIp);
+      if (
+        !rateStatus ||
+        typeof rateStatus.allowed !== 'boolean' ||
+        typeof rateStatus.current !== 'number' ||
+        !Number.isInteger(rateStatus.current) ||
+        rateStatus.current <= 0 ||
+        typeof rateStatus.limit !== 'number' ||
+        !Number.isInteger(rateStatus.limit) ||
+        rateStatus.limit <= 0 ||
+        typeof rateStatus.remaining !== 'number' ||
+        !Number.isInteger(rateStatus.remaining) ||
+        rateStatus.remaining < 0 ||
+        typeof rateStatus.resetMs !== 'number' ||
+        !Number.isFinite(rateStatus.resetMs) ||
+        rateStatus.resetMs <= 0
+      ) {
+        const invalidStatusErr = new Error('Invalid rate limiter status response');
+        invalidStatusErr.code = 'UPSTASH_INVALID_RESPONSE';
+        throw invalidStatusErr;
+      }
     } catch (rateError) {
       if (rateError?.code === 'CONFIGURATION_ERROR') {
         return sendJson(res, 503, {
@@ -331,7 +351,7 @@ export const createChatHandler = ({
     const rateHeaders = {
       'X-RateLimit-Limit': rateStatus.limit,
       'X-RateLimit-Remaining': rateStatus.remaining,
-      'X-RateLimit-Reset': Math.ceil((rateStatus.resetMs || 0) / 1000),
+      'X-RateLimit-Reset': Math.ceil(rateStatus.resetMs / 1000),
     };
 
     if (!rateStatus.allowed) {
