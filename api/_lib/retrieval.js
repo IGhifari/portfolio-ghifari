@@ -72,14 +72,14 @@ const UNLISTED_PERSONAL_PATTERNS = [
  * Prompt injection and instruction-override patterns (Indonesian & English).
  */
 const PROMPT_INJECTION_PATTERNS = [
-  /ignore\s+(all\s+)?(previous|prior|above|system|developer)?\s*(instructions|rules|prompts|constraints|guidelines)/i,
-  /disregard\s+(all\s+)?(previous|prior|above|system|developer)?\s*(instructions|rules|prompts|constraints)/i,
-  /forget\s+(all\s+)?(previous|prior|above|your)?\s*(instructions|rules|prompts|context|training)/i,
-  /abaikan\s+(semua\s+|seluruh\s+)?(instruksi|aturan|perintah|batasan|konteks|prompt)/i,
-  /lupakan\s+(semua\s+|seluruh\s+)?(instruksi|aturan|perintah|batasan|konteks|prompt)/i,
+  /ignore\s+(all\s+)?(previous|prior|above|system|developer|your)?\s*(instructions|rules|prompts|constraints|guidelines|context|training|role|persona|task|identity|objective)/i,
+  /disregard\s+(all\s+)?(previous|prior|above|system|developer|your)?\s*(instructions|rules|prompts|constraints|guidelines|role|persona|task|identity)/i,
+  /forget\s+(all\s+)?(previous|prior|above|your)?\s*(instructions|rules|prompts|context|training|role|persona|task|identity)/i,
+  /abaikan\s+(semua\s+|seluruh\s+)?(instruksi|aturan|perintah|batasan|konteks|prompt|peran|tugas|identitas|tujuan)/i,
+  /lupakan\s+(semua\s+|seluruh\s+)?(instruksi|aturan|perintah|batasan|konteks|prompt|peran|tugas|identitas|tujuan)/i,
   /(system\s*override|developer\s*mode|jailbreak|dan\s*mode|god\s*mode|sudo\s*mode)/i,
-  /(you\s+are\s+now\s+(a|an)|act\s+as\s+(a|an)|pretend\s+(to\s+be|you\s+are))/i,
-  /(kamu\s+sekarang\s+adalah|berpura-puralah\s+menjadi|bertindaklah\s+sebagai)/i,
+  /(you\s+are\s+now\s+(a|an)|act\s+as\s+(a|an)|pretend\s+(to\s+be|you\s+are)|roleplay\s+as)/i,
+  /(kamu\s+sekarang\s+adalah|berpura-puralah\s+menjadi|bertindaklah\s+sebagai|mainkan\s+peran\s+sebagai)/i,
   /(reveal|print|output|show|repeat)\s+(your|the)\s+(system\s*prompt|hidden\s*instructions|api\s*key|secret)/i,
   /(tampilkan|bocorkan|cetak|ulangi)\s+(system\s*prompt|instruksi\s*sistem|api\s*key|rahasia)/i,
   /<\s*\/?\s*(system|instruction|prompt|developer)\s*>/i,

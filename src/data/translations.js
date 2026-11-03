@@ -318,8 +318,12 @@ export const translations = {
       },
       validation: {
         nameMin: "Nama wajib diisi minimal 2 karakter.",
+        nameMax: "Nama tidak boleh melebihi 100 karakter.",
         emailValid: "Harap masukkan alamat email yang valid.",
+        emailMax: "Alamat email tidak boleh melebihi 254 karakter.",
+        subjectMax: "Subjek tidak boleh melebihi 200 karakter.",
         messageMin: "Pesan wajib diisi minimal 10 karakter.",
+        messageMax: "Pesan tidak boleh melebihi 5000 karakter.",
       },
     },
 
@@ -694,8 +698,12 @@ export const translations = {
       },
       validation: {
         nameMin: "Name must be at least 2 characters.",
+        nameMax: "Name cannot exceed 100 characters.",
         emailValid: "Please enter a valid email address.",
+        emailMax: "Email address cannot exceed 254 characters.",
+        subjectMax: "Subject cannot exceed 200 characters.",
         messageMin: "Message must be at least 10 characters.",
+        messageMax: "Message cannot exceed 5000 characters.",
       },
     },
 

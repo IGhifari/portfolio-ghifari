@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,6 +21,7 @@ import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { directEmail, contactChannelsData } from '../data/contact';
+import { validateContactForm } from '../utils/contactValidation.js';
 import '../styles/Contact.css';
 
 const channelIconsByKey = {
@@ -81,12 +81,9 @@ const Contact = () => {
     const titles = toastTitles[language] || toastTitles.en;
     toast[type](<ToastBody title={titles[type]} message={message} />);
   };
-  const serviceId =
-    import.meta.env.VITE_EMAILJS_SERVICE_ID || import.meta.env.EMAILJS_SERVICE_ID;
-  const templateId =
-    import.meta.env.VITE_EMAILJS_TEMPLATE_ID || import.meta.env.EMAILJS_TEMPLATE_ID;
-  const publicKey =
-    import.meta.env.VITE_EMAILJS_PUBLIC_KEY || import.meta.env.EMAILJS_PUBLIC_KEY;
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
   const [formData, setFormData] = useState({
     emailto: 'Ghifari',
@@ -103,16 +100,7 @@ const Contact = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
-  const formSchema = useMemo(
-    () =>
-      z.object({
-        name: z.string().trim().min(2, t('contact.validation.nameMin')),
-        email: z.string().trim().email(t('contact.validation.emailValid')),
-        subject: z.string().trim().optional(),
-        message: z.string().trim().min(10, t('contact.validation.messageMin')),
-      }),
-    [t]
-  );
+
 
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
@@ -154,7 +142,7 @@ const Contact = () => {
     setErrors({});
     setSubmitStatus(null);
 
-    const validation = formSchema.safeParse(formData);
+    const validation = validateContactForm(formData, t);
     if (!validation.success) {
       const fieldErrors = {};
       validation.error.issues.forEach((issue) => {
@@ -320,6 +308,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder={t('contact.namePlaceholder')}
                   disabled={isSubmitting}
+                  maxLength={100}
                   className={`dark-form-input ${errors.name ? 'has-error' : ''}`}
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
@@ -346,6 +335,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder={t('contact.emailPlaceholder')}
                   disabled={isSubmitting}
+                  maxLength={254}
                   className={`dark-form-input ${errors.email ? 'has-error' : ''}`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
@@ -377,8 +367,16 @@ const Contact = () => {
                 onChange={handleChange}
                 placeholder={t('contact.subjectPlaceholder')}
                 disabled={isSubmitting}
-                className="dark-form-input"
+                maxLength={200}
+                className={`dark-form-input ${errors.subject ? 'has-error' : ''}`}
+                aria-invalid={errors.subject ? 'true' : 'false'}
+                aria-describedby={errors.subject ? 'subject-error' : undefined}
               />
+              {errors.subject && (
+                <p id="subject-error" className="font-mono text-xs text-rose-500 mt-1.5 flex items-center gap-1">
+                  <FiAlertCircle size={12} aria-hidden="true" /> {errors.subject}
+                </p>
+              )}
             </div>
 
             {/* Message */}
@@ -397,6 +395,7 @@ const Contact = () => {
                 rows={5}
                 placeholder={t('contact.messagePlaceholder')}
                 disabled={isSubmitting}
+                maxLength={5000}
                 className={`dark-form-input resize-y min-h-[120px] ${errors.message ? 'has-error' : ''}`}
                 aria-invalid={errors.message ? 'true' : 'false'}
                 aria-describedby={errors.message ? 'message-error' : undefined}
