@@ -6,18 +6,36 @@ import {
   FiArrowLeft,
   FiBriefcase,
   FiLayers,
+  FiX,
+  FiFilter,
+  FiSliders,
+  FiRotateCcw,
+  FiGithub,
+  FiExternalLink,
+  FiCode,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { allProjects } from '../data/projects';
+import {
+  getAvailableTechnologies,
+  getAvailableCategories,
+  filterProjects,
+  DEFAULT_CATEGORY,
+  DEFAULT_TECH,
+  DEFAULT_SORT,
+} from '../utils/projectExplorer';
 import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
 
 const CaseStudyList = () => {
   const { language, t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
 
+  // Search, Filters & Sorting state
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
+  const [selectedTech, setSelectedTech] = useState(DEFAULT_TECH);
+  const [sortBy, setSortBy] = useState(DEFAULT_SORT);
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -40,12 +58,12 @@ const CaseStudyList = () => {
   useEffect(() => {
     const title =
       language === 'id'
-        ? 'Studi Kasus Rekayasa Perangkat Lunak | M. Ghifari Bima Khadafi'
-        : 'Engineering Case Studies | M. Ghifari Bima Khadafi';
+        ? 'Penjelajah Proyek & Studi Kasus Rekayasa | M. Ghifari Bima Khadafi'
+        : 'Project Explorer & Engineering Case Studies | M. Ghifari Bima Khadafi';
     const description =
       language === 'id'
-        ? 'Bedah arsitektur teknis, analisis permasalahan, dan implementasi rekayasa perangkat lunak pada proyek-proyek pilihan M. Ghifari Bima Khadafi.'
-        : 'In-depth technical architecture breakdowns, problem evaluations, and software engineering implementations by M. Ghifari Bima Khadafi.';
+        ? 'Jelajahi dan temukan proyek rekayasa perangkat lunak, arsitektur teknis, dan studi kasus pilihan M. Ghifari Bima Khadafi berdasarkan teknologi, kategori, dan kata kunci.'
+        : 'Explore and discover software engineering projects, technical architectures, and case studies by M. Ghifari Bima Khadafi filtered by technology, category, and keywords.';
 
     updateDocumentMetadata({
       title,
@@ -58,44 +76,65 @@ const CaseStudyList = () => {
     });
   }, [language]);
 
-  // Filtered case studies
+  // Dynamically derived categories and technologies from allProjects
+  const availableCategories = useMemo(() => getAvailableCategories(allProjects), []);
+  const availableTechnologies = useMemo(() => getAvailableTechnologies(allProjects), []);
+
+  // Filtered and sorted projects
   const filteredProjects = useMemo(() => {
-    return allProjects.filter((project) => {
-      // Category filter
-      if (selectedFilter === 'fullstack' && project.categoryKey !== 'fullstack') return false;
-      if (selectedFilter === 'webapp' && project.categoryKey !== 'webapp') return false;
-      if (selectedFilter === 'internship' && project.id !== 'project-management' && project.id !== 'internship-journal') {
-        return false;
-      }
-
-      // Search query filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const titleMatch = project.title.toLowerCase().includes(query);
-        const descMatch = (project.description[language] || project.description.en || '').toLowerCase().includes(query);
-        const tagsMatch = project.tags.some((t) => t.toLowerCase().includes(query));
-        return titleMatch || descMatch || tagsMatch;
-      }
-
-      return true;
+    return filterProjects(allProjects, {
+      search: searchQuery,
+      category: selectedCategory,
+      technology: selectedTech,
+      sortBy,
     });
-  }, [language, searchQuery, selectedFilter]);
+  }, [searchQuery, selectedCategory, selectedTech, sortBy]);
+
+  const hasActiveFilters =
+    Boolean(searchQuery.trim()) ||
+    selectedCategory !== DEFAULT_CATEGORY ||
+    selectedTech !== DEFAULT_TECH ||
+    sortBy !== DEFAULT_SORT;
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory(DEFAULT_CATEGORY);
+    setSelectedTech(DEFAULT_TECH);
+    setSortBy(DEFAULT_SORT);
+  };
+
+  const getCategoryLabel = (catKey) => {
+    switch (catKey) {
+      case 'all':
+        return t('caseStudies.filterAll');
+      case 'fullstack':
+        return t('caseStudies.filterFullstack');
+      case 'webapp':
+        return t('caseStudies.filterWebapp');
+      case 'game':
+        return t('caseStudies.filterGame');
+      default:
+        return catKey.toUpperCase();
+    }
+  };
 
   return (
     <div className="w-full min-h-screen text-[var(--text-primary)] pt-24 pb-20 px-5 sm:px-6">
-      <div className="max-w-6xl mx-auto space-y-12">
+      <div className="max-w-6xl mx-auto space-y-10 sm:space-y-12">
         {/* Navigation Breadcrumb / Back Button */}
         <motion.div {...getFadeMotion(0)} className="flex items-center justify-between">
           <RouterLink
             to="/"
-            className="inline-flex items-center gap-2 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+            className="inline-flex items-center gap-2 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
           >
             <FiArrowLeft size={14} aria-hidden="true" />
             <span>{t('caseStudies.backToHome')}</span>
           </RouterLink>
 
           <span className="font-mono text-xs text-[var(--text-muted)]">
-            {filteredProjects.length} {language === 'id' ? 'Proyek' : 'Projects'}
+            {t('caseStudies.showingProjects')
+              .replace('{count}', filteredProjects.length)
+              .replace('{total}', allProjects.length)}
           </span>
         </motion.div>
 
@@ -112,7 +151,8 @@ const CaseStudyList = () => {
           </div>
 
           <h1 className="font-grotesk font-black text-3xl sm:text-5xl md:text-6xl tracking-tight text-[var(--text-primary)] uppercase leading-none">
-            {t('caseStudies.heading')}<span className="text-[var(--accent)]">.</span>
+            {t('caseStudies.heading')}
+            <span className="text-[var(--accent)]">.</span>
           </h1>
 
           <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] max-w-2xl leading-relaxed">
@@ -120,71 +160,222 @@ const CaseStudyList = () => {
           </p>
         </motion.header>
 
-        {/* Search & Filter Toolbar */}
+        {/* ==================================================
+            ADVANCED SEARCH & FILTER CONTROLS TOOLBAR
+            ================================================== */}
         <motion.div
           {...getFadeMotion(0.1)}
-          className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
+          className="space-y-4 p-5 rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
         >
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <FiSearch
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
-              size={16}
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('caseStudies.searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors"
-            />
+          {/* Top Row: Search Input + Sort Dropdown */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <FiSearch
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+                size={16}
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('caseStudies.searchPlaceholder')}
+                aria-label={t('caseStudies.searchLabel')}
+                className="w-full pl-10 pr-9 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  title={t('caseStudies.clearSearchAria')}
+                  aria-label={t('caseStudies.clearSearchAria')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                >
+                  <FiX size={15} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+
+            {/* Technology Filter Dropdown */}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <FiCode
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+                  aria-hidden="true"
+                />
+                <select
+                  value={selectedTech}
+                  onChange={(e) => setSelectedTech(e.target.value)}
+                  aria-label={t('caseStudies.techLabel')}
+                  className="pl-8 pr-8 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs text-[var(--text-primary)] outline-none cursor-pointer appearance-none transition-colors"
+                >
+                  <option value={DEFAULT_TECH}>{t('caseStudies.allTech')}</option>
+                  {availableTechnologies.map((tech) => (
+                    <option key={tech} value={tech}>
+                      {tech}
+                    </option>
+                  ))}
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)] text-[10px]">
+                  ▼
+                </span>
+              </div>
+
+              {/* Sort By Dropdown */}
+              <div className="relative">
+                <FiSliders
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+                  aria-hidden="true"
+                />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  aria-label={t('caseStudies.sortLabel')}
+                  className="pl-8 pr-8 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs text-[var(--text-primary)] outline-none cursor-pointer appearance-none transition-colors"
+                >
+                  <option value="featured">{t('caseStudies.sortFeatured')}</option>
+                  <option value="title-asc">{t('caseStudies.sortNameAsc')}</option>
+                  <option value="title-desc">{t('caseStudies.sortNameDesc')}</option>
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)] text-[10px]">
+                  ▼
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" role="tablist">
-            {[
-              { key: 'all', label: t('caseStudies.filterAll') },
-              { key: 'fullstack', label: t('caseStudies.filterFullstack') },
-              { key: 'webapp', label: t('caseStudies.filterWebapp') },
-              { key: 'internship', label: t('caseStudies.filterInternship') },
-            ].map(({ key, label }) => {
-              const active = selectedFilter === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setSelectedFilter(key)}
-                  className={`px-3 py-1.5 rounded-md font-mono text-xs font-semibold whitespace-nowrap transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
-                    active
-                      ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-xs'
-                      : 'bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+          {/* Bottom Row: Category Filter Pills + Active Filter Badges */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[var(--border-subtle)]">
+            {/* Category Pills */}
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t('caseStudies.categoryLabel')}>
+              {availableCategories.map((catKey) => {
+                const active = selectedCategory === catKey;
+                return (
+                  <button
+                    key={catKey}
+                    type="button"
+                    onClick={() => setSelectedCategory(catKey)}
+                    aria-pressed={active}
+                    className={`px-3 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider whitespace-nowrap transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                      active
+                        ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-xs'
+                        : 'bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                    }`}
+                  >
+                    {getCategoryLabel(catKey)}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Reset Filters CTA if active */}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors cursor-pointer"
+              >
+                <FiRotateCcw size={12} aria-hidden="true" />
+                <span>{t('caseStudies.resetFilters')}</span>
+              </button>
+            )}
           </div>
+
+          {/* Active Filter Summary Badges */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-xs text-[var(--text-muted)]">
+              <span className="text-[11px] uppercase tracking-wider">{t('caseStudies.activeFiltersLabel')}</span>
+
+              {searchQuery.trim() && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-[11px]">
+                  <span>&quot;{searchQuery.trim()}&quot;</span>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="hover:text-[var(--accent)] cursor-pointer"
+                    aria-label={t('caseStudies.clearSearchAria')}
+                  >
+                    <FiX size={12} aria-hidden="true" />
+                  </button>
+                </span>
+              )}
+
+              {selectedCategory !== DEFAULT_CATEGORY && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-[11px]">
+                  <span>{getCategoryLabel(selectedCategory)}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory(DEFAULT_CATEGORY)}
+                    className="hover:text-[var(--accent)] cursor-pointer"
+                    aria-label="Reset category"
+                  >
+                    <FiX size={12} aria-hidden="true" />
+                  </button>
+                </span>
+              )}
+
+              {selectedTech !== DEFAULT_TECH && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--accent)] text-[11px]">
+                  <span>{selectedTech}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTech(DEFAULT_TECH)}
+                    className="hover:text-[var(--text-primary)] cursor-pointer"
+                    aria-label="Reset tech filter"
+                  >
+                    <FiX size={12} aria-hidden="true" />
+                  </button>
+                </span>
+              )}
+
+              {sortBy !== DEFAULT_SORT && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--text-muted)] text-[11px]">
+                  <span>{sortBy === 'title-asc' ? 'A–Z' : 'Z–A'}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSortBy(DEFAULT_SORT)}
+                    className="hover:text-[var(--text-primary)] cursor-pointer"
+                    aria-label="Reset sort"
+                  >
+                    <FiX size={12} aria-hidden="true" />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </motion.div>
 
-        {/* Case Studies Grid */}
+        {/* ==================================================
+            PROJECT EXPLORER GRID & EMPTY STATE
+            ================================================== */}
         {filteredProjects.length === 0 ? (
-          <div className="p-12 text-center rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-4">
-            <p className="font-mono text-sm text-[var(--text-secondary)]">
-              {t('caseStudies.noResults')}
-            </p>
+          <motion.div
+            {...getFadeMotion(0.15)}
+            className="p-12 text-center rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-4"
+          >
+            <div className="w-12 h-12 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] mx-auto flex items-center justify-center text-[var(--text-muted)]">
+              <FiFilter size={20} aria-hidden="true" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="font-grotesk font-black text-xl text-[var(--text-primary)] uppercase">
+                {t('caseStudies.noResultsHeading')}
+              </h2>
+              <p className="font-sans text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto">
+                {t('caseStudies.noResultsSub')}
+              </p>
+            </div>
             <button
               type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedFilter('all');
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-xs font-mono font-bold text-[var(--accent)] transition-colors cursor-pointer"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-xs font-mono font-bold text-[var(--accent)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
-              <span>{t('caseStudies.viewAll')}</span>
+              <FiRotateCcw size={13} aria-hidden="true" />
+              <span>{t('caseStudies.resetFilters')}</span>
             </button>
-          </div>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project, idx) => {
@@ -199,11 +390,11 @@ const CaseStudyList = () => {
               return (
                 <motion.article
                   key={project.id}
-                  {...getFadeMotion(0.08 * (idx % 6))}
-                  className="group bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg overflow-hidden flex flex-col justify-between transition-all duration-300"
+                  {...getFadeMotion(0.06 * (idx % 6))}
+                  className="group bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--accent)] rounded-lg overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-md"
                 >
                   <div>
-                      {/* Project Thumbnail */}
+                    {/* Project Thumbnail */}
                     <div className="relative aspect-[16/9] w-full bg-[var(--surface-alt)] overflow-hidden border-b border-[var(--border-subtle)]">
                       {project.image ? (
                         <img
@@ -220,11 +411,11 @@ const CaseStudyList = () => {
 
                       {/* Top Badges */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[var(--accent)] border border-[var(--border)] tracking-wider uppercase">
+                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-black/85 backdrop-blur-sm text-[var(--accent)] border border-[var(--border)] tracking-wider uppercase">
                           {categoryLabel}
                         </span>
                         {isInternship && (
-                          <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-950/80 backdrop-blur-sm text-blue-300 border border-blue-800 tracking-wider flex items-center gap-1">
+                          <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-950/85 backdrop-blur-sm text-blue-300 border border-blue-800 tracking-wider flex items-center gap-1">
                             <FiBriefcase size={10} aria-hidden="true" />
                             <span>PT. AMA SALAM</span>
                           </span>
@@ -239,7 +430,7 @@ const CaseStudyList = () => {
                           {project.title}
                         </h2>
                         {subtitleText && (
-                          <p className="font-mono text-xs text-[var(--text-muted)] mt-1">
+                          <p className="font-mono text-xs text-[var(--text-muted)] mt-1 line-clamp-1">
                             {subtitleText}
                           </p>
                         )}
@@ -251,14 +442,27 @@ const CaseStudyList = () => {
 
                       {/* Tech Tags */}
                       <div className="flex flex-wrap gap-1.5 pt-1">
-                        {project.tags.slice(0, 5).map((tag) => (
-                          <span
-                            key={tag}
-                            className="font-mono text-[10px] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                        {project.tags.slice(0, 5).map((tag) => {
+                          const isHighlighted =
+                            selectedTech !== DEFAULT_TECH &&
+                            tag.toLowerCase().includes(selectedTech.toLowerCase());
+
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => setSelectedTech(tag)}
+                              className={`font-mono text-[10px] px-2 py-0.5 rounded border transition-colors cursor-pointer ${
+                                isHighlighted
+                                  ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-[var(--accent)]'
+                                  : 'bg-[var(--surface-alt)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)]'
+                              }`}
+                              title={`Filter by ${tag}`}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
                         {project.tags.length > 5 && (
                           <span className="font-mono text-[10px] px-1.5 py-0.5 text-[var(--text-muted)]">
                             +{project.tags.length - 5}
@@ -268,11 +472,11 @@ const CaseStudyList = () => {
                     </div>
                   </div>
 
-                  {/* Card CTA Footer */}
-                  <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-[var(--border-subtle)] bg-[var(--surface-muted)]">
+                  {/* Card Footer: External links (if available) + Read Case Study CTA */}
+                  <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-[var(--border-subtle)] bg-[var(--surface-muted)] flex items-center justify-between">
                     <RouterLink
                       to={`/study-case/${project.id}`}
-                      className="inline-flex items-center justify-between w-full py-2 font-mono text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors"
+                      className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
                     >
                       <span>{t('caseStudies.readCaseStudy')}</span>
                       <FiArrowRight
@@ -281,6 +485,34 @@ const CaseStudyList = () => {
                         aria-hidden="true"
                       />
                     </RouterLink>
+
+                    {/* Subtle External Links (GitHub & Live) if present */}
+                    <div className="flex items-center gap-2">
+                      {project.github && (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="GitHub Repository"
+                          aria-label={`${project.title} GitHub Repository`}
+                          className="text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        >
+                          <FiGithub size={14} aria-hidden="true" />
+                        </a>
+                      )}
+                      {project.live && (
+                        <a
+                          href={project.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Live Demo"
+                          aria-label={`${project.title} Live Demo`}
+                          className="text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        >
+                          <FiExternalLink size={14} aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </motion.article>
               );
@@ -292,7 +524,7 @@ const CaseStudyList = () => {
         <motion.div {...getFadeMotion(0.2)} className="pt-8 text-center border-t border-[var(--border-subtle)]">
           <RouterLink
             to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
             <FiArrowLeft size={14} aria-hidden="true" />
             <span>{t('caseStudies.backToHome')}</span>

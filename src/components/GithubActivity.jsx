@@ -311,6 +311,17 @@ const GithubActivity = () => {
                       @{profile?.login || 'IGhifari'}
                     </span>
                   </div>
+
+                  <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-secondary)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
+                      {t('github.verifiedBadge')}
+                    </span>
+
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-muted)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
+                      {fromCache ? t('github.cachedBadge') : t('github.liveBadge')}
+                    </span>
+                  </div>
                 </div>
               </div>
 
