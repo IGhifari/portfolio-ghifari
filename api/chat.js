@@ -33,12 +33,49 @@ const historyMessageSchema = z.object({
   content: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
 });
 
+/**
+ * Validates conversational turn sequence and role alternation in history.
+ * History, if provided, must:
+ * 1. Be an even number of turns (pairs of user -> assistant).
+ * 2. Start with role 'user'.
+ * 3. End with role 'assistant' (since the active message represents the next 'user' turn).
+ * 4. Strictly alternate roles between 'user' and 'assistant'.
+ */
+export const isValidHistoryStructure = (history) => {
+  if (!Array.isArray(history) || history.length === 0) {
+    return true;
+  }
+  if (history.length % 2 !== 0) {
+    return false;
+  }
+  if (history[0]?.role !== 'user') {
+    return false;
+  }
+  if (history[history.length - 1]?.role !== 'assistant') {
+    return false;
+  }
+  for (let i = 0; i < history.length; i++) {
+    const expectedRole = i % 2 === 0 ? 'user' : 'assistant';
+    if (history[i]?.role !== expectedRole) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const chatRequestSchema = z
   .object({
     message: z.string(),
     lang: z.enum(SUPPORTED_LANGUAGES).optional(),
     language: z.enum(SUPPORTED_LANGUAGES).optional(),
-    history: z.array(historyMessageSchema).max(MAX_HISTORY_ITEMS).optional(),
+    history: z
+      .array(historyMessageSchema)
+      .max(MAX_HISTORY_ITEMS)
+      .refine(isValidHistoryStructure, {
+        message:
+          'History must be alternating user and assistant turns starting with user and ending with assistant.',
+      })
+      .optional(),
   })
   .strict();
 
