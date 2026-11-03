@@ -17,11 +17,8 @@ const Profile = () => {
   const { t } = useLanguage();
   const { scrollY } = useScroll();
 
-  const [textures, setTextures] = useState({
-    frontImage: profileData.avatarImage,
-    backImage: profileData.avatarImage,
-    strapImage: undefined,
-  });
+  const [textures, setTextures] = useState(null);
+  const [isLanyardReady, setIsLanyardReady] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
   );
@@ -37,6 +34,10 @@ const Profile = () => {
     generateLanyardTextures({ isDark }).then((generated) => {
       if (active && generated) {
         setTextures(generated);
+        // Stagger Lanyard mount by 1 animation frame so DOM & Threads settle cleanly
+        requestAnimationFrame(() => {
+          if (active) setIsLanyardReady(true);
+        });
       }
     });
     return () => {
@@ -93,32 +94,38 @@ const Profile = () => {
         aria-hidden="true"
       />
 
-      {/* Full-Screen Unbounded 3D Lanyard Overlay (In front of Hero text at z-30, strap connected to Navbar at y=62px) */}
-      <div className="absolute inset-0 w-full h-full z-30 pointer-events-none">
-        <Suspense fallback={null}>
-          <Lanyard
-            frontImage={textures.frontImage}
-            backImage={textures.backImage}
-            strapImage={textures.strapImage}
-            cardColor={isDark ? '#141418' : '#F7F7F5'}
-            strapColor={isDark ? '#111116' : '#18181B'}
-            finish="glossy"
-            orientation="portrait"
-            cornerRadius={0.22}
-            anchor={isDesktop ? 'right' : 'center'}
-            anchorOffsetY={62}
-            size={isDesktop ? 0.38 : 0.27}
-            strapLength={isDesktop ? 0.22 : 0.11}
-            strapWidth={0.65}
-            metal={isDark ? 'silver' : 'graphite'}
-            gravity={1}
-            damping={0.45}
-            elasticity={0.52}
-            breeze={0.35}
-            interactive={true}
-            intro={true}
-          />
-        </Suspense>
+      {/* Full-Screen Unbounded 3D Lanyard Overlay (Fades in smoothly once textures are ready to prevent Chromium swapchain stall) */}
+      <div
+        className={`absolute inset-0 w-full h-full z-30 pointer-events-none transition-opacity duration-500 ease-out ${
+          isLanyardReady && textures ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        {isLanyardReady && textures && (
+          <Suspense fallback={null}>
+            <Lanyard
+              frontImage={textures.frontImage}
+              backImage={textures.backImage}
+              strapImage={textures.strapImage}
+              cardColor={isDark ? '#141418' : '#F7F7F5'}
+              strapColor={isDark ? '#111116' : '#18181B'}
+              finish="glossy"
+              orientation="portrait"
+              cornerRadius={0.22}
+              anchor={isDesktop ? 'right' : 'center'}
+              anchorOffsetY={62}
+              size={isDesktop ? 0.38 : 0.27}
+              strapLength={isDesktop ? 0.22 : 0.11}
+              strapWidth={0.65}
+              metal={isDark ? 'silver' : 'graphite'}
+              gravity={1}
+              damping={0.45}
+              elasticity={0.52}
+              breeze={0.35}
+              interactive={true}
+              intro={true}
+            />
+          </Suspense>
+        )}
       </div>
 
       {/* Main Hero Text Content (z-10 behind the 3D Lanyard at z-30) */}
