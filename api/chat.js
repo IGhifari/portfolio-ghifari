@@ -139,6 +139,9 @@ export const createChatHandler = ({
   env = process.env,
   fetchImpl = globalThis.fetch,
   geminiClientFactory,
+  trustCloudflare,
+  trustVercel,
+  runtime,
 } = {}) => {
   return async function chatHandler(req, res) {
     // 1. Validate HTTP Method
@@ -296,7 +299,12 @@ export const createChatHandler = ({
       });
 
     // 5. Execute Shared Rate Limiting (Upstash Redis) — strictly fail-closed before Gemini
-    const clientIp = getClientIdentifier(req, { env });
+    const clientIp = getClientIdentifier(req, {
+      env,
+      trustCloudflare,
+      trustVercel,
+      runtime,
+    });
     let rateStatus;
     try {
       rateStatus = await activeRateLimiter.check(clientIp);

@@ -992,8 +992,9 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(getClientIdentifier(cfPagesReq, { env: { CF_PAGES: '1' } }), '198.51.100.42');
       assert.equal(getClientIdentifier(cfPagesReq, { trustCloudflare: true }), '198.51.100.42');
       assert.equal(getClientIdentifier(cfPagesReq, { runtime: 'cloudflare-pages' }), '198.51.100.42');
+      assert.equal(getClientIdentifier({ ...cfPagesReq, isCloudflarePages: true }, { env: {} }), '198.51.100.42');
 
-      // Cloudflare Pages: jika cf-connecting-ip tidak tersedia, TIDAK fallback ke x-forwarded-for / x-real-ip
+      // Cloudflare Pages: jika cf-connecting-ip tidak tersedia atau berisi comma-separated/invalid, TIDAK fallback ke x-forwarded-for / x-real-ip
       const cfPagesMissingCfIp = {
         headers: {
           'x-forwarded-for': '1.2.3.4',
@@ -1004,8 +1005,18 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(getClientIdentifier(cfPagesMissingCfIp, { env: { CF_PAGES: '1' } }), '198.51.100.99');
       assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '1.2.3.4' } }, { env: { CF_PAGES: '1' } }), 'anonymous');
 
-      // 6. Vercel: header client IP resmi (x-real-ip, x-vercel-forwarded-for, x-forwarded-for [first IP])
-      // 6a. x-real-ip resmi Vercel
+      const cfPagesCommaCfIp = {
+        headers: {
+          'cf-connecting-ip': '198.51.100.42, 198.51.100.43',
+          'x-forwarded-for': '1.2.3.4',
+        },
+        socket: { remoteAddress: '198.51.100.88' },
+      };
+      assert.equal(getClientIdentifier(cfPagesCommaCfIp, { trustCloudflare: true }), '198.51.100.88');
+      assert.equal(getClientIdentifier({ headers: { 'cf-connecting-ip': '198.51.100.42, 198.51.100.43' } }, { trustCloudflare: true }), 'anonymous');
+
+      // 6. Vercel: header client IP resmi (x-real-ip, x-vercel-forwarded-for, x-forwarded-for)
+      // 6a. Single valid IP pada masing-masing header resmi Vercel diterima
       const vercelRealIpReq = {
         headers: {
           'x-real-ip': '203.0.113.50',
@@ -1016,25 +1027,54 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(getClientIdentifier(vercelRealIpReq, { env: { VERCEL: '1' } }), '203.0.113.50');
       assert.equal(getClientIdentifier(vercelRealIpReq, { trustVercel: true }), '203.0.113.50');
 
-      // 6b. x-vercel-forwarded-for resmi (first IP adalah client)
-      const vercelVffReq = {
+      const vercelSingleVffReq = {
+        headers: {
+          'x-vercel-forwarded-for': '203.0.113.60',
+          'cf-connecting-ip': '1.2.3.4',
+        },
+      };
+      assert.equal(getClientIdentifier(vercelSingleVffReq, { env: { VERCEL: '1' } }), '203.0.113.60');
+
+      const vercelSingleXffReq = {
+        headers: {
+          'x-forwarded-for': '203.0.113.70',
+          'cf-connecting-ip': '1.2.3.4',
+        },
+      };
+      assert.equal(getClientIdentifier(vercelSingleXffReq, { env: { VERCEL: '1' } }), '203.0.113.70');
+
+      // 6b. Comma-separated values pada header Vercel DITOLAK (tanpa first-hop / rightmost-hop extraction)
+      // dan fallback ke socket.remoteAddress jika valid, atau 'anonymous'
+      const vercelCommaRealIp = {
+        headers: {
+          'x-real-ip': '203.0.113.50, 198.51.100.1',
+        },
+        socket: { remoteAddress: '203.0.113.91' },
+      };
+      assert.equal(getClientIdentifier(vercelCommaRealIp, { env: { VERCEL: '1' } }), '203.0.113.91');
+      assert.equal(getClientIdentifier({ headers: { 'x-real-ip': '203.0.113.50, 198.51.100.1' } }, { env: { VERCEL: '1' } }), 'anonymous');
+
+      const vercelCommaVffReq = {
         headers: {
           'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2',
           'cf-connecting-ip': '1.2.3.4',
         },
+        socket: { remoteAddress: '203.0.113.92' },
       };
-      assert.equal(getClientIdentifier(vercelVffReq, { env: { VERCEL: '1' } }), '203.0.113.60');
+      assert.equal(getClientIdentifier(vercelCommaVffReq, { env: { VERCEL: '1' } }), '203.0.113.92');
+      assert.equal(getClientIdentifier({ headers: { 'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2' } }, { env: { VERCEL: '1' } }), 'anonymous');
 
-      // 6c. x-forwarded-for resmi Vercel (first IP adalah visitor, bukan rightmost)
-      const vercelXffReq = {
+      const vercelCommaXffReq = {
         headers: {
           'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6',
           'cf-connecting-ip': '1.2.3.4',
         },
+        socket: { remoteAddress: '203.0.113.93' },
       };
-      assert.equal(getClientIdentifier(vercelXffReq, { env: { VERCEL: '1' } }), '203.0.113.70');
+      assert.equal(getClientIdentifier(vercelCommaXffReq, { env: { VERCEL: '1' } }), '203.0.113.93');
+      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6' } }, { env: { VERCEL: '1' } }), 'anonymous');
 
-      // 6d. Di Vercel: jika header resmi tidak ada, TIDAK fallback ke cf-connecting-ip
+      // 6c. Di Vercel: jika header resmi tidak ada, TIDAK fallback ke cf-connecting-ip
       const vercelNoOfficial = {
         headers: {
           'cf-connecting-ip': '1.2.3.4',
@@ -1120,6 +1160,50 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       const checkOtherNet = await limiter.check(differentNetworkHost);
       assert.equal(checkOtherNet.allowed, true);
       assert.equal(checkOtherNet.current, 1);
+    });
+
+    it('ensures createChatHandler passes trusted proxy options to getClientIdentifier and isolates Node runtime', async () => {
+      let recordedIdentifier = null;
+      const trackingLimiter = {
+        async check(id) {
+          recordedIdentifier = id;
+          return {
+            allowed: true,
+            limit: 10,
+            current: 1,
+            remaining: 9,
+            resetMs: 60_000,
+            retryAfterSeconds: 60,
+          };
+        },
+      };
+
+      // 1. In plain Node runtime (no options, no env), spoofed cf-connecting-ip is ignored
+      const plainHandler = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: trackingLimiter,
+      });
+      const nodeCall = createMockReqRes({
+        headers: { 'cf-connecting-ip': '1.2.3.4' },
+        body: { message: 'Halo' },
+      });
+      nodeCall.req.socket.remoteAddress = '203.0.113.111';
+      await plainHandler(nodeCall.req, nodeCall.res);
+      assert.equal(recordedIdentifier, '203.0.113.111');
+
+      // 2. In verified Cloudflare runtime (trustCloudflare: true), cf-connecting-ip is trusted
+      const cfHandler = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: trackingLimiter,
+        trustCloudflare: true,
+      });
+      const cfCall = createMockReqRes({
+        headers: { 'cf-connecting-ip': '198.51.100.222' },
+        body: { message: 'Halo' },
+      });
+      cfCall.req.socket.remoteAddress = '203.0.113.111';
+      await cfHandler(cfCall.req, cfCall.res);
+      assert.equal(recordedIdentifier, '198.51.100.222');
     });
 
     it('validates HTTP method (405), empty message (400), message > 500 chars (400), payload > 16KB (413), and invalid JSON (400)', async () => {
