@@ -15,6 +15,7 @@ const Navbar = () => {
   const navItems = [
     { to: 'projects', label: t('nav.work') },
     { to: 'about', label: t('nav.about') },
+    { to: 'experience', label: t('nav.experience') },
     { to: 'journey', label: t('nav.journey') },
     { to: 'stack', label: t('nav.stack') },
     { to: 'certificates', label: t('nav.certificates') },
@@ -79,7 +80,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Main Navigation">
+        <nav className="hidden lg:flex items-center gap-3.5 xl:gap-6" aria-label="Main Navigation">
           {navItems.map(({ to, label }) => (
             <Link
               key={to}

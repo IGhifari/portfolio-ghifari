@@ -14,6 +14,7 @@ import Project from './components/Project';
 const SoundButton = lazy(() => import('./components/SoundButton'));
 const ChatAssistant = lazy(() => import('./components/ChatAssistant'));
 const About = lazy(() => import('./components/About'));
+const Experience = lazy(() => import('./components/Experience'));
 const Journey = lazy(() => import('./components/Journey'));
 const Skills = lazy(() => import('./components/Skill'));
 const Certificate = lazy(() => import('./components/Certificate'));
@@ -108,6 +109,13 @@ const App = () => {
             <section id="about" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
                 <DeferredSection>
                     <About/>
+                </DeferredSection>
+            </section>
+
+            {/* Work Experience */}
+            <section id="experience" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                <DeferredSection>
+                    <Experience/>
                 </DeferredSection>
             </section>
 

@@ -9,6 +9,7 @@ export const translations = {
     nav: {
       work: "PROYEK",
       about: "TENTANG",
+      experience: "PENGALAMAN",
       journey: "PERJALANAN",
       stack: "TEKNOLOGI",
       certificates: "SERTIFIKAT",
@@ -117,9 +118,29 @@ export const translations = {
       ],
     },
 
+    // Work Experience
+    experience: {
+      sectionTag: "03 / PENGALAMAN KERJA",
+      subTag: "PENGALAMAN INDUSTRI",
+      heading: "PENGALAMAN KERJA",
+      intro: "Rekam jejak pengalaman industri, tanggung jawab teknis, dan kontribusi nyata dalam pengembangan aplikasi web.",
+      durationLabel: "DURASI",
+      locationLabel: "LOKASI",
+      typeLabel: "TIPE",
+      responsibilitiesHeader: "TANGGUNG JAWAB & KONTRIBUSI UTAMA",
+      techHeader: "TEKNOLOGI YANG DIGUNAKAN",
+      viewCertificate: "LIHAT SERTIFIKAT MAGANG",
+      closeModal: "Tutup pratinjau",
+      verifiedBadge: "TERVERIFIKASI",
+      issuerLabel: "Penerbit",
+      periodLabel: "Periode",
+      credentialLabel: "Status Kredensial",
+      credentialVerified: "Sertifikat Magang Resmi Terverifikasi",
+    },
+
     // Journey
     journey: {
-      sectionTag: "03 / PERJALANAN",
+      sectionTag: "04 / PERJALANAN",
       heading: "PERJALANAN PENGEMBANGAN",
       intro: "Perkembangan kronologis dari fondasi pemrograman hingga pengembangan aplikasi full-stack.",
       milestones: [
@@ -144,8 +165,8 @@ export const translations = {
           stage: "PENGEMBANGAN SISTEM & PRODUK",
           focus: "Aplikasi Skalabel & Platform Inklusif",
           description:
-            "Mengembangkan aplikasi full-stack mandiri dan kolaboratif, seperti platform aksesibilitas AksesKita, Sistem Manajemen Proyek, dan marketplace Food. Berfokus pada integrasi REST API, perancangan skema database, validasi input, dan antarmuka yang ramah pengguna.",
-          highlights: ["AksesKita Platform", "Project Management System", "Food Marketplace", "Accessibility (a11y)"],
+            "Mengembangkan aplikasi full-stack mandiri dan sistem kolaboratif industri, seperti platform aksesibilitas AksesKita, Project Management System di PT. AMA Salam Indonesia, dan marketplace Food. Berfokus pada integrasi REST API, perancangan skema database, validasi input, dan antarmuka yang ramah pengguna.",
+          highlights: ["AksesKita Platform", "Project Management (PT. AMA Salam)", "Food Marketplace", "Accessibility (a11y)"],
         },
         {
           number: "04",
@@ -160,37 +181,45 @@ export const translations = {
 
     // Tech Stack
     stack: {
-      sectionTag: "04 / TEKNOLOGI",
+      sectionTag: "05 / TEKNOLOGI",
       heading: "TEKNOLOGI YANG SAYA GUNAKAN",
       intro: "Kumpulan teknologi praktis untuk merancang, membangun, dan menerapkan aplikasi web modern dari antarmuka hingga basis data.",
       coreTech: "Teknologi Utama",
       categories: {
+        languages: {
+          title: "BAHASA PEMROGRAMAN",
+          description: "Sintaks utama, sistem pengetikan statis, dan bahasa skrip yang digunakan lintas proyek.",
+        },
         frontend: {
-          title: "FRONTEND",
-          badge: "// 01",
-          description: "Arsitektur komponen modern, antarmuka pengguna yang dinamis, dan sistem client ber-tipe.",
+          title: "PENGEMBANGAN FRONTEND",
+          description: "Antarmuka web reaktif, arsitektur komponen modular, dan tata letak responsif.",
         },
         backend: {
-          title: "BACKEND",
-          badge: "// 02",
-          description: "Layanan RESTful skalabel, middleware server, validasi skema, dan autentikasi.",
+          title: "PENGEMBANGAN BACKEND",
+          description: "Runtime sisi server, arsitektur REST API, autentikasi aman, dan layanan backend.",
         },
         database: {
-          title: "DATABASE",
-          badge: "// 03",
-          description: "Skema database relasional, normalisasi, optimasi kueri, dan migrasi.",
+          title: "BASIS DATA & ORM",
+          description: "Perancangan skema relasional, object-relational mapping, dan optimasi kueri.",
+        },
+        ai: {
+          title: "INTEGRASI AI & LLM",
+          description: "Integrasi API model bahasa, knowledge grounding terverifikasi, dan antrean worker asinkron.",
+        },
+        devops: {
+          title: "DEVOPS & DEPLOYMENT",
+          description: "Platform edge cloud, hosting statis, kontainerisasi, dan otomatisasi deployment.",
         },
         tools: {
-          title: "TOOLS & WORKFLOW",
-          badge: "// 04",
-          description: "Kontrol versi, alur pengujian API, lingkungan pengembangan, dan alat deployment.",
+          title: "DEVELOPER TOOLS",
+          description: "Alur kerja version control, pengujian API, inspeksi database, dan lingkungan pengembangan.",
         },
       },
     },
 
     // Certificates
     certificates: {
-      sectionTag: "05 / SERTIFIKAT",
+      sectionTag: "06 / SERTIFIKAT",
       subTag: "KREDENSIAL",
       heading: "SERTIFIKASI TEKNIS",
       intro: "Pelatihan kejuruan terverifikasi, kredensial magang praktis, dan pencapaian kompetisi pengembangan perangkat lunak.",
@@ -213,7 +242,7 @@ export const translations = {
 
     // Education / Academic Background
     education: {
-      sectionTag: "06 / PENDIDIKAN",
+      sectionTag: "07 / PENDIDIKAN",
       subTag: "LATAR BELAKANG AKADEMIK",
       heading: "PENDIDIKAN FORMAL",
       intro: "Riwayat pendidikan formal di bidang rekayasa perangkat lunak dan teknologi informasi, memadukan teori ilmu komputer dengan implementasi praktis.",
@@ -276,7 +305,7 @@ export const translations = {
 
     // Contact
     contact: {
-      sectionTag: "07 / KONTAK",
+      sectionTag: "08 / KONTAK",
       subTag: "HUBUNGI SAYA",
       heading: "MARI MEMBANGUN SESUATU YANG BERMANFAAT",
       intro: "Memiliki ide proyek, peluang kerja, atau rencana kolaborasi? Silakan kirim pesan langsung atau terhubung melalui saluran saya.",
@@ -397,6 +426,7 @@ export const translations = {
     nav: {
       work: "WORK",
       about: "ABOUT",
+      experience: "EXPERIENCE",
       journey: "JOURNEY",
       stack: "STACK",
       certificates: "CERTIFICATES",
@@ -505,9 +535,29 @@ export const translations = {
       ],
     },
 
+    // Work Experience
+    experience: {
+      sectionTag: "03 / WORK EXPERIENCE",
+      subTag: "INDUSTRY EXPERIENCE",
+      heading: "WORK EXPERIENCE",
+      intro: "Industry track record, technical responsibilities, and practical contributions in web software engineering.",
+      durationLabel: "DURATION",
+      locationLabel: "LOCATION",
+      typeLabel: "TYPE",
+      responsibilitiesHeader: "KEY RESPONSIBILITIES & CONTRIBUTIONS",
+      techHeader: "TECHNOLOGY STACK",
+      viewCertificate: "VIEW INTERNSHIP CERTIFICATE",
+      closeModal: "Close preview",
+      verifiedBadge: "VERIFIED",
+      issuerLabel: "Issuer",
+      periodLabel: "Period",
+      credentialLabel: "Credential Status",
+      credentialVerified: "Official Internship Certificate Verified",
+    },
+
     // Journey
     journey: {
-      sectionTag: "03 / JOURNEY",
+      sectionTag: "04 / JOURNEY",
       heading: "DEVELOPMENT JOURNEY",
       intro: "A chronological progression from core fundamentals to full-stack application development.",
       milestones: [
@@ -532,8 +582,8 @@ export const translations = {
           stage: "SYSTEM & PRODUCT DEVELOPMENT",
           focus: "Scalable Applications & Inclusive Platforms",
           description:
-            "Engineered full-stack applications including the AksesKita accessibility platform, Project Management System, and Food marketplace. Focused on REST API integration, database schema modeling, form validation, and accessible user interfaces.",
-          highlights: ["AksesKita Platform", "Project Management System", "Food Marketplace", "Accessibility (a11y)"],
+            "Engineered full-stack applications and collaborative industry systems, including the AksesKita accessibility platform, the Project Management System at PT. AMA Salam Indonesia, and the Food marketplace. Focused on REST API integration, database schema modeling, form validation, and accessible user interfaces.",
+          highlights: ["AksesKita Platform", "Project Management (PT. AMA Salam)", "Food Marketplace", "Accessibility (a11y)"],
         },
         {
           number: "04",
@@ -548,37 +598,45 @@ export const translations = {
 
     // Tech Stack
     stack: {
-      sectionTag: "04 / TECH STACK",
+      sectionTag: "05 / TECH STACK",
       heading: "TOOLS I WORK WITH",
       intro: "A practical stack for designing, building, and deploying modern web applications from interface to database.",
       coreTech: "Core Technology",
       categories: {
+        languages: {
+          title: "PROGRAMMING LANGUAGES",
+          description: "Core syntax, static type systems, and scripting languages implemented across projects.",
+        },
         frontend: {
-          title: "FRONTEND",
-          badge: "// 01",
-          description: "Modern component architectures, fluid user interfaces, and typed client systems.",
+          title: "FRONTEND DEVELOPMENT",
+          description: "Modern reactive user interfaces, component architectures, and responsive styling systems.",
         },
         backend: {
-          title: "BACKEND",
-          badge: "// 02",
-          description: "Scalable RESTful services, server middleware, schema validation, and authentication.",
+          title: "BACKEND DEVELOPMENT",
+          description: "Server-side runtimes, RESTful API architecture, authentication, and backend services.",
         },
         database: {
-          title: "DATABASE",
-          badge: "// 03",
-          description: "Relational database schemas, normalization, query optimizations, and migrations.",
+          title: "DATABASE & ORM",
+          description: "Relational database schema modeling, object-relational mapping, and query optimization.",
+        },
+        ai: {
+          title: "AI & LLM INTEGRATION",
+          description: "Language model API integration, strict knowledge grounding, and asynchronous worker queues.",
+        },
+        devops: {
+          title: "DEVOPS & DEPLOYMENT",
+          description: "Edge cloud platforms, static hosting, containerization, and deployment workflows.",
         },
         tools: {
-          title: "TOOLS & WORKFLOW",
-          badge: "// 04",
-          description: "Version control, API testing workflows, developer environments, and deployment tooling.",
+          title: "DEVELOPER TOOLS",
+          description: "Version control workflows, API testing clients, database inspectors, and development environments.",
         },
       },
     },
 
     // Certificates
     certificates: {
-      sectionTag: "05 / CERTIFICATES",
+      sectionTag: "06 / CERTIFICATES",
       subTag: "CREDENTIALS",
       heading: "TECHNICAL CERTIFICATIONS",
       intro: "Verified vocational training, practical internship credentials, and competitive software development achievements.",
@@ -601,7 +659,7 @@ export const translations = {
 
     // Education / Academic Background
     education: {
-      sectionTag: "06 / EDUCATION",
+      sectionTag: "07 / EDUCATION",
       subTag: "ACADEMIC BACKGROUND",
       heading: "FORMAL EDUCATION",
       intro: "Formal academic background in software engineering and information technology, combining computer science foundations with practical implementation.",
@@ -664,7 +722,7 @@ export const translations = {
 
     // Contact
     contact: {
-      sectionTag: "07 / CONTACT",
+      sectionTag: "08 / CONTACT",
       subTag: "GET IN TOUCH",
       heading: "LET'S BUILD SOMETHING USEFUL",
       intro: "Have a project, opportunity, or collaboration in mind? Feel free to send a message directly or connect via my channels.",

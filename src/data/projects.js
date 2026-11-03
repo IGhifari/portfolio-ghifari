@@ -61,26 +61,26 @@ export const selectedProjects = [
     number: "02",
     categoryKey: "fullstack",
     category: {
-      id: "ENTERPRISE / FULL-STACK",
-      en: "ENTERPRISE / FULL-STACK",
+      id: "MAGANG INDUSTRI / FULL-STACK",
+      en: "INTERNSHIP / FULL-STACK",
     },
     title: "Project Management System",
     subtitle: {
-      id: "Kolaborasi Tim & Pelacakan Tugas",
-      en: "Team Collaboration & Task Tracking",
+      id: "Sistem Manajemen Proyek Internal — PT. AMA Salam Indonesia",
+      en: "Internal Project Management System — PT. AMA Salam Indonesia",
     },
     description: {
-      id: "Sistem manajemen proyek berbasis web untuk memantau progres tugas, alur kerja tim, dan pelacakan issue secara terpusat melalui papan kanban interaktif.",
-      en: "A web-based project management system for tracking task progress, team workflows, and issue monitoring through interactive kanban boards.",
+      id: "Sistem manajemen proyek berbasis web yang dikembangkan selama program magang di PT. AMA Salam Indonesia untuk memantau progres tugas, alur kerja tim, dan pelacakan issue secara terpusat melalui papan kanban interaktif.",
+      en: "A web-based project management system developed during the internship at PT. AMA Salam Indonesia for tracking task progress, team workflows, and issue monitoring through interactive kanban boards.",
     },
     details: {
       problem: {
-        id: "Tim pengembangan membutuhkan ruang kerja terpusat untuk memantau status tugas lintas sprint, menetapkan prioritas, dan menyelaraskan progres anggota tim tanpa bergantung pada dokumen terpisah.",
-        en: "Development teams need a centralized workspace to track task status across sprints, assign priorities, and align team progress without relying on fragmented spreadsheets.",
+        id: "Tim pengembang di PT. AMA Salam Indonesia membutuhkan ruang kerja terpusat untuk memantau status tugas lintas sprint, menetapkan prioritas, dan menyelaraskan progres tim tanpa bergantung pada pencatatan manual yang terfragmentasi.",
+        en: "The development team at PT. AMA Salam Indonesia needed a centralized workspace to track task status across sprints, assign priorities, and align team progress without relying on fragmented manual records.",
       },
       solution: {
-        id: "Mengembangkan sistem manajemen proyek berbasis web dengan papan kanban interaktif, pengelompokan sprint, dan pelacakan alur kerja tim secara terstruktur.",
-        en: "Engineered a web-based project management system featuring interactive kanban boards, sprint organization, and structured team workflow tracking.",
+        id: "Membangun sistem manajemen proyek berbasis web untuk yayasan dengan papan kanban interaktif, alur kerja sprint terstruktur, dan pemantauan issue tim secara terintegrasi.",
+        en: "Engineered a web-based project management system for the foundation featuring interactive kanban boards, structured sprint workflows, and integrated team issue monitoring.",
       },
       architecture: {
         id: "Frontend SPA menggunakan React, TypeScript, dan Tailwind CSS yang terhubung ke backend Express.js dengan Prisma ORM dan database PostgreSQL.",
@@ -99,8 +99,8 @@ export const selectedProjects = [
         ],
       },
       contribution: {
-        id: "Full-Stack Developer — merancang model data proyek & sprint, membangun REST API, serta mengerjakan komponen antarmuka kanban.",
-        en: "Full-Stack Developer — modeled project and sprint schemas, implemented REST API services, and built the kanban UI components.",
+        id: "Frontend Developer Intern — berkolaborasi bersama tim pengembang dalam membangun antarmuka papan kanban responsif, pemantauan status tugas, serta integrasi alur kerja sistem.",
+        en: "Frontend Developer Intern — collaborated with the development team to build responsive kanban board interfaces, task status monitoring, and system workflow integration.",
       },
     },
     image: "/images/projects/project_management.webp",
