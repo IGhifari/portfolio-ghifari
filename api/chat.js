@@ -1,5 +1,5 @@
 /**
- * Vercel Serverless Function: AI Portfolio Assistant Chat Endpoint
+ * Cloudflare Pages & API Chat Handler: AI Portfolio Assistant Chat Endpoint
  *
  * Route: POST /api/chat
  * Provider: Google Gemini API (`@google/genai`)
@@ -32,7 +32,6 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
   'https://www.ighifari.my.id',
   'https://ighifari.my.id',
   'https://portfolio-ghifari.pages.dev',
-  'https://portfolio-ghifari.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:4173',
@@ -50,13 +49,6 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
  */
 export const CLOUDFLARE_PAGES_PREVIEW_ORIGIN_REGEX =
   /^https:\/\/[a-z0-9_-]+\.portfolio-ghifari\.pages\.dev$/i;
-
-/**
- * Project-scoped preview deployment regex for Vercel:
- * https://portfolio-ghifari-<preview-id>.vercel.app
- */
-export const VERCEL_PREVIEW_ORIGIN_REGEX =
-  /^https:\/\/portfolio-ghifari-[a-z0-9_-]+\.vercel\.app$/i;
 
 /**
  * Validates request Origin strictly against exact authorized origins allowlist
@@ -80,9 +72,6 @@ export const isAllowedOrigin = (rawOrigin, allowedOrigins = DEFAULT_ALLOWED_ORIG
 
   // 2. Project-scoped preview deployments strictly belonging to this project
   if (CLOUDFLARE_PAGES_PREVIEW_ORIGIN_REGEX.test(origin)) {
-    return true;
-  }
-  if (VERCEL_PREVIEW_ORIGIN_REGEX.test(origin)) {
     return true;
   }
 
@@ -216,7 +205,7 @@ const sanitizeDiagnosticMessage = (rawMessage, secrets = []) => {
 };
 
 /**
- * Helper to send a consistent JSON response in both Vercel Node req/res and standard test mocks.
+ * Helper to send a consistent JSON response in Node req/res and standard test mocks.
  */
 const getByteLength = (str) => {
   if (typeof Buffer !== 'undefined' && typeof Buffer.byteLength === 'function') {
@@ -268,7 +257,6 @@ export const createChatHandler = ({
   fetchImpl = globalThis.fetch,
   geminiClientFactory,
   trustCloudflare,
-  trustVercel,
   runtime,
   allowedOrigins,
 } = {}) => {
@@ -352,7 +340,7 @@ export const createChatHandler = ({
       }
     }
 
-    // 5. Parse and Size-Check Request Body (Safely catch @vercel/node getter errors)
+    // 5. Parse and Size-Check Request Body
     let rawBody;
     try {
       rawBody = req?.body;
@@ -495,7 +483,6 @@ export const createChatHandler = ({
     const clientIp = getClientIdentifier(req, {
       env,
       trustCloudflare,
-      trustVercel,
       runtime,
     });
     let rateStatus;

@@ -2,7 +2,7 @@
  * Server-Only Portfolio Knowledge Base Aggregator (STRICT KNOWLEDGE ONLY).
  *
  * Location: api/_lib/knowledge.js
- * IMPORTANT: This module is strictly for backend / serverless usage (Vercel Functions)
+ * IMPORTANT: This module is strictly for backend / serverless usage (Cloudflare Pages Functions / API)
  * and must NOT be imported into any frontend component.
  *
  * Every entry is normalized directly from the repository's canonical data modules
