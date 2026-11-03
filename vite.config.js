@@ -462,7 +462,7 @@ export const createLocalApiChatMiddleware = ({
 
 /**
  * Dev-only middleware so `POST /api/chat` works seamlessly under `npm run dev` (localhost:5173)
- * as well as `npx vercel dev` (localhost:3000). Never executes during production build.
+ * and preview testing. Never executes during production build.
  */
 export const localApiChatPlugin = (mode) => ({
   name: 'local-api-chat-middleware',

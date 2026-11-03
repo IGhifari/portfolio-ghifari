@@ -1,6 +1,6 @@
 # Portfolio Ghifari 🚀
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-portfolio--ghifari.vercel.app-000?style=for-the-badge&logo=vercel&logoColor=white)](https://www.ighifari.my.id/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-portfolio--ghifari.pages.dev-F38020?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://www.ighifari.my.id/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.14-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.14-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -158,11 +158,10 @@ Ensure you have the following installed on your machine:
 
 ## 🌐 Deployment
 
-The application is deployed on **Vercel** with automatic deployments on branch updates.
+The application is deployed on **Cloudflare Pages** with automatic deployments on branch updates.
 
-You can also deploy your own clone with a single click:
+Hosting, Edge caching, and serverless API functions are powered by the Cloudflare Pages & Workers runtime.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/IGhifari/Portfolio-ghifari)
 
 ---
 

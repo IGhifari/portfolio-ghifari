@@ -53,7 +53,7 @@ import {
 import { createCloudflarePagesChatHandler } from '../functions/api/chat.js';
 
 /**
- * Helper to create mock Vercel Request / Response objects
+ * Helper to create mock Request / Response objects
  */
 const createMockReqRes = ({
   method = 'POST',
@@ -951,7 +951,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       }
     });
 
-    it('verifies proxy IP trust model: Node runtime, Cloudflare Pages, Vercel, and invalid IP fallbacks', async () => {
+    it('verifies proxy IP trust model: Node runtime, Cloudflare Pages, and invalid IP fallbacks', async () => {
       // 1. Invalid IP strings must always normalize to 'anonymous', never arbitrary strings
       assert.equal(normalizeIpForRateLimit('not-an-ip'), 'anonymous');
       assert.equal(normalizeIpForRateLimit('custom-user-id-123'), 'anonymous');
@@ -1029,76 +1029,70 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(getClientIdentifier(cfPagesCommaCfIp, { trustCloudflare: true }), '198.51.100.88');
       assert.equal(getClientIdentifier({ headers: { 'cf-connecting-ip': '198.51.100.42, 198.51.100.43' } }, { trustCloudflare: true }), 'anonymous');
 
-      // 6. Vercel: header client IP resmi (x-real-ip, x-vercel-forwarded-for, x-forwarded-for)
-      // 6a. Single valid IP pada masing-masing header resmi Vercel diterima
-      const vercelRealIpReq = {
+      // 6. Header proxy tidak dipercaya (x-real-ip, x-forwarded-for, x-vercel-forwarded-for):
+      // Diabaikan pada runtime tanpa Cloudflare, selalu fallback ke socket.remoteAddress jika valid, atau 'anonymous'
+      const untrustedRealIpReq = {
         headers: {
           'x-real-ip': '203.0.113.50',
-          'cf-connecting-ip': '1.2.3.4', // spoofed cf-connecting-ip diabaikan di Vercel
+          'cf-connecting-ip': '1.2.3.4',
         },
         socket: { remoteAddress: '10.0.0.1' },
       };
-      assert.equal(getClientIdentifier(vercelRealIpReq, { env: { VERCEL: '1' } }), '203.0.113.50');
-      assert.equal(getClientIdentifier(vercelRealIpReq, { trustVercel: true }), '203.0.113.50');
+      assert.equal(getClientIdentifier(untrustedRealIpReq, { env: { VERCEL: '1' } }), '10.0.0.1');
+      assert.equal(getClientIdentifier(untrustedRealIpReq, { trustVercel: true }), '10.0.0.1');
+      assert.equal(getClientIdentifier({ headers: { 'x-real-ip': '203.0.113.50' } }, { env: { VERCEL: '1' } }), 'anonymous');
 
-      const vercelSingleVffReq = {
+      const untrustedVffReq = {
         headers: {
           'x-vercel-forwarded-for': '203.0.113.60',
           'cf-connecting-ip': '1.2.3.4',
         },
+        socket: { remoteAddress: '10.0.0.2' },
       };
-      assert.equal(getClientIdentifier(vercelSingleVffReq, { env: { VERCEL: '1' } }), '203.0.113.60');
+      assert.equal(getClientIdentifier(untrustedVffReq, { env: { VERCEL: '1' } }), '10.0.0.2');
+      assert.equal(getClientIdentifier({ headers: { 'x-vercel-forwarded-for': '203.0.113.60' } }), 'anonymous');
 
-      const vercelSingleXffReq = {
+      const untrustedXffReq = {
         headers: {
           'x-forwarded-for': '203.0.113.70',
           'cf-connecting-ip': '1.2.3.4',
         },
+        socket: { remoteAddress: '10.0.0.3' },
       };
-      assert.equal(getClientIdentifier(vercelSingleXffReq, { env: { VERCEL: '1' } }), '203.0.113.70');
+      assert.equal(getClientIdentifier(untrustedXffReq, { env: { VERCEL: '1' } }), '10.0.0.3');
+      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '203.0.113.70' } }), 'anonymous');
 
-      // 6b. Comma-separated values pada header Vercel DITOLAK (tanpa first-hop / rightmost-hop extraction)
-      // dan fallback ke socket.remoteAddress jika valid, atau 'anonymous'
-      const vercelCommaRealIp = {
+      // Comma-separated values pada header yang tidak dipercaya fallback ke socket.remoteAddress jika valid, atau 'anonymous'
+      const commaRealIp = {
         headers: {
           'x-real-ip': '203.0.113.50, 198.51.100.1',
         },
         socket: { remoteAddress: '203.0.113.91' },
       };
-      assert.equal(getClientIdentifier(vercelCommaRealIp, { env: { VERCEL: '1' } }), '203.0.113.91');
-      assert.equal(getClientIdentifier({ headers: { 'x-real-ip': '203.0.113.50, 198.51.100.1' } }, { env: { VERCEL: '1' } }), 'anonymous');
+      assert.equal(getClientIdentifier(commaRealIp, { env: {} }), '203.0.113.91');
+      assert.equal(getClientIdentifier({ headers: { 'x-real-ip': '203.0.113.50, 198.51.100.1' } }, { env: {} }), 'anonymous');
 
-      const vercelCommaVffReq = {
+      const commaVffReq = {
         headers: {
           'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2',
           'cf-connecting-ip': '1.2.3.4',
         },
         socket: { remoteAddress: '203.0.113.92' },
       };
-      assert.equal(getClientIdentifier(vercelCommaVffReq, { env: { VERCEL: '1' } }), '203.0.113.92');
-      assert.equal(getClientIdentifier({ headers: { 'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2' } }, { env: { VERCEL: '1' } }), 'anonymous');
+      assert.equal(getClientIdentifier(commaVffReq, { env: {} }), '203.0.113.92');
+      assert.equal(getClientIdentifier({ headers: { 'x-vercel-forwarded-for': '203.0.113.60, 198.51.100.2' } }, { env: {} }), 'anonymous');
 
-      const vercelCommaXffReq = {
+      const commaXffReq = {
         headers: {
           'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6',
           'cf-connecting-ip': '1.2.3.4',
         },
         socket: { remoteAddress: '203.0.113.93' },
       };
-      assert.equal(getClientIdentifier(vercelCommaXffReq, { env: { VERCEL: '1' } }), '203.0.113.93');
-      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6' } }, { env: { VERCEL: '1' } }), 'anonymous');
+      assert.equal(getClientIdentifier(commaXffReq, { env: {} }), '203.0.113.93');
+      assert.equal(getClientIdentifier({ headers: { 'x-forwarded-for': '203.0.113.70, 198.51.100.5, 198.51.100.6' } }, { env: {} }), 'anonymous');
 
-      // 6c. Di Vercel: jika header resmi tidak ada, TIDAK fallback ke cf-connecting-ip
-      const vercelNoOfficial = {
-        headers: {
-          'cf-connecting-ip': '1.2.3.4',
-        },
-        socket: { remoteAddress: '203.0.113.80' },
-      };
-      assert.equal(getClientIdentifier(vercelNoOfficial, { env: { VERCEL: '1' } }), '203.0.113.80');
-      assert.equal(getClientIdentifier({ headers: { 'cf-connecting-ip': '1.2.3.4' } }, { env: { VERCEL: '1' } }), 'anonymous');
-
-      // 7. Header IP tidak valid dan fallback yang aman (Cloudflare, Vercel, Node)
+      // 7. Header IP tidak valid dan fallback yang aman (Cloudflare, Node)
       assert.equal(
         getClientIdentifier(
           { headers: { 'cf-connecting-ip': 'invalid-ip' }, socket: { remoteAddress: '198.51.100.77' } },
@@ -1120,14 +1114,14 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
             headers: { 'x-real-ip': 'bad-ip', 'x-forwarded-for': 'also-bad' },
             socket: { remoteAddress: '203.0.113.85' },
           },
-          { env: { VERCEL: '1' } }
+          { env: {} }
         ),
         '203.0.113.85'
       );
       assert.equal(
         getClientIdentifier(
           { headers: { 'x-real-ip': 'bad-ip', 'x-forwarded-for': 'also-bad' } },
-          { env: { VERCEL: '1' } }
+          { env: {} }
         ),
         'anonymous'
       );
@@ -1708,8 +1702,8 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(isAllowedOrigin('https://portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://c5c58197.portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://branch-preview.portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
-      assert.equal(isAllowedOrigin('https://portfolio-ghifari.vercel.app', DEFAULT_ALLOWED_ORIGINS), true);
-      assert.equal(isAllowedOrigin('https://portfolio-ghifari-preview-123.vercel.app', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari.vercel.app', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari-preview-123.vercel.app', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('http://localhost:5173', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://attacker.com', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('https://attacker.pages.dev', DEFAULT_ALLOWED_ORIGINS), false);
@@ -1790,7 +1784,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(whitespaceOriginCall.res.body.error.code, 'FORBIDDEN');
       assert.equal(geminiCalled, false);
 
-      // 5. Allowed official Vercel deployment
+      // 5. Rejected deprecated Vercel deployment origin (403 FORBIDDEN)
       const vercelCall = createMockReqRes({
         headers: {
           'content-type': 'application/json',
@@ -1799,8 +1793,21 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
         body: { message: 'Ceritakan tentang AksesKita' },
       });
       await handler(vercelCall.req, vercelCall.res);
-      assert.equal(vercelCall.res.statusCode, 200);
-      assert.equal(vercelCall.res.body.ok, true);
+      assert.equal(vercelCall.res.statusCode, 403);
+      assert.equal(vercelCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
+
+      // 5b. Allowed official Cloudflare Pages deployment origin
+      const cfPagesCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://portfolio-ghifari.pages.dev',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(cfPagesCall.req, cfPagesCall.res);
+      assert.equal(cfPagesCall.res.statusCode, 200);
+      assert.equal(cfPagesCall.res.body.ok, true);
       assert.equal(geminiCalled, true);
 
       // 6. Allowed Cloudflare Pages project-scoped preview deployment
@@ -2082,11 +2089,10 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(crashCall.res.headers['Cache-Control'], 'no-store');
     });
 
-    it('verifies public/_headers and vercel.json configure synchronized security headers with strict CSP and API no-store', () => {
+    it('verifies public/_headers configures security headers with strict CSP and API no-store', () => {
       const headersContent = fs.readFileSync('public/_headers', 'utf8');
-      const vercelJson = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
 
-      // 1. Verify public/_headers
+      // Verify public/_headers
       assert.ok(headersContent.includes('Content-Security-Policy:'));
       assert.ok(headersContent.includes("default-src 'self'"));
       // script-src must NOT contain unsafe-inline or external font scripts
@@ -2094,7 +2100,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.ok(!headersContent.includes('https://fonts.googleapis.com; style-src'));
       assert.ok(headersContent.includes("'sha256-/Fgcf2NJO5BTdEda9XNcxZkG879rrsZBaL8V1Ijy6RU='"));
       assert.ok(headersContent.includes("'sha256-9jQ7iY2TnlBB9RC2Ks4RZfZJ/IoZOrhSWCBPKMBLyU8='"));
-      // connect-src must only have 'self' and https://api.emailjs.com (no Google Fonts)
+      // connect-src must only have 'self', https://api.emailjs.com, and Cloudflare Analytics
       assert.ok(headersContent.includes("connect-src 'self' https://api.emailjs.com https://cloudflareinsights.com;"));
       // img-src must restrict https: to specific origins
       assert.ok(headersContent.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id;"));
@@ -2107,31 +2113,6 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.ok(headersContent.includes('Strict-Transport-Security: max-age=31536000'));
       assert.ok(!headersContent.includes('includeSubDomains'));
       assert.ok(!headersContent.includes('preload'));
-
-      // 2. Verify vercel.json
-      assert.ok(Array.isArray(vercelJson.headers));
-      const rootHeaderEntry = vercelJson.headers.find((h) => h.source === '/(.*)');
-      assert.ok(rootHeaderEntry, 'Missing root header entry in vercel.json');
-
-      const apiHeaderEntry = vercelJson.headers.find((h) => h.source === '/api/(.*)');
-      assert.ok(apiHeaderEntry, 'Missing api header entry in vercel.json');
-      const apiHeaderMap = new Map(apiHeaderEntry.headers.map((h) => [h.key, h.value]));
-      assert.equal(apiHeaderMap.get('Cache-Control'), 'no-store');
-
-      const headerMap = new Map(rootHeaderEntry.headers.map((h) => [h.key, h.value]));
-      const csp = headerMap.get('Content-Security-Policy');
-      assert.ok(csp);
-      const scriptSrcDirective = csp.split(';').find((d) => d.trim().startsWith('script-src'));
-      assert.ok(scriptSrcDirective, 'Missing script-src in CSP');
-      assert.ok(!scriptSrcDirective.includes("'unsafe-inline'"), 'CSP script-src should not contain unsafe-inline');
-      assert.ok(!scriptSrcDirective.includes('https://fonts.googleapis.com'), 'CSP script-src should not have fonts.googleapis.com');
-      assert.ok(csp.includes("connect-src 'self' https://api.emailjs.com;"), 'connect-src restricted to self and emailjs');
-      assert.ok(csp.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id;"));
-      assert.equal(headerMap.get('X-Content-Type-Options'), 'nosniff');
-      assert.equal(headerMap.get('X-Frame-Options'), 'SAMEORIGIN');
-      assert.equal(headerMap.get('Referrer-Policy'), 'strict-origin-when-cross-origin');
-      assert.equal(headerMap.get('Permissions-Policy'), 'camera=(), microphone=(), geolocation=(), payment=()');
-      assert.equal(headerMap.get('Strict-Transport-Security'), 'max-age=31536000');
     });
   });
 });
