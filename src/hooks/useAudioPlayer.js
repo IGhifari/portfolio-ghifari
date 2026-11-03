@@ -13,6 +13,12 @@ export const useAudioPlayer = (tracks = []) => {
 
     const audioRef = useRef(null);
     const loadedTrackIndexRef = useRef(null);
+    const isPlayingRef = useRef(isPlaying);
+    const isFirstMountRef = useRef(true);
+
+    useEffect(() => {
+        isPlayingRef.current = isPlaying;
+    }, [isPlaying]);
 
     const goToTrack = useCallback(
         (direction) => {
@@ -57,8 +63,13 @@ export const useAudioPlayer = (tracks = []) => {
         };
     }, []);
 
-    // Handle track change
+    // Handle track change: only runs when track index actually changes, never on play/pause
     useEffect(() => {
+        if (isFirstMountRef.current) {
+            isFirstMountRef.current = false;
+            return;
+        }
+
         const track = tracks[currentIndex];
         if (!track) return;
 
@@ -68,25 +79,19 @@ export const useAudioPlayer = (tracks = []) => {
         const audio = audioRef.current;
         if (!audio) return;
 
-        // Only load and play if already playing or track was changed while initialized
-        if (isPlaying) {
-            if (loadedTrackIndexRef.current !== currentIndex) {
-                audio.pause();
-                audio.src = track.audio;
-                audio.load();
-                loadedTrackIndexRef.current = currentIndex;
-            }
-            audio.currentTime = 0;
+        audio.pause();
+        audio.src = track.audio;
+        audio.load();
+        audio.currentTime = 0;
+        loadedTrackIndexRef.current = currentIndex;
+
+        if (isPlayingRef.current) {
             audio.play().catch((error) => {
                 console.error("Error playing audio:", error);
                 setIsPlaying(false);
             });
-        } else if (loadedTrackIndexRef.current !== null && loadedTrackIndexRef.current !== currentIndex) {
-            audio.pause();
-            audio.currentTime = 0;
-            loadedTrackIndexRef.current = null;
         }
-    }, [currentIndex, isPlaying, tracks]);
+    }, [currentIndex, tracks]);
 
     const togglePlayback = useCallback(() => {
         const track = tracks[currentIndex];
@@ -95,24 +100,23 @@ export const useAudioPlayer = (tracks = []) => {
         const audio = getOrCreateAudio();
         if (!audio) return;
 
-        setIsPlaying((prev) => {
-            const shouldPlay = !prev;
-            if (shouldPlay) {
-                if (loadedTrackIndexRef.current !== currentIndex || !audio.src) {
-                    audio.src = track.audio;
-                    audio.load();
-                    loadedTrackIndexRef.current = currentIndex;
-                }
-                audio.play().catch((error) => {
-                    console.error("Error playing audio:", error);
-                    setIsPlaying(false);
-                });
-            } else {
-                audio.pause();
+        if (isPlaying) {
+            audio.pause();
+            setIsPlaying(false);
+        } else {
+            // Load audio source if not loaded yet
+            if (loadedTrackIndexRef.current !== currentIndex || !audio.src) {
+                audio.src = track.audio;
+                audio.load();
+                loadedTrackIndexRef.current = currentIndex;
             }
-            return shouldPlay;
-        });
-    }, [currentIndex, getOrCreateAudio, tracks]);
+            audio.play().catch((error) => {
+                console.error("Error playing audio:", error);
+                setIsPlaying(false);
+            });
+            setIsPlaying(true);
+        }
+    }, [currentIndex, getOrCreateAudio, isPlaying, tracks]);
 
     const seek = useCallback(
         (time) => {

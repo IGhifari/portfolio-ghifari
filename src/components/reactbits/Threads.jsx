@@ -24,7 +24,7 @@ uniform vec2 uMouse;
 
 #define PI 3.1415926538
 
-const int u_line_count = 28;
+const int u_line_count = 22;
 const float u_line_width = 3.2;
 const float u_line_blur = 4.5;
 
@@ -214,10 +214,15 @@ const Threads = ({
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
     }
 
-    let animationFrameId;
+    let animationFrameId = 0;
+    let isVisible = true;
     let startTime = performance.now();
 
     const update = (now) => {
+      if (!isVisible) {
+        animationFrameId = 0;
+        return;
+      }
       const elapsed = (now - startTime) * 0.001;
       program.uniforms.iTime.value = elapsed;
 
@@ -231,14 +236,38 @@ const Threads = ({
       animationFrameId = requestAnimationFrame(update);
     };
 
+    const startAnimation = () => {
+      if (!animationFrameId && !isMobile && !isReducedMotion && isVisible) {
+        startTime = performance.now();
+        animationFrameId = requestAnimationFrame(update);
+      }
+    };
+
+    const stopAnimation = () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
+    };
+
+    // Pause WebGL rendering loop when scrolled away from Hero viewport
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        startAnimation();
+      } else {
+        stopAnimation();
+      }
+    });
+    intersectionObserver.observe(container);
+
     const handleMotionChange = (e) => {
       isReducedMotion = e.matches;
       if (isReducedMotion) {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        stopAnimation();
         renderStaticFrame();
       } else if (!isMobile) {
-        startTime = performance.now();
-        animationFrameId = requestAnimationFrame(update);
+        startAnimation();
       }
     };
     reducedMotionQuery.addEventListener('change', handleMotionChange);
@@ -247,13 +276,12 @@ const Threads = ({
     if (isMobile || isReducedMotion) {
       renderStaticFrame();
     } else {
-      animationFrameId = requestAnimationFrame(update);
+      startAnimation();
     }
 
     return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
+      stopAnimation();
+      intersectionObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       if (shouldInteract) {
         window.removeEventListener('mousemove', handleMouseMove);
