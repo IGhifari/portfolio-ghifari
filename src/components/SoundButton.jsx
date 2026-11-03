@@ -191,9 +191,9 @@ const SoundButton = () => {
 
                         {/* Title & Artist */}
                         <div className="text-center px-1">
-                            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
+                            <p className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
                                 {currentTrack.title}
-                            </h5>
+                            </p>
                             <p className="font-mono text-[11px] text-[var(--text-secondary)] truncate mt-0.5">
                                 {currentTrack.artist}
                             </p>

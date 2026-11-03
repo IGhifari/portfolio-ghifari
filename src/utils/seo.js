@@ -1,9 +1,11 @@
 /**
- * SEO & Open Graph dynamic metadata helper.
- * Updates document.title, description, canonical link, and Open Graph tags on client route transitions.
+ * SEO, Open Graph, Twitter Cards & Schema.org dynamic metadata helper.
+ * Updates document.title, description, canonical link, social tags, and structured data on client route transitions.
  */
 
 export const SITE_ORIGIN = 'https://www.ighifari.my.id';
+export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/portfolio.png`;
+export const TWITTER_HANDLE = '@IGhifari';
 
 export const updateDocumentMetadata = ({
   title,
@@ -14,6 +16,8 @@ export const updateDocumentMetadata = ({
   ogDescription,
   ogImage = '/portfolio.png',
   ogType = 'website',
+  twitterCard = 'summary_large_image',
+  schemaData = null,
 } = {}) => {
   if (typeof document === 'undefined') return;
 
@@ -43,11 +47,15 @@ export const updateDocumentMetadata = ({
   }
 
   // 4. Open Graph Tags
-  setMeta('property', 'og:title', ogTitle || title);
-  setMeta('property', 'og:description', ogDescription || description);
+  const resolvedOgTitle = ogTitle || title;
+  const resolvedOgDesc = ogDescription || description;
+  setMeta('property', 'og:title', resolvedOgTitle);
+  setMeta('property', 'og:description', resolvedOgDesc);
   setMeta('property', 'og:type', ogType);
 
-  const fullOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_ORIGIN}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
+  const fullOgImage = ogImage.startsWith('http')
+    ? ogImage
+    : `${SITE_ORIGIN}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
   setMeta('property', 'og:image', fullOgImage);
 
   const fullCanonicalUrl = resolvedCanonical.startsWith('http')
@@ -64,4 +72,107 @@ export const updateDocumentMetadata = ({
   }
   linkCanonical.setAttribute('href', fullCanonicalUrl);
   linkCanonical.href = fullCanonicalUrl;
+
+  // 6. Twitter Card Tags
+  setMeta('name', 'twitter:card', twitterCard);
+  setMeta('name', 'twitter:title', resolvedOgTitle);
+  setMeta('name', 'twitter:description', resolvedOgDesc);
+  setMeta('name', 'twitter:image', fullOgImage);
+  setMeta('name', 'twitter:creator', TWITTER_HANDLE);
+  setMeta('name', 'twitter:site', TWITTER_HANDLE);
+
+  // 7. Schema.org Structured Data (JSON-LD)
+  if (schemaData) {
+    let scriptTag = document.getElementById('schema-structured-data');
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = 'schema-structured-data';
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+    scriptTag.textContent = JSON.stringify(schemaData);
+  }
+};
+
+/**
+ * Generates Schema.org CollectionPage JSON-LD for the case study catalog.
+ */
+export const generateCaseStudyListSchema = (projects = []) => {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${SITE_ORIGIN}/study-case#collection`,
+    url: `${SITE_ORIGIN}/study-case`,
+    name: 'Studi Kasus Rekayasa Perangkat Lunak | M. Ghifari Bima Khadafi',
+    description:
+      'Direktori studi kasus arsitektur perangkat lunak, perancangan sistem, dan pengembangan web modern oleh M. Ghifari Bima Khadafi.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Portfolio Ghifari',
+      url: SITE_ORIGIN,
+    },
+    about: {
+      '@type': 'Person',
+      name: 'M. Ghifari Bima Khadafi',
+      url: SITE_ORIGIN,
+    },
+    hasPart: projects.map((p) => ({
+      '@type': 'TechArticle',
+      name: p.title,
+      url: `${SITE_ORIGIN}/study-case/${p.id}`,
+      description: typeof p.description === 'object' ? p.description.id : p.description,
+    })),
+  };
+};
+
+/**
+ * Generates Schema.org TechArticle & SoftwareApplication JSON-LD for individual project case studies.
+ */
+export const generateCaseStudyDetailSchema = (project) => {
+  if (!project) return null;
+
+  const desc = typeof project.description === 'object' ? project.description.id : project.description;
+  const isInternal = project.id === 'project-management';
+  const fullImage = project.image
+    ? (project.image.startsWith('http') ? project.image : `${SITE_ORIGIN}${project.image}`)
+    : DEFAULT_OG_IMAGE;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    '@id': `${SITE_ORIGIN}/study-case/${project.id}#article`,
+    url: `${SITE_ORIGIN}/study-case/${project.id}`,
+    headline: `${project.title} — Studi Kasus Arsitektur & Rekayasa Perangkat Lunak`,
+    name: project.title,
+    description: desc,
+    image: fullImage,
+    inLanguage: ['id', 'en'],
+    author: {
+      '@type': 'Person',
+      name: 'M. Ghifari Bima Khadafi',
+      url: SITE_ORIGIN,
+      jobTitle: 'Web Developer & Software Engineer',
+    },
+    publisher: {
+      '@type': 'Person',
+      name: 'M. Ghifari Bima Khadafi',
+      url: SITE_ORIGIN,
+    },
+    about: {
+      '@type': 'SoftwareApplication',
+      name: project.title,
+      applicationCategory: 'WebApplication',
+      operatingSystem: 'All',
+      ...(project.github && !isInternal ? { codeRepository: project.github } : {}),
+      ...(project.live && !isInternal ? { installUrl: project.live } : {}),
+      ...(isInternal
+        ? {
+            provider: {
+              '@type': 'Organization',
+              name: 'PT. AMA Salam Indonesia',
+            },
+          }
+        : {}),
+    },
+  };
 };

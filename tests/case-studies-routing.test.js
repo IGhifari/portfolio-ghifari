@@ -7,7 +7,12 @@ import { fileURLToPath } from 'node:url';
 import { parseLocation } from '../src/utils/router.js';
 import { allProjects, getProjectBySlug, selectedProjects, otherProjects } from '../src/data/projects.js';
 import { translations } from '../src/data/translations.js';
-import { updateDocumentMetadata } from '../src/utils/seo.js';
+import {
+  updateDocumentMetadata,
+  generateCaseStudyListSchema,
+  generateCaseStudyDetailSchema,
+  TWITTER_HANDLE,
+} from '../src/utils/seo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -161,6 +166,7 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       const mockDoc = {
         title: '',
         querySelector: (sel) => tags[sel] || null,
+        getElementById: (id) => tags[`#${id}`] || null,
         createElement: (name) => {
           const el = { tagName: name, setAttribute: (k, v) => { el[k] = v; } };
           return el;
@@ -170,6 +176,7 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
             if (el.tagName === 'link' && el.rel === 'canonical') tags['link[rel="canonical"]'] = el;
             if (el.tagName === 'meta' && el.name) tags[`meta[name="${el.name}"]`] = el;
             if (el.tagName === 'meta' && el.property) tags[`meta[property="${el.property}"]`] = el;
+            if (el.id) tags[`#${el.id}`] = el;
           },
         },
       };
@@ -181,12 +188,16 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
           description: 'Custom Description',
           canonicalUrl: 'https://www.ighifari.my.id/study-case/studyflow',
           ogImage: 'https://www.ighifari.my.id/images/preview.webp',
+          schemaData: { '@context': 'https://schema.org', '@type': 'WebPage' },
         });
 
         assert.equal(mockDoc.title, 'Custom Title');
         assert.equal(tags['meta[name="description"]']?.content, 'Custom Description');
         assert.equal(tags['link[rel="canonical"]']?.href, 'https://www.ighifari.my.id/study-case/studyflow');
         assert.equal(tags['meta[property="og:title"]']?.content, 'Custom Title');
+        assert.equal(tags['meta[name="twitter:card"]']?.content, 'summary_large_image');
+        assert.equal(tags['meta[name="twitter:creator"]']?.content, TWITTER_HANDLE);
+        assert.ok(tags['#schema-structured-data']?.textContent?.includes('WebPage'));
       } finally {
         delete global.document;
       }
@@ -223,6 +234,53 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       // Check XML well-formedness (closing tags match opening tags)
       assert.equal((xml.match(/<url>/g) || []).length, (xml.match(/<\/url>/g) || []).length);
       assert.ok(xml.endsWith('</urlset>\n') || xml.endsWith('</urlset>'));
+    });
+  });
+
+  await t.test('7. Schema.org Generators (CollectionPage & TechArticle)', async (t2) => {
+    await t2.test('generateCaseStudyListSchema creates compliant CollectionPage', () => {
+      const schema = generateCaseStudyListSchema(allProjects);
+      assert.equal(schema['@context'], 'https://schema.org');
+      assert.equal(schema['@type'], 'CollectionPage');
+      assert.ok(schema.hasPart.length > 0, 'hasPart must contain projects');
+      assert.equal(schema.about['@type'], 'Person');
+    });
+
+    await t2.test('generateCaseStudyDetailSchema correctly configures TechArticle and internal attribution', () => {
+      const sf = getProjectBySlug('studyflow');
+      const sfSchema = generateCaseStudyDetailSchema(sf);
+      assert.equal(sfSchema['@type'], 'TechArticle');
+      assert.equal(sfSchema.headline, 'StudyFlow — Studi Kasus Arsitektur & Rekayasa Perangkat Lunak');
+      assert.ok(sfSchema.about.codeRepository, 'Public projects must link code repository');
+
+      const pm = getProjectBySlug('project-management');
+      const pmSchema = generateCaseStudyDetailSchema(pm);
+      assert.equal(pmSchema['@type'], 'TechArticle');
+      assert.equal(pmSchema.about.codeRepository, undefined, 'Internal project must omit public repository');
+      assert.equal(pmSchema.about.provider?.name, 'PT. AMA Salam Indonesia');
+    });
+  });
+
+  await t.test('8. Robots.txt Directives & Homepage Structured Data', async (t2) => {
+    await t2.test('public/robots.txt disallows /api/ and references sitemap', () => {
+      const robotsPath = path.join(rootDir, 'public', 'robots.txt');
+      assert.ok(fs.existsSync(robotsPath), 'robots.txt must exist');
+      const robots = fs.readFileSync(robotsPath, 'utf-8');
+      assert.ok(robots.includes('Disallow: /api/'));
+      assert.ok(robots.includes('Sitemap: https://www.ighifari.my.id/sitemap.xml'));
+    });
+
+    await t2.test('index.html contains @graph with WebSite, Person, and ProfilePage', () => {
+      const indexPath = path.join(rootDir, 'index.html');
+      assert.ok(fs.existsSync(indexPath), 'index.html must exist');
+      const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+
+      assert.ok(indexHtml.includes('"@type": "WebSite"'));
+      assert.ok(indexHtml.includes('"@type": "Person"'));
+      assert.ok(indexHtml.includes('"@type": "ProfilePage"'));
+      assert.ok(indexHtml.includes('PT. AMA Salam Indonesia'));
+      assert.ok(indexHtml.includes('SMKN 1 Cibinong'));
+      assert.ok(indexHtml.includes('name="twitter:site" content="@IGhifari"'));
     });
   });
 });

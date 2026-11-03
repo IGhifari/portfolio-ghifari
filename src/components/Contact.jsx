@@ -502,9 +502,9 @@ const Contact = () => {
 
           {/* Verified Profiles & Networks - Simplified Editorial List */}
           <div className="space-y-1">
-            <h5 className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2">
+            <h4 className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2 font-semibold">
               {t('contact.profilesHeader')}
-            </h5>
+            </h4>
 
             <div className="divide-y divide-[var(--border-subtle)]">
               {contactChannels.map((item) =>

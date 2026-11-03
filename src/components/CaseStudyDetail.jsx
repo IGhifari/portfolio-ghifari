@@ -17,7 +17,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { getProjectBySlug } from '../data/projects';
-import { updateDocumentMetadata } from '../utils/seo';
+import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../utils/seo';
 
 const CaseStudyDetail = ({ slug }) => {
   const { language, t } = useLanguage();
@@ -61,6 +61,7 @@ const CaseStudyDetail = ({ slug }) => {
         ogTitle: pageTitle,
         ogDescription: pageDesc,
         ogImage: project.image || '/portfolio.png',
+        schemaData: generateCaseStudyDetailSchema(project),
       });
     } else {
       const notFoundTitle =
@@ -213,13 +214,20 @@ const CaseStudyDetail = ({ slug }) => {
 
           {/* Internal Project Confidentiality Banner (PT. AMA Salam) */}
           {isInternship && (
-            <div className="p-4 sm:p-5 rounded-lg bg-[var(--surface-muted)] border-l-4 border-l-blue-500 border border-[var(--border-subtle)] space-y-1.5">
+            <div className="p-4 sm:p-5 rounded-lg bg-[var(--surface-muted)] border-l-4 border-l-blue-500 border border-[var(--border-subtle)] space-y-2">
               <div className="flex items-center gap-2 font-mono text-xs text-blue-400 font-semibold uppercase tracking-wider">
                 <FiShield size={14} aria-hidden="true" />
                 <span>{t('caseStudies.internalNoticeTitle')}</span>
               </div>
               <p className="font-sans text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                {t('caseStudies.internalNoticeDesc')}
+                {t('caseStudies.internalNoticeDesc')}{' '}
+                <RouterLink
+                  to="/#experience"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1 font-mono text-xs ml-1 font-semibold"
+                >
+                  <span>{language === 'id' ? 'Lihat riwayat magang di profil' : 'View internship details in profile'}</span>
+                  <FiExternalLink size={12} aria-hidden="true" />
+                </RouterLink>
               </p>
             </div>
           )}

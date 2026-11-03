@@ -11,6 +11,7 @@ import {
   FiExternalLink,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { RouterLink } from '../context/RouterContext';
 import { experiences } from '../data/experience';
 
 const Experience = () => {
@@ -199,24 +200,34 @@ const Experience = () => {
                 </div>
               </div>
 
-              {/* Credential Verification Footer */}
-              {exp.certificate && (
-                <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
-                    <FiAward className="text-[var(--accent)] shrink-0" size={16} aria-hidden="true" />
-                    <span>{t('experience.credentialVerified')}</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveCert(exp.certificate)}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
-                  >
-                    <FiAward size={14} aria-hidden="true" />
-                    <span>{t('experience.viewCertificate')}</span>
-                  </button>
+              {/* Credential & Case Study Footer */}
+              <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+                  <FiAward className="text-[var(--accent)] shrink-0" size={16} aria-hidden="true" />
+                  <span>{t('experience.credentialVerified')}</span>
                 </div>
-              )}
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <RouterLink
+                    to="/study-case/project-management"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                  >
+                    <span>{language === 'id' ? 'Studi Kasus Proyek Magang' : 'Internship Case Study'}</span>
+                    <FiExternalLink size={13} aria-hidden="true" />
+                  </RouterLink>
+
+                  {exp.certificate && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveCert(exp.certificate)}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                    >
+                      <FiAward size={14} aria-hidden="true" />
+                      <span>{t('experience.viewCertificate')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
             </motion.article>
           );
         })}

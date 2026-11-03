@@ -10,7 +10,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { allProjects } from '../data/projects';
-import { updateDocumentMetadata } from '../utils/seo';
+import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
 
 const CaseStudyList = () => {
   const { language, t } = useLanguage();
@@ -54,6 +54,7 @@ const CaseStudyList = () => {
       ogTitle: title,
       ogDescription: description,
       ogImage: '/portfolio.png',
+      schemaData: generateCaseStudyListSchema(allProjects),
     });
   }, [language]);
 
@@ -202,7 +203,7 @@ const CaseStudyList = () => {
                   className="group bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-lg overflow-hidden flex flex-col justify-between transition-all duration-300"
                 >
                   <div>
-                    {/* Project Thumbnail */}
+                      {/* Project Thumbnail */}
                     <div className="relative aspect-[16/9] w-full bg-[var(--surface-alt)] overflow-hidden border-b border-[var(--border-subtle)]">
                       {project.image ? (
                         <img
