@@ -51,17 +51,14 @@ const AcademicBackground = () => {
         >
           <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-5">
             <div>
-              <span className="font-mono text-[11px] text-[var(--text-muted)] uppercase tracking-wider block mb-1.5">
-                {t('education.currentProgram')}
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider block mb-1.5 font-semibold">
+                {t('education.summaryHeader')}
               </span>
               <p className="font-grotesk font-bold text-lg text-[var(--text-primary)]">
-                {t('education.schoolLevel')}
+                {t('education.summaryTitle')}
               </p>
-              <p className="font-mono text-xs text-[var(--accent)] mt-0.5 font-semibold">
-                {t('education.major')}
-              </p>
-              <p className="font-mono text-[11px] text-[var(--text-secondary)] mt-0.5">
-                {t('education.faculty')}
+              <p className="font-mono text-xs text-[var(--text-secondary)] mt-1 font-semibold">
+                {t('education.summaryFocus')}
               </p>
             </div>
 

@@ -43,7 +43,7 @@ export const selectedProjects = [
         en: [
           "Search and discovery of public spaces filtered by accessibility facilities (ramps, elevators, inclusive amenities)",
           "Detailed venue views with verified facility indicators and community evaluations",
-          "Responsive interface designed with high contrast readability and accessible navigation ergonomics",
+          "Responsive interface with high contrast readability and accessible navigation",
         ],
       },
       contribution: {
@@ -70,8 +70,8 @@ export const selectedProjects = [
       en: "Team Collaboration & Task Tracking",
     },
     description: {
-      id: "Platform manajemen proyek komprehensif yang dibangun untuk menyederhanakan pelacakan tugas agile, manajemen sprint, dan kolaborasi tim lintas fungsi melalui kanban dan alur kerja yang intuitif.",
-      en: "A comprehensive project management platform built to streamline agile task tracking, sprint management, and cross-functional team collaboration through intuitive kanban and workflow tooling.",
+      id: "Sistem manajemen proyek berbasis web untuk memantau progres tugas, alur kerja tim, dan pelacakan issue secara terpusat melalui papan kanban interaktif.",
+      en: "A web-based project management system for tracking task progress, team workflows, and issue monitoring through interactive kanban boards.",
     },
     details: {
       problem: {
@@ -123,7 +123,7 @@ export const selectedProjects = [
     },
     description: {
       id: "Platform e-commerce berbasis web modern untuk produk pertanian segar, menampilkan katalog produk lengkap, manajemen keranjang belanja, alur checkout, ulasan terverifikasi, dan pesan langsung pengguna-admin.",
-      en: "A modern web-based e-commerce platform for fresh agricultural produce, featuring comprehensive product catalogs, cart state management, checkout workflows, verified customer reviews, and direct user-admin messaging.",
+      en: "A web-based e-commerce platform for agricultural produce, featuring product catalogs, cart state management, checkout workflows, customer reviews, and direct user-admin messaging.",
     },
     details: {
       problem: {
@@ -236,7 +236,7 @@ export const selectedProjects = [
       },
       solution: {
         id: "Membangun platform pembelajaran terpadu dengan dashboard siswa dan admin, manajemen kursus dan tugas terstruktur, serta pemrosesan dokumen berbasis AI yang didukung antrean latar belakang BullMQ dan Redis.",
-        en: "Engineered a unified digital learning platform featuring comprehensive student and admin dashboards, structured course and assignment management, and AI-driven document processing powered by BullMQ background job queues and Redis.",
+        en: "Engineered a digital learning platform with student and admin dashboards, structured course and assignment management, and AI-powered document processing using BullMQ background job queues and Redis.",
       },
       architecture: {
         id: "Arsitektur full-stack modern dengan frontend Next.js 15 dan TypeScript yang terhubung ke backend Express.js, Prisma ORM, dan PostgreSQL, diperkuat sistem antrean BullMQ + Redis untuk pemrosesan Gemini AI serta validasi skema Zod.",
@@ -246,14 +246,14 @@ export const selectedProjects = [
         id: [
           "Manajemen materi pembelajaran dan pengorganisasian modul kursus terstruktur",
           "Catatan dan tugas belajar interaktif beserta pelacakan progres siswa",
-          "Pengelolaan kursus menyeluruh dengan dashboard siswa dan admin",
+          "Pengelolaan kursus dengan dashboard terpisah untuk siswa dan admin",
           "Pemrosesan dan ekstraksi dokumen pembelajaran cerdas menggunakan Gemini AI secara asinkron",
           "Sistem autentikasi aman, arsitektur REST API modular, dan validasi data ketat dengan Zod",
         ],
         en: [
           "Course curriculum and learning material management with structured notes",
           "Interactive notes and assignment workflows with student progress tracking",
-          "Comprehensive course management with dedicated student and admin dashboards",
+          "Course management with dedicated student and admin dashboards",
           "Intelligent asynchronous learning document processing and extraction using Gemini AI",
           "Secure authentication system, modular REST API services, and strict schema validation with Zod",
         ],

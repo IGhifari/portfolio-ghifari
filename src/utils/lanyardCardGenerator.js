@@ -332,7 +332,7 @@ export const generateLanyardTextures = async ({ isDark = true } = {}) => {
     bCtx.fillStyle = palette.textSecondary;
     bCtx.textAlign = 'center';
     bCtx.textBaseline = 'middle';
-    bCtx.fillText('★ SECURITY ACCESS VERIFIED ★ AUTHORIZED DEVELOPER ★', 512, 387);
+    bCtx.fillText('FULL-STACK WEB DEVELOPER · SOFTWARE ENGINEER', 512, 387);
 
     // Signature Panel
     bCtx.fillStyle = isDark ? '#1C1C24' : '#EFEFEB';
@@ -352,7 +352,7 @@ export const generateLanyardTextures = async ({ isDark = true } = {}) => {
     bCtx.font = '600 16px "Space Mono", monospace';
     bCtx.fillStyle = palette.textMuted;
     bCtx.textAlign = 'right';
-    bCtx.fillText('AUTHORIZED SIGNATURE', 1024 - 96, 586);
+    bCtx.fillText('DEVELOPER SIGNATURE', 1024 - 96, 586);
 
     // QR Code / Data Matrix Placeholder Card
     const qrBoxSize = 340;
@@ -414,8 +414,8 @@ export const generateLanyardTextures = async ({ isDark = true } = {}) => {
     // Terms / Editorial Microprint at bottom
     bCtx.font = '500 15px "Space Mono", monospace';
     bCtx.fillStyle = palette.textMuted;
-    bCtx.fillText('OFFICIAL DEVELOPER IDENTIFICATION CARD', 512, 1220);
-    bCtx.fillText('ISSUED FOR M. GHIFARI BIMA KHADAFI · WEB DEVELOPER', 512, 1250);
+    bCtx.fillText('M. GHIFARI BIMA KHADAFI · SOFTWARE ENGINEERING PORTFOLIO', 512, 1220);
+    bCtx.fillText('FOCUS: REACT · TYPESCRIPT · NODE.JS · POSTGRESQL', 512, 1250);
     bCtx.fillText('WWW.IGHIFARI.MY.ID · ALL RIGHTS RESERVED', 512, 1280);
 
     // Corner Chip contact pads (Clean Metallic Titanium / Silver)

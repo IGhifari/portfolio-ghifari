@@ -100,14 +100,16 @@ const Contact = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
-
-
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
       setCopiedEmail(true);
       notify('success', t('contact.toastCopied'));
       setTimeout(() => setCopiedEmail(false), 2500);
     });
+  };
+
+  const handleDiscordClick = () => {
+    notify('info', t('contact.toastDiscordPending'));
   };
 
   const handleChange = (e) => {
@@ -505,32 +507,62 @@ const Contact = () => {
             </h5>
 
             <div className="divide-y divide-[var(--border-subtle)]">
-              {contactChannels.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
-                      {item.icon}
-                    </span>
-                    <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
-                      {item.name}
-                    </span>
-                    <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
-                      {item.handle}
-                    </span>
-                  </div>
+              {contactChannels.map((item) =>
+                item.key === 'discord' ? (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={handleDiscordClick}
+                    className="w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none cursor-pointer bg-transparent border-0 text-left"
+                    title={t('contact.toastDiscordPending')}
+                    aria-label={`Discord: ${t('contact.discordPending')}`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
+                        {item.icon}
+                      </span>
+                      <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
+                        {item.name}
+                      </span>
+                      <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
+                        {t('contact.discordPending')}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
-                    <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
-                    <FiExternalLink size={13} aria-hidden="true" />
-                  </div>
-                </a>
-              ))}
+                    <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
+                      <span className="font-mono text-[10px] hidden md:inline uppercase text-amber-500/80">
+                        {t('contact.discordPending')}
+                      </span>
+                      <FiInfo size={13} aria-hidden="true" className="text-amber-500/80" />
+                    </div>
+                  </button>
+                ) : (
+                  <a
+                    key={item.name}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
+                        {item.icon}
+                      </span>
+                      <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
+                        {item.name}
+                      </span>
+                      <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
+                        {item.handle}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
+                      <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
+                      <FiExternalLink size={13} aria-hidden="true" />
+                    </div>
+                  </a>
+                )
+              )}
             </div>
           </div>
         </motion.div>

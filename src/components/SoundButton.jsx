@@ -46,22 +46,6 @@ const songs = [
         duration: 264,
         color: "#3B82F6",
     },
-    {
-        title: "Monolog",
-        artist: "Pamungkas",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8qVUgkHMIz72PLnsBgHLQb8Iz3x0tLTr56OjBXFOx2w&s=10",
-        audio: "/audio/monolog.mp3",
-        duration: 281,
-        color: "#3B82F6",
-    },
-    {
-        title: "Salvatore",
-        artist: "Lana Del Rey",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
-        audio: "/audio/Salvatore.mp3",
-        duration: 281,
-        color: "#3B82F6",
-    },
 ];
 
 const formatTime = (time) => {
