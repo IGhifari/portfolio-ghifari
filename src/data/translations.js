@@ -295,7 +295,7 @@ export const translations = {
       successBody: "Terima kasih telah menghubungi. Saya telah menerima pesan Anda dan akan segera membalas.",
       errorTitle: "Tidak dapat mengirim pesan otomatis",
       errorBody: "Silakan kirim email langsung ke",
-      toastSuccess: "Pesan berhasil terkirim! 🎉",
+      toastSuccess: "Pesan berhasil terkirim!",
       toastError: "Gagal mengirim pesan. Silakan hubungi langsung lewat email.",
       toastOffline: "Layanan email sedang offline. Silakan kirim ke ighifarii05@gmail.com secara langsung.",
       toastCopied: "Email disalin ke papan klip!",
