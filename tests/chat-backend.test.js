@@ -2095,7 +2095,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.ok(headersContent.includes("'sha256-/Fgcf2NJO5BTdEda9XNcxZkG879rrsZBaL8V1Ijy6RU='"));
       assert.ok(headersContent.includes("'sha256-9jQ7iY2TnlBB9RC2Ks4RZfZJ/IoZOrhSWCBPKMBLyU8='"));
       // connect-src must only have 'self' and https://api.emailjs.com (no Google Fonts)
-      assert.ok(headersContent.includes("connect-src 'self' https://api.emailjs.com;"));
+      assert.ok(headersContent.includes("connect-src 'self' https://api.emailjs.com https://cloudflareinsights.com;"));
       // img-src must restrict https: to specific origins
       assert.ok(headersContent.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id;"));
       // Edge /api/* no-store rule

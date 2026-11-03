@@ -1,2 +1,30 @@
 # Cloudflare Pages handles SPA fallback to /index.html natively when 404.html is absent.
 # Catch-all rule "/* /index.html 200" is intentionally omitted so static SEO files (/sitemap.xml, /robots.txt) are not overwritten by /index.html.
+
+# Legacy Asset 301 Redirects
+/M.GhifariBimaKhadafi_CV.pdf        /docs/M.GhifariBimaKhadafi_CV.pdf        301
+/born_to_die.mp3                    /audio/born_to_die.mp3                    301
+/monolog.mp3                        /audio/monolog.mp3                        301
+/risk_it_all.mp3                    /audio/risk_it_all.mp3                    301
+/Salvatore.mp3                      /audio/Salvatore.mp3                      301
+/sound4.mp3                         /audio/sound4.mp3                         301
+/summertime_sad.mp3                 /audio/summertime_sad.mp3                 301
+/ultraviolence.mp3                  /audio/ultraviolence.mp3                  301
+/sound2.webp                        /audio/covers/sound2.webp                 301
+/ama_salam.webp                     /images/certificates/ama_salam.webp       301
+/clevio.webp                        /images/certificates/clevio.webp          301
+/digitalent.webp                    /images/certificates/digitalent.webp      301
+/idn.webp                           /images/certificates/idn.webp             301
+/ghifari.webp                       /images/profile/ghifari.webp              301
+/ghifari.jpeg                       /images/profile/ghifari.jpeg              301
+/akseskita.webp                     /images/projects/akseskita.webp           301
+/bluehorizon.webp                   /images/projects/bluehorizon.webp         301
+/class1ia08.webp                    /images/projects/class1ia08.webp          301
+/desaku.webp                        /images/projects/desaku.webp              301
+/food.webp                          /images/projects/food.webp                301
+/internship.webp                    /images/projects/internship.webp          301
+/portfolio.webp                     /images/projects/portfolio.webp           301
+/project_management.webp            /images/projects/project_management.webp  301
+/pulauharapan.webp                  /images/projects/pulauharapan.webp        301
+/seharidirumah.webp                 /images/projects/seharidirumah.webp       301
+/studyflow.webp                     /images/projects/studyflow.webp           301

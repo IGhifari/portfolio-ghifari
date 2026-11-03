@@ -17,9 +17,9 @@ export const profileData = {
     'Muhammad Ghifari Bima Khadafi',
     'IGhifari',
   ],
-  avatarImage: '/ghifari.webp',
-  avatarFallbackImage: '/ghifari.jpeg',
-  logoImage: '/logo1.png',
+  avatarImage: '/images/profile/ghifari.webp',
+  avatarFallbackImage: '/images/profile/ghifari.jpeg',
+  logoImage: '/logo.png',
   socials: {
     github: 'https://github.com/IGhifari',
     githubHandle: 'github.com/IGhifari',

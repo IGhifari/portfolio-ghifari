@@ -88,8 +88,8 @@ export const generateLanyardTextures = async ({ isDark = true } = {}) => {
   }
 
   const [profileImg, logoImg] = await Promise.all([
-    loadImg('/ghifari.webp').then((res) => res || loadImg('/ghifari.jpeg')),
-    loadImg('/logo1.png'),
+    loadImg('/images/profile/ghifari.webp').then((res) => res || loadImg('/images/profile/ghifari.jpeg')),
+    loadImg('/logo.png'),
   ]);
 
   const palette = isDark
