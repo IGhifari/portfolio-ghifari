@@ -18,6 +18,7 @@ const About = lazy(() => import('./components/About'));
 const Experience = lazy(() => import('./components/Experience'));
 const Journey = lazy(() => import('./components/Journey'));
 const Skills = lazy(() => import('./components/Skill'));
+const GithubActivity = lazy(() => import('./components/GithubActivity'));
 const Certificate = lazy(() => import('./components/Certificate'));
 const AcademicBackground = lazy(() => import('./components/AcademicBackground'));
 const Contact = lazy(() => import('./components/Contact'));
@@ -151,6 +152,13 @@ const AppContent = () => {
                             <div id="skills" aria-hidden="true" />
                             <DeferredSection>
                                 <Skills/>
+                            </DeferredSection>
+                        </section>
+
+                        {/* GitHub Activity */}
+                        <section id="github" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <GithubActivity />
                             </DeferredSection>
                         </section>
 

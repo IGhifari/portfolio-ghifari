@@ -23,6 +23,7 @@ const Navbar = () => {
     { to: 'experience', label: t('nav.experience') },
     { to: 'journey', label: t('nav.journey') },
     { to: 'stack', label: t('nav.stack') },
+    { to: 'github', label: t('nav.github') },
     { to: 'certificates', label: t('nav.certificates') },
     { to: 'education', label: t('nav.education') },
     { to: 'contact', label: t('nav.contact') },

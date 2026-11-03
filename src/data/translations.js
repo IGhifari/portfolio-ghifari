@@ -13,6 +13,7 @@ export const translations = {
       experience: "PENGALAMAN",
       journey: "PERJALANAN",
       stack: "TEKNOLOGI",
+      github: "GITHUB",
       certificates: "SERTIFIKAT",
       education: "PENDIDIKAN",
       contact: "KONTAK",
@@ -218,9 +219,52 @@ export const translations = {
       },
     },
 
+    // GitHub Activity
+    github: {
+      sectionTag: "06 / AKTIVITAS GITHUB",
+      subTag: "KODE TERBUKA & REPOSITORI",
+      heading: "AKTIVITAS GITHUB",
+      intro: "Eksplorasi repositori publik, proyek open source, dan kode produksi yang diperbarui secara langsung dari GitHub REST API.",
+      viewProfile: "PROFIL GITHUB",
+      viewProfileAria: "Kunjungi profil GitHub IGhifari di tab baru",
+      openRepoAria: "Buka repositori {name} di GitHub",
+      stats: {
+        contributions: "KONTRIBUSI TAHUNAN",
+        repos: "REPOSITORI PUBLIK",
+        followers: "PENGIKUT",
+        following: "MENGIKUTI",
+      },
+      liveBadge: "DATA LANGSUNG",
+      filterAll: "SEMUA",
+      noDescription: "Tidak ada deskripsi yang disediakan.",
+      updatedPrefix: "Diperbarui",
+      stars: "bintang",
+      forks: "fork",
+      refresh: "SEGARKAN",
+      refreshAria: "Segarkan data dari GitHub API",
+      loading: "Memuat data repositori dari GitHub...",
+      errorHeading: "Gagal Memuat Data GitHub",
+      errorMessage: "Terjadi kendala saat menghubungi GitHub API. Anda tetap dapat mengunjungi profil saya secara langsung.",
+      rateLimitHeading: "Batas Permintaan GitHub Tercapai",
+      rateLimitMessage: "GitHub membatasi permintaan API per jam untuk akses publik. Silakan coba beberapa saat lagi atau buka profil langsung.",
+      retry: "COBA LAGI",
+      visitDirectly: "BUKA PROFIL LANGSUNG",
+      emptyHeading: "Tidak Ada Repositori Publik",
+      emptyMessage: "Belum ada repositori publik yang dapat ditampilkan saat ini.",
+      calendarHeading: "KALENDER KONTRIBUSI",
+      calendarSub: "Aktivitas commit, pull request, dan kontribusi kode publik selama 1 tahun terakhir.",
+      totalContributionsLabel: "Kontribusi dalam 1 Tahun Terakhir",
+      legendLess: "Sedikit",
+      legendMore: "Banyak",
+      recentActivityHeading: "RIWAYAT KONTRIBUSI TERBARU",
+      recentActivityIntro: "Log aktivitas publik terverifikasi yang mencatat commit, merge pull request, dan kolaborasi repositori.",
+      reposHeading: "REPOSITORI PUBLIK PILIHAN",
+      noActivity: "Belum ada riwayat aktivitas publik yang tercatat.",
+    },
+
     // Certificates
     certificates: {
-      sectionTag: "06 / SERTIFIKAT",
+      sectionTag: "07 / SERTIFIKAT",
       subTag: "KREDENSIAL",
       heading: "SERTIFIKASI TEKNIS",
       intro: "Pelatihan kejuruan terverifikasi, kredensial magang praktis, dan pencapaian kompetisi pengembangan perangkat lunak.",
@@ -243,7 +287,7 @@ export const translations = {
 
     // Education / Academic Background
     education: {
-      sectionTag: "07 / PENDIDIKAN",
+      sectionTag: "08 / PENDIDIKAN",
       subTag: "LATAR BELAKANG AKADEMIK",
       heading: "PENDIDIKAN FORMAL",
       intro: "Riwayat pendidikan formal di bidang rekayasa perangkat lunak dan teknologi informasi, memadukan teori ilmu komputer dengan implementasi praktis.",
@@ -306,7 +350,7 @@ export const translations = {
 
     // Contact
     contact: {
-      sectionTag: "08 / KONTAK",
+      sectionTag: "09 / KONTAK",
       subTag: "HUBUNGI SAYA",
       heading: "MARI MEMBANGUN SESUATU YANG BERMANFAAT",
       intro: "Memiliki ide proyek, peluang kerja, atau rencana kolaborasi? Silakan kirim pesan langsung atau terhubung melalui saluran saya.",
@@ -471,6 +515,7 @@ export const translations = {
       experience: "EXPERIENCE",
       journey: "JOURNEY",
       stack: "STACK",
+      github: "GITHUB",
       certificates: "CERTIFICATES",
       education: "EDUCATION",
       contact: "CONTACT",
@@ -676,9 +721,52 @@ export const translations = {
       },
     },
 
+    // GitHub Activity
+    github: {
+      sectionTag: "06 / GITHUB ACTIVITY",
+      subTag: "OPEN SOURCE & REPOSITORIES",
+      heading: "GITHUB ACTIVITY",
+      intro: "Explore open-source codebases, public repositories, and active software development work fetched directly from the GitHub REST API.",
+      viewProfile: "GITHUB PROFILE",
+      viewProfileAria: "Visit IGhifari's GitHub profile in a new tab",
+      openRepoAria: "Open {name} repository on GitHub",
+      stats: {
+        contributions: "ANNUAL CONTRIBUTIONS",
+        repos: "PUBLIC REPOSITORIES",
+        followers: "FOLLOWERS",
+        following: "FOLLOWING",
+      },
+      liveBadge: "LIVE DATA",
+      filterAll: "ALL",
+      noDescription: "No description provided.",
+      updatedPrefix: "Updated",
+      stars: "stars",
+      forks: "forks",
+      refresh: "REFRESH",
+      refreshAria: "Refresh data from GitHub API",
+      loading: "Loading repository data from GitHub...",
+      errorHeading: "Unable to Load GitHub Data",
+      errorMessage: "Could not retrieve repository data from GitHub API. You can still visit my GitHub profile directly.",
+      rateLimitHeading: "GitHub API Rate Limit Reached",
+      rateLimitMessage: "GitHub limits unauthenticated API requests per hour. Please try again shortly or view my profile directly.",
+      retry: "RETRY",
+      visitDirectly: "VISIT PROFILE DIRECTLY",
+      emptyHeading: "No Public Repositories Found",
+      emptyMessage: "There are currently no public repositories available to display.",
+      calendarHeading: "CONTRIBUTION CALENDAR",
+      calendarSub: "Public commit activity, pull requests, and code contributions over the past year.",
+      totalContributionsLabel: "Contributions in the Last Year",
+      legendLess: "Less",
+      legendMore: "More",
+      recentActivityHeading: "RECENT CONTRIBUTION ACTIVITY",
+      recentActivityIntro: "Verified public activities logging commits, merged pull requests, and repository collaborations.",
+      reposHeading: "SELECTED PUBLIC REPOSITORIES",
+      noActivity: "No public activity recorded recently.",
+    },
+
     // Certificates
     certificates: {
-      sectionTag: "06 / CERTIFICATES",
+      sectionTag: "07 / CERTIFICATES",
       subTag: "CREDENTIALS",
       heading: "TECHNICAL CERTIFICATIONS",
       intro: "Verified vocational training, practical internship credentials, and competitive software development achievements.",
@@ -701,7 +789,7 @@ export const translations = {
 
     // Education / Academic Background
     education: {
-      sectionTag: "07 / EDUCATION",
+      sectionTag: "08 / EDUCATION",
       subTag: "ACADEMIC BACKGROUND",
       heading: "FORMAL EDUCATION",
       intro: "Formal academic background in software engineering and information technology, combining computer science foundations with practical implementation.",
@@ -764,7 +852,7 @@ export const translations = {
 
     // Contact
     contact: {
-      sectionTag: "08 / CONTACT",
+      sectionTag: "09 / CONTACT",
       subTag: "GET IN TOUCH",
       heading: "LET'S BUILD SOMETHING USEFUL",
       intro: "Have a project, opportunity, or collaboration in mind? Feel free to send a message directly or connect via my channels.",
