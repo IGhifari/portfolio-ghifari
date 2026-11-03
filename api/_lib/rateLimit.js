@@ -248,23 +248,14 @@ const getHeaderValue = (req, headerName) => {
 };
 
 /**
- * Extracts and normalizes the first (visitor) IP from a potentially comma-separated
- * forwarding header (`x-forwarded-for`, `x-vercel-forwarded-for`).
- */
-const extractFirstForwardedIp = (rawHeaderValue) => {
-  if (typeof rawHeaderValue !== 'string' || !rawHeaderValue.trim()) {
-    return 'anonymous';
-  }
-  const firstHop = rawHeaderValue.split(',')[0].trim();
-  return normalizeIpForRateLimit(firstHop);
-};
-
-/**
  * Checks whether the request is executing in a verified Cloudflare Pages / Workers runtime.
  * Never relies merely on the presence of a `.get` function on the headers object.
  */
-const isCloudflarePages = (options = {}, env = {}) => {
+const isCloudflarePages = (options = {}, env = {}, req = {}) => {
   if (options?.trustCloudflare === true || options?.runtime === 'cloudflare-pages') {
+    return true;
+  }
+  if (req?.isCloudflarePages === true) {
     return true;
   }
   if (env?.CF_PAGES === '1' || env?.CF_PAGES === true || env?.TRUST_CLOUDFLARE_PROXY === 'true') {
@@ -299,13 +290,19 @@ const isVercel = (options = {}, env = {}) => {
  * Extracts and normalizes a client identifier (IP address) adhering strictly to verified proxy trust.
  *
  * Proxy IP trust model:
- * 1. Cloudflare Pages: When verified via runtime (`Cloudflare-Workers` / `CF_PAGES`), trust `cf-connecting-ip`.
- *    If missing/invalid, fallback to `req.socket.remoteAddress` or `'anonymous'`. Never fallback to untrusted headers.
- * 2. Vercel: When verified via runtime (`VERCEL` / `VERCEL_ENV`), trust official Vercel client IP headers
- *    (`x-real-ip`, `x-vercel-forwarded-for`, `x-forwarded-for` [first IP is client]).
- *    Never fallback to `cf-connecting-ip`.
- * 3. Plain Node runtime (no verified trusted proxy): Never trust `cf-connecting-ip`, `x-real-ip`, or `x-forwarded-for`.
- *    Use `req.socket.remoteAddress`. If unavailable/invalid, use `'anonymous'`.
+ * 1. Cloudflare Pages: When verified via runtime (`trustCloudflare`, `runtime: 'cloudflare-pages'`,
+ *    `req.isCloudflarePages`, `CF_PAGES`, or `Cloudflare-Workers`), trust `cf-connecting-ip`.
+ *    If missing/invalid/comma-separated, fallback to `req.socket.remoteAddress` or `'anonymous'`.
+ *    Never fallback to untrusted headers (`x-forwarded-for`, `x-real-ip`).
+ * 2. Vercel: When verified via runtime (`trustVercel`, `runtime: 'vercel'`, `VERCEL`, or `VERCEL_ENV`),
+ *    trust official Vercel client IP headers (`x-real-ip`, `x-vercel-forwarded-for`, `x-forwarded-for`).
+ *    Validate each header directly via `normalizeIpForRateLimit()`. Any header containing comma-separated
+ *    multiple IPs or malformed characters is rejected; fallback to `req.socket.remoteAddress` or `'anonymous'`.
+ *    Never fallback to `cf-connecting-ip` and never pick arbitrary first/rightmost hops.
+ * 3. Plain Node runtime (no verified trusted proxy): Never trust client-supplied proxy headers
+ *    (`cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`, `x-vercel-forwarded-for`).
+ *    Use `req.socket.remoteAddress` validated via `normalizeIpForRateLimit()`.
+ *    If unavailable or invalid, use `'anonymous'`.
  */
 export const getClientIdentifier = (req, options = {}) => {
   const env =
@@ -314,7 +311,7 @@ export const getClientIdentifier = (req, options = {}) => {
       : (typeof process !== 'undefined' ? process.env : {}) || {};
 
   // 1. Verified Cloudflare Pages runtime
-  if (isCloudflarePages(options, env)) {
+  if (isCloudflarePages(options, env, req)) {
     const cfConnectingIp = getHeaderValue(req, 'cf-connecting-ip');
     if (cfConnectingIp) {
       const normalized = normalizeIpForRateLimit(cfConnectingIp);
@@ -333,7 +330,7 @@ export const getClientIdentifier = (req, options = {}) => {
     return 'anonymous';
   }
 
-  // 2. Verified Vercel runtime (official documented headers)
+  // 2. Verified Vercel runtime (official documented headers validated directly without multi-hop splitting)
   if (isVercel(options, env)) {
     const realIp = getHeaderValue(req, 'x-real-ip');
     if (realIp) {
@@ -345,7 +342,7 @@ export const getClientIdentifier = (req, options = {}) => {
 
     const vercelForwardedFor = getHeaderValue(req, 'x-vercel-forwarded-for');
     if (vercelForwardedFor) {
-      const normalized = extractFirstForwardedIp(vercelForwardedFor);
+      const normalized = normalizeIpForRateLimit(vercelForwardedFor);
       if (normalized !== 'anonymous') {
         return normalized;
       }
@@ -353,7 +350,7 @@ export const getClientIdentifier = (req, options = {}) => {
 
     const forwardedFor = getHeaderValue(req, 'x-forwarded-for');
     if (forwardedFor) {
-      const normalized = extractFirstForwardedIp(forwardedFor);
+      const normalized = normalizeIpForRateLimit(forwardedFor);
       if (normalized !== 'anonymous') {
         return normalized;
       }
@@ -370,7 +367,7 @@ export const getClientIdentifier = (req, options = {}) => {
   }
 
   // 3. Plain Node runtime without verified trusted proxy:
-  // Never trust client-supplied proxy headers (cf-connecting-ip, x-real-ip, x-forwarded-for)
+  // Never trust client-supplied proxy headers (cf-connecting-ip, x-real-ip, x-forwarded-for, x-vercel-forwarded-for)
   const socketAddr = req?.socket?.remoteAddress;
   if (typeof socketAddr === 'string' && socketAddr.trim().length > 0) {
     const normalizedSocket = normalizeIpForRateLimit(socketAddr);

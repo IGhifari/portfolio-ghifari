@@ -35,12 +35,14 @@ describe('Cloudflare Pages Function Adapter (functions/api/chat.js)', () => {
     assert.equal(body.error.code, 'METHOD_NOT_ALLOWED');
   });
 
-  it('passes context.env and client IP (cf-connecting-ip) to chat handler', async () => {
+  it('passes context.env and client IP (cf-connecting-ip) to chat handler with verified Cloudflare Pages runtime', async () => {
     let capturedReq = null;
     let capturedEnv = null;
+    let capturedOptions = null;
 
-    const mockChatHandlerFactory = ({ env }) => {
-      capturedEnv = env;
+    const mockChatHandlerFactory = (options) => {
+      capturedOptions = options;
+      capturedEnv = options?.env;
       return async (req, res) => {
         capturedReq = req;
         res.setHeader('X-Custom-Header', 'test-value');
@@ -86,8 +88,11 @@ describe('Cloudflare Pages Function Adapter (functions/api/chat.js)', () => {
     assert.equal(json.ok, true);
     assert.equal(json.data.answer, 'Mocked answer for testing');
 
-    // Verify injected request and env
+    // Verify injected request, env, and trusted Cloudflare Pages runtime options
     assert.equal(capturedEnv.GEMINI_API_KEY, 'test-key');
+    assert.equal(capturedOptions.trustCloudflare, true);
+    assert.equal(capturedOptions.runtime, 'cloudflare-pages');
+    assert.equal(capturedReq.isCloudflarePages, true);
     assert.equal(capturedReq.headers['x-forwarded-for'], '198.51.100.42');
     assert.equal(capturedReq.headers.get('cf-connecting-ip'), '198.51.100.42');
   });

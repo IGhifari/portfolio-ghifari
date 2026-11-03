@@ -75,28 +75,27 @@ export const createCloudflarePagesChatHandler = ({
       }
 
       // 4. Resolve Client IP from Cloudflare Connecting IP header
-      const clientIp =
-        request?.headers?.get?.('cf-connecting-ip') ||
-        request?.headers?.get?.('x-forwarded-for') ||
-        'anonymous';
+      const cfConnectingIp = request?.headers?.get?.('cf-connecting-ip') || 'anonymous';
 
       const req = {
         method: 'POST',
         body: rawBody,
+        isCloudflarePages: true,
         headers: {
-          'x-forwarded-for': clientIp,
-          'x-real-ip': clientIp,
+          'cf-connecting-ip': cfConnectingIp,
+          'x-forwarded-for': cfConnectingIp,
+          'x-real-ip': cfConnectingIp,
           'content-type': request?.headers?.get?.('content-type') || 'application/json',
           get: (headerName) => {
             const lower = String(headerName || '').toLowerCase();
             if (lower === 'cf-connecting-ip' || lower === 'x-forwarded-for' || lower === 'x-real-ip') {
-              return clientIp;
+              return cfConnectingIp;
             }
             return request?.headers?.get?.(headerName);
           },
         },
         socket: {
-          remoteAddress: clientIp,
+          remoteAddress: cfConnectingIp !== 'anonymous' ? cfConnectingIp : undefined,
         },
       };
 
@@ -129,8 +128,12 @@ export const createCloudflarePagesChatHandler = ({
         },
       };
 
-      // 5. Explicitly inject environment variables into handler factory
-      const handler = chatHandlerFactory({ env });
+      // 5. Explicitly inject environment variables and verified Cloudflare Pages runtime into handler factory
+      const handler = chatHandlerFactory({
+        env,
+        trustCloudflare: true,
+        runtime: 'cloudflare-pages',
+      });
       await handler(req, res);
 
       if (!responseHeaders.has('Content-Type')) {
