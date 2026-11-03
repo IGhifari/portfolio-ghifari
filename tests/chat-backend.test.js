@@ -1891,6 +1891,117 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(capturedReq.headers.origin, '');
     });
 
+    it('CONF-05: Cloudflare Pages Function enforces streaming body limit (16 KB), cancels stream early, and handles fallbacks safely', async () => {
+      let factoryCalled = false;
+      const mockFactory = () => {
+        return async (req, res) => {
+          factoryCalled = true;
+          res.status(200).json({ ok: true, echoBody: req.body });
+        };
+      };
+
+      const pagesHandler = createCloudflarePagesChatHandler({
+        chatHandlerFactory: mockFactory,
+      });
+
+      // 1. Normal streaming payload within 16 KB succeeds and decodes UTF-8
+      const normalReq = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Sec-Fetch-Site': 'same-origin',
+          Origin: 'https://www.ighifari.my.id',
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: JSON.stringify({ message: 'Halo' }),
+      });
+      const normalRes = await pagesHandler({ request: normalReq, env: {} });
+      assert.equal(normalRes.status, 200);
+      assert.equal(factoryCalled, true);
+      const normalJson = await normalRes.json();
+      assert.equal(normalJson.ok, true);
+
+      // 2. Large streaming payload > 16 KB is immediately rejected with 413 and never calls chatHandlerFactory
+      factoryCalled = false;
+      const oversizedReq = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Sec-Fetch-Site': 'same-origin',
+          Origin: 'https://www.ighifari.my.id',
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: JSON.stringify({ message: 'X'.repeat(17_000) }),
+      });
+      const oversizedRes = await pagesHandler({ request: oversizedReq, env: {} });
+      assert.equal(oversizedRes.status, 413);
+      assert.equal(oversizedRes.headers.get('Content-Type'), 'application/json; charset=utf-8');
+      assert.equal(oversizedRes.headers.get('Cache-Control'), 'no-store');
+      const oversizedJson = await oversizedRes.json();
+      assert.equal(oversizedJson.ok, false);
+      assert.equal(oversizedJson.error.code, 'PAYLOAD_TOO_LARGE');
+      assert.equal(factoryCalled, false);
+
+      // 3. Early stream cancellation: verifies reader.cancel() is invoked upon overflow
+      let streamCancelled = false;
+      let cancelReasonGiven = null;
+      const customChunkStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(8192)); // Chunk 1: 8 KB
+          controller.enqueue(new Uint8Array(9000)); // Chunk 2: 9 KB (total 17.192 KB > 16 KB)
+          controller.enqueue(new Uint8Array(8192)); // Chunk 3: should not be read
+        },
+        cancel(reason) {
+          streamCancelled = true;
+          cancelReasonGiven = reason;
+        },
+      });
+
+      const cancelTestReq = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://www.ighifari.my.id',
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: customChunkStream,
+        duplex: 'half',
+      });
+
+      const cancelRes = await pagesHandler({ request: cancelTestReq, env: {} });
+      assert.equal(cancelRes.status, 413);
+      assert.equal(streamCancelled, true);
+      assert.equal(cancelReasonGiven, 'PAYLOAD_TOO_LARGE');
+
+      // 4. Fallback: mocked request with text() method > 16 KB cannot bypass limit
+      factoryCalled = false;
+      const mockTextOverReq = {
+        method: 'POST',
+        headers: {
+          get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : undefined),
+        },
+        async text() {
+          return 'T'.repeat(16_385);
+        },
+      };
+      const textOverRes = await pagesHandler({ request: mockTextOverReq, env: {} });
+      assert.equal(textOverRes.status, 413);
+      assert.equal(factoryCalled, false);
+
+      // 5. Fallback: mocked request with body as raw string > 16 KB cannot bypass limit
+      factoryCalled = false;
+      const mockStringOverReq = {
+        method: 'POST',
+        body: 'S'.repeat(16_385),
+        headers: {
+          get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : undefined),
+        },
+      };
+      const stringOverRes = await pagesHandler({ request: mockStringOverReq, env: {} });
+      assert.equal(stringOverRes.status, 413);
+      assert.equal(factoryCalled, false);
+    });
+
     it('enforces Cache-Control: no-store across all API responses (405, 415, 403, 400, 413, 429, 500, 200)', async () => {
       const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
         return {

@@ -45,18 +45,9 @@ export const createCloudflarePagesChatHandler = ({
         );
       }
 
-      // 2. Read Request Body as Text
-      let rawBody = '';
-      try {
-        rawBody = await request.text();
-      } catch {
-        rawBody = '';
-      }
-
-      // 3. Size-Check using Web Standards TextEncoder
-      const payloadBytes = new TextEncoder().encode(rawBody).length;
-      if (payloadBytes > MAX_PAYLOAD_BYTES) {
-        return new Response(
+      // Helper for returning 413 PAYLOAD_TOO_LARGE
+      const createPayloadTooLargeResponse = () =>
+        new Response(
           JSON.stringify({
             ok: false,
             error: {
@@ -72,6 +63,75 @@ export const createCloudflarePagesChatHandler = ({
             },
           }
         );
+
+      // 2. Read Request Body via Bounded Streaming Reader (max 16 KB) with early cancellation
+      let rawBody = '';
+      let isPayloadTooLarge = false;
+
+      if (request?.body && typeof request.body.getReader === 'function') {
+        const reader = request.body.getReader();
+        const chunks = [];
+        let accumulatedBytes = 0;
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) {
+              accumulatedBytes += value.byteLength;
+              if (accumulatedBytes > MAX_PAYLOAD_BYTES) {
+                isPayloadTooLarge = true;
+                try {
+                  await reader.cancel('PAYLOAD_TOO_LARGE');
+                } catch {
+                  // Ignore cancel errors if stream is already closed
+                }
+                break;
+              }
+              chunks.push(value);
+            }
+          }
+        } catch {
+          if (!isPayloadTooLarge) {
+            rawBody = '';
+          }
+        } finally {
+          try {
+            reader.releaseLock();
+          } catch {
+            // Ignore releaseLock errors if stream was cancelled
+          }
+        }
+
+        if (isPayloadTooLarge) {
+          return createPayloadTooLargeResponse();
+        }
+
+        if (chunks.length > 0) {
+          const merged = new Uint8Array(accumulatedBytes);
+          let offset = 0;
+          for (const chunk of chunks) {
+            merged.set(chunk, offset);
+            offset += chunk.byteLength;
+          }
+          rawBody = new TextDecoder('utf-8').decode(merged);
+        }
+      } else if (typeof request?.text === 'function') {
+        // Fallback for mock environments without stream reader: strictly enforce 16 KB
+        try {
+          rawBody = await request.text();
+        } catch {
+          rawBody = '';
+        }
+        if (new TextEncoder().encode(rawBody).length > MAX_PAYLOAD_BYTES) {
+          return createPayloadTooLargeResponse();
+        }
+      } else if (typeof request?.body === 'string') {
+        // Direct string fallback: strictly enforce 16 KB
+        rawBody = request.body;
+        if (new TextEncoder().encode(rawBody).length > MAX_PAYLOAD_BYTES) {
+          return createPayloadTooLargeResponse();
+        }
       }
 
       // 4. Resolve Client IP from Cloudflare Connecting IP header

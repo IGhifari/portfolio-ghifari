@@ -308,6 +308,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder={t('contact.namePlaceholder')}
                   disabled={isSubmitting}
+                  maxLength={100}
                   className={`dark-form-input ${errors.name ? 'has-error' : ''}`}
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
@@ -334,6 +335,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder={t('contact.emailPlaceholder')}
                   disabled={isSubmitting}
+                  maxLength={254}
                   className={`dark-form-input ${errors.email ? 'has-error' : ''}`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
@@ -365,8 +367,16 @@ const Contact = () => {
                 onChange={handleChange}
                 placeholder={t('contact.subjectPlaceholder')}
                 disabled={isSubmitting}
-                className="dark-form-input"
+                maxLength={200}
+                className={`dark-form-input ${errors.subject ? 'has-error' : ''}`}
+                aria-invalid={errors.subject ? 'true' : 'false'}
+                aria-describedby={errors.subject ? 'subject-error' : undefined}
               />
+              {errors.subject && (
+                <p id="subject-error" className="font-mono text-xs text-rose-500 mt-1.5 flex items-center gap-1">
+                  <FiAlertCircle size={12} aria-hidden="true" /> {errors.subject}
+                </p>
+              )}
             </div>
 
             {/* Message */}
@@ -385,6 +395,7 @@ const Contact = () => {
                 rows={5}
                 placeholder={t('contact.messagePlaceholder')}
                 disabled={isSubmitting}
+                maxLength={5000}
                 className={`dark-form-input resize-y min-h-[120px] ${errors.message ? 'has-error' : ''}`}
                 aria-invalid={errors.message ? 'true' : 'false'}
                 aria-describedby={errors.message ? 'message-error' : undefined}
