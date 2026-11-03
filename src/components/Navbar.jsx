@@ -4,6 +4,7 @@ import { FiSun, FiMoon, FiDownload } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useRouter } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 
 const Navbar = () => {
@@ -11,9 +12,13 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { route, navigate } = useRouter();
+
+  const isHome = route?.type === 'home';
 
   const navItems = [
     { to: 'projects', label: t('nav.work') },
+    { to: '/study-case', label: t('nav.caseStudies'), isRoute: true },
     { to: 'about', label: t('nav.about') },
     { to: 'experience', label: t('nav.experience') },
     { to: 'journey', label: t('nav.journey') },
@@ -67,35 +72,86 @@ const Navbar = () => {
     >
       <div className="max-w-6xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link
-          to="profile"
-          href="#profile"
-          smooth={true}
-          duration={600}
-          offset={-80}
-          className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-          aria-label="Ghifari - Home"
-        >
-          GHIFARI<span className="text-[var(--accent)]">.</span>
-        </Link>
+        {isHome ? (
+          <Link
+            to="profile"
+            href="#profile"
+            smooth={true}
+            duration={600}
+            offset={-80}
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            aria-label="Ghifari - Home"
+          >
+            GHIFARI<span className="text-[var(--accent)]">.</span>
+          </Link>
+        ) : (
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/');
+            }}
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            aria-label="Ghifari - Home"
+          >
+            GHIFARI<span className="text-[var(--accent)]">.</span>
+          </a>
+        )}
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-3.5 xl:gap-6" aria-label="Main Navigation">
-          {navItems.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              href={`#${to}`}
-              smooth={true}
-              duration={600}
-              offset={-70}
-              spy={true}
-              activeClass="!text-[var(--accent)]"
-              className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-            >
-              {label}
-            </Link>
-          ))}
+        <nav className="hidden lg:flex items-center gap-2.5 xl:gap-5" aria-label="Main Navigation">
+          {navItems.map(({ to, label, isRoute }) => {
+            if (isRoute) {
+              const isActive = route?.cleanPath?.startsWith('/study-case');
+              return (
+                <a
+                  key={to}
+                  href={to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(to);
+                  }}
+                  className={`dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                    isActive ? '!text-[var(--accent)] font-bold' : ''
+                  }`}
+                >
+                  {label}
+                </a>
+              );
+            }
+
+            if (isHome) {
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  href={`#${to}`}
+                  smooth={true}
+                  duration={600}
+                  offset={-70}
+                  spy={true}
+                  activeClass="!text-[var(--accent)]"
+                  className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                >
+                  {label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={to}
+                href={`/#${to}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/#${to}`);
+                }}
+                className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              >
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         {/* Desktop Controls (CV + Language Selector + Theme Toggle) */}
@@ -229,22 +285,63 @@ const Navbar = () => {
         aria-hidden={!isMenuOpen}
       >
         <div className="px-6 flex flex-col gap-1.5">
-          {navItems.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              href={`#${to}`}
-              smooth={true}
-              duration={600}
-              offset={-70}
-              onClick={closeMenu}
-              spy={true}
-              activeClass="!text-[var(--accent)] !bg-[var(--surface-alt)]"
-              className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
-            >
-              {label}
-            </Link>
-          ))}
+          {navItems.map(({ to, label, isRoute }) => {
+            if (isRoute) {
+              const isActive = route?.cleanPath?.startsWith('/study-case');
+              return (
+                <a
+                  key={to}
+                  href={to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    closeMenu();
+                    navigate(to);
+                  }}
+                  className={`py-3 px-4 rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer ${
+                    isActive
+                      ? '!text-[var(--accent)] !bg-[var(--surface-alt)] font-bold'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)]'
+                  }`}
+                >
+                  {label}
+                </a>
+              );
+            }
+
+            if (isHome) {
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  href={`#${to}`}
+                  smooth={true}
+                  duration={600}
+                  offset={-70}
+                  onClick={closeMenu}
+                  spy={true}
+                  activeClass="!text-[var(--accent)] !bg-[var(--surface-alt)]"
+                  className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
+                >
+                  {label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={to}
+                href={`/#${to}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeMenu();
+                  navigate(`/#${to}`);
+                }}
+                className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
+              >
+                {label}
+              </a>
+            );
+          })}
 
           {RESUME_AVAILABLE && (
             <a

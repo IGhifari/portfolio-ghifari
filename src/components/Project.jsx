@@ -4,13 +4,14 @@ import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCh
 import TiltedCard from './reactbits/TiltedCard';
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
+import { RouterLink } from '../context/RouterContext';
 import '../styles/Project.css';
 
 const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'game'];
 
 const Project = () => {
   const shouldReduceMotion = useReducedMotion();
-  const { t, resolve } = useLanguage();
+  const { language, t, resolve } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeProject, setActiveProject] = useState(null);
   const lastTriggerRef = useRef(null);
@@ -264,13 +265,22 @@ const Project = () => {
 
                     {/* Verified Links & Case Study Modal Trigger */}
                     <div className="flex flex-wrap items-center gap-3 mt-7 pt-1">
+                      <RouterLink
+                        to={`/study-case/${project.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
+                      >
+                        <FiBookOpen size={15} />
+                        <span>{t('caseStudies.readCaseStudy')}</span>
+                      </RouterLink>
+
                       <button
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                       >
-                        <FiBookOpen size={15} />
+                        <FiLayers size={15} />
                         <span>{t('projects.viewDetails')}</span>
                       </button>
 
@@ -441,6 +451,42 @@ const Project = () => {
       )}
 
       {/* ==================================================
+          CASE STUDY HUB BANNER (CTA TO /study-case)
+          ================================================== */}
+      <motion.div
+        {...getFadeMotion(0.1)}
+        className="mt-16 md:mt-24 p-6 sm:p-8 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
+        <div className="space-y-2 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+            <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)] font-semibold">
+              {t('caseStudies.heading')}
+            </span>
+          </div>
+          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-[var(--text-primary)] uppercase tracking-tight">
+            {language === 'id'
+              ? 'Analisis Arsitektur & Studi Kasus Mendalam'
+              : 'Architectural Analysis & In-Depth Case Studies'}
+          </h3>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+            {language === 'id'
+              ? 'Pelajari problem statement, keputusan teknis, arsitektur sistem, dan proses implementasi di balik proyek-proyek rekayasa perangkat lunak terpilih.'
+              : 'Explore the problem statement, technical decisions, system architecture, and implementation process behind selected software engineering projects.'}
+          </p>
+        </div>
+        <div className="shrink-0">
+          <RouterLink
+            to="/study-case"
+            className="inline-flex items-center gap-2.5 px-5 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors shadow-sm"
+          >
+            <span>{t('caseStudies.readCaseStudy')}</span>
+            <FiArrowUpRight size={16} />
+          </RouterLink>
+        </div>
+      </motion.div>
+
+      {/* ==================================================
           PROJECT CASE STUDY DETAIL MODAL
           ================================================== */}
       <AnimatePresence>
@@ -597,6 +643,15 @@ const Project = () => {
               {/* Modal Footer */}
               <div className="px-5 py-3.5 border-t border-[var(--border)] bg-[var(--surface-muted)] flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2.5">
+                  <RouterLink
+                    to={`/study-case/${activeProject.id}`}
+                    onClick={closeModal}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
+                  >
+                    <FiBookOpen size={14} />
+                    <span>{language === 'id' ? 'Buka Halaman Studi Kasus' : 'Open Full Case Study'}</span>
+                    <FiArrowUpRight size={13} />
+                  </RouterLink>
                   {activeProject.github && (
                     <a
                       href={activeProject.github}

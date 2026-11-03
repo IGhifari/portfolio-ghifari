@@ -50,6 +50,28 @@ export const selectedProjects = [
         id: "Full-Stack Developer — merancang skema database Prisma/PostgreSQL, membangun endpoint REST API Express, serta mengimplementasikan antarmuka React + TypeScript.",
         en: "Full-Stack Developer — designed the Prisma/PostgreSQL database schema, built Express REST API endpoints, and implemented the React + TypeScript frontend.",
       },
+      goals: {
+        id: "Membangun direktori fasilitas publik inklusif yang mempermudah penyandang disabilitas dan lansia menemukan lokasi dengan fasilitas ramah aksesibilitas.",
+        en: "Build an inclusive public facility directory enabling people with disabilities and the elderly to locate venues with verified accessibility amenities.",
+      },
+      process: {
+        id: [
+          "Riset kebutuhan navigasi inklusif dan fasilitas esensial (ramp kursi roda, lift khusus, toilet ramah disabilitas).",
+          "Perancangan antarmuka berprinsip aksesibilitas dengan kontras tinggi, navigasi keyboard penuh, dan HTML semantik.",
+          "Pengembangan arsitektur web interaktif dan sistem filter kategori fasilitas.",
+          "Audit kepatuhan standar aksesibilitas web (WCAG 2.1 AA).",
+        ],
+        en: [
+          "Researched inclusive navigation needs and essential amenities (wheelchair ramps, elevators, accessible restrooms).",
+          "Designed accessible interfaces prioritizing high contrast, full keyboard navigation, and semantic HTML.",
+          "Engineered interactive web views and multi-facility filter mechanisms.",
+          "Conducted web accessibility compliance audits against WCAG 2.1 AA standards.",
+        ],
+      },
+      learnings: {
+        id: "Aksesibilitas web bukan sekadar fitur tambahan, melainkan prinsip inti rekayasa perangkat lunak. Menerapkan rasio kontras warna yang tepat, navigasi ramah pembaca layar (screen reader), dan indikator fokus yang jelas menghasilkan produk yang lebih andal untuk semua pengguna.",
+        en: "Web accessibility is not an afterthought, but a core software engineering discipline. Enforcing proper color contrast ratios, screen reader compatibility, and clear keyboard focus indicators produces a more resilient product for all users.",
+      },
     },
     image: "/images/projects/akseskita.webp",
     tags: ["React", "TypeScript", "Express", "PostgreSQL", "Prisma"],
@@ -101,6 +123,28 @@ export const selectedProjects = [
       contribution: {
         id: "Frontend Developer Intern — berkolaborasi bersama tim pengembang dalam membangun antarmuka papan kanban responsif, pemantauan status tugas, serta integrasi alur kerja sistem.",
         en: "Frontend Developer Intern — collaborated with the development team to build responsive kanban board interfaces, task status monitoring, and system workflow integration.",
+      },
+      goals: {
+        id: "Membangun sistem pemantauan progres dan issue tracking terpusat untuk tim pengembang internal yayasan selama masa magang di PT. AMA Salam Indonesia.",
+        en: "Build a centralized progress and issue tracking system for the foundation's internal development team during the internship at PT. AMA Salam Indonesia.",
+      },
+      process: {
+        id: [
+          "Menganalisis alur kerja sprint internal dan kebutuhan pelacakan tugas tim yayasan.",
+          "Merancang komponen antarmuka papan kanban interaktif berbasis React dan Tailwind CSS dengan kemudahan transisi status.",
+          "Menghubungkan antarmuka ke backend Express.js, Prisma ORM, dan database PostgreSQL.",
+          "Melakukan evaluasi performa halaman web dan aksesibilitas berbasis metrik audit Lighthouse.",
+        ],
+        en: [
+          "Analyzed internal sprint workflows and task tracking requirements for the foundation's team.",
+          "Designed interactive kanban UI components using React and Tailwind CSS with smooth status transitions.",
+          "Connected frontend interfaces with Express.js backend services, Prisma ORM, and PostgreSQL.",
+          "Evaluated web performance and accessibility based on Lighthouse audit metrics.",
+        ],
+      },
+      learnings: {
+        id: "Mengembangkan sistem manajemen proyek dalam lingkungan tim profesional melatih kedisiplinan koordinasi antarmuka, pemahaman alur kerja kanban nyata, serta kepatuhan terhadap kerahasiaan data internal perusahaan.",
+        en: "Engineering a project management system in a professional team environment cultivated discipline in interface modularity, real-world kanban state workflows, and strict adherence to corporate system confidentiality.",
       },
     },
     image: "/images/projects/project_management.webp",
@@ -261,6 +305,28 @@ export const selectedProjects = [
       contribution: {
         id: "Full-Stack & AI Developer — merancang arsitektur aplikasi Next.js 15 & Express.js, memodelkan skema database Prisma/PostgreSQL, mengintegrasikan antrean BullMQ/Redis untuk pemrosesan dokumen Gemini AI, serta membangun sistem autentikasi dan API tervalidasi Zod.",
         en: "Full-Stack & AI Developer — designed the Next.js 15 & Express.js system architecture, modeled Prisma/PostgreSQL database schemas, integrated BullMQ/Redis worker queues for Gemini AI document parsing, and built authenticated REST APIs validated with Zod.",
+      },
+      goals: {
+        id: "Menyediakan ruang belajar terintegrasi yang menggabungkan modul kursus, catatan interaktif, manajemen tugas, dan ekstraksi dokumen cerdas berbasis Gemini AI tanpa membebani performa client.",
+        en: "Provide an integrated learning workspace uniting course modules, interactive notes, assignment management, and intelligent Gemini AI document processing without degrading client performance.",
+      },
+      process: {
+        id: [
+          "Perancangan skema basis data relasional PostgreSQL dengan Prisma ORM untuk entitas kursus, modul, tugas, dan catatan.",
+          "Pembangunan layanan backend RESTful modular menggunakan Express.js dengan validasi skema runtime ketat berbasis Zod.",
+          "Implementasi arsitektur asynchronous worker memanfaatkan antrean BullMQ dan Redis untuk menangani pemrosesan dokumen AI.",
+          "Integrasi frontend Next.js 15 dengan TypeScript dan Tailwind CSS untuk rendering dashboard yang cepat dan responsif.",
+        ],
+        en: [
+          "Relational schema modeling in PostgreSQL via Prisma ORM covering courses, modules, assignments, and notes.",
+          "Modular RESTful backend service engineering in Express.js with strict runtime schema validation via Zod.",
+          "Asynchronous worker architecture implementation using BullMQ and Redis queues for long-running AI document tasks.",
+          "Next.js 15 frontend engineering with TypeScript and Tailwind CSS for fast, responsive dashboard rendering.",
+        ],
+      },
+      learnings: {
+        id: "Pemisahan tugas AI yang berdurasi panjang ke antrean latar belakang BullMQ + Redis terbukti krusial untuk mencegah pemblokiran event loop server HTTP. Selain itu, pengetikan statis menyeluruh dengan TypeScript dan validasi Zod meminimalisir inkonsistensi payload data antara client dan API.",
+        en: "Decoupling heavy AI jobs to BullMQ + Redis background workers proved vital to keep the HTTP server event loop non-blocking. Additionally, end-to-end static typing with TypeScript and runtime Zod validation minimized payload inconsistencies across client and API boundaries.",
       },
     },
     image: "/images/projects/studyflow.webp",
@@ -567,3 +633,18 @@ export const otherProjects = [
     live: "https://www.ighifari.my.id/",
   },
 ];
+
+/**
+ * Combined list of all portfolio projects (selected + other).
+ */
+export const allProjects = [...selectedProjects, ...otherProjects];
+
+/**
+ * Helper to retrieve a single project by its unique slug ID (case-insensitive).
+ * Returns null if not found.
+ */
+export const getProjectBySlug = (slug) => {
+  if (!slug || typeof slug !== 'string') return null;
+  const normalized = slug.trim().toLowerCase();
+  return allProjects.find((p) => p.id.toLowerCase() === normalized) || null;
+};
