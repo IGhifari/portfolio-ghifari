@@ -6,7 +6,7 @@
   Content-Type: text/plain; charset=utf-8
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/Fgcf2NJO5BTdEda9XNcxZkG879rrsZBaL8V1Ijy6RU=' 'sha256-9jQ7iY2TnlBB9RC2Ks4RZfZJ/IoZOrhSWCBPKMBLyU8='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id; media-src 'self'; connect-src 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/Fgcf2NJO5BTdEda9XNcxZkG879rrsZBaL8V1Ijy6RU=' 'sha256-9jQ7iY2TnlBB9RC2Ks4RZfZJ/IoZOrhSWCBPKMBLyU8=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id; media-src 'self'; connect-src 'self' https://api.emailjs.com https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
