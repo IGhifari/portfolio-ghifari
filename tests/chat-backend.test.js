@@ -42,11 +42,15 @@ import {
   GEMINI_RESPONSE_SCHEMA,
   DEFAULT_SAFETY_SETTINGS,
 } from '../api/_lib/gemini.js';
+import fs from 'node:fs';
 import {
   createChatHandler,
   MAX_MESSAGE_LENGTH,
   isValidHistoryStructure,
+  DEFAULT_ALLOWED_ORIGINS,
+  isAllowedOrigin,
 } from '../api/chat.js';
+import { createCloudflarePagesChatHandler } from '../functions/api/chat.js';
 
 /**
  * Helper to create mock Vercel Request / Response objects
@@ -54,12 +58,17 @@ import {
 const createMockReqRes = ({
   method = 'POST',
   body = {},
-  headers = { 'x-forwarded-for': '203.0.113.10' },
+  headers = {},
 } = {}) => {
+  const reqHeaders = {
+    'content-type': 'application/json',
+    'x-forwarded-for': '203.0.113.10',
+    ...headers,
+  };
   const req = {
     method,
     body,
-    headers,
+    headers: reqHeaders,
     socket: { remoteAddress: '203.0.113.10' },
   };
 
@@ -1519,6 +1528,465 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(contents.length, 1);
       assert.equal(contents[0].role, 'user');
       assert.equal(contents[0].parts[0].text, queryWithDelimiter);
+    });
+  });
+
+  // =========================================================================
+  // 13. CONF-04: PRODUCTION API HARDENING & SECURITY HEADERS
+  // =========================================================================
+  describe('13. CONF-04: Production API Hardening & Security Headers', () => {
+    it('rejects POST request with missing Content-Type or non-application/json with HTTP 415 without calling rate limiter or Gemini', async () => {
+      let rateLimiterCalled = false;
+      let geminiCalled = false;
+      const trackingLimiter = {
+        async check() {
+          rateLimiterCalled = true;
+          return { allowed: true, limit: 10, current: 1, remaining: 9, resetMs: 60000 };
+        },
+      };
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return { text: '{}' };
+      });
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: trackingLimiter,
+        geminiClientFactory,
+      });
+
+      // 1. Missing Content-Type
+      const noCtCall = createMockReqRes({
+        headers: {},
+        body: { message: 'Halo' },
+      });
+      delete noCtCall.req.headers['content-type'];
+      await handler(noCtCall.req, noCtCall.res);
+      assert.equal(noCtCall.res.statusCode, 415);
+      assert.equal(noCtCall.res.body.error.code, 'UNSUPPORTED_MEDIA_TYPE');
+      assert.equal(rateLimiterCalled, false);
+      assert.equal(geminiCalled, false);
+
+      // 2. text/plain
+      const textPlainCall = createMockReqRes({
+        headers: { 'content-type': 'text/plain' },
+        body: JSON.stringify({ message: 'Halo' }),
+      });
+      await handler(textPlainCall.req, textPlainCall.res);
+      assert.equal(textPlainCall.res.statusCode, 415);
+      assert.equal(textPlainCall.res.body.error.code, 'UNSUPPORTED_MEDIA_TYPE');
+      assert.equal(rateLimiterCalled, false);
+      assert.equal(geminiCalled, false);
+
+      // 3. application/x-www-form-urlencoded
+      const formCall = createMockReqRes({
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: 'message=Halo',
+      });
+      await handler(formCall.req, formCall.res);
+      assert.equal(formCall.res.statusCode, 415);
+      assert.equal(formCall.res.body.error.code, 'UNSUPPORTED_MEDIA_TYPE');
+      assert.equal(rateLimiterCalled, false);
+      assert.equal(geminiCalled, false);
+    });
+
+    it('accepts application/json with charset parameter and executes normally', async () => {
+      let geminiCalled = false;
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return {
+          text: JSON.stringify({
+            canAnswer: true,
+            answer: 'AksesKita adalah aplikasi.',
+            sourceIds: ['project-akseskita'],
+          }),
+        };
+      });
+      const { fetchImpl: upstashFetch } = createSimulatedUpstashFetch();
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: upstashFetch,
+        geminiClientFactory,
+      });
+
+      const charsetCall = createMockReqRes({
+        headers: { 'content-type': 'application/json; charset=utf-8' },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(charsetCall.req, charsetCall.res);
+      assert.equal(charsetCall.res.statusCode, 200);
+      assert.equal(charsetCall.res.body.ok, true);
+      assert.equal(geminiCalled, true);
+    });
+
+    it('rejects Sec-Fetch-Site: cross-site with HTTP 403 without calling rate limiter or Gemini', async () => {
+      let rateLimiterCalled = false;
+      let geminiCalled = false;
+      const trackingLimiter = {
+        async check() {
+          rateLimiterCalled = true;
+          return { allowed: true, limit: 10, current: 1, remaining: 9, resetMs: 60000 };
+        },
+      };
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return { text: '{}' };
+      });
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        rateLimiter: trackingLimiter,
+        geminiClientFactory,
+      });
+
+      const crossSiteCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          'sec-fetch-site': 'cross-site',
+          origin: 'https://evil.com',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(crossSiteCall.req, crossSiteCall.res);
+      assert.equal(crossSiteCall.res.statusCode, 403);
+      assert.equal(crossSiteCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(rateLimiterCalled, false);
+      assert.equal(geminiCalled, false);
+    });
+
+    it('accepts Sec-Fetch-Site: same-origin and none and allows requests without Origin header', async () => {
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => ({
+        text: JSON.stringify({
+          canAnswer: true,
+          answer: 'AksesKita adalah aplikasi.',
+          sourceIds: ['project-akseskita'],
+        }),
+      }));
+      const { fetchImpl: upstashFetch } = createSimulatedUpstashFetch();
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: upstashFetch,
+        geminiClientFactory,
+      });
+
+      // 1. same-origin with allowed Origin
+      const sameOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          'sec-fetch-site': 'same-origin',
+          origin: 'https://www.ighifari.my.id',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(sameOriginCall.req, sameOriginCall.res);
+      assert.equal(sameOriginCall.res.statusCode, 200);
+
+      // 2. none without Origin (e.g. direct user navigation / standalone app)
+      const noneCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          'sec-fetch-site': 'none',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(noneCall.req, noneCall.res);
+      assert.equal(noneCall.res.statusCode, 200);
+
+      // 3. non-browser tool (no Sec-Fetch-Site, no Origin, e.g. cURL)
+      const noOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(noOriginCall.req, noOriginCall.res);
+      assert.equal(noOriginCall.res.statusCode, 200);
+    });
+
+    it('rejects untrusted, empty, whitespace, and null Origin with HTTP 403, and allows official deployment origins', async () => {
+      // Unit test of allowlist helper
+      assert.equal(isAllowedOrigin('https://www.ighifari.my.id', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://ighifari.my.id', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari.vercel.app', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('http://localhost:5173', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://attacker.com', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('   ', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('null', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin(null, DEFAULT_ALLOWED_ORIGINS), false);
+
+      let geminiCalled = false;
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        geminiCalled = true;
+        return {
+          text: JSON.stringify({
+            canAnswer: true,
+            answer: 'AksesKita adalah aplikasi.',
+            sourceIds: ['project-akseskita'],
+          }),
+        };
+      });
+      const { fetchImpl: upstashFetch } = createSimulatedUpstashFetch();
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: upstashFetch,
+        geminiClientFactory,
+      });
+
+      // 1. Substring / attacker domain mimicking portfolio domain
+      const spoofedOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://www.ighifari.my.id.attacker.com',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(spoofedOriginCall.req, spoofedOriginCall.res);
+      assert.equal(spoofedOriginCall.res.statusCode, 403);
+      assert.equal(spoofedOriginCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
+
+      // 2. Opaque null origin
+      const nullOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'null',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(nullOriginCall.req, nullOriginCall.res);
+      assert.equal(nullOriginCall.res.statusCode, 403);
+      assert.equal(nullOriginCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
+
+      // 3. Explicit empty string Origin
+      const emptyOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: '',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(emptyOriginCall.req, emptyOriginCall.res);
+      assert.equal(emptyOriginCall.res.statusCode, 403);
+      assert.equal(emptyOriginCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
+
+      // 4. Explicit whitespace string Origin
+      const whitespaceOriginCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: '   ',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(whitespaceOriginCall.req, whitespaceOriginCall.res);
+      assert.equal(whitespaceOriginCall.res.statusCode, 403);
+      assert.equal(whitespaceOriginCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
+
+      // 5. Allowed official Vercel deployment
+      const vercelCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://portfolio-ghifari.vercel.app',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(vercelCall.req, vercelCall.res);
+      assert.equal(vercelCall.res.statusCode, 200);
+      assert.equal(vercelCall.res.body.ok, true);
+      assert.equal(geminiCalled, true);
+    });
+
+    it('verifies Cloudflare Pages Function adapter forwards content-type, sec-fetch-site, and origin accurately', async () => {
+      let capturedReq = null;
+      const mockChatHandlerFactory = () => {
+        return async (req, res) => {
+          capturedReq = req;
+          res.status(200).json({ ok: true });
+        };
+      };
+
+      const pagesHandler = createCloudflarePagesChatHandler({
+        chatHandlerFactory: mockChatHandlerFactory,
+      });
+
+      // 1. Normal official request
+      const cfRequest = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Sec-Fetch-Site': 'same-origin',
+          Origin: 'https://www.ighifari.my.id',
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: JSON.stringify({ message: 'Halo' }),
+      });
+
+      const response = await pagesHandler({ request: cfRequest, env: {} });
+      assert.equal(response.status, 200);
+      assert.ok(capturedReq);
+      assert.equal(capturedReq.headers['content-type'], 'application/json; charset=utf-8');
+      assert.equal(capturedReq.headers['sec-fetch-site'], 'same-origin');
+      assert.equal(capturedReq.headers.origin, 'https://www.ighifari.my.id');
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+
+      // 2. Request without Content-Type: Fetch API defaults body to text/plain, rejected with 415
+      const cfNoCtRequest = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: JSON.stringify({ message: 'Halo' }),
+      });
+      assert.equal(cfNoCtRequest.headers.get('content-type'), 'text/plain;charset=UTF-8');
+      await pagesHandler({ request: cfNoCtRequest, env: {} });
+      assert.equal(capturedReq.headers['content-type'], 'text/plain;charset=UTF-8');
+
+      // 3. Request with explicit empty Origin must be forwarded as empty string
+      const cfEmptyOriginRequest = new Request('https://www.ighifari.my.id/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: '',
+          'CF-Connecting-IP': '203.0.113.88',
+        },
+        body: JSON.stringify({ message: 'Halo' }),
+      });
+      await pagesHandler({ request: cfEmptyOriginRequest, env: {} });
+      assert.equal(capturedReq.headers.origin, '');
+    });
+
+    it('enforces Cache-Control: no-store across all API responses (405, 415, 403, 400, 413, 429, 500, 200)', async () => {
+      const { factory: geminiClientFactory } = createMockGeminiClientFactory(async () => {
+        return {
+          text: JSON.stringify({
+            canAnswer: true,
+            answer: 'AksesKita adalah aplikasi.',
+            sourceIds: ['project-akseskita'],
+          }),
+        };
+      });
+      const { fetchImpl: upstashFetch } = createSimulatedUpstashFetch();
+      const handler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: upstashFetch,
+        geminiClientFactory,
+      });
+
+      // 405 Method Not Allowed
+      const getCall = createMockReqRes({ method: 'GET' });
+      await handler(getCall.req, getCall.res);
+      assert.equal(getCall.res.statusCode, 405);
+      assert.equal(getCall.res.headers['Cache-Control'], 'no-store');
+
+      // 415 Unsupported Media Type
+      const ctCall = createMockReqRes({ headers: { 'content-type': 'text/plain' }, body: 'msg' });
+      await handler(ctCall.req, ctCall.res);
+      assert.equal(ctCall.res.statusCode, 415);
+      assert.equal(ctCall.res.headers['Cache-Control'], 'no-store');
+
+      // 403 Cross-Site Sec-Fetch-Site
+      const secCall = createMockReqRes({ headers: { 'sec-fetch-site': 'cross-site' } });
+      await handler(secCall.req, secCall.res);
+      assert.equal(secCall.res.statusCode, 403);
+      assert.equal(secCall.res.headers['Cache-Control'], 'no-store');
+
+      // 403 Untrusted Origin
+      const origCall = createMockReqRes({ headers: { origin: 'https://evil.com' } });
+      await handler(origCall.req, origCall.res);
+      assert.equal(origCall.res.statusCode, 403);
+      assert.equal(origCall.res.headers['Cache-Control'], 'no-store');
+
+      // 400 Validation Error (empty message)
+      const emptyMsgCall = createMockReqRes({ body: { message: '   ' } });
+      await handler(emptyMsgCall.req, emptyMsgCall.res);
+      assert.equal(emptyMsgCall.res.statusCode, 400);
+      assert.equal(emptyMsgCall.res.headers['Cache-Control'], 'no-store');
+
+      // 413 Payload Too Large
+      const oversizedCall = createMockReqRes({ body: { message: 'x'.repeat(20000) } });
+      await handler(oversizedCall.req, oversizedCall.res);
+      assert.equal(oversizedCall.res.statusCode, 413);
+      assert.equal(oversizedCall.res.headers['Cache-Control'], 'no-store');
+
+      // 200 Success Response
+      const successCall = createMockReqRes({ body: { message: 'Ceritakan tentang AksesKita' } });
+      await handler(successCall.req, successCall.res);
+      assert.equal(successCall.res.statusCode, 200);
+      assert.equal(successCall.res.headers['Cache-Control'], 'no-store');
+
+      // 503 Configuration Error (handler without API key)
+      const noKeyHandler = createChatHandler({ env: {}, fetchImpl: upstashFetch });
+      const confErrCall = createMockReqRes({ body: { message: 'Ceritakan tentang AksesKita' } });
+      await noKeyHandler(confErrCall.req, confErrCall.res);
+      assert.equal(confErrCall.res.statusCode, 503);
+      assert.equal(confErrCall.res.headers['Cache-Control'], 'no-store');
+
+      // 500 Unhandled Internal Server Error
+      const crashingHandler = createChatHandler({
+        env: TEST_ENV,
+        fetchImpl: upstashFetch,
+        retriever: () => {
+          throw new Error('Database crash');
+        },
+      });
+      const crashCall = createMockReqRes({ body: { message: 'Ceritakan tentang AksesKita' } });
+      await crashingHandler(crashCall.req, crashCall.res);
+      assert.equal(crashCall.res.statusCode, 500);
+      assert.equal(crashCall.res.headers['Cache-Control'], 'no-store');
+    });
+
+    it('verifies public/_headers and vercel.json configure synchronized security headers with strict CSP and API no-store', () => {
+      const headersContent = fs.readFileSync('public/_headers', 'utf8');
+      const vercelJson = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+
+      // 1. Verify public/_headers
+      assert.ok(headersContent.includes('Content-Security-Policy:'));
+      assert.ok(headersContent.includes("default-src 'self'"));
+      // script-src must NOT contain unsafe-inline or external font scripts
+      assert.ok(!headersContent.includes("script-src 'self' 'unsafe-inline'"));
+      assert.ok(!headersContent.includes('https://fonts.googleapis.com; style-src'));
+      assert.ok(headersContent.includes("'sha256-/Fgcf2NJO5BTdEda9XNcxZkG879rrsZBaL8V1Ijy6RU='"));
+      assert.ok(headersContent.includes("'sha256-9jQ7iY2TnlBB9RC2Ks4RZfZJ/IoZOrhSWCBPKMBLyU8='"));
+      // connect-src must only have 'self' and https://api.emailjs.com (no Google Fonts)
+      assert.ok(headersContent.includes("connect-src 'self' https://api.emailjs.com;"));
+      // img-src must restrict https: to specific origins
+      assert.ok(headersContent.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id;"));
+      // Edge /api/* no-store rule
+      assert.ok(headersContent.includes('/api/*'));
+      assert.ok(headersContent.includes('X-Content-Type-Options: nosniff'));
+      assert.ok(headersContent.includes('X-Frame-Options: SAMEORIGIN'));
+      assert.ok(headersContent.includes('Referrer-Policy: strict-origin-when-cross-origin'));
+      assert.ok(headersContent.includes('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()'));
+      assert.ok(headersContent.includes('Strict-Transport-Security: max-age=31536000'));
+      assert.ok(!headersContent.includes('includeSubDomains'));
+      assert.ok(!headersContent.includes('preload'));
+
+      // 2. Verify vercel.json
+      assert.ok(Array.isArray(vercelJson.headers));
+      const rootHeaderEntry = vercelJson.headers.find((h) => h.source === '/(.*)');
+      assert.ok(rootHeaderEntry, 'Missing root header entry in vercel.json');
+
+      const apiHeaderEntry = vercelJson.headers.find((h) => h.source === '/api/(.*)');
+      assert.ok(apiHeaderEntry, 'Missing api header entry in vercel.json');
+      const apiHeaderMap = new Map(apiHeaderEntry.headers.map((h) => [h.key, h.value]));
+      assert.equal(apiHeaderMap.get('Cache-Control'), 'no-store');
+
+      const headerMap = new Map(rootHeaderEntry.headers.map((h) => [h.key, h.value]));
+      const csp = headerMap.get('Content-Security-Policy');
+      assert.ok(csp);
+      const scriptSrcDirective = csp.split(';').find((d) => d.trim().startsWith('script-src'));
+      assert.ok(scriptSrcDirective, 'Missing script-src in CSP');
+      assert.ok(!scriptSrcDirective.includes("'unsafe-inline'"), 'CSP script-src should not contain unsafe-inline');
+      assert.ok(!scriptSrcDirective.includes('https://fonts.googleapis.com'), 'CSP script-src should not have fonts.googleapis.com');
+      assert.ok(csp.includes("connect-src 'self' https://api.emailjs.com;"), 'connect-src restricted to self and emailjs');
+      assert.ok(csp.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id;"));
+      assert.equal(headerMap.get('X-Content-Type-Options'), 'nosniff');
+      assert.equal(headerMap.get('X-Frame-Options'), 'SAMEORIGIN');
+      assert.equal(headerMap.get('Referrer-Policy'), 'strict-origin-when-cross-origin');
+      assert.equal(headerMap.get('Permissions-Policy'), 'camera=(), microphone=(), geolocation=(), payment=()');
+      assert.equal(headerMap.get('Strict-Transport-Security'), 'max-age=31536000');
     });
   });
 });

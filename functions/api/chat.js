@@ -85,7 +85,15 @@ export const createCloudflarePagesChatHandler = ({
           'cf-connecting-ip': cfConnectingIp,
           'x-forwarded-for': cfConnectingIp,
           'x-real-ip': cfConnectingIp,
-          'content-type': request?.headers?.get?.('content-type') || 'application/json',
+          'content-type': request?.headers?.get?.('content-type') !== null
+            ? request.headers.get('content-type')
+            : undefined,
+          'sec-fetch-site': request?.headers?.get?.('sec-fetch-site') !== null
+            ? request?.headers?.get?.('sec-fetch-site')
+            : undefined,
+          'origin': request?.headers?.get?.('origin') !== null
+            ? request?.headers?.get?.('origin')
+            : undefined,
           get: (headerName) => {
             const lower = String(headerName || '').toLowerCase();
             if (lower === 'cf-connecting-ip' || lower === 'x-forwarded-for' || lower === 'x-real-ip') {

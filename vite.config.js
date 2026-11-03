@@ -473,7 +473,7 @@ export const localApiChatPlugin = (mode) => ({
 
 export default defineConfig(({ mode }) => ({
   plugins: [react(), localApiChatPlugin(mode)],
-  envPrefix: ['VITE_', 'EMAILJS_'],
+  envPrefix: ['VITE_'],
 
   server: {
     host: 'localhost',

@@ -28,6 +28,53 @@ export const MAX_PAYLOAD_BYTES = 16_384; // 16 KB
 
 const SUPPORTED_LANGUAGES = ['id', 'en'];
 
+export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
+  'https://www.ighifari.my.id',
+  'https://ighifari.my.id',
+  'https://portfolio-ghifari.pages.dev',
+  'https://portfolio-ghifari.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:4173',
+]);
+
+/**
+ * Validates request Origin strictly against exact authorized origins allowlist.
+ * Substring matching or arbitrary origins are strictly disallowed.
+ */
+export const isAllowedOrigin = (rawOrigin, allowedOrigins = DEFAULT_ALLOWED_ORIGINS) => {
+  if (typeof rawOrigin !== 'string') return false;
+  const origin = rawOrigin.trim();
+  if (!origin || origin.toLowerCase() === 'null') return false;
+  const allowSet = new Set(
+    (Array.isArray(allowedOrigins) ? allowedOrigins : [allowedOrigins]).map((o) =>
+      String(o || '').trim().toLowerCase()
+    )
+  );
+  return allowSet.has(origin.toLowerCase());
+};
+
+/**
+ * Case-insensitive header getter supporting Fetch Headers object and plain Node.js headers.
+ */
+export const getHeader = (req, headerName) => {
+  if (!req?.headers) return undefined;
+  if (typeof req.headers.get === 'function') {
+    const val = req.headers.get(headerName);
+    return typeof val === 'string' ? val : undefined;
+  }
+  const target = String(headerName || '').toLowerCase();
+  for (const [key, val] of Object.entries(req.headers)) {
+    if (String(key).toLowerCase() === target) {
+      return typeof val === 'string' ? val : Array.isArray(val) ? val[0] : undefined;
+    }
+  }
+  return undefined;
+};
+
 const historyMessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
   content: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
@@ -82,6 +129,8 @@ export const chatRequestSchema = z
 const ERROR_MESSAGES = {
   id: {
     METHOD_NOT_ALLOWED: 'Metode HTTP tidak didukung. Gunakan metode POST.',
+    UNSUPPORTED_MEDIA_TYPE: 'Tipe konten tidak didukung. Gunakan "application/json".',
+    FORBIDDEN: 'Akses ditolak.',
     PAYLOAD_TOO_LARGE: 'Ukuran payload melebihi batas maksimum yang diizinkan (16 KB).',
     INVALID_JSON: 'Format body JSON tidak valid.',
     EMPTY_MESSAGE: 'Pesan tidak boleh kosong.',
@@ -97,6 +146,8 @@ const ERROR_MESSAGES = {
   },
   en: {
     METHOD_NOT_ALLOWED: 'HTTP method not allowed. Please use POST.',
+    UNSUPPORTED_MEDIA_TYPE: 'Unsupported media type. Please use "application/json".',
+    FORBIDDEN: 'Access forbidden.',
     PAYLOAD_TOO_LARGE: 'Request payload exceeds the maximum allowed size (16 KB).',
     INVALID_JSON: 'Invalid JSON request body.',
     EMPTY_MESSAGE: 'Message cannot be empty.',
@@ -151,6 +202,14 @@ const sendJson = (res, statusCode, payload, headers = {}) => {
         res.setHeader(key, String(value));
       }
     }
+  } else if (res && res.headers && typeof res.headers === 'object') {
+    res.headers['content-type'] = 'application/json; charset=utf-8';
+    res.headers['cache-control'] = 'no-store';
+    for (const [key, value] of Object.entries(headers)) {
+      if (value !== undefined && value !== null) {
+        res.headers[key.toLowerCase()] = String(value);
+      }
+    }
   }
 
   if (res && typeof res.status === 'function') {
@@ -179,9 +238,12 @@ export const createChatHandler = ({
   trustCloudflare,
   trustVercel,
   runtime,
+  allowedOrigins,
 } = {}) => {
   return async function chatHandler(req, res) {
-    // 1. Validate HTTP Method
+    let prelimLang = 'id';
+    try {
+      // 1. Validate HTTP Method
     const method = (req?.method || '').toUpperCase();
     if (method !== 'POST') {
       return sendJson(
@@ -198,7 +260,67 @@ export const createChatHandler = ({
       );
     }
 
-    // 2. Parse and Size-Check Request Body (Safely catch @vercel/node getter errors)
+    // Determine preliminary language from Accept-Language header if available (default 'id')
+    const acceptLang = getHeader(req, 'accept-language');
+    if (typeof acceptLang === 'string' && acceptLang.trim().toLowerCase().startsWith('en')) {
+      prelimLang = 'en';
+    }
+
+    // 2. Validate Content-Type: strictly require application/json for POST (allow optional parameters)
+    const rawContentType = getHeader(req, 'content-type');
+    if (!rawContentType || typeof rawContentType !== 'string') {
+      return sendJson(res, 415, {
+        ok: false,
+        error: {
+          code: 'UNSUPPORTED_MEDIA_TYPE',
+          message: getErrorMessage('UNSUPPORTED_MEDIA_TYPE', prelimLang),
+        },
+      });
+    }
+    const [mimeType] = rawContentType.split(';').map((s) => s.trim().toLowerCase());
+    if (mimeType !== 'application/json') {
+      return sendJson(res, 415, {
+        ok: false,
+        error: {
+          code: 'UNSUPPORTED_MEDIA_TYPE',
+          message: getErrorMessage('UNSUPPORTED_MEDIA_TYPE', prelimLang),
+        },
+      });
+    }
+
+    // 3. Validate Sec-Fetch-Site: reject cross-site requests
+    const secFetchSite = getHeader(req, 'sec-fetch-site');
+    if (typeof secFetchSite === 'string' && secFetchSite.trim().toLowerCase() === 'cross-site') {
+      return sendJson(res, 403, {
+        ok: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: getErrorMessage('FORBIDDEN', prelimLang),
+        },
+      });
+    }
+
+    // 4. Validate Origin: if header is present, must strictly match authorized allowlist
+    // (Empty Origin "" or "null" is strictly rejected with HTTP 403)
+    const rawOrigin = getHeader(req, 'origin');
+    if (rawOrigin !== undefined && rawOrigin !== null) {
+      const activeAllowedOrigins = allowedOrigins || [
+        ...DEFAULT_ALLOWED_ORIGINS,
+        ...(env?.ALLOWED_ORIGIN ? [env.ALLOWED_ORIGIN] : []),
+        ...(env?.ALLOWED_ORIGINS ? env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()) : []),
+      ];
+      if (!isAllowedOrigin(rawOrigin, activeAllowedOrigins)) {
+        return sendJson(res, 403, {
+          ok: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: getErrorMessage('FORBIDDEN', prelimLang),
+          },
+        });
+      }
+    }
+
+    // 5. Parse and Size-Check Request Body (Safely catch @vercel/node getter errors)
     let rawBody;
     try {
       rawBody = req?.body;
@@ -260,7 +382,9 @@ export const createChatHandler = ({
 
     // Determine preliminary language for localized error messages
     const rawLangHint = rawBody?.lang ?? rawBody?.language;
-    const prelimLang = rawLangHint === 'en' ? 'en' : 'id';
+    if (rawLangHint === 'en' || rawLangHint === 'id') {
+      prelimLang = rawLangHint;
+    }
 
     // Explicit pre-checks for language, empty message, and message length for clear error codes
     if (
@@ -585,6 +709,19 @@ export const createChatHandler = ({
         },
         rateHeaders
       );
+    }
+    } catch (unhandledError) {
+      console.error(
+        '[/api/chat unhandled error]:',
+        unhandledError?.message || unhandledError
+      );
+      return sendJson(res, 500, {
+        ok: false,
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: getErrorMessage('INTERNAL_SERVER_ERROR', prelimLang),
+        },
+      });
     }
   };
 };
