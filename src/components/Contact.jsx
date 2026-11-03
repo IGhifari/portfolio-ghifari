@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
 import emailjs from '@emailjs/browser';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,6 +21,7 @@ import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { directEmail, contactChannelsData } from '../data/contact';
+import { validateContactForm } from '../utils/contactValidation.js';
 import '../styles/Contact.css';
 
 const channelIconsByKey = {
@@ -100,16 +100,7 @@ const Contact = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
-  const formSchema = useMemo(
-    () =>
-      z.object({
-        name: z.string().trim().min(2, t('contact.validation.nameMin')),
-        email: z.string().trim().email(t('contact.validation.emailValid')),
-        subject: z.string().trim().optional(),
-        message: z.string().trim().min(10, t('contact.validation.messageMin')),
-      }),
-    [t]
-  );
+
 
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
@@ -151,7 +142,7 @@ const Contact = () => {
     setErrors({});
     setSubmitStatus(null);
 
-    const validation = formSchema.safeParse(formData);
+    const validation = validateContactForm(formData, t);
     if (!validation.success) {
       const fieldErrors = {};
       validation.error.issues.forEach((issue) => {

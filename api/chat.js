@@ -42,19 +42,51 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
 ]);
 
 /**
- * Validates request Origin strictly against exact authorized origins allowlist.
- * Substring matching or arbitrary origins are strictly disallowed.
+ * Project-scoped preview deployment regex for Cloudflare Pages:
+ * https://<commit-or-branch>.portfolio-ghifari.pages.dev
+ *
+ * Strictly scoped to the portfolio-ghifari project. Generic wildcard *.pages.dev is intentionally
+ * disallowed to prevent cross-origin requests from arbitrary Cloudflare Pages accounts.
+ */
+export const CLOUDFLARE_PAGES_PREVIEW_ORIGIN_REGEX =
+  /^https:\/\/[a-z0-9_-]+\.portfolio-ghifari\.pages\.dev$/i;
+
+/**
+ * Project-scoped preview deployment regex for Vercel:
+ * https://portfolio-ghifari-<preview-id>.vercel.app
+ */
+export const VERCEL_PREVIEW_ORIGIN_REGEX =
+  /^https:\/\/portfolio-ghifari-[a-z0-9_-]+\.vercel\.app$/i;
+
+/**
+ * Validates request Origin strictly against exact authorized origins allowlist
+ * and project-scoped preview deployment patterns.
+ * Substring matching, arbitrary origins, and global *.pages.dev wildcards are strictly disallowed.
  */
 export const isAllowedOrigin = (rawOrigin, allowedOrigins = DEFAULT_ALLOWED_ORIGINS) => {
   if (typeof rawOrigin !== 'string') return false;
   const origin = rawOrigin.trim();
   if (!origin || origin.toLowerCase() === 'null') return false;
+
+  // 1. Exact match against configured allowlist (custom domains, production URLs, localhost)
   const allowSet = new Set(
     (Array.isArray(allowedOrigins) ? allowedOrigins : [allowedOrigins]).map((o) =>
       String(o || '').trim().toLowerCase()
     )
   );
-  return allowSet.has(origin.toLowerCase());
+  if (allowSet.has(origin.toLowerCase())) {
+    return true;
+  }
+
+  // 2. Project-scoped preview deployments strictly belonging to this project
+  if (CLOUDFLARE_PAGES_PREVIEW_ORIGIN_REGEX.test(origin)) {
+    return true;
+  }
+  if (VERCEL_PREVIEW_ORIGIN_REGEX.test(origin)) {
+    return true;
+  }
+
+  return false;
 };
 
 /**

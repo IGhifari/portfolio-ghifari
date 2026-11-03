@@ -1706,9 +1706,15 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(isAllowedOrigin('https://www.ighifari.my.id', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://ighifari.my.id', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://c5c58197.portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://branch-preview.portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://portfolio-ghifari.vercel.app', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari-preview-123.vercel.app', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('http://localhost:5173', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://attacker.com', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('https://attacker.pages.dev', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('https://evil-portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), false);
+      assert.equal(isAllowedOrigin('https://portfolio-ghifari.pages.dev.attacker.com', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('   ', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('null', DEFAULT_ALLOWED_ORIGINS), false);
@@ -1796,6 +1802,34 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(vercelCall.res.statusCode, 200);
       assert.equal(vercelCall.res.body.ok, true);
       assert.equal(geminiCalled, true);
+
+      // 6. Allowed Cloudflare Pages project-scoped preview deployment
+      geminiCalled = false;
+      const cfPreviewCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://c5c58197.portfolio-ghifari.pages.dev',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(cfPreviewCall.req, cfPreviewCall.res);
+      assert.equal(cfPreviewCall.res.statusCode, 200);
+      assert.equal(cfPreviewCall.res.body.ok, true);
+      assert.equal(geminiCalled, true);
+
+      // 7. Rejected arbitrary third-party pages.dev account
+      geminiCalled = false;
+      const attackerPagesCall = createMockReqRes({
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://attacker.pages.dev',
+        },
+        body: { message: 'Ceritakan tentang AksesKita' },
+      });
+      await handler(attackerPagesCall.req, attackerPagesCall.res);
+      assert.equal(attackerPagesCall.res.statusCode, 403);
+      assert.equal(attackerPagesCall.res.body.error.code, 'FORBIDDEN');
+      assert.equal(geminiCalled, false);
     });
 
     it('verifies Cloudflare Pages Function adapter forwards content-type, sec-fetch-site, and origin accurately', async () => {
