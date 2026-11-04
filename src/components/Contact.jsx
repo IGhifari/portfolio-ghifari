@@ -470,7 +470,7 @@ const Contact = () => {
               <a
                 href={`mailto:${directEmail}`}
                 data-cursor-label="Mail"
-                className="cursor-target font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
+                className="cursor-target font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 -mx-1"
               >
                 {directEmail}
               </a>
@@ -478,7 +478,7 @@ const Contact = () => {
                 type="button"
                 onClick={copyEmailToClipboard}
                 data-cursor-label="Copy"
-                className="cursor-target p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
+                className="cursor-target p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 title={t('contact.copyEmailTitle')}
                 aria-label={t('contact.copyEmailTitle')}
               >
@@ -516,7 +516,7 @@ const Contact = () => {
                     key={item.name}
                     type="button"
                     onClick={handleDiscordClick}
-                    className="w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none cursor-pointer bg-transparent border-0 text-left"
+                    className="w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 cursor-pointer bg-transparent border-0 text-left"
                     title={t('contact.toastDiscordPending')}
                     aria-label={`Discord: ${t('contact.discordPending')}`}
                   >
@@ -546,7 +546,7 @@ const Contact = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     data-cursor-label="Connect"
-                    className="cursor-target py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
+                    className="cursor-target py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">

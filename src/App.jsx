@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './styles/Components.css';
 
 import { ThemeProvider } from './context/ThemeContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
 
 // Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
@@ -92,6 +92,7 @@ DeferredSection.propTypes = {
 
 const AppContent = () => {
     const { route } = useRouter();
+    const { t } = useLanguage();
 
     // Scroll restoration for anchor links when switching back to home view
     useEffect(() => {
@@ -109,6 +110,20 @@ const AppContent = () => {
 
     return (
         <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
+            {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2.5 focus:rounded-md focus:bg-[var(--accent)] focus:text-[var(--accent-contrast)] focus:font-mono focus:text-xs focus:font-bold focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] transition-all cursor-target"
+                data-cursor-label="Skip"
+                onClick={() => {
+                    const mainEl = document.getElementById('main-content');
+                    if (mainEl) {
+                        mainEl.focus();
+                    }
+                }}
+            >
+                {t('nav.skipToContent') || 'Skip to main content'}
+            </a>
             <Suspense fallback={null}>
                 <SoundButton />
                 <ChatAssistant />
@@ -118,7 +133,7 @@ const AppContent = () => {
 
             <Navbar />
 
-            <main id="main-content">
+            <main id="main-content" tabIndex={-1} className="focus:outline-none">
                 {route.type === 'home' && (
                     <>
                         {/* Hero */}

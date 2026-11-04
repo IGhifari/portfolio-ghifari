@@ -280,7 +280,7 @@ const ChatAssistant = () => {
                   onClick={handleClearChat}
                   aria-label={t('chatbot.clearChatAria')}
                   title={t('chatbot.clearChatAria')}
-                  className="h-7 px-2 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer focus-visible:outline-none"
+                  className="h-7 px-2 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiRotateCcw size={11} />
                   <span className="hidden sm:inline">{t('chatbot.clearChat')}</span>
@@ -293,7 +293,7 @@ const ChatAssistant = () => {
                 onClick={() => setIsOpen(false)}
                 aria-label={t('chatbot.closeAria')}
                 data-cursor-label="Close"
-                className="cursor-target w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
+                className="cursor-target w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <IoClose size={18} />
               </button>

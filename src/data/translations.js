@@ -28,6 +28,7 @@ export const translations = {
       langGroup: "Pilihan bahasa",
       recruiter: "MODE REKRUTER",
       forRecruiters: "UNTUK REKRUTER",
+      skipToContent: "Lewati ke konten utama",
     },
 
     // Hero / Profile
@@ -658,6 +659,7 @@ export const translations = {
       langGroup: "Language selection",
       recruiter: "RECRUITER MODE",
       forRecruiters: "FOR RECRUITERS",
+      skipToContent: "Skip to main content",
     },
 
     // Hero / Profile

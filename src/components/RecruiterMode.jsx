@@ -194,7 +194,7 @@ const RecruiterMode = () => {
               type="button"
               onClick={copyEmailToClipboard}
               data-cursor-label="Copy"
-              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs transition-colors cursor-pointer focus-visible:outline-none"
+              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               title={directEmail}
             >
               {copiedEmail ? (
@@ -215,7 +215,7 @@ const RecruiterMode = () => {
               target="_blank"
               rel="noopener noreferrer"
               data-cursor-label="GitHub"
-              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none"
+              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               <FiGithub size={13} aria-hidden="true" />
               <span>GitHub</span>
@@ -227,7 +227,7 @@ const RecruiterMode = () => {
               target="_blank"
               rel="noopener noreferrer"
               data-cursor-label="LinkedIn"
-              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none"
+              className="cursor-target inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               <FiLinkedin size={13} aria-hidden="true" />
               <span>LinkedIn</span>
@@ -622,7 +622,7 @@ const RecruiterMode = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor-label="CV"
-                className="cursor-target inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors focus-visible:outline-none"
+                className="cursor-target inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiDownload size={15} aria-hidden="true" />
                 <span>{t('recruiter.downloadCv')}</span>
@@ -634,7 +634,7 @@ const RecruiterMode = () => {
               target="_blank"
               rel="noopener noreferrer"
               data-cursor-label="LinkedIn"
-              className="cursor-target inline-flex items-center gap-2 px-5 py-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none"
+              className="cursor-target inline-flex items-center gap-2 px-5 py-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               <FiLinkedin size={15} aria-hidden="true" />
               <span>LinkedIn</span>

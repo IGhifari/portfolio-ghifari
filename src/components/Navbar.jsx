@@ -282,7 +282,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}

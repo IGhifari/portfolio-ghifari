@@ -432,7 +432,7 @@ const Project = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           data-cursor-label="Code"
-                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
                           title={t('projects.githubRepo')}
                         >
@@ -445,7 +445,7 @@ const Project = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           data-cursor-label="Live Demo"
-                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
                           title={t('projects.liveDeployment')}
                         >

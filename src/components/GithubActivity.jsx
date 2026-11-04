@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   FiExternalLink,
@@ -37,6 +37,65 @@ const GithubActivity = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [fromCache, setFromCache] = useState(false);
+
+  // Roving TabIndex for keyboard accessibility (CRIT-01)
+  const gridCellsRef = useRef([]);
+  const [focusedDayIndex, setFocusedDayIndex] = useState(() => (
+    contributions?.days?.length > 0 ? contributions.days.length - 1 : 0
+  ));
+
+  useEffect(() => {
+    if (contributions?.days?.length > 0) {
+      setFocusedDayIndex((prev) => {
+        if (prev < 0 || prev >= contributions.days.length) {
+          return contributions.days.length - 1;
+        }
+        return prev;
+      });
+    }
+  }, [contributions?.days]);
+
+  const handleCellKeyDown = (e, index) => {
+    const total = contributions?.days?.length || 0;
+    if (total === 0) return;
+
+    let targetIndex = null;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        // Down 1 day in the week column
+        targetIndex = Math.min(total - 1, index + 1);
+        break;
+      case 'ArrowUp':
+        // Up 1 day in the week column
+        targetIndex = Math.max(0, index - 1);
+        break;
+      case 'ArrowRight':
+        // Next week (+7 days)
+        targetIndex = Math.min(total - 1, index + 7);
+        break;
+      case 'ArrowLeft':
+        // Previous week (-7 days)
+        targetIndex = Math.max(0, index - 7);
+        break;
+      case 'Home':
+        targetIndex = 0;
+        break;
+      case 'End':
+        targetIndex = total - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (targetIndex !== null && targetIndex !== index) {
+      e.preventDefault();
+      setFocusedDayIndex(targetIndex);
+      const targetDay = contributions.days[targetIndex];
+      setHoveredDay(targetDay);
+      gridCellsRef.current[targetIndex]?.focus();
+    }
+  };
 
   const shouldReduceMotion = useReducedMotion();
   const { language, t } = useLanguage();
@@ -465,22 +524,35 @@ const GithubActivity = () => {
                   <div
                     className="grid grid-rows-7 grid-flow-col gap-[3px]"
                     role="grid"
-                    aria-label={`GitHub contribution heatmap for IGhifari (${contributions?.total || 869} contributions)`}
+                    aria-label={
+                      language === 'id'
+                        ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || 869} kontribusi). Gunakan tombol panah untuk berpindah hari.`
+                        : `GitHub contribution heatmap for IGhifari (${contributions?.total || 869} contributions). Use arrow keys to navigate days.`
+                    }
                   >
                     {contributions.days.map((day, idx) => {
                       const tooltipText = formatDayTooltip(day);
+                      const isFocused = idx === focusedDayIndex;
                       return (
                         <div
                           key={day.date || idx}
+                          ref={(el) => {
+                            gridCellsRef.current[idx] = el;
+                          }}
                           role="gridcell"
-                          tabIndex={0}
+                          tabIndex={isFocused ? 0 : -1}
                           title={tooltipText}
                           aria-label={tooltipText}
+                          aria-selected={isFocused}
                           onMouseEnter={() => setHoveredDay(day)}
                           onMouseLeave={() => setHoveredDay(null)}
-                          onFocus={() => setHoveredDay(day)}
+                          onFocus={() => {
+                            setFocusedDayIndex(idx);
+                            setHoveredDay(day);
+                          }}
                           onBlur={() => setHoveredDay(null)}
-                          className={`w-[11px] h-[11px] rounded-[2px] transition-transform duration-100 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 ${getCellClass(
+                          onKeyDown={(e) => handleCellKeyDown(e, idx)}
+                          className={`w-[11px] h-[11px] rounded-[2px] transition-transform duration-100 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:z-10 ${getCellClass(
                             day.level
                           )}`}
                         />

@@ -308,7 +308,7 @@ const Profile = () => {
           duration={600}
           offset={-70}
           data-cursor-label="Scroll"
-          className="cursor-target flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
+          className="cursor-target flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded p-1"
           aria-label={t('hero.scrollAria')}
         >
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase">{t('hero.scroll')}</span>

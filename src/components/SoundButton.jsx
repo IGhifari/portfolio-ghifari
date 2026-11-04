@@ -112,7 +112,7 @@ const SoundButton = () => {
                             type="button"
                             onClick={togglePlayback}
                             data-cursor-label={isPlaying ? "Pause" : "Play"}
-                            className="cursor-target w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none"
+                            className="cursor-target w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                             aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             title={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                         >
@@ -125,7 +125,7 @@ const SoundButton = () => {
                             id="sound-button-mini-desktop"
                             onClick={() => setIsExpanded(true)}
                             data-cursor-label="Music"
-                            className="cursor-target flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
+                            className="cursor-target flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded py-0.5 px-1"
                             aria-label={`${t('sound.nowPlaying')} ${currentTrack.title} by ${currentTrack.artist}. ${t('sound.openPlayer')}`}
                         >
                             <span className="text-[11px] font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors max-w-[95px] truncate">
@@ -171,7 +171,7 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
-                            className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
+                            className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                             aria-label={t('sound.closePlayer')}
                         >
                             <IoClose size={15} />
@@ -204,7 +204,7 @@ const SoundButton = () => {
 
                         {/* Progress Bar */}
                         <div className="space-y-1">
-                            <div className="relative w-full h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+                            <div className="relative w-full h-1.5 rounded-full bg-[var(--border)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--accent)]">
                                 <div
                                     className="absolute top-0 left-0 h-full bg-[var(--accent)] rounded-full transition-all"
                                     style={{ width: `${progressPercent}%` }}
@@ -231,7 +231,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-prev"
                                 onClick={prev}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.prevTrack')}
                             >
                                 <FaStepBackward size={11} />
@@ -241,7 +241,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                                 aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             >
                                 {isPlaying ? (
@@ -255,7 +255,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-next"
                                 onClick={next}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.nextTrack')}
                             >
                                 <FaStepForward size={11} />
