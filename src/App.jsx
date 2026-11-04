@@ -124,13 +124,6 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            <Suspense fallback={null}>
-                <SoundButton />
-                <ChatAssistant />
-                <DeveloperTerminal />
-                <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
-            </Suspense>
-
             <Navbar />
 
             <main id="main-content" tabIndex={-1} className="focus:outline-none">
@@ -237,6 +230,16 @@ const AppContent = () => {
             <Suspense fallback={null}>
                 <Footer />
             </Suspense>
+
+            {/* Floating Utilities (Placed after main content for logical tab order) */}
+            <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
+                <Suspense fallback={null}>
+                    <SoundButton />
+                    <ChatAssistant />
+                    <DeveloperTerminal />
+                    <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
+                </Suspense>
+            </aside>
         </div>
     );
 };

@@ -132,7 +132,11 @@ const CaseStudyList = () => {
             <span>{t('caseStudies.backToHome')}</span>
           </RouterLink>
 
-          <span className="font-mono text-xs text-[var(--text-muted)]">
+          <span
+            role="status"
+            aria-live="polite"
+            className="font-mono text-xs text-[var(--text-muted)]"
+          >
             {t('caseStudies.showingProjects')
               .replace('{count}', filteredProjects.length)
               .replace('{total}', allProjects.length)}
@@ -499,11 +503,12 @@ const CaseStudyList = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="GitHub Repository"
-                          aria-label={`${project.title} GitHub Repository`}
+                          aria-label={`${project.title} GitHub Repository (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           data-cursor-label="Code"
                           className="cursor-target text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         >
                           <FiGithub size={14} aria-hidden="true" />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                       {project.live && (
@@ -512,10 +517,11 @@ const CaseStudyList = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="Live Demo"
-                          aria-label={`${project.title} Live Demo`}
+                          aria-label={`${project.title} Live Demo (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           className="text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         >
                           <FiExternalLink size={14} aria-hidden="true" />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>

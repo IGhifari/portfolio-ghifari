@@ -265,9 +265,9 @@ const ChatAssistant = () => {
                     {t('chatbot.badge')}
                   </span>
                 </div>
-                <h2 className="font-grotesk font-bold text-sm text-[var(--text-primary)] truncate">
+                <span role="heading" aria-level="2" className="block font-grotesk font-bold text-sm text-[var(--text-primary)] truncate">
                   {t('chatbot.title')}
-                </h2>
+                </span>
               </div>
             </div>
 
@@ -278,7 +278,7 @@ const ChatAssistant = () => {
                   onClick={handleClearChat}
                   aria-label={t('chatbot.clearChatAria')}
                   title={t('chatbot.clearChatAria')}
-                  className="h-7 px-2 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="h-8 px-2.5 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiRotateCcw size={11} />
                   <span className="hidden sm:inline">{t('chatbot.clearChat')}</span>
@@ -292,7 +292,7 @@ const ChatAssistant = () => {
                 onClick={() => setIsOpen(false)}
                 aria-label={t('chatbot.closeAria')}
                 data-cursor-label="Close"
-                className="cursor-target w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="cursor-target w-9 h-9 min-w-[36px] min-h-[36px] rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <IoClose size={18} />
               </button>
@@ -484,7 +484,7 @@ const ChatAssistant = () => {
                 type="submit"
                 disabled={isLoading || input.trim().length === 0}
                 aria-label={t('chatbot.sendAria')}
-                className="w-8 h-8 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-35 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-35 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <IoSend size={13} className="translate-x-[0.5px]" />
               </button>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { FiAward, FiMaximize2, FiX, FiExternalLink, FiCalendar } from 'react-icons/fi';
 import { certificates } from '../data/certificates';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,6 +9,25 @@ import '../styles/Certificate.css';
 const Certificate = () => {
   const [activeCert, setActiveCert] = useState(null);
   const { t } = useLanguage();
+  const shouldReduceMotion = useReducedMotion();
+  const easeCurve = [0.16, 1, 0.3, 1];
+
+  const getFadeMotion = (delay = 0, yOffset = 16) => {
+    if (shouldReduceMotion) {
+      return {
+        initial: { opacity: 1, y: 0 },
+        animate: { opacity: 1, y: 0 },
+        whileInView: { opacity: 1, y: 0 },
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      initial: { opacity: 0, y: yOffset },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, margin: '-50px' },
+      transition: { duration: 0.5, delay, ease: easeCurve },
+    };
+  };
 
   const modalContainerRef = useRef(null);
   const closeBtnRef = useRef(null);
@@ -48,10 +67,7 @@ const Certificate = () => {
     <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
       {/* Section Header */}
       <motion.header
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        {...getFadeMotion(0, 16)}
         className="mb-12 md:mb-16"
       >
         <div className="flex items-center gap-3 mb-3">
@@ -79,29 +95,15 @@ const Certificate = () => {
         {certificates.map((cert, index) => (
           <motion.article
             key={cert.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{
-              duration: 0.45,
-              delay: index * 0.08,
-              ease: [0.16, 1, 0.3, 1],
-            }}
+            {...getFadeMotion(index * 0.08, 20)}
             className="cert-card rounded-lg overflow-hidden flex flex-col justify-between group"
           >
-            {/* Top: Image Preview Container with Inspect Trigger */}
-            <div
+            {/* Top: Image Preview Container with Inspect Trigger (MED-04) */}
+            <button
+              type="button"
               data-cursor-label="Preview"
-              className="cursor-target cert-image-container aspect-[16/10] w-full relative cursor-pointer"
+              className="cursor-target cert-image-container aspect-[16/10] w-full relative cursor-pointer text-left block p-0 border-0 bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               onClick={(e) => openModal(cert, e.currentTarget)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  openModal(cert, e.currentTarget);
-                }
-              }}
               aria-label={`${t('certificates.inspectAria')} ${cert.title}`}
             >
               <img
@@ -137,7 +139,7 @@ const Certificate = () => {
                   {t('certificates.previewFull')}
                 </span>
               </div>
-            </div>
+            </button>
 
             {/* Bottom: Metadata & Details */}
             <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between gap-4">
@@ -192,6 +194,7 @@ const Certificate = () => {
                   >
                     <span>{t('certificates.verifyCred')}</span>
                     <FiExternalLink size={12} aria-hidden="true" />
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                   </a>
                 ) : (
                   <span className="text-[11px] font-mono text-[var(--text-muted)]">
@@ -216,10 +219,10 @@ const Certificate = () => {
           >
             <motion.div
               ref={modalContainerRef}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+              transition={{ duration: shouldReduceMotion ? 0.01 : 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="cert-modal-container max-w-4xl w-full rounded-lg flex flex-col max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >

@@ -30,6 +30,8 @@ export const translations = {
       forRecruiters: "UNTUK REKRUTER",
       skipToContent: "Lewati ke konten utama",
       mobileMenu: "Menu navigasi seluler",
+      opensNewTab: "membuka di tab baru",
+      floatingUtilities: "Utilitas mengambang",
     },
 
     // Hero / Profile
@@ -662,6 +664,8 @@ export const translations = {
       forRecruiters: "FOR RECRUITERS",
       skipToContent: "Skip to main content",
       mobileMenu: "Mobile navigation menu",
+      opensNewTab: "opens in a new tab",
+      floatingUtilities: "Floating utilities",
     },
 
     // Hero / Profile

@@ -173,11 +173,12 @@ const RecruiterMode = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor-label="CV"
-                aria-label={t('recruiter.downloadCvAria')}
+                aria-label={`${t('recruiter.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                 className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs tracking-wider uppercase transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
               >
                 <FiDownload size={14} aria-hidden="true" />
                 <span>{t('recruiter.downloadCv')}</span>
+                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
               </a>
             )}
 
@@ -220,6 +221,7 @@ const RecruiterMode = () => {
               <FiGithub size={13} aria-hidden="true" />
               <span>GitHub</span>
               <FiExternalLink size={11} aria-hidden="true" />
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
 
             <a
@@ -232,6 +234,7 @@ const RecruiterMode = () => {
               <FiLinkedin size={13} aria-hidden="true" />
               <span>LinkedIn</span>
               <FiExternalLink size={11} aria-hidden="true" />
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           </div>
 
@@ -565,6 +568,7 @@ const RecruiterMode = () => {
                         >
                           <FiGithub size={13} aria-hidden="true" />
                           <span>Code</span>
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
 
@@ -579,6 +583,7 @@ const RecruiterMode = () => {
                         >
                           <span>Live</span>
                           <FiExternalLink size={11} aria-hidden="true" />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>
@@ -622,10 +627,12 @@ const RecruiterMode = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor-label="CV"
+                aria-label={`${t('recruiter.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                 className="cursor-target inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <FiDownload size={15} aria-hidden="true" />
                 <span>{t('recruiter.downloadCv')}</span>
+                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
               </a>
             )}
 
@@ -638,6 +645,7 @@ const RecruiterMode = () => {
             >
               <FiLinkedin size={15} aria-hidden="true" />
               <span>LinkedIn</span>
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           </div>
         </motion.section>

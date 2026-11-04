@@ -320,12 +320,13 @@ const GithubActivity = () => {
               href={GITHUB_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t('github.viewProfileAria')}
+              aria-label={`${t('github.viewProfileAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-mono text-xs font-bold transition-all shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               <SiGithub size={14} aria-hidden="true" />
               <span>{t('github.visitDirectly')}</span>
               <FiExternalLink size={13} aria-hidden="true" />
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           </div>
         </motion.div>
@@ -452,13 +453,14 @@ const GithubActivity = () => {
                     href={profile?.profileUrl || GITHUB_PROFILE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={t('github.viewProfileAria')}
+                    aria-label={`${t('github.viewProfileAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                     data-cursor-label="Profile"
                     className="cursor-target inline-flex items-center gap-2 h-9 px-3.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                   >
                     <SiGithub size={14} aria-hidden="true" />
                     <span>{t('github.viewProfile')}</span>
                     <FiExternalLink size={12} aria-hidden="true" />
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                   </a>
                 </div>
               </div>

@@ -183,12 +183,13 @@ const Navbar = () => {
               download={RESUME_FILENAME}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t('hero.downloadCvAria')}
+              aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
               className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors cursor-target"
               data-cursor-label="CV"
             >
               <FiDownload size={13} aria-hidden="true" />
               <span>{t('nav.downloadCv')}</span>
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           )}
 
@@ -401,11 +402,12 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={closeMenu}
-              aria-label={t('hero.downloadCvAria')}
+              aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
               className="mt-2 py-3 px-4 rounded-md bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-sm tracking-wider uppercase inline-flex items-center justify-center gap-2"
             >
               <FiDownload size={15} aria-hidden="true" />
               <span>{t('nav.downloadCv')}</span>
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           )}
 

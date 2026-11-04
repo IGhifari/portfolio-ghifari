@@ -325,6 +325,7 @@ const Experience = () => {
                 >
                   <span>Open Full Image</span>
                   <FiExternalLink size={12} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
               </div>
             </motion.div>

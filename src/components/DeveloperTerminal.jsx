@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   FiCornerDownLeft,
   FiTrash2,
@@ -39,6 +39,7 @@ const QUICK_COMMAND_CHIPS = [
 const DeveloperTerminal = () => {
   const { language, t } = useLanguage();
   const { route, navigate } = useRouter();
+  const shouldReduceMotion = useReducedMotion();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -299,10 +300,10 @@ const DeveloperTerminal = () => {
         >
           <motion.div
               ref={modalWindowRef}
-              initial={{ opacity: 0, scale: 0.95, y: 14 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 14 }}
-              transition={{ duration: 0.22, ease: easeCurve }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.95, y: 14 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 14 }}
+              transition={{ duration: shouldReduceMotion ? 0.01 : 0.22, ease: easeCurve }}
               className={`rounded-xl border border-neutral-800 bg-[#0d1117] shadow-2xl overflow-hidden font-mono text-xs sm:text-sm flex flex-col transition-all duration-200 ${
                 isMaximized ? 'w-full h-[90vh]' : 'w-full max-w-2xl max-h-[85vh]'
               }`}
@@ -319,30 +320,36 @@ const DeveloperTerminal = () => {
             >
               {/* Terminal Window Bar (macOS Dots Style) */}
               <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-neutral-800 select-none shrink-0">
-                {/* Mac-style Window Action Dots */}
-                <div className="flex items-center gap-2">
+                {/* Mac-style Window Action Dots with expanded touch targets (MED-01) */}
+                <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
                     data-cursor-label="Close"
-                    className="cursor-target w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e] hover:brightness-110 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5f56]"
+                    className="cursor-target group relative w-7 h-7 sm:w-6 sm:h-6 -m-1 rounded-md flex items-center justify-center hover:bg-white/5 cursor-pointer touch-manipulation after:content-[''] after:absolute after:-inset-2 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5f56]"
                     title="Close (Esc)"
                     aria-label="Close terminal window"
-                  />
+                  >
+                    <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e] group-hover:brightness-110 pointer-events-none" aria-hidden="true" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123] hover:brightness-110 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ffbd2e]"
+                    className="group relative w-7 h-7 sm:w-6 sm:h-6 -m-1 rounded-md flex items-center justify-center hover:bg-white/5 cursor-pointer touch-manipulation after:content-[''] after:absolute after:-inset-2 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ffbd2e]"
                     title="Minimize"
                     aria-label="Minimize terminal window"
-                  />
+                  >
+                    <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123] group-hover:brightness-110 pointer-events-none" aria-hidden="true" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => setIsMaximized((prev) => !prev)}
-                    className="w-3 h-3 rounded-full bg-[#27c93f] inline-block border border-[#1aab29] hover:brightness-110 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#27c93f]"
+                    className="group relative w-7 h-7 sm:w-6 sm:h-6 -m-1 rounded-md flex items-center justify-center hover:bg-white/5 cursor-pointer touch-manipulation after:content-[''] after:absolute after:-inset-2 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#27c93f]"
                     title={isMaximized ? 'Restore size' : 'Maximize size'}
                     aria-label="Toggle terminal full size"
-                  />
+                  >
+                    <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block border border-[#1aab29] group-hover:brightness-110 pointer-events-none" aria-hidden="true" />
+                  </button>
                 </div>
 
                 {/* Window Title matching Image 2 */}
@@ -350,35 +357,35 @@ const DeveloperTerminal = () => {
                   visitor@ighifari: ~
                 </div>
 
-                {/* Window Controls */}
-                <div className="flex items-center gap-2">
+                {/* Window Controls with expanded touch targets (MED-01) */}
+                <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => setIsMaximized((prev) => !prev)}
-                    className="p-1 text-[var(--text-muted)] hover:text-white transition-colors rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                    className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors rounded relative after:content-[''] after:absolute after:-inset-1.5 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                     title={isMaximized ? 'Restore' : 'Maximize'}
                     aria-label={isMaximized ? 'Restore window size' : 'Maximize window size'}
                   >
-                    {isMaximized ? <FiMinimize2 size={12} /> : <FiMaximize2 size={12} />}
+                    {isMaximized ? <FiMinimize2 size={13} /> : <FiMaximize2 size={13} />}
                   </button>
                   <button
                     type="button"
                     onClick={handleClear}
                     data-cursor-label="Clear"
-                    className="cursor-target p-1 text-[var(--text-muted)] hover:text-rose-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-400"
+                    className="cursor-target w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center text-[var(--text-muted)] hover:text-rose-400 transition-colors rounded relative after:content-[''] after:absolute after:-inset-1.5 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-400"
                     title={t('terminal.clearAria')}
                     aria-label={t('terminal.clearAria')}
                   >
-                    <FiTrash2 size={12} />
+                    <FiTrash2 size={13} />
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="p-1 text-[var(--text-muted)] hover:text-white transition-colors rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+                    className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors rounded relative after:content-[''] after:absolute after:-inset-1.5 after:min-w-[44px] after:min-h-[44px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
                     title={t('terminal.closeTerminal')}
                     aria-label={t('terminal.closeTerminal')}
                   >
-                    <FiX size={14} />
+                    <FiX size={15} />
                   </button>
                 </div>
               </div>
@@ -633,6 +640,7 @@ const DeveloperTerminal = () => {
                                 <FiCode size={12} aria-hidden="true" />
                                 <span>GitHub</span>
                                 <FiExternalLink size={10} aria-hidden="true" />
+                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                               </a>
                             )}
                             {entry.live && (
@@ -644,6 +652,7 @@ const DeveloperTerminal = () => {
                               >
                                 <FiExternalLink size={12} aria-hidden="true" />
                                 <span>Live Demo</span>
+                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                               </a>
                             )}
                           </div>
@@ -830,6 +839,7 @@ const DeveloperTerminal = () => {
                           >
                             <span>{entry.actionLabel}</span>
                             <FiExternalLink size={11} aria-hidden="true" />
+                            <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                           </a>
                         </div>
 
@@ -908,6 +918,7 @@ const DeveloperTerminal = () => {
                                 <span>{ch.handle}</span>
                                 <FiExternalLink size={9} aria-hidden="true" />
                               </span>
+                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                             </a>
                           ))}
                         </div>
@@ -1046,7 +1057,7 @@ const DeveloperTerminal = () => {
               </form>
 
               {/* Terminal Footer info */}
-              <div className="px-4 py-1.5 bg-[#161b22] border-t border-neutral-800/80 flex items-center justify-between text-[10px] font-mono text-neutral-500 select-none shrink-0">
+              <div className="px-4 py-1.5 bg-[#161b22] border-t border-neutral-800/80 flex items-center justify-between text-[10px] font-mono text-neutral-400 select-none shrink-0">
                 <span>{t('terminal.historyNavHint')}</span>
                 <span>Type &apos;exit&apos; or press ESC to close</span>
               </div>

@@ -64,19 +64,25 @@ const Footer = () => {
               <span>{t('nav.recruiter')}</span>
             </RouterLink>
             <span className="text-[var(--border)] select-none hidden sm:inline" aria-hidden="true">|</span>
-            {footerLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith('mailto:') ? undefined : '_blank'}
-                rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                data-cursor-label={link.label}
-                className="cursor-target inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
-              >
-                {link.icon}
-                <span>{link.label}</span>
-              </a>
-            ))}
+            {footerLinks.map((link) => {
+              const isExternal = !link.href.startsWith('mailto:');
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                  data-cursor-label={link.label}
+                  className="cursor-target inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
+                >
+                  {link.icon}
+                  <span>{link.label}</span>
+                  {isExternal && (
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                  )}
+                </a>
+              );
+            })}
           </nav>
 
           <p className="text-[var(--text-muted)] text-xs">

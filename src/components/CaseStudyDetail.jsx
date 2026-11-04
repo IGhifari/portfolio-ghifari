@@ -412,6 +412,7 @@ const CaseStudyDetail = ({ slug }) => {
                 <FiGithub size={14} aria-hidden="true" />
                 <span>{t('caseStudies.githubAction')}</span>
                 <FiExternalLink size={12} aria-hidden="true" />
+                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
               </a>
             )}
 
@@ -425,6 +426,7 @@ const CaseStudyDetail = ({ slug }) => {
               >
                 <span>{t('caseStudies.liveAction')}</span>
                 <FiExternalLink size={12} aria-hidden="true" />
+                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
               </a>
             )}
           </div>

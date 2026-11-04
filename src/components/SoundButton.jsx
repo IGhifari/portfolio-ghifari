@@ -77,15 +77,15 @@ const SoundButton = () => {
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
                         data-cursor-label="Music"
-                        className="cursor-target sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        className="cursor-target sm:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full touch-manipulation bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}. ${t('sound.openPlayer')}` : t('sound.openPlayer')}
                         title={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}` : t('sound.openPlayer')}
                     >
                         {isPlaying ? (
                             <div className="flex items-center gap-[2px] h-3">
-                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse" />
-                                <span className="w-[2px] h-2 bg-[var(--accent)] animate-pulse delay-75" />
-                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse motion-reduce:animate-none" />
+                                <span className="w-[2px] h-2 bg-[var(--accent)] animate-pulse delay-75 motion-reduce:animate-none" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150 motion-reduce:animate-none" />
                             </div>
                         ) : (
                             <FiMusic size={14} />
@@ -171,7 +171,7 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
-                            className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                            className="w-8 h-8 min-w-[36px] min-h-[36px] flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1.5 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                             aria-label={t('sound.closePlayer')}
                         >
                             <IoClose size={15} />
@@ -188,7 +188,7 @@ const SoundButton = () => {
                                 decoding="async"
                                 width={220}
                                 height={220}
-                                className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? "scale-105" : "scale-100"}`}
+                                className={`w-full h-full object-cover transition-transform duration-500 motion-reduce:transition-none motion-reduce:transform-none ${isPlaying ? "scale-105" : "scale-100"}`}
                             />
                         </div>
 
@@ -231,7 +231,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-prev"
                                 onClick={prev}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.prevTrack')}
                             >
                                 <FaStepBackward size={11} />
@@ -241,7 +241,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                                 aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             >
                                 {isPlaying ? (
@@ -255,7 +255,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-next"
                                 onClick={next}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.nextTrack')}
                             >
                                 <FaStepForward size={11} />
@@ -270,6 +270,11 @@ const SoundButton = () => {
                 @keyframes nbBar1 { from { height: 3px; } to { height: 12px; } }
                 @keyframes nbBar2 { from { height: 6px; } to { height: 12px; } }
                 @keyframes nbBar3 { from { height: 3px; } to { height: 9px; } }
+                @media (prefers-reduced-motion: reduce) {
+                    @keyframes nbBar1 { from { height: 6px; } to { height: 6px; } }
+                    @keyframes nbBar2 { from { height: 10px; } to { height: 10px; } }
+                    @keyframes nbBar3 { from { height: 8px; } to { height: 8px; } }
+                }
             `}</style>
         </div>
     );

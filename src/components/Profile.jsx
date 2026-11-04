@@ -222,12 +222,13 @@ const Profile = () => {
                     download={RESUME_FILENAME}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={t('hero.downloadCvAria')}
+                    aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                     data-cursor-label="CV"
                     className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                   >
                     <FiDownload size={15} aria-hidden="true" />
                     <span>{t('hero.downloadCv')}</span>
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                   </a>
                 )}
 
@@ -239,7 +240,8 @@ const Profile = () => {
                   className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                 >
                   <span>{t('hero.githubCta')}</span>
-                  <FiArrowUpRight size={16} />
+                  <FiArrowUpRight size={16} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
               </div>
 
@@ -273,22 +275,24 @@ const Profile = () => {
                   href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={t('hero.githubAria')}
+                  aria-label={`${t('hero.githubAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                   data-cursor-label="GitHub"
-                  className="cursor-target p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="cursor-target p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
-                  <FiGithub size={17} />
+                  <FiGithub size={17} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
                 <span className="text-[var(--border)] select-none text-xs" aria-hidden="true">/</span>
                 <a
                   href={profileData.socials.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={t('hero.linkedinAria')}
+                  aria-label={`${t('hero.linkedinAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                   data-cursor-label="LinkedIn"
-                  className="cursor-target p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="cursor-target p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
-                  <FiLinkedin size={17} />
+                  <FiLinkedin size={17} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
               </div>
             </motion.div>

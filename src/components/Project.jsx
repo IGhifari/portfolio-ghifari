@@ -170,19 +170,12 @@ const Project = () => {
                       showGlare={true}
                       className="project-preview-frame rounded-lg overflow-hidden cursor-pointer"
                     >
-                      <div
-                        role="button"
-                        tabIndex={0}
+                      <button
+                        type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            openModal(project, e.currentTarget);
-                          }
-                        }}
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                         data-cursor-label="Preview"
-                        className="cursor-target"
+                        className="cursor-target w-full text-left appearance-none bg-transparent border-0 p-0 m-0 cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                       >
                         {/* Window Header Frame */}
                         <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
@@ -210,7 +203,7 @@ const Project = () => {
                             className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.015]"
                           />
                         </div>
-                      </div>
+                      </button>
                     </TiltedCard>
                   </div>
 
@@ -288,10 +281,11 @@ const Project = () => {
                           rel="noopener noreferrer"
                           data-cursor-label="Code"
                           className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
+                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <FiGithub size={15} />
                           <span>{t('projects.sourceCode')}</span>
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
 
@@ -302,10 +296,11 @@ const Project = () => {
                           rel="noopener noreferrer"
                           data-cursor-label="Live Demo"
                           className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
+                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <span>{t('projects.liveDemo')}</span>
                           <FiArrowUpRight size={15} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>
@@ -352,20 +347,13 @@ const Project = () => {
                 {...getFadeMotion(index * 0.08)}
                 className="other-project-card rounded-lg overflow-hidden flex flex-col justify-between group"
               >
-                {/* Project Image Preview */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Project Image Preview (MED-04 semantic button) */}
+                <button
+                  type="button"
                   onClick={(e) => openModal(project, e.currentTarget)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openModal(project, e.currentTarget);
-                    }
-                  }}
                   aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                   data-cursor-label="Preview"
-                  className="cursor-target relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden border-b border-[var(--border)] cursor-pointer"
+                  className="cursor-target w-full text-left appearance-none p-0 m-0 relative aspect-video bg-[var(--surface-muted)] overflow-hidden border-0 border-b border-[var(--border)] cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                 >
                   <img
                     src={project.image}
@@ -376,7 +364,7 @@ const Project = () => {
                     height={720}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                </div>
+                </button>
 
                 {/* Card Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
@@ -425,10 +413,11 @@ const Project = () => {
                           rel="noopener noreferrer"
                           data-cursor-label="Code"
                           className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
+                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           title={t('projects.githubRepo')}
                         >
                           <FiGithub size={16} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                       {project.live && (
@@ -438,10 +427,11 @@ const Project = () => {
                           rel="noopener noreferrer"
                           data-cursor-label="Live Demo"
                           className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
+                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           title={t('projects.liveDeployment')}
                         >
                           <FiArrowUpRight size={17} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>
@@ -667,6 +657,7 @@ const Project = () => {
                     >
                       <FiGithub size={14} />
                       <span>{t('projects.sourceCode')}</span>
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
                   )}
                   {activeProject.live ? (
@@ -678,6 +669,7 @@ const Project = () => {
                     >
                       <span>{t('projects.liveDemo')}</span>
                       <FiArrowUpRight size={14} />
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
                   ) : (
                     <span className="font-mono text-[11px] text-[var(--text-muted)]">

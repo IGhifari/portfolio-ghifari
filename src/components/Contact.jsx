@@ -563,6 +563,7 @@ const Contact = () => {
                     <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
                       <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
                       <FiExternalLink size={13} aria-hidden="true" />
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </div>
                   </a>
                 )

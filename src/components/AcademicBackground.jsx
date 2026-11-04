@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { FiBookOpen, FiCalendar, FiMapPin, FiCheckCircle } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { educationMetadata } from '../data/education';
@@ -9,14 +9,31 @@ const AcademicBackground = () => {
   const competencies = t('education.competencies') || [];
   const curriculumTags = t('education.scopeTags') || [];
 
+  const shouldReduceMotion = useReducedMotion();
+  const easeCurve = [0.16, 1, 0.3, 1];
+
+  const getFadeMotion = (delay = 0, yOffset = 16) => {
+    if (shouldReduceMotion) {
+      return {
+        initial: { opacity: 1, y: 0 },
+        animate: { opacity: 1, y: 0 },
+        whileInView: { opacity: 1, y: 0 },
+        transition: { duration: 0 },
+      };
+    }
+    return {
+      initial: { opacity: 0, y: yOffset },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, margin: '-50px' },
+      transition: { duration: 0.5, delay, ease: easeCurve },
+    };
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-6 py-20 md:py-28 text-[var(--text-primary)]">
       {/* Section Header */}
       <motion.header
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        {...getFadeMotion(0, 16)}
         className="mb-12 md:mb-16"
       >
         <div className="flex items-center gap-3 mb-3">
@@ -43,10 +60,7 @@ const AcademicBackground = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left Column: Context & Timeline Summary */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          {...getFadeMotion(0, 20)}
           className="lg:col-span-4 space-y-6"
         >
           <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 space-y-5">
@@ -99,10 +113,7 @@ const AcademicBackground = () => {
 
         {/* Right Column: Detailed Institution & Curriculum Cards */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          {...getFadeMotion(0.1, 20)}
           className="lg:col-span-8 space-y-6"
         >
           {/* Card 1: Universitas Gunadarma — Current */}
