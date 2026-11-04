@@ -415,7 +415,8 @@ const Contact = () => {
                 type="submit"
                 id="contact-submit-btn"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-black text-sm tracking-wide transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                data-cursor-label="Send"
+                className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-black text-sm tracking-wide transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -468,14 +469,16 @@ const Contact = () => {
               <FiMail size={16} className="text-[var(--accent)] shrink-0" aria-hidden="true" />
               <a
                 href={`mailto:${directEmail}`}
-                className="font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
+                data-cursor-label="Mail"
+                className="cursor-target font-mono text-xs sm:text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors truncate flex-1 focus-visible:outline-none"
               >
                 {directEmail}
               </a>
               <button
                 type="button"
                 onClick={copyEmailToClipboard}
-                className="p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
+                data-cursor-label="Copy"
+                className="cursor-target p-1.5 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer shrink-0 focus-visible:outline-none"
                 title={t('contact.copyEmailTitle')}
                 aria-label={t('contact.copyEmailTitle')}
               >
@@ -542,7 +545,8 @@ const Contact = () => {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
+                    data-cursor-label="Connect"
+                    className="cursor-target py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">

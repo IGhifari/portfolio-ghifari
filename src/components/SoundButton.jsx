@@ -76,7 +76,8 @@ const SoundButton = () => {
                         type="button"
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
-                        className="sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Music"
+                        className="cursor-target sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}. ${t('sound.openPlayer')}` : t('sound.openPlayer')}
                         title={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}` : t('sound.openPlayer')}
                     >
@@ -110,7 +111,8 @@ const SoundButton = () => {
                         <button
                             type="button"
                             onClick={togglePlayback}
-                            className="w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none"
+                            data-cursor-label={isPlaying ? "Pause" : "Play"}
+                            className="cursor-target w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none"
                             aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             title={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                         >
@@ -122,7 +124,8 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-mini-desktop"
                             onClick={() => setIsExpanded(true)}
-                            className="flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
+                            data-cursor-label="Music"
+                            className="cursor-target flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
                             aria-label={`${t('sound.nowPlaying')} ${currentTrack.title} by ${currentTrack.artist}. ${t('sound.openPlayer')}`}
                         >
                             <span className="text-[11px] font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors max-w-[95px] truncate">

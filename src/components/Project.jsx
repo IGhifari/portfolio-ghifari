@@ -120,7 +120,8 @@ const Project = () => {
                   type="button"
                   onClick={() => setActiveCategory(catKey)}
                   aria-pressed={isActive}
-                  className={`px-3.5 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
+                  data-cursor-label="Filter"
+                  className={`cursor-target px-3.5 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
                     isActive
                       ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border border-[var(--accent)] shadow-sm'
                       : 'bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] border border-[var(--border)]'
@@ -188,6 +189,8 @@ const Project = () => {
                           }
                         }}
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
+                        data-cursor-label="Preview"
+                        className="cursor-target"
                       >
                         {/* Window Header Frame */}
                         <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
@@ -267,7 +270,8 @@ const Project = () => {
                     <div className="flex flex-wrap items-center gap-3 mt-7 pt-1">
                       <RouterLink
                         to={`/study-case/${project.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Study"
+                        className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
                       >
                         <FiBookOpen size={15} />
@@ -277,7 +281,8 @@ const Project = () => {
                       <button
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Details"
+                        className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                       >
                         <FiLayers size={15} />
@@ -289,7 +294,8 @@ const Project = () => {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          data-cursor-label="Code"
+                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
                         >
                           <FiGithub size={15} />
@@ -302,7 +308,8 @@ const Project = () => {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          data-cursor-label="Live Demo"
+                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
                         >
                           <span>{t('projects.liveDemo')}</span>
@@ -365,7 +372,8 @@ const Project = () => {
                     }
                   }}
                   aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                  className="relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden border-b border-[var(--border)] cursor-pointer"
+                  data-cursor-label="Preview"
+                  className="cursor-target relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden border-b border-[var(--border)] cursor-pointer"
                 >
                   <img
                     src={project.image}
@@ -412,7 +420,8 @@ const Project = () => {
                       <button
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Details"
+                        className="cursor-target px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                       >
                         {t('projects.viewDetails')}
@@ -422,7 +431,8 @@ const Project = () => {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
+                          data-cursor-label="Code"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
                           aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
                           title={t('projects.githubRepo')}
                         >
@@ -434,7 +444,8 @@ const Project = () => {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
+                          data-cursor-label="Live Demo"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
                           aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
                           title={t('projects.liveDeployment')}
                         >
@@ -478,7 +489,8 @@ const Project = () => {
         <div className="shrink-0">
           <RouterLink
             to="/study-case"
-            className="inline-flex items-center gap-2.5 px-5 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors shadow-sm"
+            data-cursor-label="Explore"
+            className="cursor-target inline-flex items-center gap-2.5 px-5 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors shadow-sm"
           >
             <span>{t('caseStudies.readCaseStudy')}</span>
             <FiArrowUpRight size={16} />
@@ -525,7 +537,8 @@ const Project = () => {
                   ref={closeBtnRef}
                   type="button"
                   onClick={closeModal}
-                  className="px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
+                  data-cursor-label="Close"
+                  className="cursor-target px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
                   aria-label={t('projects.modal.closeAria')}
                 >
                   <FiX size={15} aria-hidden="true" />

@@ -41,7 +41,8 @@ const Footer = () => {
             <button
               type="button"
               onClick={scrollToTop}
-              className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              data-cursor-label="Top"
+              className="cursor-target group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               title={t('footer.backToTopAria')}
             >
               <span>{t('footer.backToTop')}</span>
@@ -59,7 +60,8 @@ const Footer = () => {
                 href={link.href}
                 target={link.href.startsWith('mailto:') ? undefined : '_blank'}
                 rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
+                data-cursor-label={link.label}
+                className="cursor-target inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
               >
                 {link.icon}
                 <span>{link.label}</span>

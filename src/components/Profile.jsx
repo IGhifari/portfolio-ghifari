@@ -53,6 +53,8 @@ const Profile = () => {
   const heroScale = shouldReduceMotion ? 1 : scrollScale;
   const heroOpacity = shouldReduceMotion ? 1 : scrollOpacity;
   const heroY = shouldReduceMotion ? 0 : scrollYOffset;
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+  const shortcutLabel = isMac ? '⌘J' : 'Ctrl+J';
 
   // Snappy, modern spring-like curve for entrance
   const easeCurve = [0.16, 1, 0.3, 1];
@@ -196,7 +198,8 @@ const Profile = () => {
                   smooth={true}
                   duration={600}
                   offset={-70}
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                  data-cursor-label="Explore"
+                  className="cursor-target w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                 >
                   {t('hero.exploreWork')}
                 </Link>
@@ -208,7 +211,8 @@ const Profile = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={t('hero.downloadCvAria')}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                    data-cursor-label="CV"
+                    className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                   >
                     <FiDownload size={15} aria-hidden="true" />
                     <span>{t('hero.downloadCv')}</span>
@@ -219,11 +223,36 @@ const Profile = () => {
                   href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                  data-cursor-label="GitHub"
+                  className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                 >
                   <span>{t('hero.githubCta')}</span>
                   <FiArrowUpRight size={16} />
                 </a>
+              </div>
+
+              {/* Developer Terminal Invoke Button (Image 1 Style) */}
+              <div className="pt-1.5 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-developer-terminal'))}
+                  data-cursor-label="Terminal"
+                  className="group cursor-target inline-flex items-center justify-between gap-5 sm:gap-7 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-black/85 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all duration-200 shadow-lg hover:shadow-neutral-900/50 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                  aria-label={t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
+                  title={t('terminal.invokeHint')}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[#ff5f56] font-mono text-sm sm:text-base font-bold animate-pulse" aria-hidden="true">
+                      _
+                    </span>
+                    <span className="font-mono text-xs tracking-[0.2em] uppercase font-bold text-neutral-200 group-hover:text-white transition-colors">
+                      {t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
+                    </span>
+                  </div>
+                  <kbd className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[10px] sm:text-[11px] font-mono text-neutral-400 group-hover:text-neutral-200 group-hover:border-neutral-700 transition-colors shadow-inner">
+                    {shortcutLabel}
+                  </kbd>
+                </button>
               </div>
 
               {/* Subtle Social Links */}
@@ -233,7 +262,8 @@ const Profile = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('hero.githubAria')}
-                  className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  data-cursor-label="GitHub"
+                  className="cursor-target p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiGithub size={17} />
                 </a>
@@ -243,7 +273,8 @@ const Profile = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('hero.linkedinAria')}
-                  className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  data-cursor-label="LinkedIn"
+                  className="cursor-target p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiLinkedin size={17} />
                 </a>
@@ -264,7 +295,8 @@ const Profile = () => {
           smooth={true}
           duration={600}
           offset={-70}
-          className="flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
+          data-cursor-label="Scroll"
+          className="cursor-target flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
           aria-label={t('hero.scrollAria')}
         >
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase">{t('hero.scroll')}</span>

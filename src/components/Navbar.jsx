@@ -80,7 +80,8 @@ const Navbar = () => {
             smooth={true}
             duration={600}
             offset={-80}
-            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            data-cursor-label="Home"
             aria-label="Ghifari - Home"
           >
             GHIFARI<span className="text-[var(--accent)]">.</span>
@@ -92,7 +93,8 @@ const Navbar = () => {
               e.preventDefault();
               navigate('/');
             }}
-            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            data-cursor-label="Home"
             aria-label="Ghifari - Home"
           >
             GHIFARI<span className="text-[var(--accent)]">.</span>
@@ -164,7 +166,8 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t('hero.downloadCvAria')}
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors cursor-target"
+              data-cursor-label="CV"
             >
               <FiDownload size={13} aria-hidden="true" />
               <span>{t('nav.downloadCv')}</span>
@@ -180,11 +183,12 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setLanguage('id')}
-              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'id'
                   ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
+              data-cursor-label="ID"
               aria-pressed={language === 'id'}
               title="ID — Bahasa Indonesia"
             >
@@ -194,11 +198,12 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'en'
                   ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
+              data-cursor-label="EN"
               aria-pressed={language === 'en'}
               title="EN — English"
             >
@@ -211,7 +216,8 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            data-cursor-label="Theme"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}

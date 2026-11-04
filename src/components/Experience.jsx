@@ -210,7 +210,8 @@ const Experience = () => {
                 <div className="flex flex-wrap items-center gap-2.5">
                   <RouterLink
                     to="/study-case/project-management"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                    data-cursor-label="Project"
+                    className="cursor-target inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
                   >
                     <span>{language === 'id' ? 'Studi Kasus Proyek Magang' : 'Internship Case Study'}</span>
                     <FiExternalLink size={13} aria-hidden="true" />
@@ -220,7 +221,8 @@ const Experience = () => {
                     <button
                       type="button"
                       onClick={() => setActiveCert(exp.certificate)}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                      data-cursor-label="Certificate"
+                      className="cursor-target inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
                     >
                       <FiAward size={14} aria-hidden="true" />
                       <span>{t('experience.viewCertificate')}</span>
@@ -274,7 +276,8 @@ const Experience = () => {
                   type="button"
                   onClick={closeModal}
                   aria-label={t('experience.closeModal')}
-                  className="p-1.5 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  data-cursor-label="Close"
+                  className="cursor-target p-1.5 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiX size={20} aria-hidden="true" />
                 </button>
@@ -307,7 +310,8 @@ const Experience = () => {
                   href={activeCert.image}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 font-mono text-xs text-[var(--accent)] hover:underline self-end sm:self-auto"
+                  data-cursor-label="Open"
+                  className="cursor-target inline-flex items-center gap-1.5 font-mono text-xs text-[var(--accent)] hover:underline self-end sm:self-auto"
                 >
                   <span>Open Full Image</span>
                   <FiExternalLink size={12} aria-hidden="true" />

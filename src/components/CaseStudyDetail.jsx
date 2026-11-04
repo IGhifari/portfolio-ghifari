@@ -406,7 +406,8 @@ const CaseStudyDetail = ({ slug }) => {
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+                data-cursor-label="Code"
+                className="cursor-target inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
               >
                 <FiGithub size={14} aria-hidden="true" />
                 <span>{t('caseStudies.githubAction')}</span>
@@ -419,7 +420,8 @@ const CaseStudyDetail = ({ slug }) => {
                 href={project.live}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] hover:opacity-90 font-mono text-xs font-bold text-[var(--accent-contrast)] transition-opacity"
+                data-cursor-label="Live Demo"
+                className="cursor-target inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] hover:opacity-90 font-mono text-xs font-bold text-[var(--accent-contrast)] transition-opacity"
               >
                 <span>{t('caseStudies.liveAction')}</span>
                 <FiExternalLink size={12} aria-hidden="true" />
@@ -429,7 +431,8 @@ const CaseStudyDetail = ({ slug }) => {
 
           <RouterLink
             to="/study-case"
-            className="inline-flex items-center gap-2 font-mono text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors self-start sm:self-auto"
+            data-cursor-label="Back"
+            className="cursor-target inline-flex items-center gap-2 font-mono text-xs font-bold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors self-start sm:self-auto"
           >
             <FiArrowLeft size={14} aria-hidden="true" />
             <span>{t('caseStudies.backToList')}</span>

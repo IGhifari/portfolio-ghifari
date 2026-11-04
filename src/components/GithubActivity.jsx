@@ -379,7 +379,8 @@ const GithubActivity = () => {
                     disabled={refreshing}
                     title={t('github.refreshAria')}
                     aria-label={t('github.refreshAria')}
-                    className="h-9 w-9 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                    data-cursor-label="Refresh"
+                    className="cursor-target h-9 w-9 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                   >
                     <FiRefreshCw
                       size={14}
@@ -393,7 +394,8 @@ const GithubActivity = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={t('github.viewProfileAria')}
-                    className="inline-flex items-center gap-2 h-9 px-3.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                    data-cursor-label="Profile"
+                    className="cursor-target inline-flex items-center gap-2 h-9 px-3.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                   >
                     <SiGithub size={14} aria-hidden="true" />
                     <span>{t('github.viewProfile')}</span>

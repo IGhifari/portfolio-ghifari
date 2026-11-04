@@ -21,6 +21,8 @@ const Skills = lazy(() => import('./components/Skill'));
 const GithubActivity = lazy(() => import('./components/GithubActivity'));
 const Certificate = lazy(() => import('./components/Certificate'));
 const AcademicBackground = lazy(() => import('./components/AcademicBackground'));
+const DeveloperTerminal = lazy(() => import('./components/DeveloperTerminal'));
+const TargetCursor = lazy(() => import('./components/TargetCursor'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
@@ -109,6 +111,8 @@ const AppContent = () => {
             <Suspense fallback={null}>
                 <SoundButton />
                 <ChatAssistant />
+                <DeveloperTerminal />
+                <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
             </Suspense>
 
             <Navbar />

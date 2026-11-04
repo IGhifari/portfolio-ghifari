@@ -125,7 +125,8 @@ const CaseStudyList = () => {
         <motion.div {...getFadeMotion(0)} className="flex items-center justify-between">
           <RouterLink
             to="/"
-            className="inline-flex items-center gap-2 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
+            data-cursor-label="Back"
+            className="cursor-target inline-flex items-center gap-2 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
           >
             <FiArrowLeft size={14} aria-hidden="true" />
             <span>{t('caseStudies.backToHome')}</span>
@@ -190,7 +191,8 @@ const CaseStudyList = () => {
                   onClick={() => setSearchQuery('')}
                   title={t('caseStudies.clearSearchAria')}
                   aria-label={t('caseStudies.clearSearchAria')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  data-cursor-label="Clear"
+                  className="cursor-target absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiX size={15} aria-hidden="true" />
                 </button>
@@ -259,7 +261,8 @@ const CaseStudyList = () => {
                     type="button"
                     onClick={() => setSelectedCategory(catKey)}
                     aria-pressed={active}
-                    className={`px-3 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider whitespace-nowrap transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                    data-cursor-label="Filter"
+                    className={`cursor-target px-3 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider whitespace-nowrap transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                       active
                         ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-xs'
                         : 'bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
@@ -276,7 +279,8 @@ const CaseStudyList = () => {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors cursor-pointer"
+                data-cursor-label="Reset"
+                className="cursor-target inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors cursor-pointer"
               >
                 <FiRotateCcw size={12} aria-hidden="true" />
                 <span>{t('caseStudies.resetFilters')}</span>
@@ -476,7 +480,8 @@ const CaseStudyList = () => {
                   <div className="px-5 sm:px-6 pb-5 pt-3 border-t border-[var(--border-subtle)] bg-[var(--surface-muted)] flex items-center justify-between">
                     <RouterLink
                       to={`/study-case/${project.id}`}
-                      className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
+                      data-cursor-label="Study"
+                      className="cursor-target inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded"
                     >
                       <span>{t('caseStudies.readCaseStudy')}</span>
                       <FiArrowRight
@@ -495,7 +500,8 @@ const CaseStudyList = () => {
                           rel="noopener noreferrer"
                           title="GitHub Repository"
                           aria-label={`${project.title} GitHub Repository`}
-                          className="text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          data-cursor-label="Code"
+                          className="cursor-target text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         >
                           <FiGithub size={14} aria-hidden="true" />
                         </a>

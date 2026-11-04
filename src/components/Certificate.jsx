@@ -84,7 +84,8 @@ const Certificate = () => {
           >
             {/* Top: Image Preview Container with Inspect Trigger */}
             <div
-              className="cert-image-container aspect-[16/10] w-full relative cursor-pointer"
+              data-cursor-label="Preview"
+              className="cursor-target cert-image-container aspect-[16/10] w-full relative cursor-pointer"
               onClick={() => setActiveCert(cert)}
               role="button"
               tabIndex={0}
@@ -167,7 +168,8 @@ const Certificate = () => {
                 <button
                   type="button"
                   onClick={() => setActiveCert(cert)}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded cursor-pointer"
+                  data-cursor-label="Preview"
+                  className="cursor-target inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded cursor-pointer"
                 >
                   <FiMaximize2 size={12} aria-hidden="true" />
                   <span>{t('certificates.viewCert')}</span>
@@ -178,7 +180,8 @@ const Certificate = () => {
                     href={cert.credentialUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-mono font-medium text-[var(--accent)] hover:underline"
+                    data-cursor-label="Verify"
+                    className="cursor-target inline-flex items-center gap-1 text-xs font-mono font-medium text-[var(--accent)] hover:underline"
                   >
                     <span>{t('certificates.verifyCred')}</span>
                     <FiExternalLink size={12} aria-hidden="true" />

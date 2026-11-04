@@ -233,7 +233,8 @@ const ChatAssistant = () => {
           id="chatbot-launcher-btn"
           onClick={() => setIsOpen(true)}
           aria-label={t('chatbot.openAria')}
-          className="group flex items-center gap-2.5 h-11 sm:h-12 px-3.5 sm:px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-2xl transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          data-cursor-label="AI Chat"
+          className="cursor-target group flex items-center gap-2.5 h-11 sm:h-12 px-3.5 sm:px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-2xl transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-transform duration-200 group-hover:scale-105">
             <IoSparklesSharp size={14} />
@@ -291,7 +292,8 @@ const ChatAssistant = () => {
                 id="chatbot-close-btn"
                 onClick={() => setIsOpen(false)}
                 aria-label={t('chatbot.closeAria')}
-                className="w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
+                data-cursor-label="Close"
+                className="cursor-target w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
               >
                 <IoClose size={18} />
               </button>
