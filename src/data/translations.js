@@ -29,6 +29,7 @@ export const translations = {
       recruiter: "MODE REKRUTER",
       forRecruiters: "UNTUK REKRUTER",
       skipToContent: "Lewati ke konten utama",
+      mobileMenu: "Menu navigasi seluler",
     },
 
     // Hero / Profile
@@ -660,6 +661,7 @@ export const translations = {
       recruiter: "RECRUITER MODE",
       forRecruiters: "FOR RECRUITERS",
       skipToContent: "Skip to main content",
+      mobileMenu: "Mobile navigation menu",
     },
 
     // Hero / Profile

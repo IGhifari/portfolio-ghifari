@@ -247,7 +247,7 @@ const Profile = () => {
               <div className="pt-1.5 w-full sm:w-auto">
                 <button
                   type="button"
-                  onClick={() => window.dispatchEvent(new CustomEvent('open-developer-terminal'))}
+                  onClick={(e) => window.dispatchEvent(new CustomEvent('open-developer-terminal', { detail: { trigger: e.currentTarget } }))}
                   data-cursor-label="Terminal"
                   className="group cursor-target inline-flex items-center justify-between gap-5 sm:gap-7 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-black/85 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all duration-200 shadow-lg hover:shadow-neutral-900/50 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                   aria-label={t('terminal.invokeBtn') || 'INVOKE TERMINAL'}

@@ -4,6 +4,7 @@ import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCh
 import TiltedCard from './reactbits/TiltedCard';
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { RouterLink } from '../context/RouterContext';
 import '../styles/Project.css';
 
@@ -16,6 +17,7 @@ const Project = () => {
   const [activeProject, setActiveProject] = useState(null);
   const lastTriggerRef = useRef(null);
   const closeBtnRef = useRef(null);
+  const modalContainerRef = useRef(null);
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -43,26 +45,16 @@ const Project = () => {
 
   const closeModal = useCallback(() => {
     setActiveProject(null);
-    if (lastTriggerRef.current && typeof lastTriggerRef.current.focus === 'function') {
-      setTimeout(() => lastTriggerRef.current?.focus(), 0);
-    }
   }, []);
 
-  useEffect(() => {
-    if (!activeProject) return;
-    const timer = setTimeout(() => closeBtnRef.current?.focus(), 50);
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [activeProject, closeModal]);
+  // Trap focus inside project modal, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: Boolean(activeProject),
+    containerRef: modalContainerRef,
+    initialFocusRef: closeBtnRef,
+    triggerRef: lastTriggerRef,
+    onClose: closeModal,
+  });
 
   useEffect(() => {
     if (activeProject) {
@@ -511,6 +503,7 @@ const Project = () => {
             aria-labelledby="project-modal-title"
           >
             <motion.div
+              ref={modalContainerRef}
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}

@@ -1,30 +1,37 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAward, FiMaximize2, FiX, FiExternalLink, FiCalendar } from 'react-icons/fi';
 import { certificates } from '../data/certificates';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import '../styles/Certificate.css';
 
 const Certificate = () => {
   const [activeCert, setActiveCert] = useState(null);
   const { t } = useLanguage();
 
+  const modalContainerRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const lastTriggerRef = useRef(null);
+
   // Close modal handler
   const closeModal = useCallback(() => {
     setActiveCert(null);
   }, []);
 
-  // Keyboard navigation: Escape key closes modal
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && activeCert) {
-        closeModal();
-      }
-    };
+  const openModal = useCallback((cert, triggerEl) => {
+    lastTriggerRef.current = triggerEl || (typeof document !== 'undefined' ? document.activeElement : null);
+    setActiveCert(cert);
+  }, []);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeCert, closeModal]);
+  // Trap focus inside modal, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: Boolean(activeCert),
+    containerRef: modalContainerRef,
+    initialFocusRef: closeBtnRef,
+    triggerRef: lastTriggerRef,
+    onClose: closeModal,
+  });
 
   // Lock body scroll when modal is active
   useEffect(() => {
@@ -86,13 +93,13 @@ const Certificate = () => {
             <div
               data-cursor-label="Preview"
               className="cursor-target cert-image-container aspect-[16/10] w-full relative cursor-pointer"
-              onClick={() => setActiveCert(cert)}
+              onClick={(e) => openModal(cert, e.currentTarget)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  setActiveCert(cert);
+                  openModal(cert, e.currentTarget);
                 }
               }}
               aria-label={`${t('certificates.inspectAria')} ${cert.title}`}
@@ -167,7 +174,7 @@ const Certificate = () => {
               <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  onClick={() => setActiveCert(cert)}
+                  onClick={(e) => openModal(cert, e.currentTarget)}
                   data-cursor-label="Preview"
                   className="cursor-target inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded cursor-pointer"
                 >
@@ -208,6 +215,7 @@ const Certificate = () => {
             aria-labelledby="cert-modal-title"
           >
             <motion.div
+              ref={modalContainerRef}
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
@@ -230,6 +238,7 @@ const Certificate = () => {
                 </div>
 
                 <button
+                  ref={closeBtnRef}
                   type="button"
                   onClick={closeModal}
                   className="px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"

@@ -17,6 +17,7 @@ import {
   FiMinimize2,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRouter } from '../context/RouterContext';
 import {
   executeTerminalCommand,
@@ -56,6 +57,7 @@ const DeveloperTerminal = () => {
   const outputContainerRef = useRef(null);
   const inputRef = useRef(null);
   const modalWindowRef = useRef(null);
+  const lastTriggerRef = useRef(null);
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -93,16 +95,35 @@ const DeveloperTerminal = () => {
     [navigate, route?.type]
   );
 
+  // Trap focus inside terminal window, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen,
+    containerRef: modalWindowRef,
+    initialFocusRef: inputRef,
+    triggerRef: lastTriggerRef,
+    onClose: () => setIsOpen(false),
+  });
+
   // Global shortcut handler (Ctrl+J / Cmd+J) and custom event listener
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'j' || e.key === 'J')) {
         e.preventDefault();
+        if (!isOpen && typeof document !== 'undefined' && document.activeElement && document.activeElement !== document.body) {
+          lastTriggerRef.current = document.activeElement;
+        }
         setIsOpen((prev) => !prev);
       }
     };
 
-    const handleOpenEvent = () => setIsOpen(true);
+    const handleOpenEvent = (e) => {
+      if (e?.detail?.trigger) {
+        lastTriggerRef.current = e.detail.trigger;
+      } else if (typeof document !== 'undefined' && document.activeElement && document.activeElement !== document.body) {
+        lastTriggerRef.current = document.activeElement;
+      }
+      setIsOpen(true);
+    };
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     window.addEventListener('open-developer-terminal', handleOpenEvent);
@@ -111,7 +132,7 @@ const DeveloperTerminal = () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('open-developer-terminal', handleOpenEvent);
     };
-  }, []);
+  }, [isOpen]);
 
   // Lock body scroll and manage focus when modal is open
   useEffect(() => {

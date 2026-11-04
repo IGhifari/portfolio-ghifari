@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
 import { FiSun, FiMoon, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRouter, RouterLink } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 
@@ -13,6 +14,8 @@ const Navbar = () => {
   const { isDark, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { route, navigate } = useRouter();
+  const mobileDrawerRef = useRef(null);
+  const menuBtnRef = useRef(null);
 
   const isHome = route?.type === 'home';
 
@@ -51,16 +54,14 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  // Handle escape key to close mobile menu
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isMenuOpen) {
-        setIsMenuOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMenuOpen]);
+  // Trap focus inside mobile navigation drawer and toggle button, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: isMenuOpen,
+    containerRef: mobileDrawerRef,
+    triggerRef: menuBtnRef,
+    additionalElements: [menuBtnRef],
+    onClose: closeMenu,
+  });
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
@@ -289,10 +290,13 @@ const Navbar = () => {
           </button>
 
           <button
+            ref={menuBtnRef}
             type="button"
+            id="mobile-nav-toggle"
             onClick={toggleMenu}
             aria-label={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={isMenuOpen}
+            aria-controls="mobile-nav-drawer"
             className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
             {isMenuOpen ? <IoClose size={22} /> : <IoMenu size={22} />}
@@ -302,6 +306,11 @@ const Navbar = () => {
 
       {/* Mobile Menu Overlay / Drawer */}
       <div
+        id="mobile-nav-drawer"
+        ref={mobileDrawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('nav.mobileMenu') || 'Mobile navigation'}
         className={`lg:hidden fixed inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)] transition-all duration-300 ease-in-out overflow-y-auto ${
           isMenuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100 py-6 visible' : 'max-h-0 opacity-0 py-0 invisible'
         }`}

@@ -9,6 +9,7 @@ import {
   FiCornerDownRight,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const MAX_INPUT_CHARS = 500;
 const MAX_HISTORY_TURNS = 6;
@@ -29,6 +30,9 @@ const ChatAssistant = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const abortControllerRef = useRef(null);
+  const panelRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const launcherBtnRef = useRef(null);
 
   const suggestions = t('chatbot.suggestions', []);
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
@@ -43,26 +47,15 @@ const ChatAssistant = () => {
     }
   }, [messages, isLoading, isOpen, scrollToBottom]);
 
-  // Focus input when opened on desktop
-  useEffect(() => {
-    if (isOpen && window.innerWidth >= 640) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  // Trap focus inside chat panel, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen,
+    containerRef: panelRef,
+    initialFocusRef: typeof window !== 'undefined' && window.innerWidth >= 640 ? inputRef : closeBtnRef,
+    triggerRef: launcherBtnRef,
+    fallbackSelector: '#chatbot-launcher-btn',
+    onClose: () => setIsOpen(false),
+  });
 
   // Cleanup any in-flight request on unmount
   useEffect(() => {
@@ -229,8 +222,11 @@ const ChatAssistant = () => {
       {/* Floating Trigger Button (Shown when closed) */}
       {!isOpen && (
         <button
+          ref={launcherBtnRef}
           type="button"
           id="chatbot-launcher-btn"
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
           onClick={() => setIsOpen(true)}
           aria-label={t('chatbot.openAria')}
           data-cursor-label="AI Chat"
@@ -250,7 +246,9 @@ const ChatAssistant = () => {
       {/* Chat Assistant Panel */}
       {isOpen && (
         <section
+          ref={panelRef}
           role="dialog"
+          aria-modal="true"
           aria-label={t('chatbot.title')}
           className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[420px] h-[min(580px,calc(100vh-6.5rem))] flex flex-col rounded-xl overflow-hidden bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-2xl animate-fadeIn select-text"
         >
@@ -288,6 +286,7 @@ const ChatAssistant = () => {
               )}
 
               <button
+                ref={closeBtnRef}
                 type="button"
                 id="chatbot-close-btn"
                 onClick={() => setIsOpen(false)}

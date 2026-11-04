@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   FiBriefcase,
@@ -11,6 +11,7 @@ import {
   FiExternalLink,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { RouterLink } from '../context/RouterContext';
 import { experiences } from '../data/experience';
 
@@ -38,20 +39,27 @@ const Experience = () => {
     };
   };
 
+  const modalContainerRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const lastTriggerRef = useRef(null);
+
   const closeModal = useCallback(() => {
     setActiveCert(null);
   }, []);
 
-  // Keyboard navigation: Escape key closes certificate preview modal
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && activeCert) {
-        closeModal();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeCert, closeModal]);
+  const openCertModal = useCallback((cert, triggerEl) => {
+    lastTriggerRef.current = triggerEl || (typeof document !== 'undefined' ? document.activeElement : null);
+    setActiveCert(cert);
+  }, []);
+
+  // Trap focus inside modal, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: Boolean(activeCert),
+    containerRef: modalContainerRef,
+    initialFocusRef: closeBtnRef,
+    triggerRef: lastTriggerRef,
+    onClose: closeModal,
+  });
 
   // Lock body scroll when modal is active
   useEffect(() => {
@@ -220,7 +228,7 @@ const Experience = () => {
                   {exp.certificate && (
                     <button
                       type="button"
-                      onClick={() => setActiveCert(exp.certificate)}
+                      onClick={(e) => openCertModal(exp.certificate, e.currentTarget)}
                       data-cursor-label="Certificate"
                       className="cursor-target inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
                     >
@@ -252,6 +260,7 @@ const Experience = () => {
             aria-label={activeCert.title}
           >
             <motion.div
+              ref={modalContainerRef}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -273,6 +282,7 @@ const Experience = () => {
                   </p>
                 </div>
                 <button
+                  ref={closeBtnRef}
                   type="button"
                   onClick={closeModal}
                   aria-label={t('experience.closeModal')}
