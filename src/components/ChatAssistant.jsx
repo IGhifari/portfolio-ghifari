@@ -9,6 +9,7 @@ import {
   FiCornerDownRight,
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const MAX_INPUT_CHARS = 500;
 const MAX_HISTORY_TURNS = 6;
@@ -29,6 +30,9 @@ const ChatAssistant = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const abortControllerRef = useRef(null);
+  const panelRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const launcherBtnRef = useRef(null);
 
   const suggestions = t('chatbot.suggestions', []);
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
@@ -43,26 +47,15 @@ const ChatAssistant = () => {
     }
   }, [messages, isLoading, isOpen, scrollToBottom]);
 
-  // Focus input when opened on desktop
-  useEffect(() => {
-    if (isOpen && window.innerWidth >= 640) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  // Trap focus inside chat panel, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen,
+    containerRef: panelRef,
+    initialFocusRef: typeof window !== 'undefined' && window.innerWidth >= 640 ? inputRef : closeBtnRef,
+    triggerRef: launcherBtnRef,
+    fallbackSelector: '#chatbot-launcher-btn',
+    onClose: () => setIsOpen(false),
+  });
 
   // Cleanup any in-flight request on unmount
   useEffect(() => {
@@ -229,11 +222,15 @@ const ChatAssistant = () => {
       {/* Floating Trigger Button (Shown when closed) */}
       {!isOpen && (
         <button
+          ref={launcherBtnRef}
           type="button"
           id="chatbot-launcher-btn"
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
           onClick={() => setIsOpen(true)}
           aria-label={t('chatbot.openAria')}
-          className="group flex items-center gap-2.5 h-11 sm:h-12 px-3.5 sm:px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-2xl transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          data-cursor-label="AI Chat"
+          className="cursor-target group flex items-center gap-2.5 h-11 sm:h-12 px-3.5 sm:px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-2xl transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-transform duration-200 group-hover:scale-105">
             <IoSparklesSharp size={14} />
@@ -249,7 +246,9 @@ const ChatAssistant = () => {
       {/* Chat Assistant Panel */}
       {isOpen && (
         <section
+          ref={panelRef}
           role="dialog"
+          aria-modal="true"
           aria-label={t('chatbot.title')}
           className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[420px] h-[min(580px,calc(100vh-6.5rem))] flex flex-col rounded-xl overflow-hidden bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-2xl animate-fadeIn select-text"
         >
@@ -266,9 +265,9 @@ const ChatAssistant = () => {
                     {t('chatbot.badge')}
                   </span>
                 </div>
-                <h2 className="font-grotesk font-bold text-sm text-[var(--text-primary)] truncate">
+                <span role="heading" aria-level="2" className="block font-grotesk font-bold text-sm text-[var(--text-primary)] truncate">
                   {t('chatbot.title')}
-                </h2>
+                </span>
               </div>
             </div>
 
@@ -279,7 +278,7 @@ const ChatAssistant = () => {
                   onClick={handleClearChat}
                   aria-label={t('chatbot.clearChatAria')}
                   title={t('chatbot.clearChatAria')}
-                  className="h-7 px-2 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer focus-visible:outline-none"
+                  className="h-8 px-2.5 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiRotateCcw size={11} />
                   <span className="hidden sm:inline">{t('chatbot.clearChat')}</span>
@@ -287,11 +286,13 @@ const ChatAssistant = () => {
               )}
 
               <button
+                ref={closeBtnRef}
                 type="button"
                 id="chatbot-close-btn"
                 onClick={() => setIsOpen(false)}
                 aria-label={t('chatbot.closeAria')}
-                className="w-7 h-7 rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
+                data-cursor-label="Close"
+                className="cursor-target w-9 h-9 min-w-[36px] min-h-[36px] rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <IoClose size={18} />
               </button>
@@ -483,7 +484,7 @@ const ChatAssistant = () => {
                 type="submit"
                 disabled={isLoading || input.trim().length === 0}
                 aria-label={t('chatbot.sendAria')}
-                className="w-8 h-8 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-35 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-35 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 <IoSend size={13} className="translate-x-[0.5px]" />
               </button>

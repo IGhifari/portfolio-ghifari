@@ -43,12 +43,34 @@ export const selectedProjects = [
         en: [
           "Search and discovery of public spaces filtered by accessibility facilities (ramps, elevators, inclusive amenities)",
           "Detailed venue views with verified facility indicators and community evaluations",
-          "Responsive interface designed with high contrast readability and accessible navigation ergonomics",
+          "Responsive interface with high contrast readability and accessible navigation",
         ],
       },
       contribution: {
         id: "Full-Stack Developer — merancang skema database Prisma/PostgreSQL, membangun endpoint REST API Express, serta mengimplementasikan antarmuka React + TypeScript.",
         en: "Full-Stack Developer — designed the Prisma/PostgreSQL database schema, built Express REST API endpoints, and implemented the React + TypeScript frontend.",
+      },
+      goals: {
+        id: "Membangun direktori fasilitas publik inklusif yang mempermudah penyandang disabilitas dan lansia menemukan lokasi dengan fasilitas ramah aksesibilitas.",
+        en: "Build an inclusive public facility directory enabling people with disabilities and the elderly to locate venues with verified accessibility amenities.",
+      },
+      process: {
+        id: [
+          "Riset kebutuhan navigasi inklusif dan fasilitas esensial (ramp kursi roda, lift khusus, toilet ramah disabilitas).",
+          "Perancangan antarmuka berprinsip aksesibilitas dengan kontras tinggi, navigasi keyboard penuh, dan HTML semantik.",
+          "Pengembangan arsitektur web interaktif dan sistem filter kategori fasilitas.",
+          "Audit kepatuhan standar aksesibilitas web (WCAG 2.1 AA).",
+        ],
+        en: [
+          "Researched inclusive navigation needs and essential amenities (wheelchair ramps, elevators, accessible restrooms).",
+          "Designed accessible interfaces prioritizing high contrast, full keyboard navigation, and semantic HTML.",
+          "Engineered interactive web views and multi-facility filter mechanisms.",
+          "Conducted web accessibility compliance audits against WCAG 2.1 AA standards.",
+        ],
+      },
+      learnings: {
+        id: "Aksesibilitas web bukan sekadar fitur tambahan, melainkan prinsip inti rekayasa perangkat lunak. Menerapkan rasio kontras warna yang tepat, navigasi ramah pembaca layar (screen reader), dan indikator fokus yang jelas menghasilkan produk yang lebih andal untuk semua pengguna.",
+        en: "Web accessibility is not an afterthought, but a core software engineering discipline. Enforcing proper color contrast ratios, screen reader compatibility, and clear keyboard focus indicators produces a more resilient product for all users.",
       },
     },
     image: "/images/projects/akseskita.webp",
@@ -61,26 +83,26 @@ export const selectedProjects = [
     number: "02",
     categoryKey: "fullstack",
     category: {
-      id: "ENTERPRISE / FULL-STACK",
-      en: "ENTERPRISE / FULL-STACK",
+      id: "MAGANG INDUSTRI / FULL-STACK",
+      en: "INTERNSHIP / FULL-STACK",
     },
     title: "Project Management System",
     subtitle: {
-      id: "Kolaborasi Tim & Pelacakan Tugas",
-      en: "Team Collaboration & Task Tracking",
+      id: "Sistem Manajemen Proyek Internal — PT. AMA Salam Indonesia",
+      en: "Internal Project Management System — PT. AMA Salam Indonesia",
     },
     description: {
-      id: "Platform manajemen proyek komprehensif yang dibangun untuk menyederhanakan pelacakan tugas agile, manajemen sprint, dan kolaborasi tim lintas fungsi melalui kanban dan alur kerja yang intuitif.",
-      en: "A comprehensive project management platform built to streamline agile task tracking, sprint management, and cross-functional team collaboration through intuitive kanban and workflow tooling.",
+      id: "Sistem manajemen proyek berbasis web yang dikembangkan selama program magang di PT. AMA Salam Indonesia untuk memantau progres tugas, alur kerja tim, dan pelacakan issue secara terpusat melalui papan kanban interaktif.",
+      en: "A web-based project management system developed during the internship at PT. AMA Salam Indonesia for tracking task progress, team workflows, and issue monitoring through interactive kanban boards.",
     },
     details: {
       problem: {
-        id: "Tim pengembangan membutuhkan ruang kerja terpusat untuk memantau status tugas lintas sprint, menetapkan prioritas, dan menyelaraskan progres anggota tim tanpa bergantung pada dokumen terpisah.",
-        en: "Development teams need a centralized workspace to track task status across sprints, assign priorities, and align team progress without relying on fragmented spreadsheets.",
+        id: "Tim pengembang di PT. AMA Salam Indonesia membutuhkan ruang kerja terpusat untuk memantau status tugas lintas sprint, menetapkan prioritas, dan menyelaraskan progres tim tanpa bergantung pada pencatatan manual yang terfragmentasi.",
+        en: "The development team at PT. AMA Salam Indonesia needed a centralized workspace to track task status across sprints, assign priorities, and align team progress without relying on fragmented manual records.",
       },
       solution: {
-        id: "Mengembangkan sistem manajemen proyek berbasis web dengan papan kanban interaktif, pengelompokan sprint, dan pelacakan alur kerja tim secara terstruktur.",
-        en: "Engineered a web-based project management system featuring interactive kanban boards, sprint organization, and structured team workflow tracking.",
+        id: "Membangun sistem manajemen proyek berbasis web untuk yayasan dengan papan kanban interaktif, alur kerja sprint terstruktur, dan pemantauan issue tim secara terintegrasi.",
+        en: "Engineered a web-based project management system for the foundation featuring interactive kanban boards, structured sprint workflows, and integrated team issue monitoring.",
       },
       architecture: {
         id: "Frontend SPA menggunakan React, TypeScript, dan Tailwind CSS yang terhubung ke backend Express.js dengan Prisma ORM dan database PostgreSQL.",
@@ -99,13 +121,35 @@ export const selectedProjects = [
         ],
       },
       contribution: {
-        id: "Full-Stack Developer — merancang model data proyek & sprint, membangun REST API, serta mengerjakan komponen antarmuka kanban.",
-        en: "Full-Stack Developer — modeled project and sprint schemas, implemented REST API services, and built the kanban UI components.",
+        id: "Frontend Developer Intern — berkolaborasi bersama tim pengembang dalam membangun antarmuka papan kanban responsif, pemantauan status tugas, serta integrasi alur kerja sistem.",
+        en: "Frontend Developer Intern — collaborated with the development team to build responsive kanban board interfaces, task status monitoring, and system workflow integration.",
+      },
+      goals: {
+        id: "Membangun sistem pemantauan progres dan issue tracking terpusat untuk tim pengembang internal yayasan selama masa magang di PT. AMA Salam Indonesia.",
+        en: "Build a centralized progress and issue tracking system for the foundation's internal development team during the internship at PT. AMA Salam Indonesia.",
+      },
+      process: {
+        id: [
+          "Menganalisis alur kerja sprint internal dan kebutuhan pelacakan tugas tim yayasan.",
+          "Merancang komponen antarmuka papan kanban interaktif berbasis React dan Tailwind CSS dengan kemudahan transisi status.",
+          "Menghubungkan antarmuka ke backend Express.js, Prisma ORM, dan database PostgreSQL.",
+          "Melakukan evaluasi performa halaman web dan aksesibilitas berbasis metrik audit Lighthouse.",
+        ],
+        en: [
+          "Analyzed internal sprint workflows and task tracking requirements for the foundation's team.",
+          "Designed interactive kanban UI components using React and Tailwind CSS with smooth status transitions.",
+          "Connected frontend interfaces with Express.js backend services, Prisma ORM, and PostgreSQL.",
+          "Evaluated web performance and accessibility based on Lighthouse audit metrics.",
+        ],
+      },
+      learnings: {
+        id: "Mengembangkan sistem manajemen proyek dalam lingkungan tim profesional melatih kedisiplinan koordinasi antarmuka, pemahaman alur kerja kanban nyata, serta kepatuhan terhadap kerahasiaan data internal perusahaan.",
+        en: "Engineering a project management system in a professional team environment cultivated discipline in interface modularity, real-world kanban state workflows, and strict adherence to corporate system confidentiality.",
       },
     },
     image: "/images/projects/project_management.webp",
     tags: ["React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Express"],
-    github: null,
+    github: "https://github.com/mauladhanifadhilsalam/front-end-SLM-task-management",
     live: null,
   },
   {
@@ -123,7 +167,7 @@ export const selectedProjects = [
     },
     description: {
       id: "Platform e-commerce berbasis web modern untuk produk pertanian segar, menampilkan katalog produk lengkap, manajemen keranjang belanja, alur checkout, ulasan terverifikasi, dan pesan langsung pengguna-admin.",
-      en: "A modern web-based e-commerce platform for fresh agricultural produce, featuring comprehensive product catalogs, cart state management, checkout workflows, verified customer reviews, and direct user-admin messaging.",
+      en: "A web-based e-commerce platform for agricultural produce, featuring product catalogs, cart state management, checkout workflows, customer reviews, and direct user-admin messaging.",
     },
     details: {
       problem: {
@@ -236,7 +280,7 @@ export const selectedProjects = [
       },
       solution: {
         id: "Membangun platform pembelajaran terpadu dengan dashboard siswa dan admin, manajemen kursus dan tugas terstruktur, serta pemrosesan dokumen berbasis AI yang didukung antrean latar belakang BullMQ dan Redis.",
-        en: "Engineered a unified digital learning platform featuring comprehensive student and admin dashboards, structured course and assignment management, and AI-driven document processing powered by BullMQ background job queues and Redis.",
+        en: "Engineered a digital learning platform with student and admin dashboards, structured course and assignment management, and AI-powered document processing using BullMQ background job queues and Redis.",
       },
       architecture: {
         id: "Arsitektur full-stack modern dengan frontend Next.js 15 dan TypeScript yang terhubung ke backend Express.js, Prisma ORM, dan PostgreSQL, diperkuat sistem antrean BullMQ + Redis untuk pemrosesan Gemini AI serta validasi skema Zod.",
@@ -246,14 +290,14 @@ export const selectedProjects = [
         id: [
           "Manajemen materi pembelajaran dan pengorganisasian modul kursus terstruktur",
           "Catatan dan tugas belajar interaktif beserta pelacakan progres siswa",
-          "Pengelolaan kursus menyeluruh dengan dashboard siswa dan admin",
+          "Pengelolaan kursus dengan dashboard terpisah untuk siswa dan admin",
           "Pemrosesan dan ekstraksi dokumen pembelajaran cerdas menggunakan Gemini AI secara asinkron",
           "Sistem autentikasi aman, arsitektur REST API modular, dan validasi data ketat dengan Zod",
         ],
         en: [
           "Course curriculum and learning material management with structured notes",
           "Interactive notes and assignment workflows with student progress tracking",
-          "Comprehensive course management with dedicated student and admin dashboards",
+          "Course management with dedicated student and admin dashboards",
           "Intelligent asynchronous learning document processing and extraction using Gemini AI",
           "Secure authentication system, modular REST API services, and strict schema validation with Zod",
         ],
@@ -261,6 +305,28 @@ export const selectedProjects = [
       contribution: {
         id: "Full-Stack & AI Developer — merancang arsitektur aplikasi Next.js 15 & Express.js, memodelkan skema database Prisma/PostgreSQL, mengintegrasikan antrean BullMQ/Redis untuk pemrosesan dokumen Gemini AI, serta membangun sistem autentikasi dan API tervalidasi Zod.",
         en: "Full-Stack & AI Developer — designed the Next.js 15 & Express.js system architecture, modeled Prisma/PostgreSQL database schemas, integrated BullMQ/Redis worker queues for Gemini AI document parsing, and built authenticated REST APIs validated with Zod.",
+      },
+      goals: {
+        id: "Menyediakan ruang belajar terintegrasi yang menggabungkan modul kursus, catatan interaktif, manajemen tugas, dan ekstraksi dokumen cerdas berbasis Gemini AI tanpa membebani performa client.",
+        en: "Provide an integrated learning workspace uniting course modules, interactive notes, assignment management, and intelligent Gemini AI document processing without degrading client performance.",
+      },
+      process: {
+        id: [
+          "Perancangan skema basis data relasional PostgreSQL dengan Prisma ORM untuk entitas kursus, modul, tugas, dan catatan.",
+          "Pembangunan layanan backend RESTful modular menggunakan Express.js dengan validasi skema runtime ketat berbasis Zod.",
+          "Implementasi arsitektur asynchronous worker memanfaatkan antrean BullMQ dan Redis untuk menangani pemrosesan dokumen AI.",
+          "Integrasi frontend Next.js 15 dengan TypeScript dan Tailwind CSS untuk rendering dashboard yang cepat dan responsif.",
+        ],
+        en: [
+          "Relational schema modeling in PostgreSQL via Prisma ORM covering courses, modules, assignments, and notes.",
+          "Modular RESTful backend service engineering in Express.js with strict runtime schema validation via Zod.",
+          "Asynchronous worker architecture implementation using BullMQ and Redis queues for long-running AI document tasks.",
+          "Next.js 15 frontend engineering with TypeScript and Tailwind CSS for fast, responsive dashboard rendering.",
+        ],
+      },
+      learnings: {
+        id: "Pemisahan tugas AI yang berdurasi panjang ke antrean latar belakang BullMQ + Redis terbukti krusial untuk mencegah pemblokiran event loop server HTTP. Selain itu, pengetikan statis menyeluruh dengan TypeScript dan validasi Zod meminimalisir inkonsistensi payload data antara client dan API.",
+        en: "Decoupling heavy AI jobs to BullMQ + Redis background workers proved vital to keep the HTTP server event loop non-blocking. Additionally, end-to-end static typing with TypeScript and runtime Zod validation minimized payload inconsistencies across client and API boundaries.",
       },
     },
     image: "/images/projects/studyflow.webp",
@@ -325,8 +391,8 @@ export const selectedProjects = [
     },
     image: "/images/projects/bluehorizon.webp",
     tags: ["React.js", "Vite", "Supabase", "PostgreSQL", "JavaScript", "Vercel"],
-    github: null,
-    live: null,
+    github: "https://github.com/IGhifari/blue-horizon-perlap",
+    live: "https://blue-horizon-perlap.vercel.app/",
   },
 ];
 
@@ -567,3 +633,18 @@ export const otherProjects = [
     live: "https://www.ighifari.my.id/",
   },
 ];
+
+/**
+ * Combined list of all portfolio projects (selected + other).
+ */
+export const allProjects = [...selectedProjects, ...otherProjects];
+
+/**
+ * Helper to retrieve a single project by its unique slug ID (case-insensitive).
+ * Returns null if not found.
+ */
+export const getProjectBySlug = (slug) => {
+  if (!slug || typeof slug !== 'string') return null;
+  const normalized = slug.trim().toLowerCase();
+  return allProjects.find((p) => p.id.toLowerCase() === normalized) || null;
+};

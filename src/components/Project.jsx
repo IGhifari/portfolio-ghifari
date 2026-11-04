@@ -4,17 +4,20 @@ import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCh
 import TiltedCard from './reactbits/TiltedCard';
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { RouterLink } from '../context/RouterContext';
 import '../styles/Project.css';
 
 const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'game'];
 
 const Project = () => {
   const shouldReduceMotion = useReducedMotion();
-  const { t, resolve } = useLanguage();
+  const { language, t, resolve } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeProject, setActiveProject] = useState(null);
   const lastTriggerRef = useRef(null);
   const closeBtnRef = useRef(null);
+  const modalContainerRef = useRef(null);
 
   const easeCurve = [0.16, 1, 0.3, 1];
 
@@ -42,26 +45,16 @@ const Project = () => {
 
   const closeModal = useCallback(() => {
     setActiveProject(null);
-    if (lastTriggerRef.current && typeof lastTriggerRef.current.focus === 'function') {
-      setTimeout(() => lastTriggerRef.current?.focus(), 0);
-    }
   }, []);
 
-  useEffect(() => {
-    if (!activeProject) return;
-    const timer = setTimeout(() => closeBtnRef.current?.focus(), 50);
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [activeProject, closeModal]);
+  // Trap focus inside project modal, manage initial focus, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: Boolean(activeProject),
+    containerRef: modalContainerRef,
+    initialFocusRef: closeBtnRef,
+    triggerRef: lastTriggerRef,
+    onClose: closeModal,
+  });
 
   useEffect(() => {
     if (activeProject) {
@@ -119,7 +112,8 @@ const Project = () => {
                   type="button"
                   onClick={() => setActiveCategory(catKey)}
                   aria-pressed={isActive}
-                  className={`px-3.5 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
+                  data-cursor-label="Filter"
+                  className={`cursor-target px-3.5 py-1.5 rounded-md font-mono text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
                     isActive
                       ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border border-[var(--accent)] shadow-sm'
                       : 'bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] border border-[var(--border)]'
@@ -176,17 +170,12 @@ const Project = () => {
                       showGlare={true}
                       className="project-preview-frame rounded-lg overflow-hidden cursor-pointer"
                     >
-                      <div
-                        role="button"
-                        tabIndex={0}
+                      <button
+                        type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            openModal(project, e.currentTarget);
-                          }
-                        }}
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
+                        data-cursor-label="Preview"
+                        className="cursor-target w-full text-left appearance-none bg-transparent border-0 p-0 m-0 cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                       >
                         {/* Window Header Frame */}
                         <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
@@ -207,14 +196,15 @@ const Project = () => {
                             src={project.image}
                             alt={`${project.title} interface preview`}
                             loading={index === 0 ? 'eager' : 'lazy'}
-                            fetchPriority={index === 0 ? 'high' : undefined}
+                            // eslint-disable-next-line react/no-unknown-property
+                            fetchpriority={index === 0 ? 'high' : undefined}
                             decoding="async"
                             width={1280}
                             height={720}
                             className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.015]"
                           />
                         </div>
-                      </div>
+                      </button>
                     </TiltedCard>
                   </div>
 
@@ -264,26 +254,28 @@ const Project = () => {
 
                     {/* Verified Links & Case Study Modal Trigger */}
                     <div className="flex flex-wrap items-center gap-3 mt-7 pt-1">
-                      <button
-                        type="button"
-                        onClick={(e) => openModal(project, e.currentTarget)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
+                      <RouterLink
+                        to={`/study-case/${project.id}`}
+                        data-cursor-label="Study"
+                        className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
                       >
                         <FiBookOpen size={15} />
-                        <span>{t('projects.viewDetails')}</span>
-                      </button>
+                        <span>{t('caseStudies.readCaseStudy')}</span>
+                      </RouterLink>
 
                       {project.github && (
                         <a
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
+                          data-cursor-label="Code"
+                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <FiGithub size={15} />
                           <span>{t('projects.sourceCode')}</span>
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
 
@@ -292,11 +284,13 @@ const Project = () => {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
+                          data-cursor-label="Live Demo"
+                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <span>{t('projects.liveDemo')}</span>
                           <FiArrowUpRight size={15} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>
@@ -343,19 +337,13 @@ const Project = () => {
                 {...getFadeMotion(index * 0.08)}
                 className="other-project-card rounded-lg overflow-hidden flex flex-col justify-between group"
               >
-                {/* Project Image Preview */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Project Image Preview (MED-04 semantic button) */}
+                <button
+                  type="button"
                   onClick={(e) => openModal(project, e.currentTarget)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openModal(project, e.currentTarget);
-                    }
-                  }}
                   aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                  className="relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden border-b border-[var(--border)] cursor-pointer"
+                  data-cursor-label="Preview"
+                  className="cursor-target w-full text-left appearance-none p-0 m-0 relative aspect-video bg-[var(--surface-muted)] overflow-hidden border-0 border-b border-[var(--border)] cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                 >
                   <img
                     src={project.image}
@@ -366,7 +354,7 @@ const Project = () => {
                     height={720}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                </div>
+                </button>
 
                 {/* Card Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
@@ -402,7 +390,8 @@ const Project = () => {
                       <button
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
-                        className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Details"
+                        className="cursor-target px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                       >
                         {t('projects.viewDetails')}
@@ -412,11 +401,13 @@ const Project = () => {
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title}`}
+                          data-cursor-label="Code"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           title={t('projects.githubRepo')}
                         >
                           <FiGithub size={16} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                       {project.live && (
@@ -424,11 +415,13 @@ const Project = () => {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title}`}
+                          data-cursor-label="Live Demo"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                           title={t('projects.liveDeployment')}
                         >
                           <FiArrowUpRight size={17} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
                     </div>
@@ -439,6 +432,43 @@ const Project = () => {
           </div>
         </>
       )}
+
+      {/* ==================================================
+          CASE STUDY HUB BANNER (CTA TO /study-case)
+          ================================================== */}
+      <motion.div
+        {...getFadeMotion(0.1)}
+        className="mt-16 md:mt-24 p-6 sm:p-8 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
+        <div className="space-y-2 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+            <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)] font-semibold">
+              {t('caseStudies.heading')}
+            </span>
+          </div>
+          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-[var(--text-primary)] uppercase tracking-tight">
+            {language === 'id'
+              ? 'Analisis Arsitektur & Studi Kasus Mendalam'
+              : 'Architectural Analysis & In-Depth Case Studies'}
+          </h3>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+            {language === 'id'
+              ? 'Pelajari problem statement, keputusan teknis, arsitektur sistem, dan proses implementasi di balik proyek-proyek rekayasa perangkat lunak terpilih.'
+              : 'Explore the problem statement, technical decisions, system architecture, and implementation process behind selected software engineering projects.'}
+          </p>
+        </div>
+        <div className="shrink-0">
+          <RouterLink
+            to="/study-case"
+            data-cursor-label="Explore"
+            className="cursor-target inline-flex items-center gap-2.5 px-5 py-3 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs tracking-wider uppercase transition-colors shadow-sm"
+          >
+            <span>{t('caseStudies.readCaseStudy')}</span>
+            <FiArrowUpRight size={16} />
+          </RouterLink>
+        </div>
+      </motion.div>
 
       {/* ==================================================
           PROJECT CASE STUDY DETAIL MODAL
@@ -453,6 +483,7 @@ const Project = () => {
             aria-labelledby="project-modal-title"
           >
             <motion.div
+              ref={modalContainerRef}
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -479,7 +510,8 @@ const Project = () => {
                   ref={closeBtnRef}
                   type="button"
                   onClick={closeModal}
-                  className="px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
+                  data-cursor-label="Close"
+                  className="cursor-target px-3 py-1.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer shrink-0"
                   aria-label={t('projects.modal.closeAria')}
                 >
                   <FiX size={15} aria-hidden="true" />
@@ -597,6 +629,15 @@ const Project = () => {
               {/* Modal Footer */}
               <div className="px-5 py-3.5 border-t border-[var(--border)] bg-[var(--surface-muted)] flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2.5">
+                  <RouterLink
+                    to={`/study-case/${activeProject.id}`}
+                    onClick={closeModal}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
+                  >
+                    <FiBookOpen size={14} />
+                    <span>{language === 'id' ? 'Buka Halaman Studi Kasus' : 'Open Full Case Study'}</span>
+                    <FiArrowUpRight size={13} />
+                  </RouterLink>
                   {activeProject.github && (
                     <a
                       href={activeProject.github}
@@ -606,6 +647,7 @@ const Project = () => {
                     >
                       <FiGithub size={14} />
                       <span>{t('projects.sourceCode')}</span>
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
                   )}
                   {activeProject.live ? (
@@ -617,6 +659,7 @@ const Project = () => {
                     >
                       <span>{t('projects.liveDemo')}</span>
                       <FiArrowUpRight size={14} />
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
                   ) : (
                     <span className="font-mono text-[11px] text-[var(--text-muted)]">

@@ -46,22 +46,6 @@ const songs = [
         duration: 264,
         color: "#3B82F6",
     },
-    {
-        title: "Monolog",
-        artist: "Pamungkas",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8qVUgkHMIz72PLnsBgHLQb8Iz3x0tLTr56OjBXFOx2w&s=10",
-        audio: "/audio/monolog.mp3",
-        duration: 281,
-        color: "#3B82F6",
-    },
-    {
-        title: "Salvatore",
-        artist: "Lana Del Rey",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC_OUb5_hhSmi4a22GpHllU-JyIdMldFCF3NzT91QabA&s=10",
-        audio: "/audio/Salvatore.mp3",
-        duration: 281,
-        color: "#3B82F6",
-    },
 ];
 
 const formatTime = (time) => {
@@ -92,15 +76,16 @@ const SoundButton = () => {
                         type="button"
                         id="sound-button-mini-mobile"
                         onClick={() => setIsExpanded(true)}
-                        className="sm:hidden w-8 h-8 rounded-full bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        data-cursor-label="Music"
+                        className="cursor-target sm:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full touch-manipulation bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}. ${t('sound.openPlayer')}` : t('sound.openPlayer')}
                         title={isPlaying ? `${t('sound.nowPlaying')}: ${currentTrack.title}` : t('sound.openPlayer')}
                     >
                         {isPlaying ? (
                             <div className="flex items-center gap-[2px] h-3">
-                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse" />
-                                <span className="w-[2px] h-2 bg-[var(--accent)] animate-pulse delay-75" />
-                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse motion-reduce:animate-none" />
+                                <span className="w-[2px] h-2 bg-[var(--accent)] animate-pulse delay-75 motion-reduce:animate-none" />
+                                <span className="w-[2px] h-full bg-[var(--accent)] animate-pulse delay-150 motion-reduce:animate-none" />
                             </div>
                         ) : (
                             <FiMusic size={14} />
@@ -126,7 +111,8 @@ const SoundButton = () => {
                         <button
                             type="button"
                             onClick={togglePlayback}
-                            className="w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none"
+                            data-cursor-label={isPlaying ? "Pause" : "Play"}
+                            className="cursor-target w-6 h-6 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                             aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             title={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                         >
@@ -138,7 +124,8 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-mini-desktop"
                             onClick={() => setIsExpanded(true)}
-                            className="flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none"
+                            data-cursor-label="Music"
+                            className="cursor-target flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded py-0.5 px-1"
                             aria-label={`${t('sound.nowPlaying')} ${currentTrack.title} by ${currentTrack.artist}. ${t('sound.openPlayer')}`}
                         >
                             <span className="text-[11px] font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors max-w-[95px] truncate">
@@ -184,7 +171,7 @@ const SoundButton = () => {
                             type="button"
                             id="sound-button-close"
                             onClick={() => setIsExpanded(false)}
-                            className="w-6 h-6 flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer focus-visible:outline-none"
+                            className="w-8 h-8 min-w-[36px] min-h-[36px] flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1.5 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                             aria-label={t('sound.closePlayer')}
                         >
                             <IoClose size={15} />
@@ -201,15 +188,15 @@ const SoundButton = () => {
                                 decoding="async"
                                 width={220}
                                 height={220}
-                                className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? "scale-105" : "scale-100"}`}
+                                className={`w-full h-full object-cover transition-transform duration-500 motion-reduce:transition-none motion-reduce:transform-none ${isPlaying ? "scale-105" : "scale-100"}`}
                             />
                         </div>
 
                         {/* Title & Artist */}
                         <div className="text-center px-1">
-                            <h5 className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
+                            <p className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
                                 {currentTrack.title}
-                            </h5>
+                            </p>
                             <p className="font-mono text-[11px] text-[var(--text-secondary)] truncate mt-0.5">
                                 {currentTrack.artist}
                             </p>
@@ -217,7 +204,7 @@ const SoundButton = () => {
 
                         {/* Progress Bar */}
                         <div className="space-y-1">
-                            <div className="relative w-full h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+                            <div className="relative w-full h-1.5 rounded-full bg-[var(--border)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--accent)]">
                                 <div
                                     className="absolute top-0 left-0 h-full bg-[var(--accent)] rounded-full transition-all"
                                     style={{ width: `${progressPercent}%` }}
@@ -244,7 +231,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-prev"
                                 onClick={prev}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.prevTrack')}
                             >
                                 <FaStepBackward size={11} />
@@ -254,7 +241,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-play-pause"
                                 onClick={togglePlayback}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm focus-visible:outline-none"
+                                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90 transition-all cursor-pointer shadow-sm touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                                 aria-label={isPlaying ? t('sound.pauseMusic') : t('sound.playMusic')}
                             >
                                 {isPlaying ? (
@@ -268,7 +255,7 @@ const SoundButton = () => {
                                 type="button"
                                 id="sound-next"
                                 onClick={next}
-                                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer focus-visible:outline-none"
+                                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                                 aria-label={t('sound.nextTrack')}
                             >
                                 <FaStepForward size={11} />
@@ -283,6 +270,11 @@ const SoundButton = () => {
                 @keyframes nbBar1 { from { height: 3px; } to { height: 12px; } }
                 @keyframes nbBar2 { from { height: 6px; } to { height: 12px; } }
                 @keyframes nbBar3 { from { height: 3px; } to { height: 9px; } }
+                @media (prefers-reduced-motion: reduce) {
+                    @keyframes nbBar1 { from { height: 6px; } to { height: 6px; } }
+                    @keyframes nbBar2 { from { height: 10px; } to { height: 10px; } }
+                    @keyframes nbBar3 { from { height: 8px; } to { height: 8px; } }
+                }
             `}</style>
         </div>
     );

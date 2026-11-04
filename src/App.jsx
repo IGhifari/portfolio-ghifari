@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import './styles/Components.css';
 
 import { ThemeProvider } from './context/ThemeContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { RouterProvider, useRouter } from './context/RouterContext';
 
 // Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
 import Navbar from './components/Navbar';
@@ -14,12 +15,20 @@ import Project from './components/Project';
 const SoundButton = lazy(() => import('./components/SoundButton'));
 const ChatAssistant = lazy(() => import('./components/ChatAssistant'));
 const About = lazy(() => import('./components/About'));
+const Experience = lazy(() => import('./components/Experience'));
 const Journey = lazy(() => import('./components/Journey'));
 const Skills = lazy(() => import('./components/Skill'));
+const GithubActivity = lazy(() => import('./components/GithubActivity'));
 const Certificate = lazy(() => import('./components/Certificate'));
 const AcademicBackground = lazy(() => import('./components/AcademicBackground'));
+const DeveloperTerminal = lazy(() => import('./components/DeveloperTerminal'));
+const TargetCursor = lazy(() => import('./components/TargetCursor'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
+const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
+const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
+const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
  * Defers mounting of below-the-fold lazy sections until the user scrolls near
@@ -81,80 +90,167 @@ DeferredSection.propTypes = {
     minHeight: PropTypes.string,
 };
 
-const App = () => {
+const AppContent = () => {
+    const { route } = useRouter();
+    const { t } = useLanguage();
+
+    // Scroll restoration for anchor links when switching back to home view
+    useEffect(() => {
+        if (route.type === 'home' && window.location.hash) {
+            const id = window.location.hash.replace(/^#/, '');
+            const timer = setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 80);
+            return () => clearTimeout(timer);
+        }
+    }, [route.type]);
+
     return (
-        <ThemeProvider>
-          <LanguageProvider>
-            <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
-
-            <Suspense fallback={null}>
-                <SoundButton />
-                <ChatAssistant />
-            </Suspense>
-
+        <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
+            {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2.5 focus:rounded-md focus:bg-[var(--accent)] focus:text-[var(--accent-contrast)] focus:font-mono focus:text-xs focus:font-bold focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] transition-all cursor-target"
+                data-cursor-label="Skip"
+                onClick={() => {
+                    const mainEl = document.getElementById('main-content');
+                    if (mainEl) {
+                        mainEl.focus();
+                    }
+                }}
+            >
+                {t('nav.skipToContent') || 'Skip to main content'}
+            </a>
             <Navbar />
 
-            {/* Hero */}
-            <section id="profile" className="min-h-screen bg-[var(--bg-primary)]">
-                <Profile/>
-            </section>
+            <main id="main-content" tabIndex={-1} className="focus:outline-none">
+                {route.type === 'home' && (
+                    <>
+                        {/* Hero */}
+                        <section id="profile" className="min-h-screen bg-[var(--bg-primary)]">
+                            <Profile/>
+                        </section>
 
-            {/* Projects (Eagerly rendered for immediate showcase availability) */}
-            <section id="projects" className="bg-[var(--bg-primary)]">
-                <Project/>
-            </section>
+                        {/* Projects (Eagerly rendered for immediate showcase availability) */}
+                        <section id="projects" className="bg-[var(--bg-primary)]">
+                            <Project/>
+                        </section>
 
-            {/* About */}
-            <section id="about" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <DeferredSection>
-                    <About/>
-                </DeferredSection>
-            </section>
+                        {/* About */}
+                        <section id="about" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <About/>
+                            </DeferredSection>
+                        </section>
 
-            {/* Journey */}
-            <section id="journey" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <DeferredSection>
-                    <Journey/>
-                </DeferredSection>
-            </section>
+                        {/* Work Experience */}
+                        <section id="experience" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <Experience/>
+                            </DeferredSection>
+                        </section>
 
-            {/* Tech Stack */}
-            <section id="stack" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <div id="skills" aria-hidden="true" />
-                <DeferredSection>
-                    <Skills/>
-                </DeferredSection>
-            </section>
+                        {/* Journey */}
+                        <section id="journey" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <Journey/>
+                            </DeferredSection>
+                        </section>
 
-            {/* Certificates */}
-            <section id="certificates" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <DeferredSection>
-                    <Certificate/>
-                </DeferredSection>
-            </section>
+                        {/* Tech Stack */}
+                        <section id="stack" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <div id="skills" aria-hidden="true" />
+                            <DeferredSection>
+                                <Skills/>
+                            </DeferredSection>
+                        </section>
 
-            {/* Academic Background / Education */}
-            <section id="education" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <div id="academic" aria-hidden="true" />
-                <div id="AcademicBackground" aria-hidden="true" />
-                <DeferredSection>
-                    <AcademicBackground/>
-                </DeferredSection>
-            </section>
+                        {/* GitHub Activity */}
+                        <section id="github" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <GithubActivity />
+                            </DeferredSection>
+                        </section>
 
-            {/* Contact */}
-            <section id="contact" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
-                <div id="contact2" aria-hidden="true" />
-                <DeferredSection>
-                    <Contact/>
-                </DeferredSection>
-            </section>
+                        {/* Certificates */}
+                        <section id="certificates" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <DeferredSection>
+                                <Certificate/>
+                            </DeferredSection>
+                        </section>
+
+                        {/* Academic Background / Education */}
+                        <section id="education" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <div id="academic" aria-hidden="true" />
+                            <div id="AcademicBackground" aria-hidden="true" />
+                            <DeferredSection>
+                                <AcademicBackground/>
+                            </DeferredSection>
+                        </section>
+
+                        {/* Contact */}
+                        <section id="contact" className="bg-[var(--bg-primary)] border-t border-[var(--border-subtle)]">
+                            <div id="contact2" aria-hidden="true" />
+                            <DeferredSection>
+                                <Contact/>
+                            </DeferredSection>
+                        </section>
+                    </>
+                )}
+
+                {route.type === 'study-case-list' && (
+                    <Suspense fallback={<div className="min-h-screen pt-28 max-w-6xl mx-auto px-5 sm:px-6" />}>
+                        <CaseStudyList />
+                    </Suspense>
+                )}
+
+                {route.type === 'study-case-detail' && (
+                    <Suspense fallback={<div className="min-h-screen pt-28 max-w-4xl mx-auto px-5 sm:px-6" />}>
+                        <CaseStudyDetail slug={route.slug} />
+                    </Suspense>
+                )}
+
+                {route.type === 'recruiter' && (
+                    <Suspense fallback={<div className="min-h-screen pt-28 max-w-5xl mx-auto px-5 sm:px-6" />}>
+                        <RecruiterMode />
+                    </Suspense>
+                )}
+
+                {route.type === 'not-found' && (
+                    <Suspense fallback={<div className="min-h-screen pt-28 max-w-4xl mx-auto px-5 sm:px-6" />}>
+                        <NotFound />
+                    </Suspense>
+                )}
+            </main>
 
             {/* Footer */}
             <Suspense fallback={null}>
                 <Footer />
             </Suspense>
+
+            {/* Floating Utilities (Placed after main content for logical tab order) */}
+            <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
+                <Suspense fallback={null}>
+                    <SoundButton />
+                    <ChatAssistant />
+                    <DeveloperTerminal />
+                    <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
+                </Suspense>
+            </aside>
         </div>
+    );
+};
+
+const App = () => {
+    return (
+        <ThemeProvider>
+          <LanguageProvider>
+            <RouterProvider>
+              <AppContent />
+            </RouterProvider>
           </LanguageProvider>
         </ThemeProvider>
     );

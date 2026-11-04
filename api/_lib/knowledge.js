@@ -19,6 +19,7 @@ import { RESUME_URL, RESUME_FILENAME, RESUME_AVAILABLE } from '../../src/data/re
 import { translations } from '../../src/data/translations.js';
 import { selectedProjects, otherProjects } from '../../src/data/projects.js';
 import { certificates } from '../../src/data/certificates.js';
+import { experiences } from '../../src/data/experience.js';
 import { techCategoriesData, marqueeTechnologies } from '../../src/data/skills.js';
 import { directEmail, contactChannelsData } from '../../src/data/contact.js';
 import { educationMetadata } from '../../src/data/education.js';
@@ -510,7 +511,32 @@ const educationEntries = [
 /**
  * 7. EXPERIENCE & CERTIFICATES
  */
-const experienceAndCertificateEntries = certificates.map((cert) => {
+const workExperienceEntries = experiences.map((exp) => ({
+  id: `work-experience-${exp.id}`,
+  category: KNOWLEDGE_CATEGORIES.EXPERIENCE_CERTIFICATES,
+  title: {
+    id: `${exp.role.id} — ${exp.company}`,
+    en: `${exp.role.en} — ${exp.company}`,
+  },
+  content: {
+    id: {
+      summary: `${exp.role.id} di ${exp.company} (${exp.period.id}, ${exp.type.id}). ${exp.description.id} Tanggung jawab teknis: ${exp.responsibilities.id.join(' ')} Teknologi: ${exp.technologies.join(', ')}.`,
+      data: exp,
+    },
+    en: {
+      summary: `${exp.role.en} at ${exp.company} (${exp.period.en}, ${exp.type.en}). ${exp.description.en} Key technical responsibilities: ${exp.responsibilities.en.join(' ')} Technologies: ${exp.technologies.join(', ')}.`,
+      data: exp,
+    },
+  },
+  source: {
+    files: ['src/components/Experience.jsx', 'src/data/experience.js'],
+    sectionId: '#experience',
+  },
+}));
+
+const experienceAndCertificateEntries = [
+  ...workExperienceEntries,
+  ...certificates.map((cert) => {
   const idCategoryLabel = idText.certificates.categories[cert.category] || cert.category;
   const enCategoryLabel = enText.certificates.categories[cert.category] || cert.category;
 
@@ -562,7 +588,7 @@ const experienceAndCertificateEntries = certificates.map((cert) => {
       sectionId: '#certificates',
     },
   };
-});
+})];
 
 /**
  * 8. DEVELOPMENT JOURNEY

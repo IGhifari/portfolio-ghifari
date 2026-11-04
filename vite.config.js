@@ -464,6 +464,62 @@ export const createLocalApiChatMiddleware = ({
  * Dev-only middleware so `POST /api/chat` works seamlessly under `npm run dev` (localhost:5173)
  * and preview testing. Never executes during production build.
  */
+/**
+ * Dev-only middleware so `GET /api/github` works seamlessly under `npm run dev` (localhost:5173).
+ * Proxies GitHub user profile and contribution heatmap data in Node.js, bypassing browser CORS restrictions.
+ */
+export const createLocalApiGithubMiddleware = ({
+  githubHandlerLoader = async () =>
+    (await import('./functions/api/github.js')).createCloudflarePagesGithubHandler(),
+} = {}) => {
+  return async function localApiGithubMiddleware(req, res, next) {
+    const urlPath = (req.url || '').split('?')[0]
+    if (urlPath !== '/api/github') {
+      return next()
+    }
+
+    try {
+      const handler = await githubHandlerLoader()
+      const response = await handler({
+        request: {
+          method: req.method,
+          headers: req.headers,
+        },
+      })
+
+      res.statusCode = response.status
+      for (const [key, value] of response.headers.entries()) {
+        res.setHeader(key, value)
+      }
+      const body = await response.text()
+      res.end(body)
+    } catch (err) {
+      console.error('[/api/github dev middleware error]:', err?.message || err)
+      if (!res.headersSent) {
+        res.statusCode = 500
+        res.setHeader('Content-Type', 'application/json; charset=utf-8')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(
+          JSON.stringify({
+            ok: false,
+            error: {
+              code: 'INTERNAL_SERVER_ERROR',
+              message: 'Terjadi kesalahan internal pada server GitHub dev middleware.',
+            },
+          })
+        )
+      }
+    }
+  }
+}
+
+export const localApiGithubPlugin = () => ({
+  name: 'local-api-github-middleware',
+  configureServer(server) {
+    server.middlewares.use(createLocalApiGithubMiddleware())
+  },
+})
+
 export const localApiChatPlugin = (mode) => ({
   name: 'local-api-chat-middleware',
   configureServer(server) {
@@ -472,7 +528,7 @@ export const localApiChatPlugin = (mode) => ({
 })
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), localApiChatPlugin(mode)],
+  plugins: [react(), localApiChatPlugin(mode), localApiGithubPlugin()],
   envPrefix: ['VITE_'],
 
   server: {

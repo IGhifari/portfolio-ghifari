@@ -1,13 +1,15 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-scroll';
-import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload } from 'react-icons/fi';
+import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { profileData } from '../data/profile';
+import { RouterLink } from '../context/RouterContext';
 import { generateLanyardTextures } from '../utils/lanyardCardGenerator';
 import Threads from './reactbits/Threads';
+import TechText from './reactbits/TechText';
 
 const Lanyard = lazy(() => import('./Lanyard'));
 
@@ -46,13 +48,15 @@ const Profile = () => {
   }, [isDark]);
 
   // Controlled, subtle scroll transformations away from hero
-  const scrollScale = useTransform(scrollY, [0, 520], [1, 0.96]);
-  const scrollOpacity = useTransform(scrollY, [0, 420], [1, 0]);
-  const scrollYOffset = useTransform(scrollY, [0, 520], [0, 24]);
+  const scrollScale = useTransform(scrollY, isDesktop ? [0, 520] : [380, 980], [1, 0.96]);
+  const scrollOpacity = useTransform(scrollY, isDesktop ? [0, 500] : [380, 950], [1, 0]);
+  const scrollYOffset = useTransform(scrollY, isDesktop ? [0, 520] : [380, 980], [0, 24]);
 
   const heroScale = shouldReduceMotion ? 1 : scrollScale;
   const heroOpacity = shouldReduceMotion ? 1 : scrollOpacity;
   const heroY = shouldReduceMotion ? 0 : scrollYOffset;
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+  const shortcutLabel = isMac ? '⌘J' : 'Ctrl+J';
 
   // Snappy, modern spring-like curve for entrance
   const easeCurve = [0.16, 1, 0.3, 1];
@@ -73,7 +77,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex flex-col justify-start lg:justify-center items-center overflow-hidden">
       {/* Background layer: ReactBits Threads WebGL animation with theme-aware color */}
       <Threads
         color={isDark ? [0.23, 0.51, 0.96] : [0.15, 0.39, 0.92]}
@@ -112,9 +116,9 @@ const Profile = () => {
               orientation="portrait"
               cornerRadius={0.22}
               anchor={isDesktop ? 'right' : 'center'}
-              anchorOffsetY={62}
-              size={isDesktop ? 0.38 : 0.27}
-              strapLength={isDesktop ? 0.22 : 0.11}
+              anchorOffsetY={isDesktop ? 62 : 46}
+              size={isDesktop ? 0.38 : 0.28}
+              strapLength={isDesktop ? 0.22 : 0.03}
               strapWidth={0.65}
               metal={isDark ? 'silver' : 'graphite'}
               gravity={1}
@@ -136,28 +140,69 @@ const Profile = () => {
           y: heroY,
           zIndex: 10,
         }}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[320px] pb-20 sm:pt-[340px] lg:py-24 relative"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[450px] pb-20 sm:pt-[480px] lg:py-24 relative"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Primary Identity & Actions */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
-            {/* Status Indicator */}
+            {/* Status Indicator & Recruiter Mode Shortcut */}
             <motion.div {...getMotionProps(0.05, -8)}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)]/90 backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{t('hero.available')}</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)]/90 backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{t('hero.available')}</span>
+                </div>
+
+                <RouterLink
+                  to="/recruiter"
+                  data-cursor-label="Recruiter"
+                  className="cursor-target inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border)] hover:border-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+                >
+                  <FiBriefcase size={11} className="text-[var(--accent)]" aria-hidden="true" />
+                  <span>{t('nav.forRecruiters')} &rarr;</span>
+                </RouterLink>
               </div>
             </motion.div>
 
             {/* Person's Name: Primary Visual Element (Single semantic H1 with full name) */}
-            <h1 className="space-y-0.5 sm:space-y-1 w-full select-none">
-              <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase">
-                {profileData.nameLines.first}
-              </span>
-              {" "}
-              <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase">
-                {profileData.nameLines.second}
-              </span>
+            <h1 className="space-y-0.5 sm:space-y-1 w-full select-none pointer-events-auto" aria-label={profileData.fullName}>
+              <span className="sr-only">{profileData.fullName}</span>
+              <div className="w-full h-[54px] xs:h-[64px] sm:h-[74px] md:h-[86px] lg:h-[96px] relative" aria-hidden="true">
+                <TechText
+                  text={profileData.nameLines.first}
+                  fontFamily="'Space Grotesk', sans-serif"
+                  fontWeight={800}
+                  fontSize={90}
+                  align={isDesktop ? 'left' : 'center'}
+                  color={isDark ? '#F7F7F5' : '#141418'}
+                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  reveal="letter"
+                  dashLength={4}
+                  dashGap={2}
+                  specks={12}
+                  intro="none"
+                  clickKick
+                  guides={false}
+                />
+              </div>
+              <div className="w-full h-[54px] xs:h-[64px] sm:h-[74px] md:h-[86px] lg:h-[96px] relative" aria-hidden="true">
+                <TechText
+                  text={profileData.nameLines.second}
+                  fontFamily="'Space Grotesk', sans-serif"
+                  fontWeight={800}
+                  fontSize={90}
+                  align={isDesktop ? 'left' : 'center'}
+                  color={isDark ? '#94A3B8' : '#64748B'}
+                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  reveal="letter"
+                  dashLength={4}
+                  dashGap={2}
+                  specks={12}
+                  intro="none"
+                  clickKick
+                  guides={false}
+                />
+              </div>
             </h1>
 
             {/* Role with subtle framing dividers */}
@@ -196,7 +241,8 @@ const Profile = () => {
                   smooth={true}
                   duration={600}
                   offset={-70}
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                  data-cursor-label="Explore"
+                  className="cursor-target w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[var(--accent-hover)] hover:translate-y-[-1px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                 >
                   {t('hero.exploreWork')}
                 </Link>
@@ -207,11 +253,13 @@ const Profile = () => {
                     download={RESUME_FILENAME}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={t('hero.downloadCvAria')}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                    aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                    data-cursor-label="CV"
+                    className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--surface-muted)]/90 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                   >
                     <FiDownload size={15} aria-hidden="true" />
                     <span>{t('hero.downloadCv')}</span>
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                   </a>
                 )}
 
@@ -219,11 +267,37 @@ const Profile = () => {
                   href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
+                  data-cursor-label="GitHub"
+                  className="cursor-target w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-[var(--bg-primary)]/60 backdrop-blur-md border border-[var(--border)] text-[var(--text-primary)] font-grotesk font-semibold text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                 >
                   <span>{t('hero.githubCta')}</span>
-                  <FiArrowUpRight size={16} />
+                  <FiArrowUpRight size={16} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
+              </div>
+
+              {/* Developer Terminal Invoke Button (Image 1 Style) */}
+              <div className="pt-1.5 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={(e) => window.dispatchEvent(new CustomEvent('open-developer-terminal', { detail: { trigger: e.currentTarget } }))}
+                  data-cursor-label="Terminal"
+                  className="group cursor-target inline-flex items-center justify-between gap-5 sm:gap-7 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-black/85 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all duration-200 shadow-lg hover:shadow-neutral-900/50 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                  aria-label={t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
+                  title={t('terminal.invokeHint')}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[#ff5f56] font-mono text-sm sm:text-base font-bold animate-pulse" aria-hidden="true">
+                      _
+                    </span>
+                    <span className="font-mono text-xs tracking-[0.2em] uppercase font-bold text-neutral-200 group-hover:text-white transition-colors">
+                      {t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
+                    </span>
+                  </div>
+                  <kbd className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[10px] sm:text-[11px] font-mono text-neutral-400 group-hover:text-neutral-200 group-hover:border-neutral-700 transition-colors shadow-inner">
+                    {shortcutLabel}
+                  </kbd>
+                </button>
               </div>
 
               {/* Subtle Social Links */}
@@ -232,20 +306,24 @@ const Profile = () => {
                   href={profileData.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={t('hero.githubAria')}
-                  className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  aria-label={`${t('hero.githubAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                  data-cursor-label="GitHub"
+                  className="cursor-target p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
-                  <FiGithub size={17} />
+                  <FiGithub size={17} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
                 <span className="text-[var(--border)] select-none text-xs" aria-hidden="true">/</span>
                 <a
                   href={profileData.socials.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={t('hero.linkedinAria')}
-                  className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  aria-label={`${t('hero.linkedinAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                  data-cursor-label="LinkedIn"
+                  className="cursor-target p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-all duration-150 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
-                  <FiLinkedin size={17} />
+                  <FiLinkedin size={17} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                 </a>
               </div>
             </motion.div>
@@ -256,7 +334,7 @@ const Profile = () => {
       {/* Scroll Indicator */}
       <motion.div
         {...getMotionProps(0.5, 0)}
-        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 hidden [@media(min-height:680px)]:block"
+        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 hidden lg:block"
       >
         <Link
           to="projects"
@@ -264,7 +342,8 @@ const Profile = () => {
           smooth={true}
           duration={600}
           offset={-70}
-          className="flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none"
+          data-cursor-label="Scroll"
+          className="cursor-target flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors cursor-pointer group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded p-1"
           aria-label={t('hero.scrollAria')}
         >
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase">{t('hero.scroll')}</span>

@@ -31,15 +31,15 @@ export const contactChannelsData = [
   {
     key: 'discord',
     name: 'Discord',
-    handle: 'ghifari#7471',
+    handle: '@ghifarii5',
     desc: 'Real-time developer chat and collaboration',
-    url: 'https://discord.com/channels/@ghifari#7471',
+    url: 'https://discord.com',
   },
   {
     key: 'tiktok',
     name: 'TikTok',
     handle: '@ghrfiii',
     desc: 'Short-form coding clips and creative uploads',
-    url: 'https://www.tiktok.com/@ghrfiii?',
+    url: 'https://www.tiktok.com/@ghrfiii',
   },
 ];

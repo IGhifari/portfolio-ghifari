@@ -1,4 +1,5 @@
-import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail } from 'react-icons/fi';
+import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail, FiBriefcase } from 'react-icons/fi';
+import { RouterLink } from '../context/RouterContext';
 import LastUpdated from './LastUpdated';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -41,7 +42,8 @@ const Footer = () => {
             <button
               type="button"
               onClick={scrollToTop}
-              className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              data-cursor-label="Top"
+              className="cursor-target group inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               title={t('footer.backToTopAria')}
             >
               <span>{t('footer.backToTop')}</span>
@@ -52,19 +54,35 @@ const Footer = () => {
 
         {/* Middle Tier: Social Navigation & Architecture Note */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-xs font-mono">
-          <nav aria-label="Footer Social Links" className="flex flex-wrap items-center gap-5">
-            {footerLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith('mailto:') ? undefined : '_blank'}
-                rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
-              >
-                {link.icon}
-                <span>{link.label}</span>
-              </a>
-            ))}
+          <nav aria-label="Footer Social Links" className="flex flex-wrap items-center gap-4 sm:gap-5">
+            <RouterLink
+              to="/recruiter"
+              data-cursor-label="Recruiter"
+              className="cursor-target inline-flex items-center gap-1.5 text-[var(--accent)] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded font-semibold"
+            >
+              <FiBriefcase size={14} aria-hidden="true" />
+              <span>{t('nav.recruiter')}</span>
+            </RouterLink>
+            <span className="text-[var(--border)] select-none hidden sm:inline" aria-hidden="true">|</span>
+            {footerLinks.map((link) => {
+              const isExternal = !link.href.startsWith('mailto:');
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                  data-cursor-label={link.label}
+                  className="cursor-target inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded"
+                >
+                  {link.icon}
+                  <span>{link.label}</span>
+                  {isExternal && (
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                  )}
+                </a>
+              );
+            })}
           </nav>
 
           <p className="text-[var(--text-muted)] text-xs">

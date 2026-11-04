@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
-import { FiSun, FiMoon, FiDownload } from 'react-icons/fi';
+import { FiSun, FiMoon, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRouter, RouterLink } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 
 const Navbar = () => {
@@ -11,12 +13,30 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { route, navigate } = useRouter();
+  const mobileDrawerRef = useRef(null);
+  const menuBtnRef = useRef(null);
 
-  const navItems = [
+  const isHome = route?.type === 'home';
+
+  // Desktop Header: Curated 5 core high-impact destinations for clean, editorial layout
+  const desktopNavItems = [
     { to: 'projects', label: t('nav.work') },
+    { to: '/study-case', label: t('nav.caseStudies'), isRoute: true },
+    { to: 'experience', label: t('nav.experience') },
     { to: 'about', label: t('nav.about') },
+    { to: 'contact', label: t('nav.contact') },
+  ];
+
+  // Mobile Drawer: Comprehensive navigation covering all portfolio sections
+  const mobileNavItems = [
+    { to: 'projects', label: t('nav.work') },
+    { to: '/study-case', label: t('nav.caseStudies'), isRoute: true },
+    { to: 'about', label: t('nav.about') },
+    { to: 'experience', label: t('nav.experience') },
     { to: 'journey', label: t('nav.journey') },
     { to: 'stack', label: t('nav.stack') },
+    { to: 'github', label: t('nav.github') },
     { to: 'certificates', label: t('nav.certificates') },
     { to: 'education', label: t('nav.education') },
     { to: 'contact', label: t('nav.contact') },
@@ -44,19 +64,17 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  // Handle escape key to close mobile menu
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isMenuOpen) {
-        setIsMenuOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMenuOpen]);
+  const toggleMenu = useCallback(() => setIsMenuOpen((prev) => !prev), []);
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const closeMenu = () => setIsMenuOpen(false);
+  // Trap focus inside mobile navigation drawer and toggle button, Escape key, and restore focus on close
+  useFocusTrap({
+    isOpen: isMenuOpen,
+    containerRef: mobileDrawerRef,
+    triggerRef: menuBtnRef,
+    additionalElements: [menuBtnRef],
+    onClose: closeMenu,
+  });
 
   return (
     <header
@@ -66,50 +84,122 @@ const Navbar = () => {
     >
       <div className="max-w-6xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link
-          to="profile"
-          href="#profile"
-          smooth={true}
-          duration={600}
-          offset={-80}
-          className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-          aria-label="Ghifari - Home"
-        >
-          GHIFARI<span className="text-[var(--accent)]">.</span>
-        </Link>
+        {isHome ? (
+          <Link
+            to="profile"
+            href="#profile"
+            smooth={true}
+            duration={600}
+            offset={-80}
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-4 xl:mr-8"
+            data-cursor-label="Home"
+            aria-label="Ghifari - Home"
+          >
+            GHIFARI<span className="text-[var(--accent)]">.</span>
+          </Link>
+        ) : (
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/');
+            }}
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-4 xl:mr-8"
+            data-cursor-label="Home"
+            aria-label="Ghifari - Home"
+          >
+            GHIFARI<span className="text-[var(--accent)]">.</span>
+          </a>
+        )}
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Main Navigation">
-          {navItems.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              href={`#${to}`}
-              smooth={true}
-              duration={600}
-              offset={-70}
-              spy={true}
-              activeClass="!text-[var(--accent)]"
-              className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-            >
-              {label}
-            </Link>
-          ))}
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-7" aria-label="Main Navigation">
+          {desktopNavItems.map(({ to, label, isRoute }) => {
+            if (isRoute) {
+              const isActive = route?.cleanPath?.startsWith('/study-case');
+              return (
+                <a
+                  key={to}
+                  href={to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(to);
+                  }}
+                  className={`dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                    isActive ? '!text-[var(--accent)] font-bold' : ''
+                  }`}
+                >
+                  {label}
+                </a>
+              );
+            }
+
+            if (isHome) {
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  href={`#${to}`}
+                  smooth={true}
+                  duration={600}
+                  offset={-70}
+                  spy={true}
+                  activeClass="!text-[var(--accent)]"
+                  className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                >
+                  {label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={to}
+                href={`/#${to}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/#${to}`);
+                }}
+                className="dark-nav-link cursor-pointer uppercase py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              >
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
-        {/* Desktop Controls (CV + Language Selector + Theme Toggle) */}
+        {/* Desktop Controls (Recruiter Mode + CV + Language Selector + Theme Toggle) */}
         <div className="hidden lg:flex items-center gap-2.5">
+          {/* Recruiter Mode Overview Trigger */}
+          <RouterLink
+            to="/recruiter"
+            className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-md font-mono text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
+              route?.cleanPath === '/recruiter'
+                ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
+                : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)]'
+            }`}
+            data-cursor-label="Recruiter"
+            title={t('nav.forRecruiters')}
+            aria-label={t('nav.forRecruiters')}
+          >
+            <FiBriefcase size={13} aria-hidden="true" />
+            <span className="hidden xl:inline">{t('nav.recruiter')}</span>
+            <span className="xl:hidden">RECRUITER</span>
+          </RouterLink>
+
           {RESUME_AVAILABLE && (
             <a
               href={RESUME_URL}
               download={RESUME_FILENAME}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={t('hero.downloadCvAria')}
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+              aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors cursor-target"
+              data-cursor-label="CV"
             >
               <FiDownload size={13} aria-hidden="true" />
               <span>{t('nav.downloadCv')}</span>
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           )}
 
@@ -122,11 +212,12 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setLanguage('id')}
-              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'id'
                   ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
+              data-cursor-label="ID"
               aria-pressed={language === 'id'}
               title="ID — Bahasa Indonesia"
             >
@@ -136,11 +227,12 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+              className={`h-full px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'en'
                   ? 'bg-[var(--surface-alt)] text-[var(--accent)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
+              data-cursor-label="EN"
               aria-pressed={language === 'en'}
               title="EN — English"
             >
@@ -153,7 +245,8 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            data-cursor-label="Theme"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
@@ -201,17 +294,20 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none"
+            className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
           </button>
 
           <button
+            ref={menuBtnRef}
             type="button"
+            id="mobile-nav-toggle"
             onClick={toggleMenu}
             aria-label={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={isMenuOpen}
+            aria-controls="mobile-nav-drawer"
             className="w-9 h-9 rounded-md flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
             {isMenuOpen ? <IoClose size={22} /> : <IoMenu size={22} />}
@@ -221,6 +317,11 @@ const Navbar = () => {
 
       {/* Mobile Menu Overlay / Drawer */}
       <div
+        id="mobile-nav-drawer"
+        ref={mobileDrawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('nav.mobileMenu') || 'Mobile navigation'}
         className={`lg:hidden fixed inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)] transition-all duration-300 ease-in-out overflow-y-auto ${
           isMenuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100 py-6 visible' : 'max-h-0 opacity-0 py-0 invisible'
         }`}
@@ -228,22 +329,81 @@ const Navbar = () => {
         aria-hidden={!isMenuOpen}
       >
         <div className="px-6 flex flex-col gap-1.5">
-          {navItems.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              href={`#${to}`}
-              smooth={true}
-              duration={600}
-              offset={-70}
-              onClick={closeMenu}
-              spy={true}
-              activeClass="!text-[var(--accent)] !bg-[var(--surface-alt)]"
-              className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
-            >
-              {label}
-            </Link>
-          ))}
+          {mobileNavItems.map(({ to, label, isRoute }) => {
+            if (isRoute) {
+              const isActive = route?.cleanPath?.startsWith('/study-case');
+              return (
+                <a
+                  key={to}
+                  href={to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    closeMenu();
+                    navigate(to);
+                  }}
+                  className={`py-3 px-4 rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer ${
+                    isActive
+                      ? '!text-[var(--accent)] !bg-[var(--surface-alt)] font-bold'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)]'
+                  }`}
+                >
+                  {label}
+                </a>
+              );
+            }
+
+            if (isHome) {
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  href={`#${to}`}
+                  smooth={true}
+                  duration={600}
+                  offset={-70}
+                  onClick={closeMenu}
+                  spy={true}
+                  activeClass="!text-[var(--accent)] !bg-[var(--surface-alt)]"
+                  className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
+                >
+                  {label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={to}
+                href={`/#${to}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeMenu();
+                  navigate(`/#${to}`);
+                }}
+                className="py-3 px-4 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer"
+              >
+                {label}
+              </a>
+            );
+          })}
+          {/* Mobile Recruiter Mode Link */}
+          <RouterLink
+            to="/recruiter"
+            onClick={closeMenu}
+            className={`py-3 px-4 rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-between ${
+              route?.cleanPath === '/recruiter'
+                ? '!text-[var(--accent)] !bg-[var(--surface-alt)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <FiBriefcase size={15} aria-hidden="true" className="text-[var(--accent)]" />
+              <span>{t('nav.recruiter')}</span>
+            </div>
+            <span className="font-mono text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded">
+              HIRING
+            </span>
+          </RouterLink>
 
           {RESUME_AVAILABLE && (
             <a
@@ -252,11 +412,12 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={closeMenu}
-              aria-label={t('hero.downloadCvAria')}
+              aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
               className="mt-2 py-3 px-4 rounded-md bg-[var(--accent)] text-[var(--accent-contrast)] font-grotesk font-bold text-sm tracking-wider uppercase inline-flex items-center justify-center gap-2"
             >
               <FiDownload size={15} aria-hidden="true" />
               <span>{t('nav.downloadCv')}</span>
+              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
             </a>
           )}
 

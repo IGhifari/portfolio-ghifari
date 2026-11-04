@@ -32,6 +32,7 @@
 
     <!-- Twitter Card Metadata -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@IGhifari" />
     <meta name="twitter:creator" content="@IGhifari" />
     <meta name="twitter:title" content="M. Ghifari Bima Khadafi | Web Developer &amp; Software Engineer" />
     <meta name="twitter:description" content="Portofolio resmi M. Ghifari Bima Khadafi — Web Developer &amp; Software Engineer spesialis React, TypeScript, Tailwind CSS, dan modern web architecture." />
@@ -58,62 +59,89 @@
       rel="stylesheet"
     />
 
-    <!-- Structured Data: JSON-LD for Google Search #1 Ranking -->
+    <!-- Structured Data: JSON-LD for Google Search & Semantic Discovery -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfilePage",
-      "dateCreated": "2024-10-01",
-      "dateModified": "2026-10-28",
-      "mainEntity": {
-        "@type": "Person",
-        "name": "M. Ghifari Bima Khadafi",
-        "alternateName": [
-          "M Ghifari Bima Khadafi",
-          "Ghifari Bima Khadafi",
-          "Muhammad Ghifari Bima Khadafi",
-          "IGhifari"
-        ],
-        "jobTitle": "Web Developer & Software Engineer",
-        "description": "Web Developer and Software Engineer specializing in modern frontend and fullstack technologies including React, TypeScript, Tailwind CSS, Node.js, and Laravel.",
-        "url": "https://www.ighifari.my.id/",
-        "image": "https://www.ighifari.my.id/portfolio.png",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Bogor",
-          "addressRegion": "West Java",
-          "addressCountry": "ID"
-        },
-        "alumniOf": [
-          {
-            "@type": "EducationalOrganization",
-            "name": "Universitas Gunadarma"
-          },
-          {
-            "@type": "EducationalOrganization",
-            "name": "SMKN 1 Cibinong"
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.ighifari.my.id/#website",
+          "url": "https://www.ighifari.my.id/",
+          "name": "M. Ghifari Bima Khadafi Portfolio",
+          "description": "Portofolio resmi M. Ghifari Bima Khadafi — Web Developer & Software Engineer.",
+          "inLanguage": ["id", "en"],
+          "publisher": {
+            "@id": "https://www.ighifari.my.id/#person"
           }
-        ],
-        "knowsAbout": [
-          "React",
-          "TypeScript",
-          "JavaScript",
-          "Node.js",
-          "Express",
-          "PostgreSQL",
-          "Prisma ORM",
-          "Tailwind CSS",
-          "Laravel",
-          "Web Performance",
-          "Frontend Development"
-        ],
-        "sameAs": [
-          "https://github.com/IGhifari",
-          "https://www.linkedin.com/in/ighifari/",
-          "https://www.instagram.com/ghfrriii/",
-          "https://www.tiktok.com/@ghrfiii"
-        ]
-      }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://www.ighifari.my.id/#person",
+          "name": "M. Ghifari Bima Khadafi",
+          "alternateName": [
+            "M Ghifari Bima Khadafi",
+            "Ghifari Bima Khadafi",
+            "Muhammad Ghifari Bima Khadafi",
+            "IGhifari"
+          ],
+          "jobTitle": "Web Developer & Software Engineer",
+          "description": "Web Developer and Software Engineer specializing in modern frontend and fullstack technologies including React, TypeScript, Tailwind CSS, Node.js, and Laravel.",
+          "url": "https://www.ighifari.my.id/",
+          "image": "https://www.ighifari.my.id/portfolio.png",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "PT. AMA Salam Indonesia"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Bogor",
+            "addressRegion": "West Java",
+            "addressCountry": "ID"
+          },
+          "alumniOf": [
+            {
+              "@type": "EducationalOrganization",
+              "name": "SMKN 1 Cibinong"
+            }
+          ],
+          "knowsAbout": [
+            "React",
+            "TypeScript",
+            "JavaScript",
+            "Node.js",
+            "Express",
+            "PostgreSQL",
+            "Prisma ORM",
+            "Tailwind CSS",
+            "Laravel",
+            "Web Performance",
+            "Frontend Development",
+            "Cloudflare Pages"
+          ],
+          "sameAs": [
+            "https://github.com/IGhifari",
+            "https://www.linkedin.com/in/ighifari/",
+            "https://www.instagram.com/ghfrriii/",
+            "https://www.tiktok.com/@ghrfiii"
+          ]
+        },
+        {
+          "@type": "ProfilePage",
+          "@id": "https://www.ighifari.my.id/#webpage",
+          "url": "https://www.ighifari.my.id/",
+          "name": "M. Ghifari Bima Khadafi | Web Developer & Software Engineer Portfolio",
+          "isPartOf": {
+            "@id": "https://www.ighifari.my.id/#website"
+          },
+          "about": {
+            "@id": "https://www.ighifari.my.id/#person"
+          },
+          "mainEntity": {
+            "@id": "https://www.ighifari.my.id/#person"
+          }
+        }
+      ]
     }
     </script>
   </head>
@@ -125,15 +153,16 @@
         <p>Portofolio resmi M. Ghifari Bima Khadafi (IGhifari). Berfokus pada pengembangan aplikasi web modern, performa tinggi, dan UI/UX presisi menggunakan React, TypeScript, Tailwind CSS, Node.js, dan Laravel.</p>
         <h2>Pendidikan &amp; Almamater</h2>
         <ul>
-          <li>Universitas Gunadarma — S1 Sistem Informasi</li>
+          <li>Universitas Gunadarma — S1 Informatika</li>
           <li>SMKN 1 Cibinong — Rekayasa Perangkat Lunak</li>
         </ul>
-        <h2>Proyek Pilihan</h2>
+        <h2>Proyek Pilihan &amp; Studi Kasus</h2>
         <ul>
-          <li><strong>AksesKita</strong> — Platform inklusivitas sosial &amp; aksesibilitas disabilitas berbasis React &amp; Laravel.</li>
-          <li><strong>Class 1IA08</strong> — Portal informasi akademik &amp; manajemen perkuliahan.</li>
-          <li><strong>Desaku</strong> — Sistem informasi dan administrasi desa digital berbasis web.</li>
-          <li><strong>Pulau Harapan Booking</strong> — Sistem pemesanan tour pulau dan paket wisata.</li>
+          <li><strong>StudyFlow</strong> — Manajemen jadwal perkuliahan, visualisasi beban SKS, dan pelacak tugas akademik modular. (<a href="/study-case/studyflow">Studi Kasus StudyFlow</a>)</li>
+          <li><strong>Project Management System (PT. AMA Salam Indonesia)</strong> — Fondasi sistem internal monitoring sprint, alokasi resource, dan pelaporan progres proyek magang. (<a href="/study-case/project-management">Studi Kasus Project Management System</a>)</li>
+          <li><strong>AksesKita</strong> — Platform inklusivitas sosial &amp; pelaporan fasilitas aksesibilitas ramah disabilitas berbasis React &amp; Laravel. (<a href="/study-case/akseskita">Studi Kasus AksesKita</a>)</li>
+          <li><strong>Desaku</strong> — Sistem informasi dan administrasi desa digital berbasis web. (<a href="/study-case/desaku-game">Studi Kasus Desaku</a>)</li>
+          <li><strong>Direktori Studi Kasus Lengkap</strong>: <a href="/study-case">ighifari.my.id/study-case</a></li>
         </ul>
         <h2>Kontak &amp; Profil Publik</h2>
         <ul>
