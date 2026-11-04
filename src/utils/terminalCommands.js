@@ -9,6 +9,7 @@ import { experiences } from '../data/experience.js';
 import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
+import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -340,14 +341,14 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         username: 'IGhifari',
         url: 'https://github.com/IGhifari',
         stats: {
-          contributions: 869,
+          contributions: GITHUB_TOTAL_CONTRIBUTIONS,
           publicRepos: 22,
           followers: 22,
           following: 23,
         },
         summary: isId
-          ? '869 kontribusi dalam 1 tahun terakhir, 22 repositori publik.'
-          : '869 annual contributions across 22 verified public repositories.',
+          ? `${GITHUB_TOTAL_CONTRIBUTIONS} kontribusi dalam 1 tahun terakhir, 22 repositori publik.`
+          : `${GITHUB_TOTAL_CONTRIBUTIONS} annual contributions across 22 verified public repositories.`,
         actionLabel: isId ? 'Buka Profil GitHub' : 'View GitHub Profile',
       };
     }

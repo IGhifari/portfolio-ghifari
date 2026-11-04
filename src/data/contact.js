@@ -31,7 +31,7 @@ export const contactChannelsData = [
   {
     key: 'discord',
     name: 'Discord',
-    handle: 'Pending Confirmation',
+    handle: '@ghifarii5',
     desc: 'Real-time developer chat and collaboration',
     url: 'https://discord.com',
   },

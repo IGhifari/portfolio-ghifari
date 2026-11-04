@@ -185,7 +185,7 @@ const Threads = ({
       program.uniforms.iResolution.value = [w * dpr, h * dpr, 1];
 
       // If animation loop is not running, refresh static frame on resize
-      if (isReducedMotion || isMobile) {
+      if (isReducedMotion) {
         renderStaticFrame();
       }
     };
@@ -193,7 +193,7 @@ const Threads = ({
     window.addEventListener('resize', handleResize);
     handleResize();
 
-    const shouldInteract = enableMouseInteraction && !isMobile && !isReducedMotion;
+    const shouldInteract = enableMouseInteraction && !isReducedMotion;
 
     const handleMouseMove = (e) => {
       if (!container) return;
@@ -210,8 +210,26 @@ const Threads = ({
       }
     };
 
+    const handleTouchMove = (e) => {
+      if (!container || !e.touches || e.touches.length === 0) return;
+      const touch = e.touches[0];
+      const rect = container.getBoundingClientRect();
+      if (
+        touch.clientX >= rect.left &&
+        touch.clientX <= rect.right &&
+        touch.clientY >= rect.top &&
+        touch.clientY <= rect.bottom
+      ) {
+        const nx = (touch.clientX - rect.left) / rect.width;
+        const ny = 1.0 - (touch.clientY - rect.top) / rect.height;
+        targetMouse.current = [nx, ny];
+      }
+    };
+
     if (shouldInteract) {
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      window.addEventListener('touchstart', handleTouchMove, { passive: true });
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
     }
 
     let animationFrameId = 0;
@@ -237,7 +255,7 @@ const Threads = ({
     };
 
     const startAnimation = () => {
-      if (!animationFrameId && !isMobile && !isReducedMotion && isVisible) {
+      if (!animationFrameId && !isReducedMotion && isVisible) {
         startTime = performance.now();
         animationFrameId = requestAnimationFrame(update);
       }
@@ -266,14 +284,14 @@ const Threads = ({
       if (isReducedMotion) {
         stopAnimation();
         renderStaticFrame();
-      } else if (!isMobile) {
+      } else {
         startAnimation();
       }
     };
     reducedMotionQuery.addEventListener('change', handleMotionChange);
 
-    // If mobile or reduced-motion, render a single lightweight static frame and do not run continuous RAF loop
-    if (isMobile || isReducedMotion) {
+    // If reduced-motion, render a single lightweight static frame and do not run continuous RAF loop
+    if (isReducedMotion) {
       renderStaticFrame();
     } else {
       startAnimation();
@@ -285,6 +303,8 @@ const Threads = ({
       window.removeEventListener('resize', handleResize);
       if (shouldInteract) {
         window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('touchstart', handleTouchMove);
+        window.removeEventListener('touchmove', handleTouchMove);
       }
       reducedMotionQuery.removeEventListener('change', handleMotionChange);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
 import { FiSun, FiMoon, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { Link } from 'react-scroll';
@@ -19,7 +19,17 @@ const Navbar = () => {
 
   const isHome = route?.type === 'home';
 
-  const navItems = [
+  // Desktop Header: Curated 5 core high-impact destinations for clean, editorial layout
+  const desktopNavItems = [
+    { to: 'projects', label: t('nav.work') },
+    { to: '/study-case', label: t('nav.caseStudies'), isRoute: true },
+    { to: 'experience', label: t('nav.experience') },
+    { to: 'about', label: t('nav.about') },
+    { to: 'contact', label: t('nav.contact') },
+  ];
+
+  // Mobile Drawer: Comprehensive navigation covering all portfolio sections
+  const mobileNavItems = [
     { to: 'projects', label: t('nav.work') },
     { to: '/study-case', label: t('nav.caseStudies'), isRoute: true },
     { to: 'about', label: t('nav.about') },
@@ -54,6 +64,9 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
+  const toggleMenu = useCallback(() => setIsMenuOpen((prev) => !prev), []);
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
   // Trap focus inside mobile navigation drawer and toggle button, Escape key, and restore focus on close
   useFocusTrap({
     isOpen: isMenuOpen,
@@ -62,9 +75,6 @@ const Navbar = () => {
     additionalElements: [menuBtnRef],
     onClose: closeMenu,
   });
-
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header
@@ -81,7 +91,7 @@ const Navbar = () => {
             smooth={true}
             duration={600}
             offset={-80}
-            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-4 xl:mr-8"
             data-cursor-label="Home"
             aria-label="Ghifari - Home"
           >
@@ -94,7 +104,7 @@ const Navbar = () => {
               e.preventDefault();
               navigate('/');
             }}
-            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            className="cursor-pointer font-grotesk font-black text-lg md:text-xl tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-4 xl:mr-8"
             data-cursor-label="Home"
             aria-label="Ghifari - Home"
           >
@@ -103,8 +113,8 @@ const Navbar = () => {
         )}
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-2.5 xl:gap-5" aria-label="Main Navigation">
-          {navItems.map(({ to, label, isRoute }) => {
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-7" aria-label="Main Navigation">
+          {desktopNavItems.map(({ to, label, isRoute }) => {
             if (isRoute) {
               const isActive = route?.cleanPath?.startsWith('/study-case');
               return (
@@ -319,7 +329,7 @@ const Navbar = () => {
         aria-hidden={!isMenuOpen}
       >
         <div className="px-6 flex flex-col gap-1.5">
-          {navItems.map(({ to, label, isRoute }) => {
+          {mobileNavItems.map(({ to, label, isRoute }) => {
             if (isRoute) {
               const isActive = route?.cleanPath?.startsWith('/study-case');
               return (

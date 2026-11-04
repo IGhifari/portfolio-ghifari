@@ -43,7 +43,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
   await t.test('1. Constants & Configuration', () => {
     assert.equal(GITHUB_USERNAME, 'IGhifari');
     assert.equal(GITHUB_PROFILE_URL, 'https://github.com/IGhifari');
-    assert.equal(CACHE_STORAGE_KEY, 'portfolio_github_contributions_v3');
+    assert.equal(CACHE_STORAGE_KEY, 'portfolio_github_contributions_v4');
     assert.equal(CACHE_TTL_MS, 15 * 60 * 1000);
   });
 
@@ -147,9 +147,9 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(emptyParsed.days.length, initialContributionsData.days.length);
     });
 
-    await t2.test('initialContributionsData holds verified dataset of 367 days and 869 contributions', () => {
-      assert.equal(initialContributionsData.total, 869);
-      assert.equal(initialContributionsData.days.length, 367);
+    await t2.test('initialContributionsData holds verified dataset of 368 days and 870 contributions', () => {
+      assert.equal(initialContributionsData.total, 870);
+      assert.equal(initialContributionsData.days.length, 368);
       assert.ok(initialContributionsData.days.some((d) => d.level > 0));
     });
   });
@@ -232,7 +232,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
           return {
             ok: true,
             status: 200,
-            text: async () => '869 contributions in the last year',
+            text: async () => '870 contributions in the last year',
           };
         }
         return {
@@ -250,7 +250,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(result.fromCache, false);
       assert.equal(result.data.profile.login, 'IGhifari');
       assert.equal(result.data.profile.publicRepos, 22);
-      assert.equal(result.data.contributions.total, 869);
+      assert.equal(result.data.contributions.total, 870);
 
       // Subsequent call should hit cache
       const cachedResult = await fetchGithubData({ force: false, fetchFn: mockFetch });
@@ -321,7 +321,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
     await t2.test('returns 200 JSON with profile and verified contributions on GET', async () => {
       const mockFetch = async (url) => {
         if (url.includes('/users/IGhifari/contributions')) {
-          return { ok: true, status: 200, text: async () => '869 contributions' };
+          return { ok: true, status: 200, text: async () => '870 contributions' };
         }
         return { ok: true, status: 200, json: async () => ({ login: 'IGhifari', public_repos: 22 }) };
       };
@@ -335,7 +335,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       const body = await res.json();
       assert.equal(body.ok, true);
       assert.equal(body.data.profile.login, 'IGhifari');
-      assert.equal(body.data.contributions.total, 869);
+      assert.equal(body.data.contributions.total, 870);
     });
 
     await t2.test('handles OPTIONS preflight with 204 No Content', async () => {

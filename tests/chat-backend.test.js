@@ -255,6 +255,15 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
         eduRetrieval.results.some((r) => r.id === 'education-universitas-gunadarma')
       );
 
+      // Verify exact chatbot quick suggestions (both EN and ID)
+      const quickQuestionEn = retrieveKnowledge('Where is Ghifari currently studying?', { lang: 'en' });
+      assert.equal(quickQuestionEn.hasRelevantKnowledge, true);
+      assert.ok(quickQuestionEn.results.some((r) => r.id === 'education-universitas-gunadarma'));
+
+      const quickQuestionId = retrieveKnowledge('Di mana Ghifari menempuh pendidikan saat ini?', { lang: 'id' });
+      assert.equal(quickQuestionId.hasRelevantKnowledge, true);
+      assert.ok(quickQuestionId.results.some((r) => r.id === 'education-universitas-gunadarma'));
+
       const internRetrieval = retrieveKnowledge(
         'Where did Ghifari complete his Frontend Developer Internship?',
         { lang: 'en' }

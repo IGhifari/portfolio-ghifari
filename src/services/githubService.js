@@ -9,7 +9,7 @@ import { initialContributionsData } from '../data/githubContributions.js';
 
 export const GITHUB_USERNAME = 'IGhifari';
 export const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
-export const CACHE_STORAGE_KEY = 'portfolio_github_contributions_v3';
+export const CACHE_STORAGE_KEY = 'portfolio_github_contributions_v4';
 export const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 export const LANGUAGE_COLORS = {

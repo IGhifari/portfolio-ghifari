@@ -149,7 +149,7 @@ export const selectedProjects = [
     },
     image: "/images/projects/project_management.webp",
     tags: ["React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Express"],
-    github: null,
+    github: "https://github.com/mauladhanifadhilsalam/front-end-SLM-task-management",
     live: null,
   },
   {
@@ -391,8 +391,8 @@ export const selectedProjects = [
     },
     image: "/images/projects/bluehorizon.webp",
     tags: ["React.js", "Vite", "Supabase", "PostgreSQL", "JavaScript", "Vercel"],
-    github: null,
-    live: null,
+    github: "https://github.com/IGhifari/blue-horizon-perlap",
+    live: "https://blue-horizon-perlap.vercel.app/",
   },
 ];
 

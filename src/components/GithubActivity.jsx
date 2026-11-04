@@ -390,7 +390,7 @@ const GithubActivity = () => {
                 {/* Verified Contributions */}
                 <div className="space-y-0.5 min-w-[70px]">
                   <div className="font-grotesk font-black text-2xl sm:text-3xl text-emerald-400">
-                    {contributions?.total ? `${contributions.total}+` : '869+'}
+                    {contributions?.total ? `${contributions.total}+` : `${initialContributionsData.total}+`}
                   </div>
                   <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
                     <FiActivity size={11} className="text-emerald-400" aria-hidden="true" />
@@ -490,7 +490,7 @@ const GithubActivity = () => {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-mono text-xs text-emerald-400 font-semibold self-start sm:self-auto">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
                 <span>
-                  {contributions?.total || 869} {t('github.totalContributionsLabel')}
+                  {contributions?.total || initialContributionsData.total} {t('github.totalContributionsLabel')}
                 </span>
               </div>
             </div>
@@ -528,8 +528,8 @@ const GithubActivity = () => {
                     role="grid"
                     aria-label={
                       language === 'id'
-                        ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || 869} kontribusi). Gunakan tombol panah untuk berpindah hari.`
-                        : `GitHub contribution heatmap for IGhifari (${contributions?.total || 869} contributions). Use arrow keys to navigate days.`
+                        ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || initialContributionsData.total} kontribusi). Gunakan tombol panah untuk berpindah hari.`
+                        : `GitHub contribution heatmap for IGhifari (${contributions?.total || initialContributionsData.total} contributions). Use arrow keys to navigate days.`
                     }
                   >
                     {contributions.days.map((day, idx) => {

@@ -196,7 +196,8 @@ const Project = () => {
                             src={project.image}
                             alt={`${project.title} interface preview`}
                             loading={index === 0 ? 'eager' : 'lazy'}
-                            fetchPriority={index === 0 ? 'high' : undefined}
+                            // eslint-disable-next-line react/no-unknown-property
+                            fetchpriority={index === 0 ? 'high' : undefined}
                             decoding="async"
                             width={1280}
                             height={720}
@@ -262,17 +263,6 @@ const Project = () => {
                         <FiBookOpen size={15} />
                         <span>{t('caseStudies.readCaseStudy')}</span>
                       </RouterLink>
-
-                      <button
-                        type="button"
-                        onClick={(e) => openModal(project, e.currentTarget)}
-                        data-cursor-label="Details"
-                        className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                      >
-                        <FiLayers size={15} />
-                        <span>{t('projects.viewDetails')}</span>
-                      </button>
 
                       {project.github && (
                         <a

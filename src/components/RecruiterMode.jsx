@@ -423,7 +423,7 @@ const RecruiterMode = () => {
                       <span className="font-semibold text-[var(--text-primary)] tracking-wide">
                         {category.title}
                       </span>
-                      <span className="text-[10px] text-[var(--text-muted)]">
+                      <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap shrink-0">
                         {category.badge}
                       </span>
                     </div>

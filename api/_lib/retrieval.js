@@ -157,6 +157,7 @@ const INTENT_RULES = [
       'rekayasa', 'perangkat', 'lunak', 'informatika', 'informatics',
       's1', 'undergraduate', 'degree', 'kurikulum', 'curriculum',
       'kompetensi', 'competencies', 'alumni', 'lulusan', 'student', 'mahasiswa',
+      'studying', 'study', 'studies', 'belajar', 'menempuh', 'pursuing',
     ],
     categories: [KNOWLEDGE_CATEGORIES.EDUCATION],
     categoryBoost: 4.5,

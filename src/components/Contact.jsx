@@ -99,6 +99,7 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
 
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
@@ -108,8 +109,12 @@ const Contact = () => {
     });
   };
 
-  const handleDiscordClick = () => {
-    notify('info', t('contact.toastDiscordPending'));
+  const copyDiscordToClipboard = () => {
+    navigator.clipboard.writeText('ghifarii5').then(() => {
+      setCopiedDiscord(true);
+      notify('success', t('contact.toastDiscordCopied'));
+      setTimeout(() => setCopiedDiscord(false), 2500);
+    });
   };
 
   const handleChange = (e) => {
@@ -515,10 +520,11 @@ const Contact = () => {
                   <button
                     key={item.name}
                     type="button"
-                    onClick={handleDiscordClick}
-                    className="w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 cursor-pointer bg-transparent border-0 text-left"
-                    title={t('contact.toastDiscordPending')}
-                    aria-label={`Discord: ${t('contact.discordPending')}`}
+                    onClick={copyDiscordToClipboard}
+                    data-cursor-label="Copy"
+                    className="cursor-target w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 cursor-pointer bg-transparent border-0 text-left"
+                    title={t('contact.copyDiscordTitle')}
+                    aria-label={`Discord: ${item.handle} (${copiedDiscord ? t('contact.copied') : t('contact.copyHandle')})`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
@@ -528,15 +534,19 @@ const Contact = () => {
                         {item.name}
                       </span>
                       <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
-                        {t('contact.discordPending')}
+                        {item.handle}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
-                      <span className="font-mono text-[10px] hidden md:inline uppercase text-amber-500/80">
-                        {t('contact.discordPending')}
+                      <span className="font-mono text-[10px] hidden md:inline uppercase">
+                        {copiedDiscord ? t('contact.copied') : t('contact.copyHandle')}
                       </span>
-                      <FiInfo size={13} aria-hidden="true" className="text-amber-500/80" />
+                      {copiedDiscord ? (
+                        <FiCheck size={13} aria-hidden="true" className="text-emerald-500" />
+                      ) : (
+                        <FiCopy size={13} aria-hidden="true" />
+                      )}
                     </div>
                   </button>
                 ) : (

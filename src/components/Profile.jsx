@@ -9,6 +9,7 @@ import { profileData } from '../data/profile';
 import { RouterLink } from '../context/RouterContext';
 import { generateLanyardTextures } from '../utils/lanyardCardGenerator';
 import Threads from './reactbits/Threads';
+import TechText from './reactbits/TechText';
 
 const Lanyard = lazy(() => import('./Lanyard'));
 
@@ -47,9 +48,9 @@ const Profile = () => {
   }, [isDark]);
 
   // Controlled, subtle scroll transformations away from hero
-  const scrollScale = useTransform(scrollY, [0, 520], [1, 0.96]);
-  const scrollOpacity = useTransform(scrollY, [0, 420], [1, 0]);
-  const scrollYOffset = useTransform(scrollY, [0, 520], [0, 24]);
+  const scrollScale = useTransform(scrollY, isDesktop ? [0, 520] : [380, 980], [1, 0.96]);
+  const scrollOpacity = useTransform(scrollY, isDesktop ? [0, 500] : [380, 950], [1, 0]);
+  const scrollYOffset = useTransform(scrollY, isDesktop ? [0, 520] : [380, 980], [0, 24]);
 
   const heroScale = shouldReduceMotion ? 1 : scrollScale;
   const heroOpacity = shouldReduceMotion ? 1 : scrollOpacity;
@@ -76,7 +77,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex flex-col justify-start lg:justify-center items-center overflow-hidden">
       {/* Background layer: ReactBits Threads WebGL animation with theme-aware color */}
       <Threads
         color={isDark ? [0.23, 0.51, 0.96] : [0.15, 0.39, 0.92]}
@@ -115,9 +116,9 @@ const Profile = () => {
               orientation="portrait"
               cornerRadius={0.22}
               anchor={isDesktop ? 'right' : 'center'}
-              anchorOffsetY={62}
-              size={isDesktop ? 0.38 : 0.27}
-              strapLength={isDesktop ? 0.22 : 0.11}
+              anchorOffsetY={isDesktop ? 62 : 46}
+              size={isDesktop ? 0.38 : 0.28}
+              strapLength={isDesktop ? 0.22 : 0.03}
               strapWidth={0.65}
               metal={isDark ? 'silver' : 'graphite'}
               gravity={1}
@@ -139,7 +140,7 @@ const Profile = () => {
           y: heroY,
           zIndex: 10,
         }}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[320px] pb-20 sm:pt-[340px] lg:py-24 relative"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[450px] pb-20 sm:pt-[480px] lg:py-24 relative"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Primary Identity & Actions */}
@@ -164,14 +165,44 @@ const Profile = () => {
             </motion.div>
 
             {/* Person's Name: Primary Visual Element (Single semantic H1 with full name) */}
-            <h1 className="space-y-0.5 sm:space-y-1 w-full select-none">
-              <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-primary)] uppercase">
-                {profileData.nameLines.first}
-              </span>
-              {" "}
-              <span className="block hero-name-clamp tracking-tight font-extrabold text-[var(--text-secondary)] uppercase">
-                {profileData.nameLines.second}
-              </span>
+            <h1 className="space-y-0.5 sm:space-y-1 w-full select-none pointer-events-auto" aria-label={profileData.fullName}>
+              <span className="sr-only">{profileData.fullName}</span>
+              <div className="w-full h-[54px] xs:h-[64px] sm:h-[74px] md:h-[86px] lg:h-[96px] relative" aria-hidden="true">
+                <TechText
+                  text={profileData.nameLines.first}
+                  fontFamily="'Space Grotesk', sans-serif"
+                  fontWeight={800}
+                  fontSize={90}
+                  align={isDesktop ? 'left' : 'center'}
+                  color={isDark ? '#F7F7F5' : '#141418'}
+                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  reveal="letter"
+                  dashLength={4}
+                  dashGap={2}
+                  specks={12}
+                  intro="none"
+                  clickKick
+                  guides={false}
+                />
+              </div>
+              <div className="w-full h-[54px] xs:h-[64px] sm:h-[74px] md:h-[86px] lg:h-[96px] relative" aria-hidden="true">
+                <TechText
+                  text={profileData.nameLines.second}
+                  fontFamily="'Space Grotesk', sans-serif"
+                  fontWeight={800}
+                  fontSize={90}
+                  align={isDesktop ? 'left' : 'center'}
+                  color={isDark ? '#94A3B8' : '#64748B'}
+                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  reveal="letter"
+                  dashLength={4}
+                  dashGap={2}
+                  specks={12}
+                  intro="none"
+                  clickKick
+                  guides={false}
+                />
+              </div>
             </h1>
 
             {/* Role with subtle framing dividers */}
@@ -303,7 +334,7 @@ const Profile = () => {
       {/* Scroll Indicator */}
       <motion.div
         {...getMotionProps(0.5, 0)}
-        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 hidden [@media(min-height:680px)]:block"
+        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 hidden lg:block"
       >
         <Link
           to="projects"
