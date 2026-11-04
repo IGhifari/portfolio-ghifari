@@ -27,6 +27,7 @@ const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -201,6 +202,12 @@ const AppContent = () => {
                 {route.type === 'study-case-detail' && (
                     <Suspense fallback={<div className="min-h-screen pt-28 max-w-4xl mx-auto px-5 sm:px-6" />}>
                         <CaseStudyDetail slug={route.slug} />
+                    </Suspense>
+                )}
+
+                {route.type === 'recruiter' && (
+                    <Suspense fallback={<div className="min-h-screen pt-28 max-w-5xl mx-auto px-5 sm:px-6" />}>
+                        <RecruiterMode />
                     </Suspense>
                 )}
 

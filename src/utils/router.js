@@ -38,6 +38,16 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
     };
   }
 
+  if (cleanPath === '/recruiter') {
+    return {
+      pathname,
+      cleanPath: '/recruiter',
+      search,
+      hash,
+      route: { type: 'recruiter' },
+    };
+  }
+
   const detailMatch = cleanPath.match(/^\/study-case\/([a-zA-Z0-9_-]+)$/);
   if (detailMatch) {
     return {

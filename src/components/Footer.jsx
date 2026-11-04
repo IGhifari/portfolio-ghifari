@@ -1,4 +1,5 @@
-import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail } from 'react-icons/fi';
+import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail, FiBriefcase } from 'react-icons/fi';
+import { RouterLink } from '../context/RouterContext';
 import LastUpdated from './LastUpdated';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -53,7 +54,16 @@ const Footer = () => {
 
         {/* Middle Tier: Social Navigation & Architecture Note */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-xs font-mono">
-          <nav aria-label="Footer Social Links" className="flex flex-wrap items-center gap-5">
+          <nav aria-label="Footer Social Links" className="flex flex-wrap items-center gap-4 sm:gap-5">
+            <RouterLink
+              to="/recruiter"
+              data-cursor-label="Recruiter"
+              className="cursor-target inline-flex items-center gap-1.5 text-[var(--accent)] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded font-semibold"
+            >
+              <FiBriefcase size={14} aria-hidden="true" />
+              <span>{t('nav.recruiter')}</span>
+            </RouterLink>
+            <span className="text-[var(--border)] select-none hidden sm:inline" aria-hidden="true">|</span>
             {footerLinks.map((link) => (
               <a
                 key={link.label}

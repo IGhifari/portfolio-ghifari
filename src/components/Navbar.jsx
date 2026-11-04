@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
-import { FiSun, FiMoon, FiDownload } from 'react-icons/fi';
+import { FiSun, FiMoon, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useRouter } from '../context/RouterContext';
+import { useRouter, RouterLink } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 
 const Navbar = () => {
@@ -157,8 +157,25 @@ const Navbar = () => {
           })}
         </nav>
 
-        {/* Desktop Controls (CV + Language Selector + Theme Toggle) */}
+        {/* Desktop Controls (Recruiter Mode + CV + Language Selector + Theme Toggle) */}
         <div className="hidden lg:flex items-center gap-2.5">
+          {/* Recruiter Mode Overview Trigger */}
+          <RouterLink
+            to="/recruiter"
+            className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-md font-mono text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
+              route?.cleanPath === '/recruiter'
+                ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
+                : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)]'
+            }`}
+            data-cursor-label="Recruiter"
+            title={t('nav.forRecruiters')}
+            aria-label={t('nav.forRecruiters')}
+          >
+            <FiBriefcase size={13} aria-hidden="true" />
+            <span className="hidden xl:inline">{t('nav.recruiter')}</span>
+            <span className="xl:hidden">RECRUITER</span>
+          </RouterLink>
+
           {RESUME_AVAILABLE && (
             <a
               href={RESUME_URL}
@@ -349,6 +366,24 @@ const Navbar = () => {
               </a>
             );
           })}
+          {/* Mobile Recruiter Mode Link */}
+          <RouterLink
+            to="/recruiter"
+            onClick={closeMenu}
+            className={`py-3 px-4 rounded-md font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-between ${
+              route?.cleanPath === '/recruiter'
+                ? '!text-[var(--accent)] !bg-[var(--surface-alt)] font-bold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <FiBriefcase size={15} aria-hidden="true" className="text-[var(--accent)]" />
+              <span>{t('nav.recruiter')}</span>
+            </div>
+            <span className="font-mono text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded">
+              HIRING
+            </span>
+          </RouterLink>
 
           {RESUME_AVAILABLE && (
             <a

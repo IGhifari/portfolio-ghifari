@@ -37,6 +37,9 @@ export const NAVIGATION_TARGETS = {
   'study-cases': { type: 'route', target: 'study-case', url: '/study-case' },
   'case-studies': { type: 'route', target: 'study-case', url: '/study-case' },
   'case-study': { type: 'route', target: 'study-case', url: '/study-case' },
+  recruiter: { type: 'route', target: 'recruiter', url: '/recruiter' },
+  resume: { type: 'route', target: 'recruiter', url: '/recruiter' },
+  cv: { type: 'route', target: 'recruiter', url: '/recruiter' },
 };
 
 /**
@@ -106,6 +109,7 @@ export const getAvailableCommands = (t = (k) => k) => [
   { cmd: 'education', desc: t('terminal.cmdEducationDesc') || 'Display formal academic and vocational education history.' },
   { cmd: 'github', desc: t('terminal.cmdGithubDesc') || 'Display GitHub profile summary and activity metrics.' },
   { cmd: 'contact', desc: t('terminal.cmdContactDesc') || 'Display direct email and verified communication channels.' },
+  { cmd: 'recruiter', desc: t('terminal.cmdRecruiterDesc') || 'Open recruiter mode executive overview.' },
   { cmd: 'whoami', desc: t('terminal.cmdWhoamiDesc') || 'Display current guest explorer session information.' },
   { cmd: 'open <target>', desc: t('terminal.cmdOpenDesc') || 'Navigate to a portfolio section or case study.' },
   { cmd: 'date', desc: t('terminal.cmdDateDesc') || 'Display current local date and time.' },
@@ -396,6 +400,24 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         command,
         args,
         raw,
+      };
+    }
+
+    case 'recruiter': {
+      const isId = language === 'id';
+      const destUrl = '/recruiter';
+      if (typeof onNavigate === 'function') {
+        onNavigate(destUrl, { type: 'route', target: 'recruiter', url: destUrl });
+      }
+      return {
+        type: 'navigate',
+        command,
+        args,
+        raw,
+        target: 'recruiter',
+        url: destUrl,
+        mode: 'route',
+        message: isId ? 'Membuka Mode Rekruter...' : 'Navigating to Recruiter Mode...',
       };
     }
 

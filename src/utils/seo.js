@@ -176,3 +176,58 @@ export const generateCaseStudyDetailSchema = (project) => {
     },
   };
 };
+
+/**
+ * Generates Schema.org ProfilePage & Person JSON-LD for the recruiter overview.
+ */
+export const generateRecruiterSchema = () => {
+  const recruiterCanonical = `${SITE_ORIGIN}/recruiter`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${recruiterCanonical}#webpage`,
+    url: recruiterCanonical,
+    name: 'Ringkasan Eksekutif & Mode Rekruter | M. Ghifari Bima Khadafi',
+    description:
+      'Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi, keahlian teknis, dan proyek unggulan M. Ghifari Bima Khadafi untuk peninjauan rekruter dan hiring manager.',
+    mainEntity: {
+      '@type': 'Person',
+      '@id': `${SITE_ORIGIN}/#person`,
+      name: 'M. Ghifari Bima Khadafi',
+      jobTitle: 'Web Developer / Software Engineer',
+      url: SITE_ORIGIN,
+      sameAs: [
+        'https://github.com/IGhifari',
+        'https://www.linkedin.com/in/ighifari/',
+      ],
+      knowsAbout: [
+        'React',
+        'TypeScript',
+        'Next.js',
+        'Node.js',
+        'Express',
+        'PostgreSQL',
+        'Tailwind CSS',
+        'Prisma ORM',
+        'Web Accessibility (WCAG 2.1 AA)',
+        'Full-Stack Web Engineering',
+      ],
+      alumniOf: [
+        {
+          '@type': 'EducationalOrganization',
+          name: 'Universitas Gunadarma',
+          location: 'Indonesia',
+        },
+        {
+          '@type': 'EducationalOrganization',
+          name: 'SMKN 1 Cibinong',
+          location: 'Bogor, Jawa Barat, Indonesia',
+        },
+      ],
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Available for Work',
+      },
+    },
+  };
+};

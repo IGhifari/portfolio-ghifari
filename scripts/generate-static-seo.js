@@ -271,6 +271,100 @@ ${allProjects
     console.log(`[prerender-seo] Generated /study-case/${project.id}/index.html`);
   }
 
+  // 3. Generate /recruiter/index.html (Recruiter Mode Executive Overview)
+  const recruiterTitle = 'Mode Rekruter & Ringkasan Eksekutif | M. Ghifari Bima Khadafi';
+  const recruiterDesc =
+    'Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi (PT. AMA Salam Indonesia), keahlian teknis (React, TypeScript, Next.js, Node.js, PostgreSQL), dan proyek unggulan M. Ghifari Bima Khadafi.';
+  const recruiterCanonical = `${SITE_ORIGIN}/recruiter`;
+
+  const recruiterSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': `${recruiterCanonical}#webpage`,
+    url: recruiterCanonical,
+    name: recruiterTitle,
+    description: recruiterDesc,
+    mainEntity: {
+      '@type': 'Person',
+      '@id': `${SITE_ORIGIN}/#person`,
+      name: 'M. Ghifari Bima Khadafi',
+      jobTitle: 'Web Developer / Software Engineer',
+      url: SITE_ORIGIN,
+      sameAs: [
+        'https://github.com/IGhifari',
+        'https://www.linkedin.com/in/ighifari/',
+      ],
+      knowsAbout: [
+        'React',
+        'TypeScript',
+        'Next.js',
+        'Node.js',
+        'Express',
+        'PostgreSQL',
+        'Tailwind CSS',
+        'Prisma ORM',
+        'Web Accessibility (WCAG 2.1 AA)',
+        'Full-Stack Web Engineering',
+      ],
+      alumniOf: [
+        {
+          '@type': 'EducationalOrganization',
+          name: 'Universitas Gunadarma',
+          location: 'Indonesia',
+        },
+        {
+          '@type': 'EducationalOrganization',
+          name: 'SMKN 1 Cibinong',
+          location: 'Bogor, Jawa Barat, Indonesia',
+        },
+      ],
+    },
+  };
+
+  const recruiterNoscript = `      <div style="padding: 24px; max-width: 800px; margin: 0 auto; font-family: sans-serif; line-height: 1.6;">
+        <h1>M. Ghifari Bima Khadafi — Recruiter Overview / Mode Rekruter</h1>
+        <p><strong>Posisi:</strong> Web Developer / Software Engineer | <strong>Status:</strong> Tersedia untuk Bekerja</p>
+        <p><strong>Lokasi:</strong> Bogor / Jakarta, Indonesia | <strong>Email:</strong> ighifarii05@gmail.com</p>
+        <p>${escapeHtml(recruiterDesc)}</p>
+        <h2>Pengalaman Kerja Terverifikasi</h2>
+        <p><strong>Frontend Developer Intern</strong> — PT. AMA Salam Indonesia (Okt 2025 – Feb 2026)</p>
+        <ul>
+          <li>Mengembangkan antarmuka Project Management System berbasis web dengan React dan Tailwind CSS.</li>
+          <li>Membangun komponen antarmuka yang modular, responsif, dan terstruktur.</li>
+          <li>Optimasi performa halaman web dan aksesibilitas (audit Lighthouse).</li>
+        </ul>
+        <h2>Pendidikan Formal</h2>
+        <ul>
+          <li><strong>Universitas Gunadarma:</strong> S1 Informatika (Sedang Menempuh)</li>
+          <li><strong>SMKN 1 Cibinong:</strong> Rekayasa Perangkat Lunak (2023 – 2026)</li>
+        </ul>
+        <h2>Keahlian Teknis Utama</h2>
+        <p>React, TypeScript, Next.js, Node.js, Express, PostgreSQL, Prisma ORM, Tailwind CSS, REST APIs, Git/GitHub, Lighthouse.</p>
+        <h2>Tautan Resmi</h2>
+        <p>
+          <a href="/docs/M.GhifariBimaKhadafi_CV.pdf" download>Unduh CV (PDF)</a> |
+          <a href="https://github.com/IGhifari" target="_blank" rel="noopener noreferrer">GitHub</a> |
+          <a href="https://www.linkedin.com/in/ighifari/" target="_blank" rel="noopener noreferrer">LinkedIn</a> |
+          <a href="/">Kembali ke Beranda Portofolio</a>
+        </p>
+      </div>`;
+
+  const recruiterHtml = injectSeoMetadata(baseHtml, {
+    title: recruiterTitle,
+    description: recruiterDesc,
+    canonicalUrl: recruiterCanonical,
+    ogImage: DEFAULT_IMAGE,
+    ogType: 'profile',
+    schemaData: recruiterSchema,
+    noscriptContent: recruiterNoscript,
+  });
+
+  const recruiterDir = path.join(distDir, 'recruiter');
+  fs.mkdirSync(recruiterDir, { recursive: true });
+  fs.writeFileSync(path.join(recruiterDir, 'index.html'), recruiterHtml, 'utf-8');
+  generatedCount++;
+  console.log('[prerender-seo] Generated /recruiter/index.html');
+
   console.log(`[prerender-seo] Successfully generated ${generatedCount} static prerendered HTML pages for Cloudflare Pages!`);
 };
 

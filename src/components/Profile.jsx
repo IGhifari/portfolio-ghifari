@@ -1,11 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-scroll';
-import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload } from 'react-icons/fi';
+import { FiArrowUpRight, FiArrowDown, FiGithub, FiLinkedin, FiDownload, FiBriefcase } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { profileData } from '../data/profile';
+import { RouterLink } from '../context/RouterContext';
 import { generateLanyardTextures } from '../utils/lanyardCardGenerator';
 import Threads from './reactbits/Threads';
 
@@ -143,11 +144,22 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Primary Identity & Actions */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
-            {/* Status Indicator */}
+            {/* Status Indicator & Recruiter Mode Shortcut */}
             <motion.div {...getMotionProps(0.05, -8)}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)]/90 backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{t('hero.available')}</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-muted)]/90 backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-secondary)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{t('hero.available')}</span>
+                </div>
+
+                <RouterLink
+                  to="/recruiter"
+                  data-cursor-label="Recruiter"
+                  className="cursor-target inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border)] hover:border-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] backdrop-blur-md text-[11px] font-mono tracking-wider text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+                >
+                  <FiBriefcase size={11} className="text-[var(--accent)]" aria-hidden="true" />
+                  <span>{t('nav.forRecruiters')} &rarr;</span>
+                </RouterLink>
               </div>
             </motion.div>
 
