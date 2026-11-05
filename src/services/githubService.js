@@ -6,9 +6,10 @@
  */
 
 import { initialContributionsData } from '../data/githubContributions.js';
+import { siteConfig } from '../config/site.js';
 
-export const GITHUB_USERNAME = 'IGhifari';
-export const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USERNAME}`;
+export const GITHUB_USERNAME = siteConfig.author.githubUsername;
+export const GITHUB_PROFILE_URL = siteConfig.author.github;
 export const CACHE_STORAGE_KEY = 'portfolio_github_contributions_v4';
 export const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
