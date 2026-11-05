@@ -19,6 +19,7 @@ import {
   GITHUB_PROFILE_URL,
 } from '../services/githubService';
 import { initialContributionsData } from '../data/githubContributions';
+import { profileData } from '../data/profile';
 
 const MONTH_LABELS = {
   id: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
@@ -391,20 +392,19 @@ const GithubActivity = () => {
                 <div className="flex items-start gap-4 sm:gap-5">
                   {/* Avatar with Status Ring */}
                   <div className="relative shrink-0">
-                    {profile?.avatarUrl ? (
-                      <img
-                        src={profile.avatarUrl}
-                        alt={profile.login}
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] object-cover shadow-sm"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[var(--surface-alt)] border-2 border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0 shadow-sm">
-                        <SiGithub size={32} aria-hidden="true" />
-                      </div>
-                    )}
+                    <img
+                      src={profile?.avatarUrl || profileData.avatarImage}
+                      alt={profile?.name || profileData.fullName}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] object-cover shadow-sm bg-[var(--surface-alt)]"
+                      loading="lazy"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== profileData.avatarImage) {
+                          e.currentTarget.src = profileData.avatarImage;
+                        }
+                      }}
+                    />
                     <span
                       className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--surface-muted)] ring-1 ring-emerald-400/40"
                       title={t('github.verifiedBadge')}

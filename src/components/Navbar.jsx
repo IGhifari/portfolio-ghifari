@@ -87,7 +87,7 @@ const Navbar = () => {
       <div
         className={`w-full mx-auto flex items-center justify-between transition-all duration-300 ease-out ${
           isScrolled
-            ? 'pointer-events-auto max-w-5xl h-14 px-4 sm:px-6 rounded-full bg-[var(--surface)]/85 dark:bg-[#0c1017]/85 backdrop-blur-xl border border-[var(--border)] dark:border-white/[0.08] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.5)] dark:shadow-[0_16px_50px_-8px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.04]'
+            ? 'pointer-events-auto max-w-5xl h-14 px-4 sm:px-6 rounded-full bg-[var(--nav-bg)] backdrop-blur-xl border border-[var(--border)] shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_16px_50px_-8px_rgba(0,0,0,0.7)]'
             : 'max-w-6xl h-16 px-5 sm:px-6'
         }`}
       >
@@ -137,8 +137,8 @@ const Navbar = () => {
                   }}
                   className={`dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                     isActive
-                      ? '!text-[var(--text-primary)] !bg-black/[0.06] dark:!bg-white/[0.1] font-bold shadow-xs'
-                      : 'hover:text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]'
+                      ? '!text-[var(--text-primary)] !bg-[var(--surface-alt)] font-bold shadow-xs'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
                   {label}
@@ -156,8 +156,8 @@ const Navbar = () => {
                   duration={600}
                   offset={-70}
                   spy={true}
-                  activeClass="!text-[var(--text-primary)] !bg-black/[0.06] dark:!bg-white/[0.1] font-bold shadow-xs"
-                  className="dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  activeClass="!text-[var(--text-primary)] !bg-[var(--surface-alt)] font-bold shadow-xs"
+                  className="dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   {label}
                 </Link>
@@ -191,7 +191,7 @@ const Navbar = () => {
             className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
               route?.cleanPath === '/recruiter'
                 ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
-                : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-[var(--border)] dark:border-white/[0.08] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
             data-cursor-label="Recruiter"
             title={t('nav.forRecruiters')}
@@ -209,7 +209,7 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-[var(--border)] dark:border-white/[0.08] text-[11px] font-mono font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer cursor-target focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[11px] font-mono font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer cursor-target focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               data-cursor-label="CV"
             >
               <FiDownload size={12} aria-hidden="true" />
@@ -222,14 +222,14 @@ const Navbar = () => {
           <div
             role="group"
             aria-label={t('nav.langGroup')}
-            className="flex items-center h-8 p-0.5 rounded-full bg-[var(--surface-muted)] dark:bg-white/[0.04] border border-[var(--border)] dark:border-white/[0.08]"
+            className="flex items-center h-8 p-0.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)]"
           >
             <button
               type="button"
               onClick={() => setLanguage('id')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'id'
-                  ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               data-cursor-label="ID"
@@ -238,13 +238,13 @@ const Navbar = () => {
             >
               ID
             </button>
-            <span className="text-[var(--border)] dark:text-white/[0.1] select-none text-[9px] px-0.5" aria-hidden="true">|</span>
+            <span className="text-[var(--border)] select-none text-[9px] px-0.5" aria-hidden="true">|</span>
             <button
               type="button"
               onClick={() => setLanguage('en')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'en'
-                  ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               data-cursor-label="EN"
@@ -260,7 +260,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-[var(--border)] dark:border-white/[0.08] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target"
             data-cursor-label="Theme"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
@@ -274,14 +274,14 @@ const Navbar = () => {
           <div
             role="group"
             aria-label={t('nav.langGroup')}
-            className="flex items-center h-8 p-0.5 rounded-full bg-[var(--surface-muted)] dark:bg-white/[0.04] border border-[var(--border)] dark:border-white/[0.08]"
+            className="flex items-center h-8 p-0.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)]"
           >
             <button
               type="button"
               onClick={() => setLanguage('id')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                 language === 'id'
-                  ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'id'}
@@ -289,13 +289,13 @@ const Navbar = () => {
             >
               ID
             </button>
-            <span className="text-[var(--border)] dark:text-white/[0.1] select-none text-[9px]" aria-hidden="true">|</span>
+            <span className="text-[var(--border)] select-none text-[9px]" aria-hidden="true">|</span>
             <button
               type="button"
               onClick={() => setLanguage('en')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                 language === 'en'
-                  ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
               aria-pressed={language === 'en'}
@@ -309,7 +309,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-[var(--border)] dark:border-white/[0.08] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
           >
             {isDark ? <FiSun size={14} /> : <FiMoon size={14} />}
@@ -323,7 +323,7 @@ const Navbar = () => {
             aria-label={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-nav-drawer"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-[var(--border)] dark:border-white/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-primary)] hover:text-[var(--accent)] bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
           >
             {isMenuOpen ? <IoClose size={18} /> : <IoMenu size={18} />}
           </button>
