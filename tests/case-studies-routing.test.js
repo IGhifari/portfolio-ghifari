@@ -233,7 +233,7 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
 
       // Check XML well-formedness (closing tags match opening tags)
       assert.equal((xml.match(/<url>/g) || []).length, (xml.match(/<\/url>/g) || []).length);
-      assert.ok(xml.endsWith('</urlset>\n') || xml.endsWith('</urlset>'));
+      assert.ok(xml.trimEnd().endsWith('</urlset>'));
     });
   });
 
