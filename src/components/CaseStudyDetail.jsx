@@ -18,6 +18,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { getProjectBySlug } from '../data/projects';
 import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../utils/seo';
+import { siteConfig } from '../config/site';
 
 const CaseStudyDetail = ({ slug }) => {
   const { language, t } = useLanguage();
@@ -47,8 +48,8 @@ const CaseStudyDetail = ({ slug }) => {
     if (project) {
       const pageTitle =
         language === 'id'
-          ? `Studi Kasus: ${project.title} | M. Ghifari Bima Khadafi`
-          : `Case Study: ${project.title} | M. Ghifari Bima Khadafi`;
+          ? `Studi Kasus: ${project.title} | ${siteConfig.name}`
+          : `Case Study: ${project.title} | ${siteConfig.name}`;
       const pageDesc =
         project.description[language] ||
         project.description.en ||
@@ -66,8 +67,8 @@ const CaseStudyDetail = ({ slug }) => {
     } else {
       const notFoundTitle =
         language === 'id'
-          ? 'Studi Kasus Tidak Ditemukan | M. Ghifari Bima Khadafi'
-          : 'Case Study Not Found | M. Ghifari Bima Khadafi';
+          ? `Studi Kasus Tidak Ditemukan | ${siteConfig.name}`
+          : `Case Study Not Found | ${siteConfig.name}`;
       updateDocumentMetadata({
         title: notFoundTitle,
         description: 'The requested case study could not be found.',

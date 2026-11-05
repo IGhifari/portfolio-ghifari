@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRouter, RouterLink } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
+import { siteConfig } from '../config/site';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,9 +102,9 @@ const Navbar = () => {
             offset={-80}
             className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-3 xl:mr-6 flex items-center gap-1"
             data-cursor-label="Home"
-            aria-label="Ghifari - Home"
+            aria-label={`${siteConfig.shortName || siteConfig.brandName} - Home`}
           >
-            <span>GHIFARI</span>
+            <span>{siteConfig.brandName}</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent)] group-hover:scale-125 transition-transform" />
           </Link>
         ) : (
@@ -115,9 +116,9 @@ const Navbar = () => {
             }}
             className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-3 xl:mr-6 flex items-center gap-1"
             data-cursor-label="Home"
-            aria-label="Ghifari - Home"
+            aria-label={`${siteConfig.shortName || siteConfig.brandName} - Home`}
           >
-            <span>GHIFARI</span>
+            <span>{siteConfig.brandName}</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent)] group-hover:scale-125 transition-transform" />
           </a>
         )}

@@ -11,6 +11,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import LatticeLoader from './reactbits/LatticeLoader';
+import { siteConfig } from '../config/site';
 
 const MAX_INPUT_CHARS = 500;
 const MAX_HISTORY_TURNS = 6;
@@ -372,7 +373,7 @@ const ChatAssistant = () => {
                 >
                   {/* Role Mini Label */}
                   <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1 px-1">
-                    {isUser ? (language === 'en' ? 'YOU' : 'ANDA') : 'GHIFARI AI'}
+                    {isUser ? (language === 'en' ? 'YOU' : 'ANDA') : siteConfig.bot.name}
                   </span>
 
                   {/* Message Bubble */}
@@ -460,7 +461,7 @@ const ChatAssistant = () => {
             {isLoading && (
               <div className="flex flex-col items-start">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1 px-1">
-                  GHIFARI AI
+                  {siteConfig.bot.name}
                 </span>
                 <div className="inline-flex items-center px-3 py-2 rounded-xl rounded-bl-xs bg-[var(--surface-alt)] border border-[var(--border)] text-xs font-mono text-[var(--text-secondary)] shadow-sm">
                   <LatticeLoader

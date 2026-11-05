@@ -28,7 +28,10 @@ export const MAX_PAYLOAD_BYTES = 16_384; // 16 KB
 
 const SUPPORTED_LANGUAGES = ['id', 'en'];
 
+const envOrigins = (typeof process !== 'undefined' && process.env?.ALLOWED_ORIGIN ? process.env.ALLOWED_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean) : []);
+
 export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
+  ...envOrigins,
   'https://www.ighifari.my.id',
   'https://ighifari.my.id',
   'https://portfolio-ghifari.pages.dev',

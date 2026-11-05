@@ -22,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { directEmail, contactChannelsData } from '../data/contact';
 import { validateContactForm } from '../utils/contactValidation.js';
+import { siteConfig } from '../config/site';
 import '../styles/Contact.css';
 
 const channelIconsByKey = {
@@ -86,7 +87,7 @@ const Contact = () => {
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
   const [formData, setFormData] = useState({
-    emailto: 'Ghifari',
+    emailto: siteConfig.shortName || 'Ghifari',
     name: '',
     email: '',
     subject: '',
@@ -110,7 +111,7 @@ const Contact = () => {
   };
 
   const copyDiscordToClipboard = () => {
-    navigator.clipboard.writeText('ghifarii5').then(() => {
+    navigator.clipboard.writeText(siteConfig.author.discord || 'ghifarii5').then(() => {
       setCopiedDiscord(true);
       notify('success', t('contact.toastDiscordCopied'));
       setTimeout(() => setCopiedDiscord(false), 2500);
@@ -177,7 +178,7 @@ const Contact = () => {
       setSubmitStatus('success');
       notify('success', t('contact.toastSuccess'));
       setFormData({
-        emailto: 'Ghifari',
+        emailto: siteConfig.shortName || 'Ghifari',
         name: '',
         email: '',
         subject: '',
