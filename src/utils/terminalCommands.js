@@ -333,6 +333,25 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
 
     case 'github': {
       const isId = language === 'id';
+      const liveProfile = context?.githubData?.profile || context?.profile;
+      const liveContributions = context?.githubData?.contributions || context?.contributions;
+
+      const contributions = typeof liveContributions?.total === 'number'
+        ? liveContributions.total
+        : GITHUB_TOTAL_CONTRIBUTIONS;
+
+      const publicRepos = typeof liveProfile?.publicRepos === 'number'
+        ? liveProfile.publicRepos
+        : 22;
+
+      const followers = typeof liveProfile?.followers === 'number'
+        ? liveProfile.followers
+        : 22;
+
+      const following = typeof liveProfile?.following === 'number'
+        ? liveProfile.following
+        : 23;
+
       return {
         type: 'github',
         command,
@@ -341,14 +360,14 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         username: 'IGhifari',
         url: 'https://github.com/IGhifari',
         stats: {
-          contributions: GITHUB_TOTAL_CONTRIBUTIONS,
-          publicRepos: 22,
-          followers: 22,
-          following: 23,
+          contributions,
+          publicRepos,
+          followers,
+          following,
         },
         summary: isId
-          ? `${GITHUB_TOTAL_CONTRIBUTIONS} kontribusi dalam 1 tahun terakhir, 22 repositori publik.`
-          : `${GITHUB_TOTAL_CONTRIBUTIONS} annual contributions across 22 verified public repositories.`,
+          ? `${contributions} kontribusi dalam 1 tahun terakhir, ${publicRepos} repositori publik.`
+          : `${contributions} annual contributions across ${publicRepos} verified public repositories.`,
         actionLabel: isId ? 'Buka Profil GitHub' : 'View GitHub Profile',
       };
     }

@@ -23,6 +23,7 @@ import {
   executeTerminalCommand,
   parseCommandLine,
 } from '../utils/terminalCommands';
+import { getCachedGithubData, fetchGithubData } from '../services/githubService';
 
 const QUICK_COMMAND_CHIPS = [
   'help',
@@ -53,6 +54,22 @@ const DeveloperTerminal = () => {
     },
   ]);
   const [copiedKey, setCopiedKey] = useState(null);
+  const [githubData, setGithubData] = useState(() => getCachedGithubData());
+
+  useEffect(() => {
+    const cached = getCachedGithubData();
+    if (cached) {
+      setGithubData(cached);
+    } else {
+      fetchGithubData()
+        .then((res) => {
+          if (res?.data) {
+            setGithubData(res.data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const savedDraftRef = useRef('');
   const outputContainerRef = useRef(null);
@@ -198,10 +215,12 @@ const DeveloperTerminal = () => {
         return;
       }
 
+      const currentGithub = githubData || getCachedGithubData();
       const result = executeTerminalCommand(trimmed, {
         language,
         t,
         onNavigate: handleTerminalNavigate,
+        githubData: currentGithub,
       });
 
       setOutputList((prev) => [
@@ -215,7 +234,7 @@ const DeveloperTerminal = () => {
 
       setInputVal('');
     },
-    [handleTerminalNavigate, language, t]
+    [handleTerminalNavigate, language, t, githubData]
   );
 
   // Keyboard navigation for command history (Up / Down) and Enter execution
@@ -837,14 +856,14 @@ const DeveloperTerminal = () => {
                       <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-3 text-xs">
                         <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
                           <div className="flex items-center gap-2 text-white font-bold text-sm">
-                            <FiCode className="text-[var(--accent)]" size={15} aria-hidden="true" />
+                            <FiCode className="text-emerald-400" size={15} aria-hidden="true" />
                             <span>{entry.username}</span>
                           </div>
                           <a
                             href={entry.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-2.5 py-1 rounded bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-[var(--accent)] hover:underline inline-flex items-center gap-1 text-[11px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                            className="px-2.5 py-1 rounded-md bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 hover:text-white inline-flex items-center gap-1 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400"
                           >
                             <span>{entry.actionLabel}</span>
                             <FiExternalLink size={11} aria-hidden="true" />
@@ -853,24 +872,26 @@ const DeveloperTerminal = () => {
                         </div>
 
                         <p className="text-[var(--text-secondary)] leading-relaxed text-xs">
-                          {entry.summary}
+                          {language === 'id'
+                            ? `${githubData?.contributions?.total ?? entry.stats.contributions} kontribusi dalam 1 tahun terakhir, ${githubData?.profile?.publicRepos ?? entry.stats.publicRepos} repositori publik.`
+                            : `${githubData?.contributions?.total ?? entry.stats.contributions} annual contributions across ${githubData?.profile?.publicRepos ?? entry.stats.publicRepos} verified public repositories.`}
                         </p>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-center">
                           <div className="p-2 rounded bg-neutral-800/60 border border-neutral-700">
-                            <div className="text-sm font-bold text-[var(--accent)]">{entry.stats.contributions}</div>
+                            <div className="text-sm font-bold text-emerald-400">{githubData?.contributions?.total ?? entry.stats.contributions}</div>
                             <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{language === 'id' ? 'Kontribusi' : 'Contributions'}</div>
                           </div>
                           <div className="p-2 rounded bg-neutral-800/60 border border-neutral-700">
-                            <div className="text-sm font-bold text-white">{entry.stats.publicRepos}</div>
+                            <div className="text-sm font-bold text-white">{githubData?.profile?.publicRepos ?? entry.stats.publicRepos}</div>
                             <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{language === 'id' ? 'Repositori' : 'Public Repos'}</div>
                           </div>
                           <div className="p-2 rounded bg-neutral-800/60 border border-neutral-700">
-                            <div className="text-sm font-bold text-white">{entry.stats.followers}</div>
+                            <div className="text-sm font-bold text-white">{githubData?.profile?.followers ?? entry.stats.followers}</div>
                             <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{language === 'id' ? 'Pengikut' : 'Followers'}</div>
                           </div>
                           <div className="p-2 rounded bg-neutral-800/60 border border-neutral-700">
-                            <div className="text-sm font-bold text-white">{entry.stats.following}</div>
+                            <div className="text-sm font-bold text-white">{githubData?.profile?.following ?? entry.stats.following}</div>
                             <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{language === 'id' ? 'Mengikuti' : 'Following'}</div>
                           </div>
                         </div>
