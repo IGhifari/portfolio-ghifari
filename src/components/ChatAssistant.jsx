@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import LatticeLoader from './reactbits/LatticeLoader';
 
 const MAX_INPUT_CHARS = 500;
 const MAX_HISTORY_TURNS = 6;
@@ -455,19 +456,32 @@ const ChatAssistant = () => {
               );
             })}
 
-            {/* Loading / Thinking Indicator */}
+            {/* Loading / Thinking Indicator with React Bits LatticeLoader */}
             {isLoading && (
               <div className="flex flex-col items-start">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1 px-1">
                   GHIFARI AI
                 </span>
-                <div className="inline-flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl rounded-bl-xs bg-[var(--surface-alt)] border border-[var(--border)] text-xs font-mono text-[var(--text-secondary)]">
-                  <div className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse delay-75" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse delay-150" />
-                  </div>
-                  <span>{t('chatbot.thinking')}</span>
+                <div className="inline-flex items-center px-3 py-2 rounded-xl rounded-bl-xs bg-[var(--surface-alt)] border border-[var(--border)] text-xs font-mono text-[var(--text-secondary)] shadow-sm">
+                  <LatticeLoader
+                    status="working"
+                    label={t('chatbot.thinking') || 'Thinking...'}
+                    doneLabel="Done in"
+                    errorLabel="Failed after"
+                    pattern="orbit"
+                    grid={3}
+                    shape="round"
+                    color="var(--accent)"
+                    doneColor="#22c55e"
+                    errorColor="#ef4444"
+                    cellSize={5}
+                    gap={2}
+                    fontSize={12}
+                    step={90}
+                    idleOpacity={0.18}
+                    glow={false}
+                    showTimer={true}
+                  />
                 </div>
               </div>
             )}
