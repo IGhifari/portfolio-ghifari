@@ -354,6 +354,44 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(body.ok, false);
       assert.equal(body.error.code, 'METHOD_NOT_ALLOWED');
     });
+
+    await t2.test('gracefully returns 200 with verified fallback data when GitHub user API returns 403 or 429', async () => {
+      const mockRateLimitedFetch = async () => ({
+        ok: false,
+        status: 429,
+        headers: new Map([['x-ratelimit-remaining', '0']]),
+      });
+
+      const handler = createCloudflarePagesGithubHandler({ fetchFn: mockRateLimitedFetch });
+      const req = new Request('https://www.ighifari.my.id/api/github', { method: 'GET' });
+      const res = await handler({ request: req });
+
+      assert.equal(res.status, 200);
+      const body = await res.json();
+      assert.equal(body.ok, true);
+      assert.equal(body.fallback, true);
+      assert.equal(body.data.profile.login, 'IGhifari');
+      assert.equal(body.data.contributions.total, 870);
+    });
+
+    await t2.test('attaches Authorization Bearer token when GITHUB_TOKEN is present in context env', async () => {
+      let capturedAuthHeader = null;
+      const mockFetch = async (url, options) => {
+        if (url.includes('api.github.com')) { capturedAuthHeader = options?.headers?.Authorization; }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ login: 'IGhifari', public_repos: 22 }),
+        };
+      };
+
+      const handler = createCloudflarePagesGithubHandler({ fetchFn: mockFetch });
+      const req = new Request('https://www.ighifari.my.id/api/github', { method: 'GET' });
+      const res = await handler({ request: req, env: { GITHUB_TOKEN: 'ghp_testsecrettoken123' } });
+
+      assert.equal(res.status, 200);
+      assert.equal(capturedAuthHeader, 'Bearer ghp_testsecrettoken123');
+    });
   });
 
   await t.test('7. Bilingual Translations Parity for GitHub Activity', async (t2) => {
