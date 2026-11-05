@@ -47,6 +47,10 @@ export default {
         'nb-xl': '8px 8px 0px var(--nb-shadow-color)',
         'nb-hover': 'var(--nb-shadow-hover)',
       },
+      spacing: {
+        '4.5': '1.125rem',
+        '5.5': '1.375rem',
+      },
     },
   },
   plugins: [],
