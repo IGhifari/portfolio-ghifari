@@ -166,47 +166,56 @@ const Skills = () => {
             <motion.div
               key={category.id}
               {...getFadeMotion(index * 0.05)}
-              className="tech-card rounded-lg p-5 sm:p-6 flex flex-col justify-between"
+              className="tech-card rounded-xl p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden group"
             >
-              <div>
-                {/* Category Header */}
-                <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
-                  <h3 className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] tracking-wider uppercase">
-                    {t(`stack.categories.${category.id}.title`, category.title)}
-                  </h3>
-                  <span className="font-mono text-[10px] text-[var(--accent)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] tracking-wider whitespace-nowrap shrink-0">
-                    {category.badge}
-                  </span>
+              {/* Subtle ambient card glow */}
+              <div
+                className="pointer-events-none absolute -top-12 -right-12 w-32 h-32 bg-[var(--accent)]/5 rounded-full blur-2xl transition-opacity group-hover:opacity-100 opacity-0"
+                aria-hidden="true"
+              />
+
+              <div className="relative z-10 flex flex-col h-full justify-between">
+                <div>
+                  {/* Category Header */}
+                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
+                    <h3 className="font-grotesk font-black text-xs sm:text-sm text-[var(--text-primary)] tracking-wide uppercase">
+                      {t(`stack.categories.${category.id}.title`, category.title)}
+                    </h3>
+                    <span className="font-mono text-[10px] text-[var(--accent)] px-2.5 py-0.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-semibold tracking-wider whitespace-nowrap shrink-0 flex items-center gap-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+                      {category.badge}
+                    </span>
+                  </div>
+
+                  {/* Category Brief */}
+                  <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mt-3 mb-5">
+                    {t(`stack.categories.${category.id}.description`, category.description)}
+                  </p>
+
+                  {/* Technology List - Editorial Rows */}
+                  <ul className="space-y-1 list-none p-0 m-0">
+                    {category.skills.map((skill) => (
+                      <li
+                        key={skill.name}
+                        className="tech-item group/item cursor-default"
+                      >
+                        <span className="text-[var(--text-muted)] group-hover/item:text-[var(--accent)] transition-colors flex items-center justify-center flex-shrink-0 text-base">
+                          {skill.icon}
+                        </span>
+                        <span className="font-mono text-xs text-[var(--text-secondary)] group-hover/item:text-[var(--text-primary)] transition-colors flex-1 tracking-wide font-medium">
+                          {skill.name}
+                        </span>
+                        {skill.highlight && (
+                          <span
+                            className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] ring-2 ring-[var(--accent)]/30 animate-pulse"
+                            title={t('stack.coreTech')}
+                            aria-hidden="true"
+                          />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                {/* Category Brief */}
-                <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed mt-3 mb-5">
-                  {t(`stack.categories.${category.id}.description`, category.description)}
-                </p>
-
-                {/* Technology List - Editorial Rows */}
-                <ul className="space-y-1 list-none p-0 m-0">
-                  {category.skills.map((skill) => (
-                    <li
-                      key={skill.name}
-                      className="tech-item group cursor-default"
-                    >
-                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors flex items-center justify-center flex-shrink-0">
-                        {skill.icon}
-                      </span>
-                      <span className="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors flex-1 tracking-wide">
-                        {skill.name}
-                      </span>
-                      {skill.highlight && (
-                        <span
-                          className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] opacity-70 group-hover:opacity-100 transition-opacity"
-                          title={t('stack.coreTech')}
-                          aria-hidden="true"
-                        />
-                      )}
-                    </li>
-                  ))}
-                </ul>
               </div>
             </motion.div>
           ))}
@@ -216,7 +225,7 @@ const Skills = () => {
       {/* ==================================================
           SECONDARY VISUAL: INFINITE LOGO / TECH STRIP (React Bits LogoLoop)
           ================================================== */}
-      <div className="w-full border-y border-[var(--border-subtle)] bg-[var(--surface-alt)] py-3.5 overflow-hidden select-none">
+      <div className="w-full border-y border-[var(--border-subtle)] bg-[var(--surface-alt)] py-3.5 overflow-hidden select-none relative [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
         <LogoLoop
           logos={techLogos}
           speed={55}

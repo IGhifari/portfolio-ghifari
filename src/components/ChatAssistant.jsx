@@ -230,11 +230,14 @@ const ChatAssistant = () => {
           onClick={() => setIsOpen(true)}
           aria-label={t('chatbot.openAria')}
           data-cursor-label="AI Chat"
-          className="cursor-target group flex items-center gap-2.5 h-11 sm:h-12 px-3.5 sm:px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-2xl transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="cursor-target group flex items-center gap-3 h-12 px-4 rounded-full bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] shadow-[0_12px_36px_-8px_rgba(0,0,0,0.5)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.65)] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
-          <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-transform duration-200 group-hover:scale-105">
-            <IoSparklesSharp size={14} />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-[var(--surface)]" />
+          <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-transform duration-200 group-hover:scale-105 shadow-sm">
+            <IoSparklesSharp size={13} />
+            <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
           </span>
 
           <span className="font-mono font-bold text-xs tracking-wider uppercase text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
@@ -250,23 +253,30 @@ const ChatAssistant = () => {
           role="dialog"
           aria-modal="true"
           aria-label={t('chatbot.title')}
-          className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[420px] h-[min(580px,calc(100vh-6.5rem))] flex flex-col rounded-xl overflow-hidden bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-2xl animate-fadeIn select-text"
+          className="w-[calc(100vw-2rem)] sm:w-[420px] md:w-[440px] h-[min(600px,calc(100vh-6rem))] flex flex-col rounded-2xl overflow-hidden bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65)] animate-fadeIn select-text"
         >
-          {/* Top Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]/90">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-[var(--accent-muted)] border border-[var(--accent)]/30 flex items-center justify-center text-[var(--accent)] flex-shrink-0">
-                <IoSparklesSharp size={15} />
+          {/* Top Header Frame (Linear / Antigravity Window) */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]/95 select-none">
+            <div className="flex items-center gap-3 min-w-0">
+              {/* macOS Traffic Lights */}
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80" />
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--accent)] truncate">
-                    {t('chatbot.badge')}
-                  </span>
-                </div>
-                <span role="heading" aria-level="2" className="block font-grotesk font-bold text-sm text-[var(--text-primary)] truncate">
+
+              <span className="h-3.5 w-px bg-[var(--border)]" aria-hidden="true" />
+
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span role="heading" aria-level="2" className="block font-grotesk font-black text-xs sm:text-sm text-[var(--text-primary)] uppercase tracking-wide truncate">
                   {t('chatbot.title')}
+                </span>
+                <span className="font-mono text-[9px] text-[var(--accent)] font-semibold px-1.5 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] uppercase tracking-wider shrink-0">
+                  {t('chatbot.badge')}
                 </span>
               </div>
             </div>
@@ -278,7 +288,7 @@ const ChatAssistant = () => {
                   onClick={handleClearChat}
                   aria-label={t('chatbot.clearChatAria')}
                   title={t('chatbot.clearChatAria')}
-                  className="h-8 px-2.5 rounded flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="h-8 px-2.5 rounded-md flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   <FiRotateCcw size={11} />
                   <span className="hidden sm:inline">{t('chatbot.clearChat')}</span>
@@ -292,9 +302,9 @@ const ChatAssistant = () => {
                 onClick={() => setIsOpen(false)}
                 aria-label={t('chatbot.closeAria')}
                 data-cursor-label="Close"
-                className="cursor-target w-9 h-9 min-w-[36px] min-h-[36px] rounded flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="cursor-target w-8 h-8 rounded-md flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
-                <IoClose size={18} />
+                <IoClose size={17} />
               </button>
             </div>
           </div>
@@ -304,40 +314,43 @@ const ChatAssistant = () => {
             {/* Welcome Card & Quick Starter Suggestions */}
             {messages.length === 0 && (
               <div className="space-y-4">
-                <div className="p-3.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] space-y-2">
-                  <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--accent)]">
-                    <FiShield size={12} />
-                    <span>STRICT KNOWLEDGE MODE</span>
+                <div className="p-4 rounded-xl bg-[var(--surface-alt)]/80 border border-[var(--border)] space-y-2.5 shadow-sm relative overflow-hidden group">
+                  <div className="flex items-center justify-between">
+                    <div className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] font-semibold">
+                      <FiShield size={12} />
+                      <span>STRICT KNOWLEDGE ENGINE</span>
+                    </div>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
                   </div>
-                  <p className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] leading-snug">
+                  <p className="font-grotesk font-black text-sm text-[var(--text-primary)] tracking-tight leading-snug">
                     {t('chatbot.welcomeTitle')}
                   </p>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed">
                     {t('chatbot.welcomeBody')}
                   </p>
                 </div>
 
                 {safeSuggestions.length > 0 && (
                   <div className="space-y-2">
-                    <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] px-0.5">
+                    <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)] px-1">
                       {t('chatbot.suggestedLabel')}
                     </span>
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-2">
                       {safeSuggestions.map((question, idx) => (
                         <button
                           key={idx}
                           type="button"
                           disabled={isLoading}
                           onClick={() => sendMessage(question)}
-                          className="group w-full text-left px-3 py-2.5 rounded-lg bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] transition-all duration-150 flex items-start gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          className="group w-full text-left px-3.5 py-2.5 rounded-lg bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] transition-all duration-150 flex items-center justify-between gap-2.5 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         >
-                          <FiCornerDownRight
-                            size={13}
-                            className="mt-0.5 text-[var(--text-muted)] group-hover:text-[var(--accent)] flex-shrink-0 transition-colors"
-                          />
-                          <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] leading-snug transition-colors">
+                          <span className="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] leading-snug transition-colors flex-1">
                             {question}
                           </span>
+                          <FiCornerDownRight
+                            size={12}
+                            className="text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all shrink-0"
+                          />
                         </button>
                       ))}
                     </div>
@@ -363,17 +376,17 @@ const ChatAssistant = () => {
 
                   {/* Message Bubble */}
                   <div
-                    className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap break-words ${
+                    className={`max-w-[88%] rounded-2xl px-4 py-3 text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
                       isUser
-                        ? 'bg-[var(--accent)] text-[var(--accent-contrast)] font-medium rounded-br-xs'
+                        ? 'bg-[var(--accent)] text-[var(--accent-contrast)] font-medium rounded-tr-xs'
                         : msg.isError
-                        ? 'bg-red-500/10 border border-red-500/30 text-[var(--text-primary)] rounded-bl-xs'
-                        : 'bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-primary)] rounded-bl-xs'
+                        ? 'bg-red-500/10 border border-red-500/30 text-[var(--text-primary)] rounded-tl-xs'
+                        : 'bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-primary)] rounded-tl-xs'
                     }`}
                   >
                     {/* Strict Refusal / Guard Badge */}
                     {!isUser && msg.meta?.refused && (
-                      <div className="inline-flex items-center gap-1 px-1.5 py-0.5 mb-2 rounded bg-[var(--surface-muted)] border border-[var(--border)] font-mono text-[10px] uppercase tracking-wider text-[var(--text-secondary)]">
+                      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 mb-2 rounded bg-[var(--surface-muted)] border border-[var(--border)] font-mono text-[10px] uppercase tracking-wider text-[var(--text-secondary)]">
                         <FiShield size={10} className="text-[var(--accent)]" />
                         <span>{t('chatbot.strictGuardBadge')}</span>
                       </div>
@@ -397,7 +410,7 @@ const ChatAssistant = () => {
                         onClick={() =>
                           sendMessage(msg.retryQuery, { isRetry: true })
                         }
-                        className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--surface)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-[10px] uppercase tracking-wider text-[var(--text-primary)] transition-colors cursor-pointer"
+                        className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[var(--surface)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-[10px] uppercase tracking-wider text-[var(--text-primary)] transition-colors cursor-pointer"
                       >
                         <FiRotateCcw size={11} />
                         <span>{t('chatbot.retryBtn')}</span>
@@ -421,7 +434,7 @@ const ChatAssistant = () => {
                                   handleNavigateToSection(src.sectionId)
                                 }
                                 title={`${t('chatbot.jumpToSection')} ${src.sectionId}`}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--tag-bg)] hover:bg-[var(--surface-hover)] border border-[var(--tag-border)] hover:border-[var(--accent)] font-mono text-[10px] text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--accent)] font-mono text-[10px] text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer shadow-2xs"
                               >
                                 <span className="truncate max-w-[190px]">
                                   {src.title}
@@ -465,9 +478,10 @@ const ChatAssistant = () => {
           {/* Input Form Footer */}
           <form
             onSubmit={handleFormSubmit}
-            className="p-3 border-t border-[var(--border)] bg-[var(--surface-muted)]/95 space-y-2"
+            className="p-3.5 border-t border-[var(--border)] bg-[var(--surface-muted)]/95 backdrop-blur-md space-y-2 select-none"
           >
-            <div className="flex items-center gap-2 pl-3.5 pr-1.5 py-1.5 rounded-xl bg-[var(--input-bg)] border border-[var(--border)] focus-within:border-[var(--accent)] transition-colors">
+            <div className="flex items-center gap-2 pl-3.5 pr-1.5 py-1.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] transition-all shadow-inner">
+              <span className="text-[var(--text-muted)] font-mono text-sm select-none">›</span>
               <input
                 ref={inputRef}
                 type="text"
@@ -484,9 +498,9 @@ const ChatAssistant = () => {
                 type="submit"
                 disabled={isLoading || input.trim().length === 0}
                 aria-label={t('chatbot.sendAria')}
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-35 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="w-8 h-8 min-w-[32px] min-h-[32px] rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-30 disabled:pointer-events-none text-[var(--accent-contrast)] flex items-center justify-center transition-all cursor-pointer flex-shrink-0 relative after:content-[''] after:absolute after:-inset-1 after:min-w-[44px] after:min-h-[44px] touch-manipulation focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] shadow-sm"
               >
-                <IoSend size={13} className="translate-x-[0.5px]" />
+                <IoSend size={12} className="translate-x-[0.5px]" />
               </button>
             </div>
 

@@ -293,7 +293,7 @@ const DeveloperTerminal = () => {
       {isOpen && (
         <div
           onClick={handleBackdropClick}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label={t('terminal.heading')}
@@ -304,7 +304,7 @@ const DeveloperTerminal = () => {
               animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
               exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 14 }}
               transition={{ duration: shouldReduceMotion ? 0.01 : 0.22, ease: easeCurve }}
-              className={`rounded-xl border border-neutral-800 bg-[#0d1117] shadow-2xl overflow-hidden font-mono text-xs sm:text-sm flex flex-col transition-all duration-200 ${
+              className={`rounded-2xl border border-white/[0.08] ring-1 ring-black/40 bg-[#0d1117] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.75)] overflow-hidden font-mono text-xs sm:text-sm flex flex-col transition-all duration-200 ${
                 isMaximized ? 'w-full h-[90vh]' : 'w-full max-w-2xl max-h-[85vh]'
               }`}
               onClick={(e) => {
@@ -319,7 +319,7 @@ const DeveloperTerminal = () => {
               }}
             >
               {/* Terminal Window Bar (macOS Dots Style) */}
-              <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-neutral-800 select-none shrink-0">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22]/95 border-b border-white/[0.06] select-none shrink-0">
                 {/* Mac-style Window Action Dots with expanded touch targets (MED-01) */}
                 <div className="flex items-center gap-1">
                   <button
@@ -353,8 +353,17 @@ const DeveloperTerminal = () => {
                 </div>
 
                 {/* Window Title matching Image 2 */}
-                <div className="text-[var(--text-secondary)] font-mono text-xs font-semibold truncate px-2">
-                  visitor@ighifari: ~
+                <div className="flex items-center gap-2 min-w-0 px-2.5 py-1 rounded-md bg-[#0d1117] border border-white/[0.06]">
+                  <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="text-neutral-300 font-mono text-[11px] font-semibold truncate">
+                    visitor@ighifari: ~
+                  </span>
+                  <span className="hidden sm:inline text-[9px] font-mono font-semibold uppercase tracking-wider text-neutral-400 px-1.5 py-px rounded bg-white/[0.04] border border-white/[0.06] shrink-0">
+                    zsh
+                  </span>
                 </div>
 
                 {/* Window Controls with expanded touch targets (MED-01) */}
@@ -458,7 +467,7 @@ const DeveloperTerminal = () => {
                     )}
 
                     {entry.type === 'about' && (
-                      <div className="p-3.5 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-2.5 text-xs">
+                      <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-2.5 text-xs">
                         <div className="flex items-center gap-2 text-white font-bold text-sm">
                           <FiUser className="text-[var(--accent)]" aria-hidden="true" />
                           <span>{entry.name}</span>
@@ -508,7 +517,7 @@ const DeveloperTerminal = () => {
                           {entry.projects.map((p) => (
                             <div
                               key={p.id}
-                              className="p-3 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-2 hover:border-neutral-700 transition-colors"
+                              className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-2 hover:border-neutral-700 transition-colors"
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <button
@@ -566,7 +575,7 @@ const DeveloperTerminal = () => {
                     )}
 
                     {entry.type === 'project-detail' && (
-                      <div className="p-4 rounded-lg bg-neutral-900/60 border border-neutral-800 space-y-3 text-xs">
+                      <div className="p-4 rounded-xl bg-white/[0.025] border border-white/[0.07] space-y-3 text-xs">
                         <div className="flex items-start justify-between gap-3 pb-2 border-b border-neutral-800">
                           <div>
                             <div className="text-[10px] font-bold text-[var(--accent)] uppercase tracking-widest">
@@ -681,7 +690,7 @@ const DeveloperTerminal = () => {
                           {entry.categories.map((cat) => (
                             <div
                               key={cat.id}
-                              className="p-3 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-1.5"
+                              className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-1.5"
                             >
                               <div className="flex items-center justify-between text-[11px]">
                                 <span className="font-bold text-white uppercase tracking-wider">
@@ -723,7 +732,7 @@ const DeveloperTerminal = () => {
                         {entry.experiences.map((exp) => (
                           <div
                             key={exp.id}
-                            className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-3 text-xs"
+                            className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-3 text-xs"
                           >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-neutral-800">
                               <div>
@@ -795,7 +804,7 @@ const DeveloperTerminal = () => {
                           {entry.items.map((item) => (
                             <div
                               key={item.institution}
-                              className="p-3.5 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-1.5"
+                              className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-1.5"
                             >
                               <div className="flex items-center justify-between">
                                 <span className="font-bold text-white text-xs flex items-center gap-1.5">
@@ -825,7 +834,7 @@ const DeveloperTerminal = () => {
                     )}
 
                     {entry.type === 'github' && (
-                      <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-3 text-xs">
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-3 text-xs">
                         <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
                           <div className="flex items-center gap-2 text-white font-bold text-sm">
                             <FiCode className="text-[var(--accent)]" size={15} aria-hidden="true" />
@@ -869,7 +878,7 @@ const DeveloperTerminal = () => {
                     )}
 
                     {entry.type === 'contact' && (
-                      <div className="p-4 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-3 text-xs">
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-3 text-xs">
                         <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
                           <span className="font-bold text-white text-xs uppercase tracking-wider">
                             {`// ${language === 'id' ? 'Saluran Kontak Resmi' : 'Verified Contact Channels'}`}
@@ -926,7 +935,7 @@ const DeveloperTerminal = () => {
                     )}
 
                     {entry.type === 'whoami' && (
-                      <div className="p-3.5 rounded-lg bg-neutral-900/50 border border-neutral-800 space-y-1.5 text-xs font-mono">
+                      <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.07] space-y-1.5 text-xs font-mono">
                         <div className="flex items-center gap-2 text-[var(--accent)] font-bold">
                           <FiUser size={13} aria-hidden="true" />
                           <span>{entry.user}</span>
@@ -996,7 +1005,7 @@ const DeveloperTerminal = () => {
               </div>
 
               {/* Quick Suggestion Chips */}
-              <div className="px-4 py-2 bg-[#161b22] border-t border-neutral-800 flex items-center gap-2 overflow-x-auto select-none shrink-0">
+              <div className="px-4 py-2.5 bg-[#161b22]/80 border-t border-white/[0.06] flex items-center gap-2.5 overflow-x-auto select-none shrink-0">
                 <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider shrink-0 hidden sm:inline">
                   {t('terminal.chipsLabel')}
                 </span>
@@ -1006,7 +1015,7 @@ const DeveloperTerminal = () => {
                       key={chip}
                       type="button"
                       onClick={() => runCommand(chip)}
-                      className="px-2 py-0.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-600 text-neutral-300 hover:text-white font-mono text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                      className="px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.2] text-neutral-300 hover:text-white font-mono text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                     >
                       {chip}
                     </button>
@@ -1020,7 +1029,7 @@ const DeveloperTerminal = () => {
                   e.preventDefault();
                   runCommand(inputVal);
                 }}
-                className="flex items-center gap-2 px-4 py-3 bg-[#0d1117] border-t border-neutral-800 shrink-0"
+                className="flex items-center gap-2 mx-3 my-3 pl-3.5 pr-1.5 py-1.5 rounded-xl bg-[#161b22] border border-white/[0.08] focus-within:border-white/[0.2] transition-colors shadow-inner shrink-0"
               >
                 {/* Prompt prefix: arrow + tilde */}
                 <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs font-semibold select-none">
@@ -1048,7 +1057,7 @@ const DeveloperTerminal = () => {
                 <button
                   type="submit"
                   disabled={!inputVal.trim()}
-                  className="px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-neutral-900 border border-neutral-800 text-[var(--accent)] text-xs font-mono transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] disabled:opacity-30 disabled:pointer-events-none border border-white/[0.08] text-neutral-200 text-[11px] font-mono font-bold uppercase tracking-wide transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                   aria-label={t('terminal.submitAria')}
                 >
                   <span className="hidden sm:inline">Enter</span>
@@ -1057,9 +1066,15 @@ const DeveloperTerminal = () => {
               </form>
 
               {/* Terminal Footer info */}
-              <div className="px-4 py-1.5 bg-[#161b22] border-t border-neutral-800/80 flex items-center justify-between text-[10px] font-mono text-neutral-400 select-none shrink-0">
-                <span>{t('terminal.historyNavHint')}</span>
-                <span>Type &apos;exit&apos; or press ESC to close</span>
+              <div className="px-4 py-1.5 bg-[#161b22]/95 border-t border-white/[0.06] flex items-center justify-between gap-3 text-[10px] font-mono text-neutral-400 select-none shrink-0">
+                <span className="inline-flex items-center gap-1.5 truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('terminal.historyNavHint')}</span>
+                </span>
+                <span className="hidden sm:inline-flex items-center gap-1 shrink-0">
+                  <kbd className="px-1.5 py-px rounded border border-white/[0.1] bg-white/[0.04] text-neutral-300">ESC</kbd>
+                  <span>/ exit</span>
+                </span>
               </div>
             </motion.div>
           </div>
