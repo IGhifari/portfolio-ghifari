@@ -7,9 +7,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['"Geist Variable"', 'Geist', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         montserrat: ['Montserrat', 'sans-serif'],
-        grotesk: ['Space Grotesk', 'sans-serif'],
-        mono: ['Space Mono', 'monospace'],
+        grotesk: ['"Geist Variable"', 'Geist', 'Inter', '"Space Grotesk"', 'sans-serif'],
+        mono: ['"Geist Mono Variable"', '"Geist Mono"', '"JetBrains Mono"', '"Space Mono"', 'monospace'],
       },
       colors: {
         theme: {
