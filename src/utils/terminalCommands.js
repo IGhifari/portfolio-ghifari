@@ -10,6 +10,7 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
+import { siteConfig } from '../config/site.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -169,7 +170,7 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         command,
         args,
         raw,
-        name: 'M. Ghifari Bima Khadafi',
+        name: siteConfig.name,
         role: 'Web Developer / Software Engineer',
         location: isId ? 'Bogor, Jawa Barat, Indonesia' : 'Bogor, West Java, Indonesia',
         summary: isId
@@ -357,8 +358,8 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         command,
         args,
         raw,
-        username: 'IGhifari',
-        url: 'https://github.com/IGhifari',
+        username: siteConfig.author.githubUsername,
+        url: siteConfig.author.github,
         stats: {
           contributions,
           publicRepos,
@@ -396,11 +397,11 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         command,
         args,
         raw,
-        user: 'visitor@ighifari',
+        user: `${siteConfig.terminal.user}@${siteConfig.terminal.host}`,
         role: t('terminal.whoamiRole') || 'Guest Explorer',
         session: t('terminal.whoamiSession') || 'Sandboxed Read-Only Client Session',
-        host: 'https://www.ighifari.my.id',
-        shell: 'Virtual Portfolio Terminal [v1.0.0]',
+        host: siteConfig.origin,
+        shell: `Virtual Portfolio Terminal [${siteConfig.terminal.version}]`,
       };
     }
 
@@ -544,7 +545,7 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         command,
         args,
         raw,
-        message: 'portfolio://www.ighifari.my.id/visitor',
+        message: `portfolio://${siteConfig.domain}/visitor`,
       };
     }
 

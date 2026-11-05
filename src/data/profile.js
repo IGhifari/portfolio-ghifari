@@ -4,9 +4,11 @@
  * and src/utils/lanyardCardGenerator.js.
  */
 
+import { siteConfig } from '../config/site.js';
+
 export const profileData = {
-  fullName: 'M. Ghifari Bima Khadafi',
-  brandName: 'GHIFARI',
+  fullName: siteConfig.name,
+  brandName: siteConfig.brandName,
   nameLines: {
     first: 'M. GHIFARI',
     second: 'BIMA KHADAFI',
@@ -21,10 +23,10 @@ export const profileData = {
   avatarFallbackImage: '/images/profile/ghifari.jpeg',
   logoImage: '/logo.png',
   socials: {
-    github: 'https://github.com/IGhifari',
-    githubHandle: 'github.com/IGhifari',
-    linkedin: 'https://www.linkedin.com/in/ighifari/',
-    instagram: 'https://www.instagram.com/ghfrriii/',
+    github: siteConfig.author.github,
+    githubHandle: `github.com/${siteConfig.author.githubUsername}`,
+    linkedin: siteConfig.author.linkedin,
+    instagram: siteConfig.author.instagram,
   },
   lanyardCard: {
     badgeHeader: 'DEV // PASS',

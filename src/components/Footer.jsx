@@ -2,6 +2,7 @@ import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail, FiBriefcase } fro
 import { RouterLink } from '../context/RouterContext';
 import LastUpdated from './LastUpdated';
 import { useLanguage } from '../context/LanguageContext';
+import { siteConfig } from '../config/site';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -16,10 +17,10 @@ const Footer = () => {
   };
 
   const footerLinks = [
-    { label: 'GitHub', href: 'https://github.com/IGhifari', icon: <FiGithub size={15} /> },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/ighifari/', icon: <FiLinkedin size={15} /> },
-    { label: 'Instagram', href: 'https://www.instagram.com/ghfrriii/', icon: <FiInstagram size={15} /> },
-    { label: 'Email', href: 'mailto:ighifarii05@gmail.com', icon: <FiMail size={15} /> },
+    { label: 'GitHub', href: siteConfig.author.github, icon: <FiGithub size={15} /> },
+    { label: 'LinkedIn', href: siteConfig.author.linkedin, icon: <FiLinkedin size={15} /> },
+    { label: 'Instagram', href: siteConfig.author.instagram, icon: <FiInstagram size={15} /> },
+    { label: 'Email', href: `mailto:${siteConfig.author.email}`, icon: <FiMail size={15} /> },
   ];
 
   return (
@@ -30,7 +31,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="font-grotesk font-black text-2xl tracking-tight text-[var(--text-primary)]">
-                GHIFARI<span className="text-[var(--accent)]">.</span>
+                {siteConfig.brandName}<span className="text-[var(--accent)]">.</span>
               </span>
             </div>
             <p className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
@@ -93,7 +94,7 @@ const Footer = () => {
         {/* Bottom Tier: Copyright & Last Updated */}
         <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-[var(--text-muted)]">
           <p>
-            &copy; {currentYear} M. Ghifari Bima Khadafi. {t('footer.copyright')}
+            &copy; {currentYear} {siteConfig.name}. {t('footer.copyright')}
           </p>
 
           <div className="flex items-center gap-3">

@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { allProjects } from '../src/data/projects.js';
+import { siteConfig } from '../src/config/site.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,9 +11,9 @@ const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const indexHtmlPath = path.join(distDir, 'index.html');
 
-const SITE_ORIGIN = 'https://www.ighifari.my.id';
-const DEFAULT_IMAGE = `${SITE_ORIGIN}/portfolio.png`;
-const TWITTER_HANDLE = '@IGhifari';
+const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || siteConfig.origin;
+const DEFAULT_IMAGE = `${SITE_ORIGIN}${siteConfig.seo.ogImage}`;
+const TWITTER_HANDLE = siteConfig.seo.twitterHandle;
 
 const escapeHtml = (str = '') =>
   str

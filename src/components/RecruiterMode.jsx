@@ -27,6 +27,7 @@ import { selectedProjects } from '../data/projects';
 import { directEmail } from '../data/contact';
 import { RESUME_URL, RESUME_FILENAME, RESUME_AVAILABLE } from '../data/resume';
 import { updateDocumentMetadata, generateRecruiterSchema } from '../utils/seo';
+import { siteConfig } from '../config/site';
 
 const RecruiterMode = () => {
   const { language, t } = useLanguage();
@@ -37,11 +38,11 @@ const RecruiterMode = () => {
   useEffect(() => {
     const isId = language === 'id';
     const title = isId
-      ? 'Mode Rekruter & Ringkasan Eksekutif | M. Ghifari Bima Khadafi'
-      : 'Recruiter Mode & Executive Summary | M. Ghifari Bima Khadafi';
+      ? `Mode Rekruter & Ringkasan Eksekutif | ${siteConfig.name}`
+      : `Recruiter Mode & Executive Summary | ${siteConfig.name}`;
     const description = isId
-      ? 'Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi (PT. AMA Salam Indonesia), keahlian teknis, dan proyek unggulan M. Ghifari Bima Khadafi.'
-      : 'A concise professional overview of software engineering qualifications, formal education, verified work experience (PT. AMA Salam Indonesia), technical skills, and selected projects by M. Ghifari Bima Khadafi.';
+      ? `Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi (PT. AMA Salam Indonesia), keahlian teknis, dan proyek unggulan ${siteConfig.name}.`
+      : `A concise professional overview of software engineering qualifications, formal education, verified work experience (PT. AMA Salam Indonesia), technical skills, and selected projects by ${siteConfig.name}.`;
 
     updateDocumentMetadata({
       title,

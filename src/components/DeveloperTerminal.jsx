@@ -19,6 +19,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRouter } from '../context/RouterContext';
+import { siteConfig } from '../config/site';
 import {
   executeTerminalCommand,
   parseCommandLine,
@@ -378,7 +379,7 @@ const DeveloperTerminal = () => {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   </span>
                   <span className="text-neutral-300 font-mono text-[11px] font-semibold truncate">
-                    visitor@ighifari: ~
+                    {siteConfig.terminal.user}@{siteConfig.terminal.host}: ~
                   </span>
                   <span className="hidden sm:inline text-[9px] font-mono font-semibold uppercase tracking-wider text-neutral-400 px-1.5 py-px rounded bg-white/[0.04] border border-white/[0.06] shrink-0">
                     zsh
@@ -442,7 +443,7 @@ const DeveloperTerminal = () => {
                     {/* Welcome Banner matching Image 2 */}
                     {entry.type === 'welcome' && (
                       <div className="space-y-1 py-1 text-xs sm:text-sm font-mono text-neutral-300">
-                        <div className="font-semibold text-white">Welcome to GHIFARI-OS v1.0.0</div>
+                        <div className="font-semibold text-white">Welcome to {siteConfig.terminal.osName} {siteConfig.terminal.version}</div>
                         <div className="text-neutral-400">
                           {language === 'id' ? "Ketik 'help' untuk melihat daftar perintah." : "Type 'help' for a list of commands."}
                         </div>

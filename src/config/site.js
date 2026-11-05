@@ -1,0 +1,49 @@
+/**
+ * Centralized Site & Identity Configuration
+ *
+ * This file serves as the Single Source of Truth (SSOT) for the entire portfolio.
+ * When adapting this project for another person/template, simply update the values below
+ * and the entire application (Navbar, Footer, Terminal, ChatAssistant, SEO, etc.) will adapt automatically.
+ */
+
+export const siteConfig = {
+  name: 'M. Ghifari Bima Khadafi',
+  brandName: 'GHIFARI',
+  shortName: 'Ghifari',
+  title: 'M. Ghifari Bima Khadafi | Web Developer & Software Engineer',
+  description:
+    'Portfolio & engineering showcase of M. Ghifari Bima Khadafi. Exploring software engineering, modern frontend architecture, and full-stack web solutions.',
+  origin: 'https://www.ighifari.my.id',
+  domain: 'ighifari.my.id',
+
+  author: {
+    name: 'M. Ghifari Bima Khadafi',
+    email: 'ighifarii05@gmail.com',
+    github: 'https://github.com/IGhifari',
+    githubUsername: 'IGhifari',
+    linkedin: 'https://www.linkedin.com/in/ighifari/',
+    instagram: 'https://www.instagram.com/ghfrriii/',
+    discord: 'ghifarii5',
+    twitter: '@IGhifari',
+  },
+
+  bot: {
+    name: 'GHIFARI AI',
+    role: 'Portfolio Assistant',
+  },
+
+  terminal: {
+    user: 'visitor',
+    host: 'ighifari',
+    osName: 'GHIFARI-OS',
+    version: 'v1.0.0',
+  },
+
+  seo: {
+    defaultTitle: 'M. Ghifari Bima Khadafi | Web Developer & Software Engineer',
+    twitterHandle: '@IGhifari',
+    ogImage: '/portfolio.png',
+  },
+};
+
+export default siteConfig;

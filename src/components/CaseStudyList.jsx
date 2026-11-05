@@ -26,6 +26,7 @@ import {
   DEFAULT_SORT,
 } from '../utils/projectExplorer';
 import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
+import { siteConfig } from '../config/site';
 
 const CaseStudyList = () => {
   const { language, t } = useLanguage();
@@ -58,12 +59,12 @@ const CaseStudyList = () => {
   useEffect(() => {
     const title =
       language === 'id'
-        ? 'Penjelajah Proyek & Studi Kasus Rekayasa | M. Ghifari Bima Khadafi'
-        : 'Project Explorer & Engineering Case Studies | M. Ghifari Bima Khadafi';
+        ? `Penjelajah Proyek & Studi Kasus Rekayasa | ${siteConfig.name}`
+        : `Project Explorer & Engineering Case Studies | ${siteConfig.name}`;
     const description =
       language === 'id'
-        ? 'Jelajahi dan temukan proyek rekayasa perangkat lunak, arsitektur teknis, dan studi kasus pilihan M. Ghifari Bima Khadafi berdasarkan teknologi, kategori, dan kata kunci.'
-        : 'Explore and discover software engineering projects, technical architectures, and case studies by M. Ghifari Bima Khadafi filtered by technology, category, and keywords.';
+        ? `Jelajahi dan temukan proyek rekayasa perangkat lunak, arsitektur teknis, dan studi kasus pilihan ${siteConfig.name} berdasarkan teknologi, kategori, dan kata kunci.`
+        : `Explore and discover software engineering projects, technical architectures, and case studies by ${siteConfig.name} filtered by technology, category, and keywords.`;
 
     updateDocumentMetadata({
       title,

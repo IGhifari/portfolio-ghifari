@@ -4,34 +4,36 @@
  * Localized channel descriptions are available in src/data/translations.js (contact.channels.*).
  */
 
-export const directEmail = 'ighifarii05@gmail.com';
+import { siteConfig } from '../config/site.js';
+
+export const directEmail = siteConfig.author.email;
 
 export const contactChannelsData = [
   {
     key: 'github',
     name: 'GitHub',
-    handle: '@IGhifari',
+    handle: `@${siteConfig.author.githubUsername}`,
     desc: 'Public code, project repositories & contributions',
-    url: 'https://github.com/IGhifari',
+    url: siteConfig.author.github,
   },
   {
     key: 'linkedin',
     name: 'LinkedIn',
     handle: 'in/ighifari',
     desc: 'Professional network, career background & credentials',
-    url: 'https://www.linkedin.com/in/ighifari/',
+    url: siteConfig.author.linkedin,
   },
   {
     key: 'instagram',
     name: 'Instagram',
     handle: '@ghfrriii',
     desc: 'Personal activities, design experiments & updates',
-    url: 'https://www.instagram.com/ghfrriii/',
+    url: siteConfig.author.instagram,
   },
   {
     key: 'discord',
     name: 'Discord',
-    handle: '@ghifarii5',
+    handle: `@${siteConfig.author.discord}`,
     desc: 'Real-time developer chat and collaboration',
     url: 'https://discord.com',
   },

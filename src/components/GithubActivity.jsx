@@ -20,6 +20,7 @@ import {
 } from '../services/githubService';
 import { initialContributionsData } from '../data/githubContributions';
 import { profileData } from '../data/profile';
+import { siteConfig } from '../config/site';
 
 const MONTH_LABELS = {
   id: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
@@ -416,10 +417,10 @@ const GithubActivity = () => {
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-grotesk font-black text-xl sm:text-2xl text-[var(--text-primary)]">
-                        {profile?.name || 'M. Ghifari Bima Khadafi'}
+                        {profile?.name || siteConfig.name}
                       </span>
                       <span className="font-mono text-xs text-[var(--accent)] font-semibold">
-                        @{profile?.login || 'IGhifari'}
+                        @{profile?.login || siteConfig.author.githubUsername}
                       </span>
                     </div>
 
@@ -578,7 +579,7 @@ const GithubActivity = () => {
 
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
-                  git log --graph --oneline // ighifari/contributions
+                  git log --graph --oneline // {siteConfig.author.githubUsername.toLowerCase()}/contributions
                 </span>
               </div>
 
@@ -624,8 +625,8 @@ const GithubActivity = () => {
                       role="grid"
                       aria-label={
                         language === 'id'
-                          ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || initialContributionsData.total} kontribusi). Gunakan tombol panah untuk berpindah hari.`
-                          : `GitHub contribution heatmap for IGhifari (${contributions?.total || initialContributionsData.total} contributions). Use arrow keys to navigate days.`
+                          ? `Kalender kontribusi GitHub untuk ${siteConfig.author.githubUsername} (${contributions?.total || initialContributionsData.total} kontribusi). Gunakan tombol panah untuk berpindah hari.`
+                          : `GitHub contribution heatmap for ${siteConfig.author.githubUsername} (${contributions?.total || initialContributionsData.total} contributions). Use arrow keys to navigate days.`
                       }
                     >
                       {contributions.days.map((day, idx) => {
