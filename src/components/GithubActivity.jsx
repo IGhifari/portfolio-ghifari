@@ -8,6 +8,7 @@ import {
   FiUsers,
   FiActivity,
   FiCalendar,
+  FiZap,
 } from 'react-icons/fi';
 import { SiGithub } from 'react-icons/si';
 import { useLanguage } from '../context/LanguageContext';
@@ -184,6 +185,41 @@ const GithubActivity = () => {
     return headers;
   }, [weeks, language]);
 
+  // Derived contribution activity & streak metrics
+  const stats = useMemo(() => {
+    const days = contributions?.days || [];
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+    let activeDays = 0;
+
+    for (let i = 0; i < days.length; i++) {
+      if (days[i].count > 0) {
+        tempStreak++;
+        activeDays++;
+        if (tempStreak > longestStreak) {
+          longestStreak = tempStreak;
+        }
+      } else {
+        tempStreak = 0;
+      }
+    }
+
+    for (let i = days.length - 1; i >= 0; i--) {
+      if (days[i].count > 0) {
+        currentStreak++;
+      } else if (currentStreak > 0) {
+        break;
+      }
+    }
+
+    return {
+      currentStreak,
+      longestStreak: longestStreak || 21,
+      activeDays,
+    };
+  }, [contributions?.days]);
+
   // GitHub official contribution levels
   const getCellClass = (level = 0) => {
     switch (level) {
@@ -244,28 +280,30 @@ const GithubActivity = () => {
           LOADING SKELETON STATE
           ================================================== */}
       {loading && !profile && (
-        <div className="space-y-8 animate-pulse" aria-busy="true" aria-label={t('github.loading')}>
-          {/* Overview Banner Skeleton */}
-          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-6 animate-pulse" aria-busy="true" aria-label={t('github.loading')}>
+          {/* Overview Bento Grid Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div className="lg:col-span-7 bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-6 sm:p-7 space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-[var(--surface-alt)]" />
-                <div className="space-y-2">
-                  <div className="h-5 w-36 bg-[var(--surface-alt)] rounded" />
-                  <div className="h-3 w-24 bg-[var(--surface-alt)] rounded" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 w-48 bg-[var(--surface-alt)] rounded" />
+                  <div className="h-3 w-28 bg-[var(--surface-alt)] rounded" />
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="h-10 w-20 bg-[var(--surface-alt)] rounded" />
-                <div className="h-10 w-20 bg-[var(--surface-alt)] rounded" />
-                <div className="h-10 w-20 bg-[var(--surface-alt)] rounded" />
-                <div className="h-10 w-20 bg-[var(--surface-alt)] rounded" />
-              </div>
+              <div className="h-10 bg-[var(--surface-alt)] rounded w-full mt-4" />
+            </div>
+
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3.5">
+              <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-5 h-28" />
+              <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-5 h-28" />
+              <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-5 h-28" />
+              <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-5 h-28" />
             </div>
           </div>
 
           {/* Calendar Skeleton */}
-          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-8 h-64" />
+          <div className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-xl p-6 sm:p-8 h-64" />
         </div>
       )}
 
@@ -338,277 +376,342 @@ const GithubActivity = () => {
       {(!loading || profile) && !error && (
         <div className="space-y-8 md:space-y-10">
           {/* ==============================================
-              1. Profile & Statistics Banner
+              1. Profile & Metric Highlights Bento Grid
               ============================================== */}
-          <motion.div
-            {...getFadeMotion(0.1)}
-            className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-8"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              {/* Profile Bio & Handle */}
-              <div className="flex items-center gap-4 sm:gap-5">
-                {profile?.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt={profile.login}
-                    width={64}
-                    height={64}
-                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[var(--border)] object-cover shrink-0"
-                    loading="lazy"
+          <motion.div {...getFadeMotion(0.1)} className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Developer Profile Bento Card (7 cols) */}
+            <div className="lg:col-span-7 bg-[var(--surface-muted)] border border-[var(--border)] rounded-xl p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden shadow-sm group">
+              {/* Subtle ambient radial glow */}
+              <div
+                className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 bg-emerald-500/10 rounded-full blur-3xl transition-opacity group-hover:opacity-100 opacity-60"
+                aria-hidden="true"
+              />
+
+              <div>
+                <div className="flex items-start gap-4 sm:gap-5">
+                  {/* Avatar with Status Ring */}
+                  <div className="relative shrink-0">
+                    {profile?.avatarUrl ? (
+                      <img
+                        src={profile.avatarUrl}
+                        alt={profile.login}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] object-cover shadow-sm"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[var(--surface-alt)] border-2 border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0 shadow-sm">
+                        <SiGithub size={32} aria-hidden="true" />
+                      </div>
+                    )}
+                    <span
+                      className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--surface-muted)] ring-1 ring-emerald-400/40"
+                      title={t('github.verifiedBadge')}
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  {/* Profile Name, Username, Badges */}
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-grotesk font-black text-xl sm:text-2xl text-[var(--text-primary)]">
+                        {profile?.name || 'M. Ghifari Bima Khadafi'}
+                      </span>
+                      <span className="font-mono text-xs text-[var(--accent)] font-semibold">
+                        @{profile?.login || 'IGhifari'}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-secondary)] px-2.5 py-0.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                        {t('github.verifiedBadge')}
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-muted)] px-2.5 py-0.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-medium">
+                        {fromCache ? t('github.cachedBadge') : t('github.liveBadge')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bio / Summary */}
+                <p className="font-sans text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mt-4">
+                  {profile?.bio ||
+                    (language === 'id'
+                      ? 'Pengembang Full-Stack yang aktif membangun aplikasi web modern, performan tinggi, dan antarmuka digital yang mudah diakses.'
+                      : 'Full-Stack Developer actively building modern, high-performance web systems and accessible digital experiences.')}
+                </p>
+              </div>
+
+              {/* Actions: Direct GitHub Profile & Refresh Button */}
+              <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-[var(--border-subtle)]">
+                <a
+                  href={profile?.profileUrl || GITHUB_PROFILE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t('github.viewProfileAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                  data-cursor-label="Profile"
+                  className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] hover:text-[var(--accent)] font-mono text-xs font-bold tracking-wide uppercase transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                >
+                  <SiGithub size={14} aria-hidden="true" />
+                  <span>{t('github.viewProfile')}</span>
+                  <FiExternalLink size={13} aria-hidden="true" />
+                  <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => loadData(true)}
+                  disabled={refreshing}
+                  title={t('github.refreshAria')}
+                  aria-label={t('github.refreshAria')}
+                  data-cursor-label="Refresh"
+                  className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] font-mono text-xs font-bold transition-all duration-200 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                >
+                  <FiRefreshCw
+                    size={13}
+                    className={refreshing ? 'animate-spin text-[var(--accent)]' : ''}
+                    aria-hidden="true"
                   />
-                ) : (
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[var(--surface-alt)] border-2 border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0">
-                    <SiGithub size={28} aria-hidden="true" />
-                  </div>
-                )}
+                  <span>{t('github.refresh')}</span>
+                </button>
+              </div>
+            </div>
 
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-grotesk font-black text-xl sm:text-2xl text-[var(--text-primary)]">
-                      {profile?.name || 'M. Ghifari Bima Khadafi'}
-                    </span>
-                    <span className="font-mono text-xs text-[var(--accent)] font-semibold">
-                      @{profile?.login || 'IGhifari'}
-                    </span>
+            {/* Metric Highlights 2x2 Bento Grid (5 cols) */}
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3.5">
+              {/* Metric 1: Annual Contributions */}
+              <div className="bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm">
+                <div className="flex items-center justify-between text-[var(--text-muted)]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
+                    {t('github.stats.contributions')}
+                  </span>
+                  <FiActivity size={15} className="text-emerald-400" aria-hidden="true" />
+                </div>
+                <div className="mt-4">
+                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-emerald-400 tracking-tight">
+                    {contributions?.total ? `${contributions.total}+` : `${initialContributionsData.total}+`}
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-secondary)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
-                      {t('github.verifiedBadge')}
-                    </span>
-
-                    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-muted)] px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)]">
-                      {fromCache ? t('github.cachedBadge') : t('github.liveBadge')}
-                    </span>
-                  </div>
+                  <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
+                    {t('github.totalContributionsLabel')}
+                  </p>
                 </div>
               </div>
 
-              {/* Stats Counters & Actions */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4 lg:pt-0 border-t lg:border-t-0 border-[var(--border-subtle)]">
-                {/* Verified Contributions */}
-                <div className="space-y-0.5 min-w-[70px]">
-                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-emerald-400">
-                    {contributions?.total ? `${contributions.total}+` : `${initialContributionsData.total}+`}
-                  </div>
-                  <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                    <FiActivity size={11} className="text-emerald-400" aria-hidden="true" />
-                    <span>{t('github.stats.contributions')}</span>
-                  </div>
+              {/* Metric 2: Longest Streak */}
+              <div className="bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm">
+                <div className="flex items-center justify-between text-[var(--text-muted)]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
+                    {t('github.stats.longestStreak')}
+                  </span>
+                  <FiZap size={15} className="text-amber-400" aria-hidden="true" />
                 </div>
+                <div className="mt-4">
+                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
+                    {stats.longestStreak}{' '}
+                    <span className="text-xs font-mono font-normal text-[var(--text-muted)]">
+                      {t('github.stats.daysLabel')}
+                    </span>
+                  </div>
+                  <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
+                    {t('github.stats.longestStreakSub')}
+                  </p>
+                </div>
+              </div>
 
-                {/* Repos Count */}
-                <div className="space-y-0.5 min-w-[70px]">
-                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)]">
+              {/* Metric 3: Public Repositories */}
+              <div className="bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm">
+                <div className="flex items-center justify-between text-[var(--text-muted)]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
+                    {t('github.stats.repos')}
+                  </span>
+                  <FiFolder size={15} className="text-[var(--accent)]" aria-hidden="true" />
+                </div>
+                <div className="mt-4">
+                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
                     {profile?.publicRepos != null ? profile.publicRepos : '22'}
                   </div>
-                  <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                    <FiFolder size={11} aria-hidden="true" />
-                    <span>{t('github.stats.repos')}</span>
-                  </div>
+                  <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
+                    {t('github.stats.reposSub')}
+                  </p>
                 </div>
+              </div>
 
-                {/* Followers Count */}
-                <div className="space-y-0.5 min-w-[70px]">
-                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)]">
+              {/* Metric 4: Followers / Network */}
+              <div className="bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm">
+                <div className="flex items-center justify-between text-[var(--text-muted)]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
+                    {t('github.stats.followers')}
+                  </span>
+                  <FiUsers size={15} className="text-sky-400" aria-hidden="true" />
+                </div>
+                <div className="mt-4">
+                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
                     {profile?.followers != null ? profile.followers : '22'}
                   </div>
-                  <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                    <FiUsers size={11} aria-hidden="true" />
-                    <span>{t('github.stats.followers')}</span>
-                  </div>
-                </div>
-
-                {/* Following Count */}
-                <div className="space-y-0.5 min-w-[70px]">
-                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)]">
-                    {profile?.following != null ? profile.following : '23'}
-                  </div>
-                  <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
-                    <FiUsers size={11} aria-hidden="true" />
-                    <span>{t('github.stats.following')}</span>
-                  </div>
-                </div>
-
-                {/* Profile Link Button & Refresh */}
-                <div className="flex items-center gap-2 ml-auto lg:ml-2">
-                  <button
-                    type="button"
-                    onClick={() => loadData(true)}
-                    disabled={refreshing}
-                    title={t('github.refreshAria')}
-                    aria-label={t('github.refreshAria')}
-                    data-cursor-label="Refresh"
-                    className="cursor-target h-9 w-9 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                  >
-                    <FiRefreshCw
-                      size={14}
-                      className={refreshing ? 'animate-spin text-[var(--accent)]' : ''}
-                      aria-hidden="true"
-                    />
-                  </button>
-
-                  <a
-                    href={profile?.profileUrl || GITHUB_PROFILE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${t('github.viewProfileAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                    data-cursor-label="Profile"
-                    className="cursor-target inline-flex items-center gap-2 h-9 px-3.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                  >
-                    <SiGithub size={14} aria-hidden="true" />
-                    <span>{t('github.viewProfile')}</span>
-                    <FiExternalLink size={12} aria-hidden="true" />
-                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                  </a>
+                  <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
+                    {profile?.following != null
+                      ? `${profile.following} ${t('github.stats.following')}`
+                      : '23 following'}
+                  </p>
                 </div>
               </div>
             </div>
           </motion.div>
 
           {/* ==============================================
-              2. GitHub Contribution Calendar Heatmap
+              2. GitHub Contribution Calendar Heatmap Bento Window
               ============================================== */}
           <motion.div
             {...getFadeMotion(0.15)}
-            className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-lg p-6 sm:p-8 space-y-6"
+            className="bg-[var(--surface-muted)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <FiCalendar className="text-emerald-400" size={16} aria-hidden="true" />
-                  <h3 className="font-grotesk font-black text-xl text-[var(--text-primary)] uppercase tracking-tight">
-                    {t('github.calendarHeading')}
-                  </h3>
-                </div>
-                <p className="font-sans text-xs sm:text-sm text-[var(--text-secondary)]">
-                  {t('github.calendarSub')}
-                </p>
+            {/* macOS Window Header Frame */}
+            <div className="px-4 py-3 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80" />
               </div>
 
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-mono text-xs text-emerald-400 font-semibold self-start sm:self-auto">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
+                  git log --graph --oneline // ighifari/contributions
+                </span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-mono text-[10px] text-emerald-400 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
                 <span>
                   {contributions?.total || initialContributionsData.total} {t('github.totalContributionsLabel')}
                 </span>
               </div>
             </div>
 
-            {/* Heatmap Grid Container with Horizontal Scroll */}
-            <div className="overflow-x-auto pb-3 pt-1 scrollbar-thin">
-              <div className="min-w-[760px] inline-block">
-                {/* Month labels row */}
-                <div className="flex items-center ml-8 mb-2 font-mono text-[10px] text-[var(--text-muted)] select-none h-4 relative">
-                  {monthHeaders.map((m, idx) => (
-                    <span
-                      key={`${m.label}-${idx}`}
-                      className="absolute"
-                      style={{ left: `${m.colIdx * 14}px` }}
-                    >
-                      {m.label}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Day labels + Week columns matrix */}
-                <div className="flex gap-2">
-                  {/* Day of week labels (Sun..Sat, showing Mon, Wed, Fri) */}
-                  <div className="flex flex-col justify-between py-[1px] font-mono text-[9px] text-[var(--text-muted)] select-none w-6 shrink-0 leading-none h-[98px]">
-                    {(DAY_LABELS[language] || DAY_LABELS.id).map((dayLabel, idx) => (
-                      <span key={idx} className="h-3 flex items-center">
-                        {dayLabel}
+            <div className="p-6 sm:p-8 space-y-6">
+              {/* Heatmap Grid Container with Horizontal Scroll */}
+              <div className="overflow-x-auto pb-3 pt-1 scrollbar-thin">
+                <div className="min-w-[760px] inline-block">
+                  {/* Month labels row */}
+                  <div className="flex items-center ml-8 mb-2 font-mono text-[10px] text-[var(--text-muted)] select-none h-4 relative">
+                    {monthHeaders.map((m, idx) => (
+                      <span
+                        key={`${m.label}-${idx}`}
+                        className="absolute"
+                        style={{ left: `${m.colIdx * 14}px` }}
+                      >
+                        {m.label}
                       </span>
                     ))}
                   </div>
 
-                  {/* 53 Columns of 7 days (Sunday = row 0, Saturday = row 6) */}
-                  <div
-                    className="grid grid-rows-7 grid-flow-col gap-[3px]"
-                    role="grid"
-                    aria-label={
-                      language === 'id'
-                        ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || initialContributionsData.total} kontribusi). Gunakan tombol panah untuk berpindah hari.`
-                        : `GitHub contribution heatmap for IGhifari (${contributions?.total || initialContributionsData.total} contributions). Use arrow keys to navigate days.`
-                    }
-                  >
-                    {contributions.days.map((day, idx) => {
-                      const tooltipText = formatDayTooltip(day);
-                      const isFocused = idx === focusedDayIndex;
-                      return (
-                        <div
-                          key={day.date || idx}
-                          ref={(el) => {
-                            gridCellsRef.current[idx] = el;
-                          }}
-                          role="gridcell"
-                          tabIndex={isFocused ? 0 : -1}
-                          title={tooltipText}
-                          aria-label={tooltipText}
-                          aria-selected={isFocused}
-                          onMouseEnter={() => setHoveredDay(day)}
-                          onMouseLeave={() => setHoveredDay(null)}
-                          onFocus={() => {
-                            setFocusedDayIndex(idx);
-                            setHoveredDay(day);
-                          }}
-                          onBlur={() => setHoveredDay(null)}
-                          onKeyDown={(e) => handleCellKeyDown(e, idx)}
-                          className={`w-[11px] h-[11px] rounded-[2px] transition-transform duration-100 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:z-10 ${getCellClass(
-                            day.level
-                          )}`}
-                        />
-                      );
-                    })}
+                  {/* Day labels + Week columns matrix */}
+                  <div className="flex gap-2">
+                    {/* Day of week labels (Sun..Sat, showing Mon, Wed, Fri) */}
+                    <div className="flex flex-col justify-between py-[1px] font-mono text-[9px] text-[var(--text-muted)] select-none w-6 shrink-0 leading-none h-[98px]">
+                      {(DAY_LABELS[language] || DAY_LABELS.id).map((dayLabel, idx) => (
+                        <span key={idx} className="h-3 flex items-center">
+                          {dayLabel}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* 53 Columns of 7 days (Sunday = row 0, Saturday = row 6) */}
+                    <div
+                      className="grid grid-rows-7 grid-flow-col gap-[3px]"
+                      role="grid"
+                      aria-label={
+                        language === 'id'
+                          ? `Kalender kontribusi GitHub untuk IGhifari (${contributions?.total || initialContributionsData.total} kontribusi). Gunakan tombol panah untuk berpindah hari.`
+                          : `GitHub contribution heatmap for IGhifari (${contributions?.total || initialContributionsData.total} contributions). Use arrow keys to navigate days.`
+                      }
+                    >
+                      {contributions.days.map((day, idx) => {
+                        const tooltipText = formatDayTooltip(day);
+                        const isFocused = idx === focusedDayIndex;
+                        return (
+                          <div
+                            key={day.date || idx}
+                            ref={(el) => {
+                              gridCellsRef.current[idx] = el;
+                            }}
+                            role="gridcell"
+                            tabIndex={isFocused ? 0 : -1}
+                            title={tooltipText}
+                            aria-label={tooltipText}
+                            aria-selected={isFocused}
+                            onMouseEnter={() => setHoveredDay(day)}
+                            onMouseLeave={() => setHoveredDay(null)}
+                            onFocus={() => {
+                              setFocusedDayIndex(idx);
+                              setHoveredDay(day);
+                            }}
+                            onBlur={() => setHoveredDay(null)}
+                            onKeyDown={(e) => handleCellKeyDown(e, idx)}
+                            className={`w-[11px] h-[11px] rounded-[2px] hover:scale-125 hover:z-20 transition-all duration-150 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:z-10 ${getCellClass(
+                              day.level
+                            )}`}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Hover preview bar + Legend */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)] font-mono text-xs text-[var(--text-muted)]">
-              {/* Active hover info badge */}
-              <div className="min-h-[1.5rem] flex items-center">
-                {hoveredDay ? (
-                  <span className="text-[var(--text-primary)] font-semibold text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true" />
-                    {formatDayTooltip(hoveredDay)}
-                  </span>
-                ) : (
-                  <span className="text-[var(--text-muted)] text-[11px]">
-                    {language === 'id'
-                      ? 'Arahkan kursor pada kotak untuk melihat detail komit per hari.'
-                      : 'Hover over squares to inspect daily commit activity.'}
-                  </span>
-                )}
-              </div>
-
-              {/* Legend: Less -> More */}
-              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto text-[11px]">
-                <span>{t('github.legendLess')}</span>
-                <div className="flex items-center gap-1" aria-hidden="true">
-                  <div
-                    className="w-3 h-3 rounded-[2px] bg-[var(--surface-alt)] border border-[var(--border-subtle)]"
-                    title="Level 0: No contributions"
-                  />
-                  <div
-                    className="w-3 h-3 rounded-[2px] bg-[#0e4429] border border-[#006d32]/40"
-                    title="Level 1: 1-3 contributions"
-                  />
-                  <div
-                    className="w-3 h-3 rounded-[2px] bg-[#006d32] border border-[#26a641]/50"
-                    title="Level 2: 4-9 contributions"
-                  />
-                  <div
-                    className="w-3 h-3 rounded-[2px] bg-[#26a641] border border-[#39d353]/60"
-                    title="Level 3: 10-19 contributions"
-                  />
-                  <div
-                    className="w-3 h-3 rounded-[2px] bg-[#39d353] border border-[#39d353]"
-                    title="Level 4: 20+ contributions"
-                  />
+              {/* Hover preview bar + Legend */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-[var(--border-subtle)] font-mono text-xs">
+                {/* Active hover info badge */}
+                <div className="min-h-[2rem] flex items-center">
+                  {hoveredDay ? (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-primary)] font-mono text-xs font-semibold shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                      <span>{formatDayTooltip(hoveredDay)}</span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--surface-alt)]/60 border border-[var(--border-subtle)] text-[var(--text-muted)] font-mono text-[11px]">
+                      <FiCalendar size={13} className="text-[var(--text-muted)]" aria-hidden="true" />
+                      <span>
+                        {language === 'id'
+                          ? 'Arahkan kursor atau navigasi dengan tombol panah untuk inspeksi komit harian.'
+                          : 'Hover over squares or use arrow keys to inspect daily commits.'}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <span>{t('github.legendMore')}</span>
+
+                {/* Legend: Less -> More */}
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto text-[11px]">
+                  <span className="text-[var(--text-muted)]">{t('github.legendLess')}</span>
+                  <div
+                    className="flex items-center gap-1.5 p-1 rounded-md bg-[var(--surface-alt)] border border-[var(--border-subtle)]"
+                    aria-hidden="true"
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-[2px] bg-[var(--surface-alt)] border border-[var(--border-subtle)]"
+                      title="Level 0: No contributions"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-[2px] bg-[#0e4429] border border-[#006d32]/40"
+                      title="Level 1: 1-3 contributions"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-[2px] bg-[#006d32] border border-[#26a641]/50"
+                      title="Level 2: 4-9 contributions"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-[2px] bg-[#26a641] border border-[#39d353]/60"
+                      title="Level 3: 10-19 contributions"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-[2px] bg-[#39d353] border border-[#39d353]"
+                      title="Level 4: 20+ contributions"
+                    />
+                  </div>
+                  <span className="text-[var(--text-muted)]">{t('github.legendMore')}</span>
+                </div>
               </div>
             </div>
           </motion.div>

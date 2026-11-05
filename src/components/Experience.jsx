@@ -116,13 +116,29 @@ const Experience = () => {
             <motion.article
               key={exp.id}
               {...getFadeMotion(index * 0.1)}
-              className="bg-[var(--surface-muted)] border border-[var(--border-subtle)] hover:border-[var(--border)] rounded-lg p-6 sm:p-8 md:p-10 transition-colors space-y-6 sm:space-y-8"
+              className="group relative overflow-hidden bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-2xl p-6 sm:p-8 md:p-10 shadow-[0_4px_20px_-6px_rgba(0,0,0,0.3)] hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.55)] transition-all duration-300 space-y-6 sm:space-y-8"
             >
+              {/* Subtle ambient radial card glow */}
+              <div
+                className="pointer-events-none absolute -top-20 -right-20 w-60 h-60 bg-[var(--accent)]/5 rounded-full blur-3xl transition-opacity group-hover:opacity-100 opacity-40"
+                aria-hidden="true"
+              />
+
+              {/* Illuminated top beam + left accent rail */}
+              <span
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/60 to-transparent"
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute left-0 top-8 bottom-8 w-[2px] rounded-full bg-gradient-to-b from-[var(--accent)] via-[var(--accent)]/40 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              />
               {/* Header: Role, Organization, and Metadata Badges */}
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-[var(--border-subtle)]">
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[11px] font-bold text-[var(--accent)] px-2.5 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border)] tracking-wider uppercase">
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-[var(--accent)] px-2.5 py-0.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border)] tracking-wider uppercase shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
                       {typeText}
                     </span>
                     <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
@@ -200,7 +216,7 @@ const Experience = () => {
                   {exp.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="font-mono text-xs px-3 py-1 rounded bg-[var(--surface-alt)] border border-[var(--border-subtle)] text-[var(--text-primary)] hover:border-[var(--accent)] transition-colors"
+                      className="linear-tag-pill inline-flex items-center px-2.5 py-1 text-[11px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded-md tracking-wide hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-hover)] transition-all"
                     >
                       {tech}
                     </span>
@@ -219,7 +235,7 @@ const Experience = () => {
                   <RouterLink
                     to="/study-case/project-management"
                     data-cursor-label="Project"
-                    className="cursor-target inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                    className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold tracking-wide text-[var(--accent)] transition-all duration-200 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
                   >
                     <span>{language === 'id' ? 'Studi Kasus Proyek Magang' : 'Internship Case Study'}</span>
                     <FiExternalLink size={13} aria-hidden="true" />
@@ -230,7 +246,7 @@ const Experience = () => {
                       type="button"
                       onClick={(e) => openCertModal(exp.certificate, e.currentTarget)}
                       data-cursor-label="Certificate"
-                      className="cursor-target inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
+                      className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-mono font-bold tracking-wide text-[var(--text-primary)] hover:text-[var(--accent)] transition-all duration-200 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] self-start sm:self-auto"
                     >
                       <FiAward size={14} aria-hidden="true" />
                       <span>{t('experience.viewCertificate')}</span>

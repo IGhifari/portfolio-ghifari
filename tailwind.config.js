@@ -7,9 +7,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['"Geist Variable"', 'Geist', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         montserrat: ['Montserrat', 'sans-serif'],
-        grotesk: ['Space Grotesk', 'sans-serif'],
-        mono: ['Space Mono', 'monospace'],
+        grotesk: ['"Geist Variable"', 'Geist', 'Inter', '"Space Grotesk"', 'sans-serif'],
+        mono: ['"Geist Mono Variable"', '"Geist Mono"', '"JetBrains Mono"', '"Space Mono"', 'monospace'],
       },
       colors: {
         theme: {
@@ -45,6 +46,10 @@ export default {
         'nb-lg': 'var(--nb-shadow-lg)',
         'nb-xl': '8px 8px 0px var(--nb-shadow-color)',
         'nb-hover': 'var(--nb-shadow-hover)',
+      },
+      spacing: {
+        '4.5': '1.125rem',
+        '5.5': '1.375rem',
       },
     },
   },

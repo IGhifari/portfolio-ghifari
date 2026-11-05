@@ -180,14 +180,16 @@ const Project = () => {
                         {/* Window Header Frame */}
                         <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
                           <div className="flex items-center gap-1.5" aria-hidden="true">
-                            <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80 group-hover:bg-[#ff5f56] transition-colors" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80 group-hover:bg-[#ffbd2e] transition-colors" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80 group-hover:bg-[#27c93f] transition-colors" />
                           </div>
-                          <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wider uppercase">
-                            {project.title.toLowerCase().replace(/\s+/g, '-')}.app
+                          <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
+                            https://{project.title.toLowerCase().replace(/\s+/g, '-')}.app
                           </span>
-                          <div className="w-10" aria-hidden="true" />
+                          <span className="font-mono text-[9px] text-[var(--accent)] px-1.5 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-semibold">
+                            v1.0
+                          </span>
                         </div>
 
                         {/* Screenshot Preview */}
@@ -245,7 +247,7 @@ const Project = () => {
                       {project.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 text-xs font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/70 border border-[var(--border-subtle)] rounded-sm tracking-wide"
+                          className="linear-tag-pill inline-flex items-center px-2.5 py-1 text-[11px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded-md tracking-wide"
                         >
                           {tag}
                         </span>
@@ -257,7 +259,7 @@ const Project = () => {
                       <RouterLink
                         to={`/study-case/${project.id}`}
                         data-cursor-label="Study"
-                        className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
                       >
                         <FiBookOpen size={15} />
@@ -270,7 +272,7 @@ const Project = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           data-cursor-label="Code"
-                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <FiGithub size={15} />
@@ -285,7 +287,7 @@ const Project = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           data-cursor-label="Live Demo"
-                          className="cursor-target inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:shadow-[0_0_20px_-3px_rgba(59,130,246,0.4)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                           aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
                         >
                           <span>{t('projects.liveDemo')}</span>
@@ -378,7 +380,7 @@ const Project = () => {
                       {project.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/70 border border-[var(--border-subtle)] rounded-sm"
+                          className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded-md"
                         >
                           {tag}
                         </span>
@@ -391,7 +393,7 @@ const Project = () => {
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
                         data-cursor-label="Details"
-                        className="cursor-target px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        className="cursor-target px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] shadow-sm"
                         aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                       >
                         {t('projects.viewDetails')}
