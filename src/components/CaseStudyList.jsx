@@ -27,6 +27,7 @@ import {
 } from '../utils/projectExplorer';
 import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
 import { siteConfig } from '../config/site';
+import FilterDropdown from './ui/FilterDropdown';
 
 const CaseStudyList = () => {
   const { language, t } = useLanguage();
@@ -171,7 +172,7 @@ const CaseStudyList = () => {
             ================================================== */}
         <motion.div
           {...getFadeMotion(0.1)}
-          className="space-y-4 p-5 rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
+          className="relative z-20 space-y-4 p-5 rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
         >
           {/* Top Row: Search Input + Sort Dropdown */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -204,53 +205,32 @@ const CaseStudyList = () => {
               )}
             </div>
 
-            {/* Technology Filter Dropdown */}
+            {/* Technology & Sort Dropdowns (custom listbox, consistent on mobile) */}
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <FiCode
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-                  aria-hidden="true"
-                />
-                <select
-                  value={selectedTech}
-                  onChange={(e) => setSelectedTech(e.target.value)}
-                  aria-label={t('caseStudies.techLabel')}
-                  className="pl-8 pr-8 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs text-[var(--text-primary)] outline-none cursor-pointer appearance-none transition-colors"
-                >
-                  <option value={DEFAULT_TECH}>{t('caseStudies.allTech')}</option>
-                  {availableTechnologies.map((tech) => (
-                    <option key={tech} value={tech}>
-                      {tech}
-                    </option>
-                  ))}
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)] text-[10px]">
-                  ▼
-                </span>
-              </div>
-
-              {/* Sort By Dropdown */}
-              <div className="relative">
-                <FiSliders
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-                  aria-hidden="true"
-                />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  aria-label={t('caseStudies.sortLabel')}
-                  className="pl-8 pr-8 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs text-[var(--text-primary)] outline-none cursor-pointer appearance-none transition-colors"
-                >
-                  <option value="featured">{t('caseStudies.sortFeatured')}</option>
-                  <option value="title-asc">{t('caseStudies.sortNameAsc')}</option>
-                  <option value="title-desc">{t('caseStudies.sortNameDesc')}</option>
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)] text-[10px]">
-                  ▼
-                </span>
-              </div>
+              <FilterDropdown
+                value={selectedTech}
+                onChange={setSelectedTech}
+                label={t('caseStudies.techLabel')}
+                icon={FiCode}
+                cursorLabel="Tech"
+                options={[
+                  { value: DEFAULT_TECH, label: t('caseStudies.allTech') },
+                  ...availableTechnologies.map((tech) => ({ value: tech, label: tech })),
+                ]}
+              />
+              <FilterDropdown
+                value={sortBy}
+                onChange={setSortBy}
+                label={t('caseStudies.sortLabel')}
+                icon={FiSliders}
+                align="end"
+                cursorLabel="Sort"
+                options={[
+                  { value: 'featured', label: t('caseStudies.sortFeatured') },
+                  { value: 'title-asc', label: t('caseStudies.sortNameAsc') },
+                  { value: 'title-desc', label: t('caseStudies.sortNameDesc') },
+                ]}
+              />
             </div>
           </div>
 
