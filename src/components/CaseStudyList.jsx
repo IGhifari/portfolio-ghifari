@@ -189,7 +189,7 @@ const CaseStudyList = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('caseStudies.searchPlaceholder')}
                 aria-label={t('caseStudies.searchLabel')}
-                className="w-full pl-10 pr-9 py-2.5 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors"
+                className="w-full h-10 pl-10 pr-9 bg-[var(--surface-alt)] border border-[var(--border-subtle)] focus:border-[var(--accent)] rounded-md font-mono text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-colors"
               />
               {searchQuery && (
                 <button
@@ -206,13 +206,14 @@ const CaseStudyList = () => {
             </div>
 
             {/* Technology & Sort Dropdowns (custom listbox, consistent on mobile) */}
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-2.5 shrink-0">
               <FilterDropdown
                 value={selectedTech}
                 onChange={setSelectedTech}
                 label={t('caseStudies.techLabel')}
                 icon={FiCode}
                 cursorLabel="Tech"
+                className="w-full sm:w-48 lg:w-52"
                 options={[
                   { value: DEFAULT_TECH, label: t('caseStudies.allTech') },
                   ...availableTechnologies.map((tech) => ({ value: tech, label: tech })),
@@ -225,6 +226,7 @@ const CaseStudyList = () => {
                 icon={FiSliders}
                 align="end"
                 cursorLabel="Sort"
+                className="w-full sm:w-48 lg:w-52"
                 options={[
                   { value: 'featured', label: t('caseStudies.sortFeatured') },
                   { value: 'title-asc', label: t('caseStudies.sortNameAsc') },
