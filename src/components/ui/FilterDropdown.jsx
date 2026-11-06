@@ -6,7 +6,16 @@ import { FiCheck, FiChevronDown } from 'react-icons/fi';
  * Accessible custom dropdown (listbox pattern) replacing native <select>.
  * Native selects render as OS sheets on mobile, breaking the visual language.
  */
-const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = 'start', cursorLabel = 'Filter' }) => {
+const FilterDropdown = ({
+  value,
+  options,
+  onChange,
+  label,
+  icon: Icon,
+  align = 'start',
+  cursorLabel = 'Filter',
+  className = '',
+}) => {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef(null);
@@ -16,6 +25,7 @@ const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = '
 
   const selectedIndex = Math.max(0, options.findIndex((o) => o.value === value));
   const selected = options[selectedIndex];
+  const isDefaultSelected = selectedIndex === 0;
 
   // Close on outside click / touch
   useEffect(() => {
@@ -91,7 +101,7 @@ const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = '
   };
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className={`relative ${className}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -102,15 +112,31 @@ const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = '
         data-cursor-label={cursorLabel}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={onTriggerKeyDown}
-        className={`cursor-target inline-flex items-center gap-2 pl-3 pr-2.5 py-2.5 max-w-[220px] rounded-md border font-mono text-xs text-[var(--text-primary)] bg-[var(--surface-alt)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
-          open ? 'border-[var(--accent)]' : 'border-[var(--border-subtle)] hover:border-[var(--border)]'
+        className={`cursor-target w-full h-10 inline-flex items-center justify-between gap-2 pl-3 pr-2.5 rounded-md border font-mono text-xs text-[var(--text-primary)] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+          open
+            ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]/30 bg-[var(--surface-hover)]'
+            : !isDefaultSelected
+              ? 'border-[var(--accent)]/50 bg-[var(--accent)]/[0.04] hover:bg-[var(--surface-hover)] hover:border-[var(--accent)]'
+              : 'border-[var(--border-subtle)] bg-[var(--surface-alt)] hover:border-[var(--border)] hover:bg-[var(--surface-hover)]'
         }`}
       >
-        {Icon && <Icon size={14} className="shrink-0 text-[var(--text-muted)]" aria-hidden="true" />}
-        <span className="truncate">{selected?.label}</span>
+        <span className="flex items-center gap-2 min-w-0 flex-1">
+          {Icon && (
+            <Icon
+              size={14}
+              className={`shrink-0 transition-colors ${
+                !isDefaultSelected ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'
+              }`}
+              aria-hidden="true"
+            />
+          )}
+          <span className="truncate text-left">{selected?.label}</span>
+        </span>
         <FiChevronDown
           size={14}
-          className={`shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 text-[var(--text-muted)] transition-transform duration-200 ml-1 ${
+            open ? 'rotate-180 text-[var(--accent)]' : ''
+          }`}
           aria-hidden="true"
         />
       </button>
@@ -124,7 +150,7 @@ const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = '
           aria-label={label}
           aria-activedescendant={`${listId}-opt-${activeIndex}`}
           onKeyDown={onListKeyDown}
-          className={`absolute z-50 mt-1.5 min-w-[200px] w-max max-w-[min(280px,calc(100vw-2.5rem))] max-h-72 overflow-y-auto overscroll-contain p-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-xl shadow-black/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+          className={`absolute z-50 mt-1.5 w-full min-w-full sm:min-w-[210px] max-w-[min(300px,calc(100vw-2.5rem))] max-h-72 overflow-y-auto overscroll-contain p-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-2xl shadow-black/25 backdrop-blur-xl focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] custom-dropdown-scroll animate-fadeIn ${
             align === 'end' ? 'right-0' : 'left-0'
           }`}
         >
@@ -140,9 +166,13 @@ const FilterDropdown = ({ value, options, onChange, label, icon: Icon, align = '
                 aria-selected={isSelected}
                 onClick={() => choose(index)}
                 onMouseEnter={() => setActiveIndex(index)}
-                className={`flex items-center justify-between gap-3 px-2.5 py-2 rounded-md font-mono text-xs cursor-pointer select-none transition-colors ${
+                className={`flex items-center justify-between gap-3 px-3 py-2 rounded-md font-mono text-xs cursor-pointer select-none transition-colors ${
                   isActive ? 'bg-[var(--surface-hover)]' : ''
-                } ${isSelected ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}`}
+                } ${
+                  isSelected
+                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--surface-alt)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
               >
                 <span className="truncate">{opt.label}</span>
                 {isSelected && <FiCheck size={13} className="shrink-0 text-[var(--accent)]" aria-hidden="true" />}
@@ -165,6 +195,7 @@ FilterDropdown.propTypes = {
   icon: PropTypes.elementType,
   align: PropTypes.oneOf(['start', 'end']),
   cursorLabel: PropTypes.string,
+  className: PropTypes.string,
 };
 
 export default FilterDropdown;
