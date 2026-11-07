@@ -15,6 +15,7 @@ import {
   setCachedGithubData,
   clearGithubCache,
   fetchGithubData,
+  calculateContributionStats,
 } from '../src/services/githubService.js';
 import { initialContributionsData } from '../src/data/githubContributions.js';
 import { createCloudflarePagesGithubHandler } from '../functions/api/github.js';
@@ -435,6 +436,61 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.ok(translations.en.certificates.sectionTag.startsWith('07 /'));
       assert.ok(translations.en.education.sectionTag.startsWith('08 /'));
       assert.ok(translations.en.contact.sectionTag.startsWith('09 /'));
+    });
+  });
+
+  await t.test('7. Streak Calculation and Contribution Metrics (calculateContributionStats)', async (t2) => {
+    await t2.test('returns default metrics for empty or invalid input', () => {
+      assert.deepEqual(calculateContributionStats([]), {
+        currentStreak: 0,
+        longestStreak: 21,
+        activeDays: 0,
+      });
+      assert.deepEqual(calculateContributionStats(null), {
+        currentStreak: 0,
+        longestStreak: 21,
+        activeDays: 0,
+      });
+    });
+
+    await t2.test('calculates active current streak when today has contributions', () => {
+      const days = [
+        { date: '2026-03-01', count: 0 },
+        { date: '2026-03-02', count: 2 },
+        { date: '2026-03-03', count: 5 },
+        { date: '2026-03-04', count: 1 },
+      ];
+      const stats = calculateContributionStats(days);
+      assert.equal(stats.currentStreak, 3);
+      assert.equal(stats.longestStreak, 3);
+      assert.equal(stats.activeDays, 3);
+    });
+
+    await t2.test('maintains current streak when today has 0 but yesterday was active', () => {
+      const days = [
+        { date: '2026-03-01', count: 0 },
+        { date: '2026-03-02', count: 3 },
+        { date: '2026-03-03', count: 4 },
+        { date: '2026-03-04', count: 0 },
+      ];
+      const stats = calculateContributionStats(days);
+      assert.equal(stats.currentStreak, 2);
+      assert.equal(stats.longestStreak, 2);
+      assert.equal(stats.activeDays, 2);
+    });
+
+    await t2.test('strictly breaks current streak (0) when both today and yesterday have 0 contributions', () => {
+      const days = [
+        { date: '2026-02-20', count: 5 },
+        { date: '2026-02-21', count: 5 },
+        { date: '2026-02-22', count: 5 },
+        { date: '2026-02-23', count: 0 },
+        { date: '2026-02-24', count: 0 },
+      ];
+      const stats = calculateContributionStats(days);
+      assert.equal(stats.currentStreak, 0, 'Streak must be 0 and not jump backwards to past days');
+      assert.equal(stats.longestStreak, 3);
+      assert.equal(stats.activeDays, 3);
     });
   });
 });

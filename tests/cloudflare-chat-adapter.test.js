@@ -71,7 +71,7 @@ describe('Cloudflare Pages Function Adapter (functions/api/chat.js)', () => {
 
     const testEnv = {
       GEMINI_API_KEY: 'test-key',
-      GEMINI_MODEL: 'gemini-3.5-flash-lite',
+      GEMINI_MODEL: 'gemini-2.0-flash',
     };
 
     const response = await handler({

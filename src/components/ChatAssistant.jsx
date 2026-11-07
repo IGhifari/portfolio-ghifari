@@ -70,6 +70,7 @@ const ChatAssistant = () => {
     if (!sectionId || typeof sectionId !== 'string') return;
 
     // Trigger lazy DeferredSection mount if not yet rendered
+    window.dispatchEvent(new Event('hashchange'));
     window.dispatchEvent(new Event('scroll'));
 
     const normalizedHash = sectionId.startsWith('#') ? sectionId : `#${sectionId}`;

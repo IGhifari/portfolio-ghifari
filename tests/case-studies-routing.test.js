@@ -168,7 +168,7 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
         querySelector: (sel) => tags[sel] || null,
         getElementById: (id) => tags[`#${id}`] || null,
         createElement: (name) => {
-          const el = { tagName: name, setAttribute: (k, v) => { el[k] = v; } };
+          const el = { tagName: name, setAttribute: (k, v) => { el[k] = v; }, remove: () => { if (el.id) delete tags[`#${el.id}`]; } };
           return el;
         },
         head: {
@@ -198,6 +198,14 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
         assert.equal(tags['meta[name="twitter:card"]']?.content, 'summary_large_image');
         assert.equal(tags['meta[name="twitter:creator"]']?.content, TWITTER_HANDLE);
         assert.ok(tags['#schema-structured-data']?.textContent?.includes('WebPage'));
+
+        // Calling updateDocumentMetadata without schemaData removes lingering structured data tag
+        updateDocumentMetadata({
+          title: 'Home Title',
+          canonicalUrl: 'https://www.ighifari.my.id/',
+          schemaData: null,
+        });
+        assert.equal(tags['#schema-structured-data'], undefined, 'schema-structured-data tag must be removed when schemaData is null');
       } finally {
         delete global.document;
       }

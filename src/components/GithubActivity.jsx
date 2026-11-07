@@ -16,6 +16,7 @@ import {
   fetchGithubData,
   clearGithubCache,
   formatRepoDate,
+  calculateContributionStats,
   GITHUB_PROFILE_URL,
 } from '../services/githubService';
 import { initialContributionsData } from '../data/githubContributions';
@@ -189,37 +190,7 @@ const GithubActivity = () => {
 
   // Derived contribution activity & streak metrics
   const stats = useMemo(() => {
-    const days = contributions?.days || [];
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let tempStreak = 0;
-    let activeDays = 0;
-
-    for (let i = 0; i < days.length; i++) {
-      if (days[i].count > 0) {
-        tempStreak++;
-        activeDays++;
-        if (tempStreak > longestStreak) {
-          longestStreak = tempStreak;
-        }
-      } else {
-        tempStreak = 0;
-      }
-    }
-
-    for (let i = days.length - 1; i >= 0; i--) {
-      if (days[i].count > 0) {
-        currentStreak++;
-      } else if (currentStreak > 0) {
-        break;
-      }
-    }
-
-    return {
-      currentStreak,
-      longestStreak: longestStreak || 21,
-      activeDays,
-    };
+    return calculateContributionStats(contributions?.days);
   }, [contributions?.days]);
 
   // GitHub official contribution levels
