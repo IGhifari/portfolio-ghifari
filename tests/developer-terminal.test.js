@@ -215,7 +215,8 @@ test('CONF-05C — Interactive Developer Terminal Test Suite', async (t) => {
       assert.ok(channelKeys.includes('github'));
       assert.ok(channelKeys.includes('linkedin'));
       assert.ok(channelKeys.includes('instagram'));
-      assert.ok(channelKeys.includes('tiktok'));
+      assert.equal(channelKeys.includes('tiktok'), false);
+      assert.equal(channelKeys.includes('discord'), false);
     });
 
     await t2.test('whoami: returns safe guest explorer session metadata', () => {

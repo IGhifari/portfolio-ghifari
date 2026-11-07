@@ -17,7 +17,7 @@ import {
   FiInfo,
 } from 'react-icons/fi';
 import { IoLogoGithub } from 'react-icons/io';
-import { FaLinkedin, FaInstagram, FaDiscord, FaTiktok } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { directEmail, contactChannelsData } from '../data/contact';
@@ -29,8 +29,6 @@ const channelIconsByKey = {
   github: <IoLogoGithub size={18} aria-hidden="true" />,
   linkedin: <FaLinkedin size={18} aria-hidden="true" />,
   instagram: <FaInstagram size={18} aria-hidden="true" />,
-  discord: <FaDiscord size={18} aria-hidden="true" />,
-  tiktok: <FaTiktok size={18} aria-hidden="true" />,
 };
 
 const contactChannels = contactChannelsData.map((channel) => ({
@@ -100,21 +98,12 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedDiscord, setCopiedDiscord] = useState(false);
 
   const copyEmailToClipboard = () => {
     navigator.clipboard.writeText(directEmail).then(() => {
       setCopiedEmail(true);
       notify('success', t('contact.toastCopied'));
       setTimeout(() => setCopiedEmail(false), 2500);
-    });
-  };
-
-  const copyDiscordToClipboard = () => {
-    navigator.clipboard.writeText(siteConfig.author.discord || 'ghifarii5').then(() => {
-      setCopiedDiscord(true);
-      notify('success', t('contact.toastDiscordCopied'));
-      setTimeout(() => setCopiedDiscord(false), 2500);
     });
   };
 
@@ -516,69 +505,34 @@ const Contact = () => {
             </h4>
 
             <div className="divide-y divide-[var(--border-subtle)]">
-              {contactChannels.map((item) =>
-                item.key === 'discord' ? (
-                  <button
-                    key={item.name}
-                    type="button"
-                    onClick={copyDiscordToClipboard}
-                    data-cursor-label="Copy"
-                    className="cursor-target w-full py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 cursor-pointer bg-transparent border-0 text-left"
-                    title={t('contact.copyDiscordTitle')}
-                    aria-label={`Discord: ${item.handle} (${copiedDiscord ? t('contact.copied') : t('contact.copyHandle')})`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
-                        {item.icon}
-                      </span>
-                      <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
-                        {item.name}
-                      </span>
-                      <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
-                        {item.handle}
-                      </span>
-                    </div>
+              {contactChannels.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor-label="Connect"
+                  className="cursor-target py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
+                      {item.icon}
+                    </span>
+                    <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
+                      {item.name}
+                    </span>
+                    <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
+                      {item.handle}
+                    </span>
+                  </div>
 
-                    <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
-                      <span className="font-mono text-[10px] hidden md:inline uppercase">
-                        {copiedDiscord ? t('contact.copied') : t('contact.copyHandle')}
-                      </span>
-                      {copiedDiscord ? (
-                        <FiCheck size={13} aria-hidden="true" className="text-emerald-500" />
-                      ) : (
-                        <FiCopy size={13} aria-hidden="true" />
-                      )}
-                    </div>
-                  </button>
-                ) : (
-                  <a
-                    key={item.name}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-cursor-label="Connect"
-                    className="cursor-target py-2.5 flex items-center justify-between group no-underline text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0">
-                        {item.icon}
-                      </span>
-                      <span className="font-grotesk font-semibold text-xs sm:text-sm text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate">
-                        {item.name}
-                      </span>
-                      <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline truncate">
-                        {item.handle}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
-                      <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
-                      <FiExternalLink size={13} aria-hidden="true" />
-                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                    </div>
-                  </a>
-                )
-              )}
+                  <div className="flex items-center gap-1 text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors shrink-0 ml-2">
+                    <span className="font-mono text-[10px] hidden md:inline uppercase">{t('contact.connectAction')}</span>
+                    <FiExternalLink size={13} aria-hidden="true" />
+                    <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </motion.div>
