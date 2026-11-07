@@ -30,18 +30,4 @@ export const contactChannelsData = [
     desc: 'Personal activities, design experiments & updates',
     url: siteConfig.author.instagram,
   },
-  {
-    key: 'discord',
-    name: 'Discord',
-    handle: `@${siteConfig.author.discord}`,
-    desc: 'Real-time developer chat and collaboration',
-    url: 'https://discord.com',
-  },
-  {
-    key: 'tiktok',
-    name: 'TikTok',
-    handle: '@ghrfiii',
-    desc: 'Short-form coding clips and creative uploads',
-    url: 'https://www.tiktok.com/@ghrfiii',
-  },
 ];

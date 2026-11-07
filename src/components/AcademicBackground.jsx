@@ -1,12 +1,12 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { FiBookOpen, FiCalendar, FiMapPin, FiCheckCircle } from 'react-icons/fi';
+import { FiBookOpen, FiCalendar, FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { educationMetadata } from '../data/education';
 
 const AcademicBackground = () => {
   const { t } = useLanguage();
 
-  const competencies = t('education.competencies') || [];
+  const gunadarmaFocus = t('education.gunadarma.focusAreas') || [];
   const curriculumTags = t('education.scopeTags') || [];
 
   const shouldReduceMotion = useReducedMotion();
@@ -143,6 +143,22 @@ const AcademicBackground = () => {
             <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
               {t('education.gunadarma.description')}
             </p>
+
+            {gunadarmaFocus.length > 0 && (
+              <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
+                <span className="font-mono text-[11px] text-[var(--text-muted)] mr-1">
+                  {t('education.gunadarmaFocusLabel')}
+                </span>
+                {gunadarmaFocus.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--accent)] font-semibold"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Card 2: SMKN 1 Cibinong — Previous */}
@@ -173,32 +189,6 @@ const AcademicBackground = () => {
             <p className="font-sans text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
               {t('education.overview')}
             </p>
-
-            {/* Curriculum Focus Areas */}
-            <div className="space-y-3 pt-2">
-              <h4 className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-                {t('education.competenciesHeader')}
-              </h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                {competencies.map((item) => (
-                  <div
-                    key={item.title}
-                    className="bg-[var(--surface-alt)] border border-[var(--border-subtle)] rounded-md p-3.5 flex flex-col justify-between"
-                  >
-                    <div className="flex items-start gap-2 mb-1">
-                      <FiCheckCircle size={14} className="text-[var(--accent)] mt-0.5 shrink-0" aria-hidden="true" />
-                      <span className="font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)]">
-                        {item.title}
-                      </span>
-                    </div>
-                    <p className="font-sans text-xs text-[var(--text-secondary)] leading-relaxed pl-5.5">
-                      {item.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Curriculum Tags */}
             <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5">
