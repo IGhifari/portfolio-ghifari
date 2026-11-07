@@ -57,10 +57,13 @@ const RecruiterMode = () => {
 
   const copyEmailToClipboard = () => {
     if (!navigator?.clipboard?.writeText) return;
-    navigator.clipboard.writeText(directEmail).then(() => {
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2200);
-    });
+    navigator.clipboard
+      .writeText(directEmail)
+      .then(() => {
+        setCopiedEmail(true);
+        setTimeout(() => setCopiedEmail(false), 2200);
+      })
+      .catch(() => {});
   };
 
   const easeCurve = [0.16, 1, 0.3, 1];

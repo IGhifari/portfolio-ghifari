@@ -155,21 +155,19 @@ const DeveloperTerminal = () => {
 
   // Lock body scroll and manage focus when modal is open
   useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+    if (!isOpen) return;
 
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 60);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        clearTimeout(timer);
-      };
-    } else {
-      document.body.style.overflow = '';
-    }
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 60);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      clearTimeout(timer);
+    };
   }, [isOpen]);
 
   // Auto-scroll output container on new logs
@@ -296,10 +294,13 @@ const DeveloperTerminal = () => {
 
   const copyToClipboard = (text, key) => {
     if (!navigator?.clipboard?.writeText) return;
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedKey(key);
-      setTimeout(() => setCopiedKey(null), 2000);
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopiedKey(key);
+        setTimeout(() => setCopiedKey(null), 2000);
+      })
+      .catch(() => {});
   };
 
   const handleBackdropClick = (e) => {

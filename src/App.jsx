@@ -64,16 +64,12 @@ const DeferredSection = ({ children, rootMargin = '400px 0px', minHeight = 'min-
             observer.observe(el);
         }
 
-        const onUserInteract = () => setShouldRender(true);
-        window.addEventListener('hashchange', onUserInteract, { once: true });
-        window.addEventListener('click', onUserInteract, { once: true, passive: true });
-        window.addEventListener('scroll', onUserInteract, { once: true, passive: true });
+        const onHash = () => setShouldRender(true);
+        window.addEventListener('hashchange', onHash, { once: true });
 
         return () => {
             if (observer) observer.disconnect();
-            window.removeEventListener('hashchange', onUserInteract);
-            window.removeEventListener('click', onUserInteract);
-            window.removeEventListener('scroll', onUserInteract);
+            window.removeEventListener('hashchange', onHash);
         };
     }, [rootMargin, shouldRender]);
 

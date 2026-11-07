@@ -195,6 +195,55 @@ export const parseContributionHtml = (html = '') => {
 };
 
 /**
+ * Calculates current streak, longest streak, and active days metrics from contribution calendar.
+ * Current streak is active only if today or yesterday has contributions; otherwise streak is 0.
+ */
+export const calculateContributionStats = (days = []) => {
+  if (!Array.isArray(days) || days.length === 0) {
+    return { currentStreak: 0, longestStreak: 21, activeDays: 0 };
+  }
+
+  let longestStreak = 0;
+  let tempStreak = 0;
+  let activeDays = 0;
+
+  for (let i = 0; i < days.length; i++) {
+    if (days[i]?.count > 0) {
+      tempStreak++;
+      activeDays++;
+      if (tempStreak > longestStreak) {
+        longestStreak = tempStreak;
+      }
+    } else {
+      tempStreak = 0;
+    }
+  }
+
+  const lastIdx = days.length - 1;
+  let currentStreak = 0;
+  const isTodayActive = (days[lastIdx]?.count || 0) > 0;
+  const isYesterdayActive = lastIdx > 0 && (days[lastIdx - 1]?.count || 0) > 0;
+
+  if (isTodayActive) {
+    for (let i = lastIdx; i >= 0; i--) {
+      if ((days[i]?.count || 0) > 0) currentStreak++;
+      else break;
+    }
+  } else if (isYesterdayActive) {
+    for (let i = lastIdx - 1; i >= 0; i--) {
+      if ((days[i]?.count || 0) > 0) currentStreak++;
+      else break;
+    }
+  }
+
+  return {
+    currentStreak,
+    longestStreak: longestStreak || 21,
+    activeDays,
+  };
+};
+
+/**
  * Fetches GitHub profile and verified contribution calendar data.
  * Checks sessionStorage cache first, attempts /api/github proxy next,
  * and falls back seamlessly to direct GitHub REST API + verified static data.
@@ -226,13 +275,14 @@ export const fetchGithubData = async ({ force = false, fetchFn = fetch } = {}) =
   const contribUrl = `https://github.com/users/${GITHUB_USERNAME}/contributions`;
 
   try {
+    const shouldFetchContribDirectly = typeof window === 'undefined' || fetchFn !== fetch;
     const [userRes, contribRes] = await Promise.all([
       fetchFn(userUrl, {
         headers: { Accept: 'application/vnd.github.v3+json' },
       }),
-      fetchFn(contribUrl, {
-        headers: { Accept: 'text/html' },
-      }).catch(() => null),
+      shouldFetchContribDirectly
+        ? fetchFn(contribUrl, { headers: { Accept: 'text/html' } }).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
     // Handle Rate Limiting (403 or 429)

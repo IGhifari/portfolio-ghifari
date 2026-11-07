@@ -100,11 +100,15 @@ const Contact = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const copyEmailToClipboard = () => {
-    navigator.clipboard.writeText(directEmail).then(() => {
-      setCopiedEmail(true);
-      notify('success', t('contact.toastCopied'));
-      setTimeout(() => setCopiedEmail(false), 2500);
-    });
+    if (!navigator?.clipboard?.writeText) return;
+    navigator.clipboard
+      .writeText(directEmail)
+      .then(() => {
+        setCopiedEmail(true);
+        notify('success', t('contact.toastCopied'));
+        setTimeout(() => setCopiedEmail(false), 2500);
+      })
+      .catch(() => {});
   };
 
   const handleChange = (e) => {

@@ -82,8 +82,9 @@ export const updateDocumentMetadata = ({
   setMeta('name', 'twitter:site', TWITTER_HANDLE);
 
   // 7. Schema.org Structured Data (JSON-LD)
+  const existingScript = document.getElementById('schema-structured-data');
   if (schemaData) {
-    let scriptTag = document.getElementById('schema-structured-data');
+    let scriptTag = existingScript;
     if (!scriptTag) {
       scriptTag = document.createElement('script');
       scriptTag.id = 'schema-structured-data';
@@ -91,6 +92,12 @@ export const updateDocumentMetadata = ({
       document.head.appendChild(scriptTag);
     }
     scriptTag.textContent = JSON.stringify(schemaData);
+  } else if (existingScript) {
+    if (typeof existingScript.remove === 'function') {
+      existingScript.remove();
+    } else if (existingScript.parentNode && typeof existingScript.parentNode.removeChild === 'function') {
+      existingScript.parentNode.removeChild(existingScript);
+    }
   }
 };
 

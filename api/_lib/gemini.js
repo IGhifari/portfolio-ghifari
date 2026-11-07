@@ -18,7 +18,7 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { getKnowledgeById } from './knowledge.js';
 
-export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
+export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
 export const DEFAULT_GEMINI_TIMEOUT_MS = 25_000;
 export const DEFAULT_MAX_OUTPUT_TOKENS = 1024;
 

@@ -177,7 +177,7 @@ const createMockGeminiClientFactory = (handlerFn) => {
 
 const TEST_ENV = {
   GEMINI_API_KEY: 'AIzaSyTest-Server-Only-Gemini-Key',
-  GEMINI_MODEL: 'gemini-3.5-flash-lite',
+  GEMINI_MODEL: 'gemini-2.0-flash',
   GEMINI_TIMEOUT_MS: '15000',
   UPSTASH_REDIS_REST_URL: 'https://simulated-upstash.upstash.io',
   UPSTASH_REDIS_REST_TOKEN: 'simulated-upstash-token',
@@ -234,11 +234,11 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(res.body.meta.language, 'id');
       assert.equal(res.body.meta.refused, false);
       assert.equal(res.body.meta.reason, null);
-      assert.equal(res.body.meta.model, 'gemini-3.5-flash-lite');
+      assert.equal(res.body.meta.model, 'gemini-2.0-flash');
 
       // Verify Gemini SDK received structured JSON schema config
       assert.equal(geminiCalls.length, 1);
-      assert.equal(geminiCalls[0].model, 'gemini-3.5-flash-lite');
+      assert.equal(geminiCalls[0].model, 'gemini-2.0-flash');
       assert.equal(geminiCalls[0].config.responseMimeType, 'application/json');
       assert.deepEqual(geminiCalls[0].config.responseSchema, GEMINI_RESPONSE_SCHEMA);
     });
