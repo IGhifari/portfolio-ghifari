@@ -5,6 +5,8 @@ import './styles/Components.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
+import { updateDocumentMetadata } from './utils/seo';
+import { siteConfig } from './config/site';
 
 // Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
 import Navbar from './components/Navbar';
@@ -93,6 +95,20 @@ DeferredSection.propTypes = {
 const AppContent = () => {
     const { route } = useRouter();
     const { t } = useLanguage();
+
+    // Restore home page document metadata on returning to home route
+    useEffect(() => {
+        if (route.type === 'home') {
+            updateDocumentMetadata({
+                title: siteConfig.title,
+                description: siteConfig.description,
+                canonicalPath: '/',
+                ogTitle: siteConfig.title,
+                ogDescription: siteConfig.description,
+                ogImage: siteConfig.seo?.ogImage || '/portfolio.png',
+            });
+        }
+    }, [route.type]);
 
     // Scroll restoration for anchor links when switching back to home view
     useEffect(() => {

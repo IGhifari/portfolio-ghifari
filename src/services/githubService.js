@@ -231,7 +231,7 @@ export const fetchGithubData = async ({ force = false, fetchFn = fetch } = {}) =
         headers: { Accept: 'application/vnd.github.v3+json' },
       }),
       fetchFn(contribUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        headers: { Accept: 'text/html' },
       }).catch(() => null),
     ]);
 
