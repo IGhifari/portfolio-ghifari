@@ -2112,7 +2112,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       // connect-src must only have 'self', https://api.emailjs.com, and Cloudflare Analytics
       assert.ok(headersContent.includes("connect-src 'self' https://api.emailjs.com https://cloudflareinsights.com https://api.github.com https://github.com;"));
       // img-src must restrict https: to specific origins
-      assert.ok(headersContent.includes("img-src 'self' data: blob: https://encrypted-tbn0.gstatic.com https://www.ighifari.my.id https://avatars.githubusercontent.com;"));
+      assert.ok(headersContent.includes("img-src 'self' data: blob: https://www.ighifari.my.id https://avatars.githubusercontent.com;"));
       // Edge /api/* no-store rule
       assert.ok(headersContent.includes('/api/*'));
       assert.ok(headersContent.includes('X-Content-Type-Options: nosniff'));

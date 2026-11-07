@@ -99,20 +99,31 @@ const ChatAssistant = () => {
 
     const cleanQuery = trimmed.slice(0, MAX_INPUT_CHARS);
 
-    // Build history from valid prior turns before adding current message
-    const priorHistory = messages
-      .filter(
-        (m) =>
-          !m.isError &&
-          (m.role === 'user' || m.role === 'assistant') &&
-          typeof m.content === 'string' &&
-          m.content.trim().length > 0
-      )
-      .slice(-MAX_HISTORY_TURNS)
-      .map((m) => ({
-        role: m.role,
-        content: m.content.trim().slice(0, MAX_INPUT_CHARS),
-      }));
+    // Build history strictly from valid completed prior turns (user -> assistant pairs)
+    const cleanMessages = messages.filter(
+      (m) =>
+        !m.isError &&
+        (m.role === 'user' || m.role === 'assistant') &&
+        typeof m.content === 'string' &&
+        m.content.trim().length > 0
+    );
+
+    // If retrying, discard the failed trailing user message from history since it is being resent as active message
+    const eligibleMessages =
+      isRetry && cleanMessages.length > 0 && cleanMessages[cleanMessages.length - 1].role === 'user'
+        ? cleanMessages.slice(0, -1)
+        : cleanMessages;
+
+    const validPairs = [];
+    for (let i = 0; i < eligibleMessages.length - 1; i += 2) {
+      if (eligibleMessages[i]?.role === 'user' && eligibleMessages[i + 1]?.role === 'assistant') {
+        validPairs.push(
+          { role: 'user', content: eligibleMessages[i].content.trim().slice(0, MAX_INPUT_CHARS) },
+          { role: 'assistant', content: eligibleMessages[i + 1].content.trim().slice(0, MAX_INPUT_CHARS) }
+        );
+      }
+    }
+    const priorHistory = validPairs.slice(-MAX_HISTORY_TURNS);
 
     const userMsgId = `user-${Date.now()}`;
 

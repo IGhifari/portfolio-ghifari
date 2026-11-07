@@ -9,7 +9,7 @@ const songs = [
     {
         title: "Born to Die",
         artist: "Lana Del Rey",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyhwdaRdmssjL5ImhqFjuV0U0bADjt6_MUiDf0XWavnw&s=10",
+        cover: "/audio/covers/born_to_die.webp",
         audio: "/audio/born_to_die.mp3",
         duration: 265,
         color: "#3B82F6",
@@ -17,7 +17,7 @@ const songs = [
     {
         title: "Risk It All",
         artist: "Bruno Mars",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_iGgvKbRt8FcjYF6VUTVjPZtKPz2K38qLLGs7wvi_YQ&s=10",
+        cover: "/audio/covers/risk_it_all.webp",
         audio: "/audio/risk_it_all.mp3",
         duration: 265,
         color: "#3B82F6",
@@ -25,7 +25,7 @@ const songs = [
     {
         title: "Ultraviolence",
         artist: "Lana Del Rey",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUBqbWTV_PaMn06j_KFUAK49Su7gXHKV5cDORcr98dHw&s=10",
+        cover: "/audio/covers/ultraviolence.webp",
         audio: "/audio/ultraviolence.mp3",
         duration: 263,
         color: "#3B82F6",
@@ -41,7 +41,7 @@ const songs = [
     {
         title: "Summertime Sadness",
         artist: "Lana Del Rey",
-        cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0xDTVAz0wVKvO6Y32DEC_3kSWJqLEjnZPN5VNZ-ZFA&s=10",
+        cover: "/audio/covers/summertime_sadness.webp",
         audio: "/audio/summertime_sad.mp3",
         duration: 264,
         color: "#3B82F6",
