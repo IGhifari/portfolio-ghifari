@@ -424,7 +424,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
   // =========================================================================
   describe('5. Validasi Ketat Source IDs', () => {
     it('rejects hallucinated source IDs and refuses factual response when no valid source remains', async () => {
-      const retrieval = retrieveKnowledge('Ceritakan tentang proyek Desaku', { lang: 'id' });
+      const retrieval = retrieveKnowledge('Ceritakan tentang proyek AksesKita', { lang: 'id' });
       assert.equal(retrieval.hasRelevantKnowledge, true);
 
       const validated = validateAndBuildSources({
@@ -443,7 +443,7 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       }));
 
       const result = await generateGroundedAnswer({
-        message: 'Ceritakan tentang proyek Desaku',
+        message: 'Ceritakan tentang proyek AksesKita',
         retrievedResults: retrieval.results,
         lang: 'id',
         apiKey: TEST_ENV.GEMINI_API_KEY,
