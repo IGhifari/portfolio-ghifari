@@ -539,53 +539,6 @@ export const otherProjects = [
     live: "https://bendaditempatku.netlify.app/",
   },
   {
-    id: "desaku",
-    categoryKey: "fullstack",
-    title: "Desaku",
-    category: {
-      id: "Portal Administrasi / Full-Stack",
-      en: "Administrative Portal / Full-Stack",
-    },
-    description: {
-      id: "Portal administrasi digital yang dirancang untuk memodernisasi tata kelola desa, mengelola data kartu keluarga, dan mendistribusikan pengumuman komunitas publik.",
-      en: "A digital administrative portal designed to modernize village governance, manage family registry records, and distribute public community announcements.",
-    },
-    details: {
-      problem: {
-        id: "Pengelolaan data warga, pencatatan kartu keluarga, dan penyebaran informasi desa yang masih terpisah memperlambat layanan administrasi masyarakat.",
-        en: "Fragmented resident records, family registry administration, and village announcements slow down community public services.",
-      },
-      solution: {
-        id: "Membangun portal administrasi desa berbasis web untuk mengelola data kependudukan/kartu keluarga dan mempublikasikan pengumuman desa secara terpusat.",
-        en: "Built a web-based village administrative portal to manage family registry data and publish community announcements centrally.",
-      },
-      architecture: {
-        id: "Aplikasi full-stack dengan frontend React & Tailwind CSS serta backend Express.js, Prisma ORM, dan database MySQL.",
-        en: "Full-stack application pairing a React & Tailwind CSS frontend with an Express.js backend, Prisma ORM, and MySQL database.",
-      },
-      features: {
-        id: [
-          "Manajemen data warga dan pencatatan kartu keluarga terstruktur",
-          "Publikasi berita dan pengumuman kegiatan desa untuk warga",
-          "Antarmuka dasbor administrasi dengan operasi CRUD tervalidasi",
-        ],
-        en: [
-          "Structured resident and family registry (Kartu Keluarga) data management",
-          "Public village news and community announcement publishing",
-          "Administrative dashboard interface with validated CRUD operations",
-        ],
-      },
-      contribution: {
-        id: "Full-Stack Developer — merancang skema database MySQL/Prisma, membuat REST API Express, dan membangun antarmuka dasbor React.",
-        en: "Full-Stack Developer — designed the MySQL/Prisma schema, created Express REST APIs, and built the React dashboard views.",
-      },
-    },
-    image: "/images/projects/desaku.webp",
-    tags: ["React", "Express", "Prisma", "MySQL", "Tailwind CSS"],
-    github: "https://github.com/IGhifari/Website-DesaKita",
-    live: null,
-  },
-  {
     id: "portfolio-ghifari",
     categoryKey: "webapp",
     title: "Portfolio Website",

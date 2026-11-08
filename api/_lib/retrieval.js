@@ -142,7 +142,7 @@ const INTENT_RULES = [
       'e-commerce', 'pertanian', 'agricultural', 'internship-journal',
       'jurnal', 'journal', '1ia08', 'class', 'kelas', 'ecovoyage',
       'pulau', 'harapan', 'day', 'home', 'sehari', 'rumah', 'tunarungu',
-      'deaf', 'slb', 'desaku', 'desa', 'village', 'kartu', 'keluarga',
+      'deaf', 'slb',
     ],
     categories: [KNOWLEDGE_CATEGORIES.SELECTED_PROJECTS, KNOWLEDGE_CATEGORIES.OTHER_PROJECTS],
     categoryBoost: 4.0,
@@ -341,7 +341,7 @@ const scoreKnowledgeEntry = (entry, rawQuery, queryTokens, matchedIntents) => {
       continue;
     }
 
-    // Exact match in entry ID (e.g. "akseskita", "desaku", "ecovoyage", "clevio", "gunadarma")
+    // Exact match in entry ID (e.g. "akseskita", "ecovoyage", "clevio", "gunadarma")
     if (entryIdLower.includes(token) && token.length >= 3) {
       score += 5.5;
       matchedKeywords.add(token);
