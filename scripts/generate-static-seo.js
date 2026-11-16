@@ -252,6 +252,7 @@ ${allProjects
         ${roleDesc ? `<h2>Peran &amp; Kontribusi Nyata</h2><p>${escapeHtml(roleDesc)}</p>` : ''}
         <h2>Tech Stack</h2>
         <ul>${(project.tags || []).map((t) => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
+        ${!isInternal && (project.live || project.github) ? `<h2>Tautan Proyek</h2><p>${project.live ? `<a href="${escapeHtml(project.live)}" target="_blank" rel="noopener noreferrer">Live Demo</a>` : ''}${project.live && project.github ? ' | ' : ''}${project.github ? `<a href="${escapeHtml(project.github)}" target="_blank" rel="noopener noreferrer">Source Code (GitHub)</a>` : ''}</p>` : ''}
         <p><a href="/study-case">Lihat Semua Studi Kasus</a> | <a href="/">Kembali ke Beranda</a></p>
       </div>`;
 
@@ -325,7 +326,7 @@ ${allProjects
   const recruiterNoscript = `      <div style="padding: 24px; max-width: 800px; margin: 0 auto; font-family: sans-serif; line-height: 1.6;">
         <h1>M. Ghifari Bima Khadafi — Recruiter Overview / Mode Rekruter</h1>
         <p><strong>Posisi:</strong> Web Developer / Software Engineer | <strong>Status:</strong> Tersedia untuk Bekerja</p>
-        <p><strong>Lokasi:</strong> Bogor / Jakarta, Indonesia | <strong>Email:</strong> ighifarii05@gmail.com</p>
+        <p><strong>Lokasi:</strong> Bogor / Jakarta, Indonesia | <strong>Kontak:</strong> <a href="/#contact">Formulir Kontak</a> (<code>ighifarii05 [at] gmail [dot] com</code>)</p>
         <p>${escapeHtml(recruiterDesc)}</p>
         <h2>Pengalaman Kerja Terverifikasi</h2>
         <p><strong>Frontend Developer Intern</strong> — PT. AMA Salam Indonesia (Okt 2025 – Feb 2026)</p>

@@ -20,8 +20,9 @@ import {
   GITHUB_PROFILE_URL,
 } from '../services/githubService';
 import { initialContributionsData } from '../data/githubContributions';
-import { profileData } from '../data/profile';
 import { siteConfig } from '../config/site';
+
+const GITHUB_AVATAR_URL = `https://avatars.githubusercontent.com/${siteConfig.author.githubUsername}?v=4`;
 
 const MONTH_LABELS = {
   id: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
@@ -41,6 +42,11 @@ const GithubActivity = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [fromCache, setFromCache] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [profile?.avatarUrl]);
 
   // Roving TabIndex for keyboard accessibility (CRIT-01)
   const gridCellsRef = useRef([]);
@@ -362,21 +368,32 @@ const GithubActivity = () => {
 
               <div>
                 <div className="flex items-start gap-4 sm:gap-5">
-                  {/* Avatar with Status Ring */}
+                  {/* Avatar with Status Ring (strictly from GitHub API / GitHub Avatar CDN) */}
                   <div className="relative shrink-0">
-                    <img
-                      src={profile?.avatarUrl || profileData.avatarImage}
-                      alt={profile?.name || profileData.fullName}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] object-cover shadow-sm bg-[var(--surface-alt)]"
-                      loading="lazy"
-                      onError={(e) => {
-                        if (e.currentTarget.src !== profileData.avatarImage) {
-                          e.currentTarget.src = profileData.avatarImage;
-                        }
-                      }}
-                    />
+                    {!avatarFailed ? (
+                      <img
+                        src={profile?.avatarUrl || GITHUB_AVATAR_URL}
+                        alt={profile?.name || siteConfig.name}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] object-cover shadow-sm bg-[var(--surface-alt)]"
+                        loading="lazy"
+                        onError={(e) => {
+                          if (e.currentTarget.src !== GITHUB_AVATAR_URL) {
+                            e.currentTarget.src = GITHUB_AVATAR_URL;
+                          } else {
+                            setAvatarFailed(true);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center shadow-sm"
+                        aria-label={profile?.name || siteConfig.name}
+                      >
+                        <SiGithub size={28} className="text-[var(--text-secondary)]" aria-hidden="true" />
+                      </div>
+                    )}
                     <span
                       className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--surface-muted)] ring-1 ring-emerald-400/40"
                       title={t('github.verifiedBadge')}
