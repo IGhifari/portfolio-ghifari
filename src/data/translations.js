@@ -3,6 +3,8 @@
  * Supported languages: 'id' (Indonesian - default), 'en' (English).
  */
 
+import { siteConfig } from '../config/site.js';
+
 export const translations = {
   id: {
     // Navbar
@@ -385,7 +387,7 @@ export const translations = {
       errorBody: "Silakan kirim email langsung ke",
       toastSuccess: "Pesan berhasil terkirim!",
       toastError: "Gagal mengirim pesan. Silakan hubungi langsung lewat email.",
-      toastOffline: "Layanan email sedang offline. Silakan kirim ke ighifarii05@gmail.com secara langsung.",
+      toastOffline: `Layanan email sedang offline. Silakan kirim ke ${siteConfig.author.email} secara langsung.`,
       toastCopied: "Email disalin ke papan klip!",
       toastDiscordCopied: "Username Discord disalin ke papan klip!",
       toastDiscordPending: "Username Discord sedang dalam konfirmasi. Silakan hubungi via email atau formulir.",
@@ -605,7 +607,7 @@ export const translations = {
       githubProfile: "GitHub Profile",
       linkedinProfile: "LinkedIn Profile",
       profileSummaryTitle: "Profil Profesional & Nilai Tambah",
-      profileSummaryText: "Pengembang perangkat lunak dengan spesialisasi pengembangan web full-stack, rekayasa frontend modern (React, TypeScript, Next.js, Tailwind CSS), dan backend terstruktur (Node.js, Express, PostgreSQL, Prisma ORM). Mengedepankan arsitektur modular, kode yang teruji, aksesibilitas inklusif (WCAG 2.1 AA), dan performa web optimal (Core Web Vitals).",
+      profileSummaryText: "Pengembang web dengan fokus utama pada rekayasa frontend modern (React, TypeScript, Next.js, Tailwind CSS), serta berpengalaman membangun layanan backend terstruktur (Node.js, Express, PostgreSQL, Prisma ORM, dan Laravel). Mengedepankan arsitektur modular, kode yang teruji, aksesibilitas inklusif (WCAG 2.1 AA), dan performa web optimal (Core Web Vitals).",
       keyStrengthsTitle: "Pilar Rekayasa Utama",
       strengths: [
         {
@@ -1022,7 +1024,7 @@ export const translations = {
       errorBody: "Please feel free to email me directly at",
       toastSuccess: "Message delivered successfully!",
       toastError: "Failed to send message. Please reach out directly via email.",
-      toastOffline: "Email service is temporarily offline. Please write to ighifarii05@gmail.com directly.",
+      toastOffline: `Email service is temporarily offline. Please write to ${siteConfig.author.email} directly.`,
       toastCopied: "Email copied to clipboard!",
       toastDiscordCopied: "Discord username copied to clipboard!",
       toastDiscordPending: "Discord username is pending confirmation. Please reach out via email or the contact form.",
@@ -1242,7 +1244,7 @@ export const translations = {
       githubProfile: "GitHub Profile",
       linkedinProfile: "LinkedIn Profile",
       profileSummaryTitle: "Professional Profile & Value Proposition",
-      profileSummaryText: "Software developer specializing in full-stack web engineering, modern frontend architectures (React, TypeScript, Next.js, Tailwind CSS), and structured backend services (Node.js, Express, PostgreSQL, Prisma ORM). Dedicated to modular architecture, tested code, inclusive accessibility standards (WCAG 2.1 AA), and Core Web Vitals performance.",
+      profileSummaryText: "Web developer focused primarily on modern frontend engineering (React, TypeScript, Next.js, Tailwind CSS), with practical experience building structured backend services (Node.js, Express, PostgreSQL, Prisma ORM, and Laravel). Dedicated to modular architecture, tested code, inclusive accessibility standards (WCAG 2.1 AA), and Core Web Vitals performance.",
       keyStrengthsTitle: "Core Engineering Strengths",
       strengths: [
         {

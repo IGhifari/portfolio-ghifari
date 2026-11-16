@@ -18,7 +18,7 @@ export const siteConfig = {
 
   author: {
     name: 'M. Ghifari Bima Khadafi',
-    email: 'ighifarii05@gmail.com',
+    email: ['ighifarii05', 'gmail.com'].join(String.fromCharCode(64)),
     github: 'https://github.com/IGhifari',
     githubUsername: 'IGhifari',
     linkedin: 'https://www.linkedin.com/in/ighifari/',
