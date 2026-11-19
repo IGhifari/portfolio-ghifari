@@ -132,10 +132,10 @@ const GameHUD = ({
                   className="absolute top-0 left-0 transition-opacity duration-150"
                 >
                   <div
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-mono text-[11px] tracking-wider uppercase whitespace-nowrap shadow-md ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-mono text-[11px] tracking-wider uppercase whitespace-nowrap backdrop-blur-sm ${
                       isNearest
-                        ? 'bg-[var(--surface)] border-[var(--accent)] text-[var(--text-primary)] font-bold'
-                        : 'bg-[var(--bg-primary)]/90 border-[var(--border)] text-[var(--text-secondary)]'
+                        ? 'bg-[var(--surface)] border-[var(--accent)] ring-1 ring-[var(--accent)]/40 text-[var(--text-primary)] font-bold shadow-[0_6px_16px_rgba(15,23,42,0.22)]'
+                        : 'bg-[var(--surface)]/95 border-[var(--text-primary)]/20 text-[var(--text-primary)] font-semibold shadow-[0_4px_12px_rgba(15,23,42,0.16)]'
                     }`}
                   >
                     <span className="text-[var(--accent)] font-bold">{b.number}</span>
@@ -194,7 +194,7 @@ const GameHUD = ({
             )}
 
             {/* Controls Hint Pill */}
-            <div className="px-3.5 py-1.5 rounded-md bg-[var(--bg-primary)]/90 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)]">
+            <div className="px-3.5 py-1.5 rounded-md bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)] shadow-sm">
               {isTouch ? t('game.controlsHintTouch') : t('game.controlsHintDesktop')}
             </div>
           </div>

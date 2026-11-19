@@ -482,3 +482,123 @@ export const buildGameCssVars = (theme3D = DEFAULT_GAME_THEME) => ({
   '--accent-contrast': theme3D.accentContrastHex,
   '--modal-backdrop': theme3D.modalBackdrop,
 });
+
+/**
+ * Dedicated Outdoor Daytime Park Theme exclusively for Explore (/play/explore).
+ * Strictly isolated from Deploy Stack, Bug Hunter, and Stack Runner arena themes.
+ */
+export const EXPLORE_DAYTIME_PARK_THEME = {
+  ...DEFAULT_GAME_THEME,
+  id: 'explore-daytime-park',
+  month: null,
+  isActive: false,
+  isLight: true,
+
+  // Crisp readable frosted park HUD tokens
+  bgHex: '#BAE6FD',
+  bgSecondaryHex: '#E0F2FE',
+  surfaceHex: '#FFFFFF',
+  surfaceAltHex: '#F1F5F9',
+  surfaceHoverHex: '#E2E8F0',
+  borderHex: '#CBD5E1',
+  borderSubtleHex: '#E2E8F0',
+  borderHoverHex: '#0E7490',
+  textPrimaryHex: '#0F172A',
+  textSecondaryHex: '#334155',
+  textMutedHex: '#475569',
+  accentHex: '#0E7490',
+  accentHoverHex: '#155E75',
+  accentContrastHex: '#FFFFFF',
+  modalBackdrop: 'rgba(15, 23, 42, 0.44)',
+  vignetteBackground:
+    'radial-gradient(ellipse 95% 32% at 50% 0%, rgba(125, 211, 252, 0.24) 0%, transparent 72%), radial-gradient(circle at 50% 55%, transparent 68%, rgba(14, 116, 144, 0.10) 100%)',
+
+  // Daytime outdoor park 3D sky, natural meadow grass & balanced daylight
+  sceneBg: 0x90d7f7,
+  exploreBg: 0xc2e6f9,
+  groundCenterHex: '#6eb363',
+  groundMidHex: '#559c54',
+  groundEdgeHex: '#3f7f47',
+  groundOuterHex: '#c2e6f9',
+  fogNearMult: 1,
+  fogFarMult: 1,
+  hemiSky: 0xe8f4fd,
+  hemiGround: 0x456e4b,
+  hemiIntensity: 1.04,
+  dirLight: 0xfff8ec,
+  dirIntensity: 1.46,
+  rimColor: 0x7dd3fc,
+  rimIntensity: 0.5,
+  gridMajor: 0x45804b,
+  gridMinor: 0x559c54,
+
+  // Portfolio buildings + signage + pink/cyan accents
+  accent: 0x06b6d4,
+  accentRgb: [6, 182, 212],
+  pinkAccent: 0xec4899,
+  visited: 0x10b981,
+  surface: 0xf8fafc,
+  surfaceAlt: 0xe2e8f0,
+  plinth: 0xcbd5e1,
+  edgeDefault: 0x64748b,
+  edgeVisited: 0x059669,
+  ringDefault: 0x94a3b8,
+  signLight: 0x1e293b,
+
+  // Warm natural limestone paths, wood, trees & vegetation
+  tile: 0xd1c2a5,
+  plazaStone: 0xe8ebe5,
+  plazaTrim: 0x9aa5b1,
+  wood: 0x854d27,
+  trunk: 0x6b4423,
+  foliage: 0x2f7044,
+  foliageLight: 0x4b9451,
+  lampHead: 0xfef08a,
+  dustColor: 0xfef9c3,
+
+  playerTorso: 0x1e293b,
+  playerLimb: 0x334155,
+  playerLight: 0xffffff,
+};
+
+/**
+ * Resolves Explore's outdoor park theme cleanly.
+ * Shifts gently to frosty winter greenery only during December Light Winter.
+ */
+export const getExploreParkTheme = (season, seasonalEnabled = true) => {
+  if (
+    seasonalEnabled &&
+    season?.isSeasonalActive &&
+    season.id === 'december-winter' &&
+    !season.isDark
+  ) {
+    return {
+      ...EXPLORE_DAYTIME_PARK_THEME,
+      id: 'december-winter',
+      month: 12,
+      isActive: true,
+      accentHex: '#0369A1',
+      accentHoverHex: '#075985',
+      bgHex: '#E2E8F0',
+      sceneBg: 0xdce7f3,
+      exploreBg: 0xdce7f3,
+      groundCenterHex: '#f1f5f9',
+      groundMidHex: '#e2e8f0',
+      groundEdgeHex: '#cbd5e1',
+      groundOuterHex: '#dce7f3',
+      hemiSky: 0xffffff,
+      hemiGround: 0xcbd5e1,
+      accent: 0x0369a1,
+      accentRgb: [3, 105, 161],
+      tile: 0xcbd5e1,
+      foliage: 0x1e6b44,
+      foliageLight: 0x15803d,
+      trunk: 0x784b26,
+      effectType: 'winter',
+      particlePrimary: 0xffffff,
+      particleSecondary: 0x7dd3fc,
+      particleTertiary: 0x0369a1,
+    };
+  }
+  return EXPLORE_DAYTIME_PARK_THEME;
+};

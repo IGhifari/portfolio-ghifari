@@ -1,29 +1,92 @@
 import * as THREE from 'three';
-import { WORLD_BOUNDS, PLAYER_CONFIG, getWorldInteractables } from '../logic/worldConfig.js';
+import {
+  WORLD_BOUNDS,
+  PLAYER_CONFIG,
+  FOOTBALL_FIELD,
+  getWorldInteractables,
+  getWorldColliders,
+} from '../logic/worldConfig.js';
 import { stepPlayer, findNearestBuilding } from '../logic/physics.js';
+import {
+  createFootballState,
+  stepFootball,
+  kickFootball,
+  resetFootballPosition,
+  isPlayerInFootballZone,
+} from '../logic/footballPhysics.js';
 import { DEFAULT_GAME_THEME } from '../shared/seasonalGameTheme.js';
 import { createSeasonalAtmosphere } from '../shared/createSeasonalAtmosphere.js';
 import { createBuildings } from './createBuildings.js';
 import { createPlayer } from './createPlayer.js';
 import { createProps } from './createProps.js';
+import { createFootballField } from './createFootballField.js';
 
 /**
- * Generates a radial ground gradient texture fading smoothly from the lifted central
- * plaza tone out to the scene horizon fog boundary, eliminating any hard floor edge.
+ * Generates a natural layered low-poly meadow canvas texture (multi-shade grass clearings,
+ * shaded perimeter woodland washes, curated lawn aprons, and smooth horizon mist fade).
  */
 const createGroundGradientTexture = (theme = DEFAULT_GAME_THEME) => {
+  const size = 1024;
+  const worldSpan = 340;
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext('2d');
   if (ctx) {
-    const grad = ctx.createRadialGradient(256, 256, 12, 256, 256, 240);
-    grad.addColorStop(0, theme.groundCenterHex);
-    grad.addColorStop(0.24, theme.groundMidHex);
-    grad.addColorStop(0.52, theme.groundEdgeHex);
-    grad.addColorStop(1, theme.groundOuterHex);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 512, 512);
+    const cx = size / 2;
+    const cy = size / 2;
+    const baseGrad = ctx.createRadialGradient(cx, cy, 24, cx, cy, size * 0.48);
+    baseGrad.addColorStop(0, theme.groundCenterHex);
+    baseGrad.addColorStop(0.24, theme.groundMidHex);
+    baseGrad.addColorStop(0.56, theme.groundEdgeHex);
+    baseGrad.addColorStop(1, theme.groundOuterHex);
+    ctx.fillStyle = baseGrad;
+    ctx.fillRect(0, 0, size, size);
+
+    const toPx = (worldVal) => (worldVal / worldSpan + 0.5) * size;
+    const toScale = (meters) => (meters / worldSpan) * size;
+
+    const paintGlade = (wx, wz, radiusM, innerColor, outerColor, alpha = 0.28) => {
+      const px = toPx(wx);
+      const py = toPx(wz);
+      const r = toScale(radiusM);
+      const g = ctx.createRadialGradient(px, py, r * 0.12, px, py, r);
+      g.addColorStop(0, innerColor);
+      g.addColorStop(1, outerColor);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    if (!(theme.isActive && theme.id === 'december-winter')) {
+      // Balanced sunlit sage-meadow clearings around Central Hub & North Promenade
+      paintGlade(0, -4, 15.5, '#86be69', 'rgba(134, 190, 105, 0)', 0.24);
+      paintGlade(0, -15.5, 11.5, '#7cb665', 'rgba(124, 182, 101, 0)', 0.2);
+      paintGlade(-11, -10, 9.5, '#7bb465', 'rgba(123, 180, 101, 0)', 0.16);
+      paintGlade(11, -10, 9.5, '#7bb465', 'rgba(123, 180, 101, 0)', 0.16);
+
+      // Gentle shaded woodland washes beneath perimeter groves
+      paintGlade(-23, -17, 15.5, '#356b3e', 'rgba(53, 107, 62, 0)', 0.24);
+      paintGlade(22, -17, 15.5, '#356b3e', 'rgba(53, 107, 62, 0)', 0.24);
+      paintGlade(0, -24, 17, '#397343', 'rgba(57, 115, 67, 0)', 0.22);
+      paintGlade(-28, 3, 16, '#397343', 'rgba(57, 115, 67, 0)', 0.22);
+      paintGlade(32, 8, 16, '#376f40', 'rgba(55, 111, 64, 0)', 0.22);
+      paintGlade(-8, 22, 16, '#397343', 'rgba(57, 115, 67, 0)', 0.2);
+      paintGlade(16, 22, 16, '#397343', 'rgba(57, 115, 67, 0)', 0.2);
+
+      // Subtle grass transition apron around East Football Field & cool moss pad under Arcade
+      paintGlade(17.5, 7.5, 14.5, '#43894c', 'rgba(67, 137, 76, 0)', 0.26);
+      paintGlade(-10.5, 9.0, 8.0, '#4a8e53', 'rgba(74, 142, 83, 0)', 0.18);
+    } else {
+      // Soft frosty snowdrift variation for December Light Winter
+      paintGlade(0, -4, 16, '#ffffff', 'rgba(255, 255, 255, 0)', 0.32);
+      paintGlade(-22, -16, 15, '#cbd5e1', 'rgba(203, 213, 225, 0)', 0.24);
+      paintGlade(24, 10, 15, '#cbd5e1', 'rgba(203, 213, 225, 0)', 0.22);
+    }
   }
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -31,8 +94,7 @@ const createGroundGradientTexture = (theme = DEFAULT_GAME_THEME) => {
 };
 
 /**
- * Initializes the Three.js exploration world inside `container`.
- * Returns `{ dispose, setVisitedSet, setPaused }` or `null` if WebGL is unavailable.
+ * Initializes the Three.js expanded park world & playable football field inside `container`.
  */
 export const createWorld = (
   container,
@@ -44,11 +106,14 @@ export const createWorld = (
     getInput = () => ({ x: 0, z: 0 }),
     onNearestChange = () => {},
     onLabelsUpdate = () => {},
+    onFootballChange = () => {},
+    onGoalScored = () => {},
   } = {}
 ) => {
   if (!container) return null;
   const theme = seasonalTheme || DEFAULT_GAME_THEME;
   const interactables = getWorldInteractables(includeArcade);
+  const worldColliders = getWorldColliders(includeArcade);
 
   let renderer;
   try {
@@ -83,65 +148,55 @@ export const createWorld = (
     54 * theme.fogFarMult
   );
 
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 180);
+  const camera = new THREE.PerspectiveCamera(45, 1, 1.0, 220);
   let camDistScale = 1;
 
-  // Lighting: Soft Hemisphere + Key Directional + Rim Light
+  // Lighting: Natural Daytime Sky Hemisphere + Texel-Snapped Sun Key Light + Soft Horizon Rim
   const hemiLight = new THREE.HemisphereLight(
     theme.hemiSky,
     theme.hemiGround,
     theme.hemiIntensity
   );
-  hemiLight.position.set(0, 25, 0);
+  hemiLight.position.set(0, 32, 0);
   scene.add(hemiLight);
 
+  const shadowFrustumHalf = 28;
+  const shadowTexelSize = (shadowFrustumHalf * 2) / 1024;
   const dirLight = new THREE.DirectionalLight(theme.dirLight, theme.dirIntensity);
-  dirLight.position.set(16, 26, 18);
+  dirLight.position.set(24, 34, 20);
   if (!isMobile) {
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
-    dirLight.shadow.camera.near = 2;
-    dirLight.shadow.camera.far = 65;
-    const d = 22;
-    dirLight.shadow.camera.left = -d;
-    dirLight.shadow.camera.right = d;
-    dirLight.shadow.camera.top = d;
-    dirLight.shadow.camera.bottom = -d;
+    dirLight.shadow.camera.near = 6;
+    dirLight.shadow.camera.far = 82;
+    dirLight.shadow.camera.left = -shadowFrustumHalf;
+    dirLight.shadow.camera.right = shadowFrustumHalf;
+    dirLight.shadow.camera.top = shadowFrustumHalf;
+    dirLight.shadow.camera.bottom = -shadowFrustumHalf;
+    dirLight.shadow.bias = -0.0012;
+    dirLight.shadow.normalBias = 0.035;
   }
   scene.add(dirLight);
+  scene.add(dirLight.target);
 
   const rimLight = new THREE.DirectionalLight(theme.rimColor, theme.rimIntensity);
-  rimLight.position.set(-18, 12, -16);
+  rimLight.position.set(-24, 18, -22);
   scene.add(rimLight);
 
-  // Extended Horizon Ground Plane (240x240) blending seamlessly into fog with zero hard edge
+  // Expanded Meadow Ground Plane (340x340) blending smoothly out into bright sky horizon
   const groundGradientTex = createGroundGradientTexture(theme);
   const groundMat = new THREE.MeshStandardMaterial({
     map: groundGradientTex,
-    roughness: 0.92,
-    metalness: 0.06,
+    roughness: 0.96,
+    metalness: 0.02,
   });
-  const groundGeo = new THREE.PlaneGeometry(240, 240);
+  const groundGeo = new THREE.PlaneGeometry(340, 340);
   groundGeo.rotateX(-Math.PI / 2);
   const groundMesh = new THREE.Mesh(groundGeo, groundMat);
   groundMesh.position.y = 0;
   groundMesh.receiveShadow = !isMobile;
   scene.add(groundMesh);
-
-  // Extended subtle grid (180x180) so its outer edges dissolve completely inside the fog
-  const gridHelper = new THREE.GridHelper(180, 90, theme.gridMajor, theme.gridMinor);
-  gridHelper.position.y = 0.006;
-  if (Array.isArray(gridHelper.material)) {
-    gridHelper.material.forEach((m) => {
-      m.transparent = true;
-      m.opacity = theme.isLight ? 0.42 : 0.35;
-    });
-  } else if (gridHelper.material) {
-    gridHelper.material.transparent = true;
-    gridHelper.material.opacity = theme.isLight ? 0.42 : 0.35;
-  }
-  scene.add(gridHelper);
 
   const buildingsCtrl = createBuildings(scene, {
     isMobile,
@@ -149,22 +204,25 @@ export const createWorld = (
     seasonalTheme: theme,
   });
   const propsCtrl = createProps(scene, { isMobile, seasonalTheme: theme });
+  const footballCtrl = createFootballField(scene, { isMobile });
   const playerCtrl = createPlayer(scene, { isMobile, seasonalTheme: theme });
   const seasonalAtmosphere = createSeasonalAtmosphere(scene, theme, {
     isMobile,
     reducedMotion,
-    spanX: 30,
-    spanY: 8,
-    spanZ: 24,
+    spanX: 68,
+    spanY: 11,
+    spanZ: 50,
     baseY: 0.4,
   });
 
   let playerState = {
     x: PLAYER_CONFIG.startX,
-    z: PLAYER_CONFIG.startZ,
+    z: PLAYER_CONFIG.startZ + 2.25,
     angle: Math.PI,
     isMoving: false,
   };
+  let footballState = createFootballState(FOOTBALL_FIELD);
+  let lastFootballUi = { inZone: false, inKickRange: false, score: 0 };
   let visitedSet = new Set();
   let lastNearestId = null;
   let paused = false;
@@ -172,14 +230,15 @@ export const createWorld = (
   let rafId = 0;
   let lastTime = performance.now();
 
-  // Compute desired camera position & target maintaining ~37 deg pitch (between 35-40 deg)
+  // Smooth third-person park camera framing around player inside the 72x54 world
   const getDesiredCamera = (pState) => {
-    const basePullZ = 16.8 * camDistScale;
-    const baseHeightY = 12.6 * camDistScale; // atan(12.6 / 16.8) = 36.87 deg pitch
-    const followWeight = camDistScale > 1.3 ? 0.28 : 0.55;
+    const basePullZ = 16.4 * camDistScale;
+    const baseHeightY = 12.2 * camDistScale; // ~36.6 deg pitch
+    const followWeightX = camDistScale > 1.3 ? 0.72 : 0.82;
+    const followWeightZ = camDistScale > 1.3 ? 0.7 : 0.78;
 
-    const targetX = pState.x * followWeight;
-    const targetZ = pState.z * 0.42 - 1.8;
+    const targetX = pState.x * followWeightX;
+    const targetZ = pState.z * followWeightZ - 1.2;
     return {
       camX: targetX,
       camY: baseHeightY + 0.85,
@@ -190,7 +249,7 @@ export const createWorld = (
     };
   };
 
-  const camTarget = new THREE.Vector3(0, 0.85, 1.35);
+  const camTarget = new THREE.Vector3(0, 0.85, -1.2);
   const projVec = new THREE.Vector3();
   const boxMinVec = new THREE.Vector3();
 
@@ -202,14 +261,13 @@ export const createWorld = (
 
     camera.aspect = aspect;
     camera.fov = aspect < 0.85 ? 52 : 46;
-    // Keep camera framing so all 5 buildings fit comfortably at 390px and 1280px
     camDistScale =
       aspect < 1.15
-        ? Math.min(3.15, Math.max(1.04, 1.38 / Math.max(aspect, 0.4)))
-        : 1.04;
+        ? Math.min(2.6, Math.max(1.02, 1.32 / Math.max(aspect, 0.45)))
+        : 1.02;
 
-    scene.fog.near = 21 * camDistScale;
-    scene.fog.far = 52 * camDistScale;
+    scene.fog.near = 34 * camDistScale * theme.fogNearMult;
+    scene.fog.far = 96 * camDistScale * theme.fogFarMult;
 
     const initCam = getDesiredCamera(playerState);
     camera.position.set(initCam.camX, initCam.camY, initCam.camZ);
@@ -317,13 +375,57 @@ export const createWorld = (
       speed: PLAYER_CONFIG.speed,
       radius: PLAYER_CONFIG.radius,
       bounds: WORLD_BOUNDS,
-      buildings: interactables,
+      buildings: worldColliders,
     });
+
+    const fbStep = paused
+      ? {
+          ball: footballState,
+          scoredSide: null,
+          didReset: false,
+          inKickRange: false,
+        }
+      : stepFootball(footballState, playerState, dt, {
+          field: FOOTBALL_FIELD,
+          playerRadius: PLAYER_CONFIG.radius,
+        });
+    footballState = fbStep.ball;
+
+    if (fbStep.scoredSide) {
+      footballCtrl.triggerGoalBurst(fbStep.scoredSide);
+      onGoalScored(fbStep.scoredSide, footballState.score);
+    }
+
+    const inZone = isPlayerInFootballZone(playerState, FOOTBALL_FIELD);
+    if (
+      inZone !== lastFootballUi.inZone ||
+      fbStep.inKickRange !== lastFootballUi.inKickRange ||
+      footballState.score !== lastFootballUi.score
+    ) {
+      lastFootballUi = {
+        inZone,
+        inKickRange: fbStep.inKickRange,
+        score: footballState.score,
+      };
+      onFootballChange(lastFootballUi);
+    }
 
     playerCtrl.update(playerState, dt, { reducedMotion });
     propsCtrl.update(dt, { reducedMotion });
+    footballCtrl.update(footballState, dt, {
+      inKickRange: fbStep.inKickRange && !paused,
+      reducedMotion,
+    });
     buildingsCtrl.updateBeacon(dt, { reducedMotion });
     seasonalAtmosphere.update(dt, { focusY: 0 });
+
+    if (!isMobile) {
+      // Snap light target to world shadow-map texel grid to prevent shadow swimming while walking
+      const snapX = Math.round(playerState.x / shadowTexelSize) * shadowTexelSize;
+      const snapZ = Math.round(playerState.z / shadowTexelSize) * shadowTexelSize;
+      dirLight.target.position.set(snapX, 0, snapZ);
+      dirLight.position.set(snapX + 24, 34, snapZ + 20);
+    }
 
     const nearest = findNearestBuilding(playerState, interactables);
     const nearestId = nearest ? nearest.building.id : null;
@@ -384,16 +486,37 @@ export const createWorld = (
     setPaused: (nextPaused) => {
       paused = Boolean(nextPaused);
     },
+    kickBall: () => {
+      if (paused) return false;
+      const res = kickFootball(footballState, playerState, performance.now());
+      footballState = res.ball;
+      return res.kicked;
+    },
+    resetBall: () => {
+      footballState = resetFootballPosition(footballState, FOOTBALL_FIELD);
+      const nextUi = {
+        inZone: isPlayerInFootballZone(playerState, FOOTBALL_FIELD),
+        inKickRange: false,
+        score: footballState.score,
+      };
+      lastFootballUi = nextUi;
+      onFootballChange(nextUi);
+    },
     dispose: () => {
       alive = false;
       if (rafId) cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       groundGradientTex.dispose();
+      propsCtrl.dispose?.();
+      footballCtrl.dispose?.();
       buildingsCtrl.dispose?.();
       seasonalAtmosphere.dispose();
 
       scene.traverse((obj) => {
+        if (obj.isInstancedMesh) {
+          obj.dispose?.();
+        }
         if (obj.geometry) {
           obj.geometry.dispose();
         }
