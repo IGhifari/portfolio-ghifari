@@ -4,6 +4,7 @@ import {
   extractTechLabels,
   formatTechLabel,
 } from '../logic/runnerLogic.js';
+import { DEFAULT_GAME_THEME } from '../../shared/seasonalGameTheme.js';
 
 export const RUNNER_COLORS = {
   bg: 0x080808,
@@ -22,7 +23,8 @@ export const RUNNER_COLORS = {
  * Builds shared geometries, materials, cached tech token CanvasTextures,
  * and pre-allocated object pools for Stack Runner with complete disposal tracking.
  */
-export const createRunnerAssets = ({ isMobile = false } = {}) => {
+export const createRunnerAssets = ({ isMobile = false, seasonalTheme = DEFAULT_GAME_THEME } = {}) => {
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
   const geos = [];
   const mats = [];
   const textures = [];
@@ -43,59 +45,59 @@ export const createRunnerAssets = ({ isMobile = false } = {}) => {
   // Shared Materials
   const materials = {
     track: trackMat(
-      new THREE.MeshStandardMaterial({ color: RUNNER_COLORS.trackSurface, roughness: 0.86, metalness: 0.08 })
+      new THREE.MeshStandardMaterial({ color: theme.trackSurface, roughness: 0.86, metalness: 0.08 })
     ),
     shoulder: trackMat(
-      new THREE.MeshStandardMaterial({ color: RUNNER_COLORS.trackShoulder, roughness: 0.95, metalness: 0.04 })
+      new THREE.MeshStandardMaterial({ color: theme.trackShoulder, roughness: 0.95, metalness: 0.04 })
     ),
     surface: trackMat(
-      new THREE.MeshStandardMaterial({ color: RUNNER_COLORS.surface, roughness: 0.68, metalness: 0.16 })
+      new THREE.MeshStandardMaterial({ color: theme.surface, roughness: 0.68, metalness: 0.16 })
     ),
     dark: trackMat(
-      new THREE.MeshStandardMaterial({ color: RUNNER_COLORS.dark, roughness: 0.68, metalness: 0.14 })
+      new THREE.MeshStandardMaterial({ color: theme.obstacleDark, roughness: 0.68, metalness: 0.14 })
     ),
     laneMark: trackMat(
-      new THREE.MeshBasicMaterial({ color: RUNNER_COLORS.laneMark })
+      new THREE.MeshBasicMaterial({ color: theme.laneMark })
     ),
     accent: trackMat(
       new THREE.MeshStandardMaterial({
-        color: RUNNER_COLORS.accent,
-        emissive: RUNNER_COLORS.accent,
+        color: theme.accent,
+        emissive: theme.accent,
         emissiveIntensity: 0.55,
         roughness: 0.3,
       })
     ),
     red: trackMat(
       new THREE.MeshStandardMaterial({
-        color: RUNNER_COLORS.obstacleRed,
-        emissive: RUNNER_COLORS.obstacleRed,
+        color: theme.obstacleRed,
+        emissive: theme.obstacleRed,
         emissiveIntensity: 0.3,
         roughness: 0.44,
       })
     ),
     edge: trackMat(
-      new THREE.LineBasicMaterial({ color: RUNNER_COLORS.edge, transparent: true, opacity: 0.9 })
+      new THREE.LineBasicMaterial({ color: theme.edgeDefault, transparent: true, opacity: 0.9 })
     ),
     firewallEdge: trackMat(
-      new THREE.LineBasicMaterial({ color: RUNNER_COLORS.firewallEdge, transparent: true, opacity: 0.95 })
+      new THREE.LineBasicMaterial({ color: theme.edgeFirewall, transparent: true, opacity: 0.95 })
     ),
     accentEdge: trackMat(
-      new THREE.LineBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.85 })
+      new THREE.LineBasicMaterial({ color: theme.edgeAccentLine, transparent: true, opacity: 0.85 })
     ),
     // Runner player materials (transparent enabled for soft non-disappearing invuln pulse)
     playerTorso: trackMat(
-      new THREE.MeshStandardMaterial({ color: 0x262630, roughness: 0.55, metalness: 0.16, transparent: true, opacity: 1 })
+      new THREE.MeshStandardMaterial({ color: theme.playerTorso, roughness: 0.55, metalness: 0.16, transparent: true, opacity: 1 })
     ),
     playerLimb: trackMat(
-      new THREE.MeshStandardMaterial({ color: 0x363642, roughness: 0.58, metalness: 0.15, transparent: true, opacity: 1 })
+      new THREE.MeshStandardMaterial({ color: theme.playerLimb, roughness: 0.58, metalness: 0.15, transparent: true, opacity: 1 })
     ),
     playerLight: trackMat(
-      new THREE.MeshStandardMaterial({ color: 0xf4f4f5, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 1 })
+      new THREE.MeshStandardMaterial({ color: theme.playerLight, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 1 })
     ),
     playerAccent: trackMat(
       new THREE.MeshStandardMaterial({
-        color: RUNNER_COLORS.accent,
-        emissive: RUNNER_COLORS.accent,
+        color: theme.accent,
+        emissive: theme.accent,
         emissiveIntensity: 0.72,
         roughness: 0.25,
         transparent: true,
@@ -103,10 +105,10 @@ export const createRunnerAssets = ({ isMobile = false } = {}) => {
       })
     ),
     shadow: trackMat(
-      new THREE.MeshBasicMaterial({ color: 0x040406, transparent: true, opacity: 0.52 })
+      new THREE.MeshBasicMaterial({ color: theme.shadow, transparent: true, opacity: theme.isLight ? 0.36 : 0.52 })
     ),
     shieldRing: trackMat(
-      new THREE.MeshBasicMaterial({ color: RUNNER_COLORS.accent, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+      new THREE.MeshBasicMaterial({ color: theme.accent, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
     ),
   };
 
@@ -211,9 +213,9 @@ export const createRunnerAssets = ({ isMobile = false } = {}) => {
     canvas.height = 80;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#09090b';
+      ctx.fillStyle = theme.blockFaceFillHex;
       ctx.fillRect(0, 0, 256, 80);
-      ctx.strokeStyle = '#3b82f6';
+      ctx.strokeStyle = theme.accentHex;
       ctx.lineWidth = 4;
       ctx.strokeRect(4, 4, 248, 72);
 
@@ -225,7 +227,7 @@ export const createRunnerAssets = ({ isMobile = false } = {}) => {
         fontPx = Math.max(14, Math.floor((fontPx * 220) / measured));
         ctx.font = `bold ${fontPx}px monospace`;
       }
-      ctx.fillStyle = '#f4f4f5';
+      ctx.fillStyle = theme.blockTextHex;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, 128, 41);

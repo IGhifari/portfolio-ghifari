@@ -12,12 +12,8 @@ import {
   createWaveState,
   stepWaveState,
 } from '../logic/bugsLogic.js';
-
-const COLOR_BG = 0x080808;
-const COLOR_SURFACE = 0x141418;
-const COLOR_EDGE = 0x3f3f46;
-const COLOR_ACCENT = 0x3b82f6;
-const COLOR_BUG_RED = 0xef4444;
+import { DEFAULT_GAME_THEME } from '../../shared/seasonalGameTheme.js';
+import { createSeasonalAtmosphere } from '../../shared/createSeasonalAtmosphere.js';
 
 /**
  * Initializes the Three.js Orthographic arena for "Bug Hunter" inside `container`.
@@ -28,12 +24,14 @@ export const createBugsWorld = (
   {
     isMobile = false,
     reducedMotion = false,
+    seasonalTheme = DEFAULT_GAME_THEME,
     onStateChange = () => {},
     onWaveCleared = () => {},
     onGameOver = () => {},
   } = {}
 ) => {
   if (!container) return null;
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
 
   let renderer;
   try {
@@ -48,7 +46,7 @@ export const createBugsWorld = (
 
   const maxDpr = isMobile ? 1.5 : 2;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-  renderer.setClearColor(COLOR_BG, 1);
+  renderer.setClearColor(theme.sceneBg, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const canvas = renderer.domElement;
@@ -57,24 +55,32 @@ export const createBugsWorld = (
   container.appendChild(canvas);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(COLOR_BG);
-  scene.fog = new THREE.Fog(COLOR_BG, 22, 54);
+  scene.background = new THREE.Color(theme.sceneBg);
+  scene.fog = new THREE.Fog(
+    theme.sceneBg,
+    22 * theme.fogNearMult,
+    54 * theme.fogFarMult
+  );
 
   // Isometric OrthographicCamera
   const camera = new THREE.OrthographicCamera(-9, 9, 9, -9, 0.1, 100);
   camera.position.set(13, 14.5, 13);
   camera.lookAt(0, 0, 0);
 
-  // Lighting matching DESIGN.md & Deploy Stack
-  const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x09090b, 0.78);
+  // Lighting matching DESIGN.md & seasonal atmosphere
+  const hemiLight = new THREE.HemisphereLight(
+    theme.hemiSky,
+    theme.hemiGround,
+    theme.hemiIntensity
+  );
   hemiLight.position.set(0, 25, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xf8fafc, 1.35);
+  const dirLight = new THREE.DirectionalLight(theme.dirLight, theme.dirIntensity);
   dirLight.position.set(14, 24, 16);
   scene.add(dirLight);
 
-  const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.6);
+  const rimLight = new THREE.DirectionalLight(theme.rimColor, theme.rimIntensity);
   rimLight.position.set(-16, 12, -14);
   scene.add(rimLight);
 
@@ -91,38 +97,47 @@ export const createBugsWorld = (
   };
 
   const surfaceMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: COLOR_SURFACE, roughness: 0.75, metalness: 0.18 })
+    new THREE.MeshStandardMaterial({ color: theme.surface, roughness: 0.75, metalness: 0.18 })
   );
   const darkMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7, metalness: 0.15 })
+    new THREE.MeshStandardMaterial({ color: theme.bugsDark, roughness: 0.7, metalness: 0.15 })
   );
   const accentMat = trackMat(
     new THREE.MeshStandardMaterial({
-      color: COLOR_ACCENT,
-      emissive: COLOR_ACCENT,
+      color: theme.accent,
+      emissive: theme.accent,
       emissiveIntensity: 0.45,
       roughness: 0.35,
     })
   );
   const bugRedMat = trackMat(
     new THREE.MeshStandardMaterial({
-      color: COLOR_BUG_RED,
-      emissive: COLOR_BUG_RED,
+      color: theme.bugsRed,
+      emissive: theme.bugsRed,
       emissiveIntensity: 0.25,
       roughness: 0.48,
     })
   );
   const bugFlashMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: 0xf4f4f5 })
+    new THREE.MeshBasicMaterial({ color: theme.bugsFlash })
   );
   const edgeMat = trackMat(
-    new THREE.LineBasicMaterial({ color: COLOR_EDGE, transparent: true, opacity: 0.85 })
+    new THREE.LineBasicMaterial({ color: theme.edgeDefault, transparent: true, opacity: 0.85 })
   );
 
   // Arena Floor Grid & Perimeter Ring
-  const gridHelper = new THREE.GridHelper(20, 20, 0x222530, 0x14161d);
+  const gridHelper = new THREE.GridHelper(20, 20, theme.gridMajor, theme.gridMinor);
   gridHelper.position.y = 0;
   scene.add(gridHelper);
+
+  const seasonalAtmosphere = createSeasonalAtmosphere(scene, theme, {
+    isMobile,
+    reducedMotion,
+    spanX: 18,
+    spanY: 9,
+    spanZ: 18,
+    baseY: 0.3,
+  });
 
   const arenaRingGeo = trackGeo(
     new THREE.RingGeometry(BUGS_CONFIG.arenaRadius - 0.025, BUGS_CONFIG.arenaRadius + 0.025, 64)
@@ -130,7 +145,7 @@ export const createBugsWorld = (
   arenaRingGeo.rotateX(-Math.PI / 2);
   const arenaRingMat = trackMat(
     new THREE.MeshBasicMaterial({
-      color: 0x1f1f23,
+      color: theme.arenaRing,
       transparent: true,
       opacity: 0.4,
       side: THREE.DoubleSide,
@@ -161,7 +176,7 @@ export const createBugsWorld = (
   );
   serverRingGeo.rotateX(-Math.PI / 2);
   const serverRingMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: COLOR_ACCENT, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: theme.accent, side: THREE.DoubleSide })
   );
   const serverRing = new THREE.Mesh(serverRingGeo, serverRingMat);
   serverRing.position.y = 0.02;
@@ -174,7 +189,7 @@ export const createBugsWorld = (
   const squashEffects = Array.from({ length: 4 }, () => {
     const mat = trackMat(
       new THREE.MeshBasicMaterial({
-        color: COLOR_BUG_RED,
+        color: theme.bugsRed,
         side: THREE.DoubleSide,
         transparent: true,
         opacity: 0,
@@ -330,7 +345,7 @@ export const createBugsWorld = (
     score = 0;
     comboState = { combo: 0, lastKillMs: -Infinity };
     isGameOver = false;
-    serverRingMat.color.setHex(COLOR_ACCENT);
+    serverRingMat.color.setHex(theme.accent);
     for (const slot of poolSlots) {
       slot.bugId = null;
       slot.group.visible = false;
@@ -375,7 +390,7 @@ export const createBugsWorld = (
       score += hitRes.scoreDelta;
       if (hitRes.serverHeal > 0) {
         serverHp = applyServerHeal(serverHp, hitRes.serverHeal, BUGS_CONFIG);
-        serverRingMat.color.setHex(serverHp <= 2 ? COLOR_BUG_RED : COLOR_ACCENT);
+        serverRingMat.color.setHex(serverHp <= 2 ? theme.bugsRed : theme.accent);
       }
       triggerSquashEffect(deadBug.x, deadBug.z);
     } else {
@@ -442,7 +457,7 @@ export const createBugsWorld = (
           activeBugs.splice(i, 1);
           const dmgRes = applyServerDamage(serverHp, moved.type, BUGS_CONFIG);
           serverHp = dmgRes.hp;
-          serverRingMat.color.setHex(serverHp <= 2 ? COLOR_BUG_RED : COLOR_ACCENT);
+          serverRingMat.color.setHex(serverHp <= 2 ? theme.bugsRed : theme.accent);
           stateChanged = true;
 
           if (dmgRes.gameOver) {
@@ -509,6 +524,7 @@ export const createBugsWorld = (
     }
 
     syncPoolToActiveBugs(dt);
+    seasonalAtmosphere.update(paused || isGameOver ? 0 : dt);
     renderer.render(scene, camera);
     rafId = requestAnimationFrame(tick);
   };
@@ -557,6 +573,7 @@ export const createBugsWorld = (
 
       sharedGeos.forEach((g) => g.dispose());
       sharedMats.forEach((m) => m.dispose());
+      seasonalAtmosphere.dispose();
       gridHelper.geometry?.dispose();
       if (Array.isArray(gridHelper.material)) {
         gridHelper.material.forEach((m) => m.dispose?.());

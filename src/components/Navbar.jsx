@@ -189,9 +189,9 @@ const Navbar = () => {
           {/* Optional 3D World Exploration Trigger */}
           {ENABLE_3D_GAME && (
             <RouterLink
-              to={language === 'en' ? '/en/play' : '/play'}
+              to={language === 'en' ? '/en/play/explore' : '/play/explore'}
               className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
-                route?.cleanPath === '/play'
+                route?.cleanPath?.startsWith('/play')
                   ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
                   : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)]'
               }`}
@@ -199,7 +199,11 @@ const Navbar = () => {
               title={t('nav.playAria')}
               aria-label={t('nav.playAria')}
             >
-              <FiBox size={12} className="text-[var(--accent)]" aria-hidden="true" />
+              <FiBox
+                size={12}
+                className={route?.cleanPath?.startsWith('/play') ? 'text-[var(--accent-contrast)]' : 'text-[var(--accent)]'}
+                aria-hidden="true"
+              />
               <span>{t('nav.play')}</span>
             </RouterLink>
           )}
@@ -358,7 +362,7 @@ const Navbar = () => {
         aria-label={t('nav.mobileMenu') || 'Mobile navigation'}
         className={`lg:hidden fixed z-50 pointer-events-auto transition-all duration-300 ease-in-out overflow-y-auto ${
           isScrolled
-            ? 'inset-x-3 sm:inset-x-4 top-[4.25rem] max-w-lg mx-auto rounded-2xl bg-[var(--surface)]/95 dark:bg-[#0c1017]/95 backdrop-blur-2xl border border-[var(--border)] dark:border-white/[0.1] shadow-2xl'
+            ? 'inset-x-3 sm:inset-x-4 top-[4.25rem] max-w-lg mx-auto rounded-2xl bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-2xl'
             : 'inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)]'
         } ${
           isMenuOpen
@@ -429,7 +433,7 @@ const Navbar = () => {
           {/* Mobile 3D World Link */}
           {ENABLE_3D_GAME && (
             <RouterLink
-              to={language === 'en' ? '/en/play' : '/play'}
+              to={language === 'en' ? '/en/play/explore' : '/play/explore'}
               onClick={closeMenu}
               className="py-2.5 px-4 rounded-xl font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >

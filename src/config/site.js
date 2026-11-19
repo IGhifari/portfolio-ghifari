@@ -66,4 +66,9 @@ export const ENABLE_BUG_GAME = true;
  */
 export const ENABLE_RUNNER_GAME = true;
 
+/**
+ * Master switch for the Monthly Seasonal Event Theme System across the portfolio.
+ */
+export const ENABLE_SEASONAL_THEMES = true;
+
 export default siteConfig;

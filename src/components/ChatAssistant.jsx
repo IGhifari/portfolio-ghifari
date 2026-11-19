@@ -267,10 +267,10 @@ const ChatAssistant = () => {
           role="dialog"
           aria-modal="true"
           aria-label={t('chatbot.title')}
-          className="w-[calc(100vw-2rem)] sm:w-[420px] md:w-[440px] h-[min(600px,calc(100vh-6rem))] flex flex-col rounded-2xl overflow-hidden bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65)] animate-fadeIn select-text"
+          className="w-[calc(100vw-2rem)] sm:w-[420px] md:w-[440px] h-[min(600px,calc(100vh-6rem))] flex flex-col rounded-2xl overflow-hidden bg-[var(--surface)] border border-[var(--border)] shadow-[var(--card-shadow-hover)] animate-fadeIn select-text"
         >
           {/* Top Header Frame (Linear / Antigravity Window) */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]/95 select-none">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)] select-none">
             <div className="flex items-center gap-3 min-w-0">
               {/* macOS Traffic Lights */}
               <div className="flex items-center gap-1.5" aria-hidden="true">

@@ -1,14 +1,6 @@
 import * as THREE from 'three';
-import { BUILDINGS } from '../logic/worldConfig.js';
-
-const COLOR_SURFACE = 0x17171c;
-const COLOR_PLINTH = 0x111115;
-const COLOR_EDGE_DEFAULT = 0x3f3f46;
-const COLOR_EDGE_VISITED = 0x52525b;
-const COLOR_RING_DEFAULT = 0x2e2e36;
-const COLOR_ACCENT = 0x3b82f6;
-const COLOR_SIGN_LIGHT = 0xf4f4f5;
-const COLOR_VISITED = 0x10b981;
+import { getWorldInteractables } from '../logic/worldConfig.js';
+import { DEFAULT_GAME_THEME } from '../shared/seasonalGameTheme.js';
 
 const addEdges = (mesh, edgeMat) => {
   const edgesGeo = new THREE.EdgesGeometry(mesh.geometry);
@@ -17,18 +9,19 @@ const addEdges = (mesh, edgeMat) => {
 };
 
 /**
- * Generates a soft radial blue glow texture for the ground halo under a nearby building.
+ * Generates a soft radial accent glow texture for the ground halo under a nearby building.
  */
-const createProximityGlowTexture = () => {
+const createProximityGlowTexture = (accentRgb = DEFAULT_GAME_THEME.accentRgb) => {
+  const [r, g, b] = accentRgb;
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;
   const ctx = canvas.getContext('2d');
   if (ctx) {
     const grad = ctx.createRadialGradient(64, 64, 10, 64, 64, 64);
-    grad.addColorStop(0, 'rgba(59, 130, 246, 0.55)');
-    grad.addColorStop(0.55, 'rgba(59, 130, 246, 0.22)');
-    grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+    grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.55)`);
+    grad.addColorStop(0.55, `rgba(${r}, ${g}, ${b}, 0.22)`);
+    grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 128, 128);
   }
@@ -110,6 +103,48 @@ const buildSectionSignage = (id, accentMat, signMat) => {
   }
 
   return signGroup;
+};
+
+const buildArcadeKiosk = (group, bodyMat, accentMat, signMat, edgeMat, castShadow) => {
+  const kioskGroup = new THREE.Group();
+  kioskGroup.rotation.y = -0.45;
+
+  const cabinet = new THREE.Mesh(new THREE.BoxGeometry(1.22, 1.38, 0.94), bodyMat);
+  cabinet.position.set(0, 0.87, 0);
+  cabinet.castShadow = castShadow;
+  cabinet.receiveShadow = castShadow;
+  addEdges(cabinet, edgeMat);
+
+  const marquee = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.28, 1.02), bodyMat);
+  marquee.position.set(0, 1.68, 0.04);
+  marquee.castShadow = castShadow;
+  addEdges(marquee, edgeMat);
+
+  const marqueeStrip = new THREE.Mesh(new THREE.BoxGeometry(1.06, 0.14, 0.08), accentMat);
+  marqueeStrip.position.set(0, 1.68, 0.55);
+
+  const screenFrame = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.68, 0.08), signMat);
+  screenFrame.position.set(0, 1.04, 0.46);
+
+  const screenGlow = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.56, 0.1), accentMat);
+  screenGlow.position.set(0, 1.04, 0.47);
+
+  // Joy-deck + control stick
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(1.16, 0.14, 0.44), bodyMat);
+  deck.position.set(0, 0.6, 0.58);
+  addEdges(deck, edgeMat);
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.16, 6), accentMat);
+  stick.position.set(-0.24, 0.74, 0.62);
+  const btn = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.06, 0.14), accentMat);
+  btn.position.set(0.2, 0.7, 0.62);
+
+  // Hovering arcade crystal beacon above cabinet
+  const beacon = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 0), accentMat);
+  beacon.position.set(0, 2.28, 0);
+
+  kioskGroup.add(cabinet, marquee, marqueeStrip, screenFrame, screenGlow, deck, stick, btn, beacon);
+  group.add(kioskGroup);
+  return beacon;
 };
 
 const buildArchitecture = (id, group, bodyMat, accentMat, signMat, edgeMat, castShadow) => {
@@ -206,40 +241,46 @@ const buildArchitecture = (id, group, bodyMat, accentMat, signMat, edgeMat, cast
  * Creates the 5 portfolio buildings with subtle edge highlights, 3D section icons,
  * and a soft ground glow ring under the building the player is near.
  */
-export const createBuildings = (scene, { isMobile = false } = {}) => {
+export const createBuildings = (
+  scene,
+  { isMobile = false, includeArcade = true, seasonalTheme = DEFAULT_GAME_THEME } = {}
+) => {
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
   const castShadow = !isMobile;
-  const glowTex = createProximityGlowTexture();
+  const glowTex = createProximityGlowTexture(theme.accentRgb);
+  const interactables = getWorldInteractables(includeArcade);
+  let arcadeBeacon = null;
 
   const plinthMat = new THREE.MeshStandardMaterial({
-    color: COLOR_PLINTH,
+    color: theme.plinth,
     roughness: 0.85,
     metalness: 0.12,
   });
 
   const signMat = new THREE.MeshStandardMaterial({
-    color: COLOR_SIGN_LIGHT,
+    color: theme.signLight,
     roughness: 0.35,
     metalness: 0.1,
   });
 
-  const entries = BUILDINGS.map((b) => {
+  const entries = interactables.map((b) => {
     const group = new THREE.Group();
     group.position.set(b.x, 0, b.z);
 
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: COLOR_SURFACE,
+      color: theme.surface,
       roughness: 0.68,
       metalness: 0.22,
     });
     const edgeMat = new THREE.LineBasicMaterial({
-      color: COLOR_EDGE_DEFAULT,
+      color: theme.edgeDefault,
       transparent: true,
       opacity: 0.88,
     });
     const accentMat = new THREE.MeshStandardMaterial({
-      color: COLOR_ACCENT,
-      emissive: COLOR_ACCENT,
-      emissiveIntensity: 0.32,
+      color: theme.accent,
+      emissive: theme.accent,
+      emissiveIntensity: b.isArcade ? 0.45 : 0.32,
       roughness: 0.35,
     });
 
@@ -253,7 +294,11 @@ export const createBuildings = (scene, { isMobile = false } = {}) => {
     addEdges(plinth, edgeMat);
     group.add(plinth);
 
-    buildArchitecture(b.id, group, bodyMat, accentMat, signMat, edgeMat, castShadow);
+    if (b.isArcade) {
+      arcadeBeacon = buildArcadeKiosk(group, bodyMat, accentMat, signMat, edgeMat, castShadow);
+    } else {
+      buildArchitecture(b.id, group, bodyMat, accentMat, signMat, edgeMat, castShadow);
+    }
 
     // Soft radial ground glow halo under the building when player is near
     const glowSpan = (Math.max(b.halfW, b.halfD) + 1.55) * 2;
@@ -274,7 +319,7 @@ export const createBuildings = (scene, { isMobile = false } = {}) => {
     const ringGeo = new THREE.RingGeometry(ringOuter - 0.14, ringOuter, 32);
     ringGeo.rotateX(-Math.PI / 2);
     const ringMat = new THREE.MeshBasicMaterial({
-      color: COLOR_RING_DEFAULT,
+      color: theme.ringDefault,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0.42,
@@ -302,23 +347,23 @@ export const createBuildings = (scene, { isMobile = false } = {}) => {
       const isVisited = visitedSet?.has(entry.data.id);
 
       if (isNearest) {
-        entry.edgeMat.color.setHex(COLOR_ACCENT);
+        entry.edgeMat.color.setHex(theme.accent);
         entry.edgeMat.opacity = 1.0;
-        entry.ringMat.color.setHex(COLOR_ACCENT);
+        entry.ringMat.color.setHex(theme.accent);
         entry.ringMat.opacity = 0.96;
         entry.glowMat.opacity = 0.92;
         entry.accentMat.emissiveIntensity = 0.72;
       } else if (isVisited) {
-        entry.edgeMat.color.setHex(COLOR_EDGE_VISITED);
+        entry.edgeMat.color.setHex(theme.edgeVisited);
         entry.edgeMat.opacity = 0.92;
-        entry.ringMat.color.setHex(COLOR_VISITED);
+        entry.ringMat.color.setHex(theme.visited);
         entry.ringMat.opacity = 0.58;
         entry.glowMat.opacity = 0.15;
         entry.accentMat.emissiveIntensity = 0.38;
       } else {
-        entry.edgeMat.color.setHex(COLOR_EDGE_DEFAULT);
+        entry.edgeMat.color.setHex(theme.edgeDefault);
         entry.edgeMat.opacity = 0.85;
-        entry.ringMat.color.setHex(COLOR_RING_DEFAULT);
+        entry.ringMat.color.setHex(theme.ringDefault);
         entry.ringMat.opacity = 0.4;
         entry.glowMat.opacity = 0;
         entry.accentMat.emissiveIntensity = 0.3;
@@ -326,9 +371,19 @@ export const createBuildings = (scene, { isMobile = false } = {}) => {
     }
   };
 
+  let beaconClock = 0;
+
+  const updateBeacon = (dt, { reducedMotion = false } = {}) => {
+    if (!arcadeBeacon || reducedMotion) return;
+    beaconClock += dt;
+    arcadeBeacon.rotation.y += dt * 1.35;
+    arcadeBeacon.position.y = 2.28 + Math.sin(beaconClock * 2.4) * 0.08;
+  };
+
   return {
     entries,
     updateHighlights,
+    updateBeacon,
     dispose: () => {
       glowTex.dispose();
     },

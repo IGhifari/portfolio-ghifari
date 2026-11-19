@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { BUILDINGS, PLAYER_CONFIG } from '../logic/worldConfig.js';
+import { DEFAULT_GAME_THEME } from '../shared/seasonalGameTheme.js';
 
 const TREE_COORDS = [
   { x: -15.4, z: -9.8, s: 1.05 },
@@ -76,14 +77,15 @@ const buildStraightPathsAndLamps = () => {
  * Populates low-poly world props strictly using THREE.InstancedMesh (straight walkway
  * paths, path-aligned lamp posts, perimeter trees) plus subtle floating dust particles.
  */
-export const createProps = (scene, { isMobile = false } = {}) => {
+export const createProps = (scene, { isMobile = false, seasonalTheme = DEFAULT_GAME_THEME } = {}) => {
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
   const dummy = new THREE.Object3D();
   const { tiles: tileTransforms, lamps: lampCoords } = buildStraightPathsAndLamps();
 
   // 1. Clean Straight Walkway Tiles (InstancedMesh)
   const tileGeo = new THREE.BoxGeometry(0.92, 0.036, 0.68);
   const tileMat = new THREE.MeshStandardMaterial({
-    color: 0x22222a,
+    color: theme.tile,
     roughness: 0.82,
     metalness: 0.12,
   });
@@ -103,14 +105,14 @@ export const createProps = (scene, { isMobile = false } = {}) => {
   // 2. Path-Aligned Low-Poly Lamp Posts: Poles + Luminaire Caps (2 InstancedMeshes)
   const poleGeo = new THREE.CylinderGeometry(0.05, 0.08, 1.85, 6);
   const poleMat = new THREE.MeshStandardMaterial({
-    color: 0x27272a,
+    color: theme.pole,
     roughness: 0.6,
     metalness: 0.35,
   });
   const lampHeadGeo = new THREE.BoxGeometry(0.24, 0.1, 0.24);
   const lampHeadMat = new THREE.MeshStandardMaterial({
-    color: 0x93c5fd,
-    emissive: 0x3b82f6,
+    color: theme.lampHead,
+    emissive: theme.accent,
     emissiveIntensity: 0.45,
     roughness: 0.3,
   });
@@ -134,40 +136,55 @@ export const createProps = (scene, { isMobile = false } = {}) => {
   headInstanced.instanceMatrix.needsUpdate = true;
   scene.add(poleInstanced, headInstanced);
 
-  // 3. Low-Poly Perimeter Trees: Trunks + Foliage Cones (2 InstancedMeshes)
-  const trunkGeo = new THREE.CylinderGeometry(0.09, 0.13, 0.65, 5);
+  // 3. Low-Poly Perimeter Trees taller than player (Brown Trunks + 2-Tier Green Foliage Cones)
+  const trunkGeo = new THREE.CylinderGeometry(0.13, 0.2, 1.25, 6);
   const trunkMat = new THREE.MeshStandardMaterial({
-    color: 0x232329,
+    color: theme.trunk,
     roughness: 0.9,
   });
-  const foliageGeo = new THREE.ConeGeometry(0.56, 1.55, 6);
+  const foliageLowerGeo = new THREE.ConeGeometry(0.84, 1.55, 6);
+  const foliageUpperGeo = new THREE.ConeGeometry(0.6, 1.4, 6);
   const foliageMat = new THREE.MeshStandardMaterial({
-    color: 0x1a2230,
+    color: theme.foliage,
     roughness: 0.78,
-    metalness: 0.12,
+    metalness: 0.08,
   });
 
   const trunkInstanced = new THREE.InstancedMesh(trunkGeo, trunkMat, TREE_COORDS.length);
-  const foliageInstanced = new THREE.InstancedMesh(foliageGeo, foliageMat, TREE_COORDS.length);
-  foliageInstanced.castShadow = !isMobile;
+  const foliageLowerInstanced = new THREE.InstancedMesh(foliageLowerGeo, foliageMat, TREE_COORDS.length);
+  const foliageUpperInstanced = new THREE.InstancedMesh(foliageUpperGeo, foliageMat, TREE_COORDS.length);
+  trunkInstanced.castShadow = !isMobile;
+  foliageLowerInstanced.castShadow = !isMobile;
+  foliageUpperInstanced.castShadow = !isMobile;
 
   TREE_COORDS.forEach((c, idx) => {
     const s = c.s;
     dummy.rotation.set(0, idx * 0.7, 0);
     dummy.scale.set(s, s, s);
-    dummy.position.set(c.x, 0.32 * s, c.z);
+    dummy.position.set(c.x, 0.625 * s, c.z);
     dummy.updateMatrix();
     trunkInstanced.setMatrixAt(idx, dummy.matrix);
 
-    dummy.position.set(c.x, 1.22 * s, c.z);
+    dummy.position.set(c.x, 1.82 * s, c.z);
     dummy.updateMatrix();
-    foliageInstanced.setMatrixAt(idx, dummy.matrix);
+    foliageLowerInstanced.setMatrixAt(idx, dummy.matrix);
+
+    dummy.position.set(c.x, 2.82 * s, c.z);
+    dummy.updateMatrix();
+    foliageUpperInstanced.setMatrixAt(idx, dummy.matrix);
   });
   trunkInstanced.instanceMatrix.needsUpdate = true;
-  foliageInstanced.instanceMatrix.needsUpdate = true;
-  scene.add(trunkInstanced, foliageInstanced);
+  foliageLowerInstanced.instanceMatrix.needsUpdate = true;
+  foliageUpperInstanced.instanceMatrix.needsUpdate = true;
+  scene.add(trunkInstanced, foliageLowerInstanced, foliageUpperInstanced);
 
-  // 4. Very Subtle Floating Dust Particles (respects prefers-reduced-motion)
+  // 4. Subtle Floating Dust Particles on default months (seasonal events render createSeasonalAtmosphere)
+  if (theme.isActive) {
+    return {
+      update: () => {},
+    };
+  }
+
   const dustCount = isMobile ? 26 : 44;
   const positions = new Float32Array(dustCount * 3);
   const baseY = new Float32Array(dustCount);
@@ -191,7 +208,7 @@ export const createProps = (scene, { isMobile = false } = {}) => {
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const dustMat = new THREE.PointsMaterial({
-    color: 0x93c5fd,
+    color: theme.dustColor,
     size: 0.085,
     transparent: true,
     opacity: 0.24,

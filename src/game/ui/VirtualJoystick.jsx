@@ -82,8 +82,8 @@ const VirtualJoystick = ({ onMove }) => {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
-        className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#141414]/90 border-2 flex items-center justify-center transition-colors ${
-          active ? 'border-[#3B82F6]' : 'border-[#27272A]'
+        className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[var(--surface)]/90 border-2 flex items-center justify-center transition-colors ${
+          active ? 'border-[var(--accent)]' : 'border-[var(--border)]'
         }`}
       >
         <div
@@ -92,8 +92,8 @@ const VirtualJoystick = ({ onMove }) => {
           }}
           className={`w-11 h-11 rounded-full border transition-colors ${
             active
-              ? 'bg-[#3B82F6] border-white/80 shadow-md'
-              : 'bg-[#1f1f24] border-[#3f3f46]'
+              ? 'bg-[var(--accent)] border-white/80 shadow-md'
+              : 'bg-[var(--surface-hover)] border-[var(--border-hover)]'
           }`}
         />
       </div>

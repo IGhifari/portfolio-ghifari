@@ -8,8 +8,11 @@ import {
   WORLD_BOUNDS,
   PLAYER_CONFIG,
   BUILDINGS,
+  ARCADE_KIOSK,
+  getWorldInteractables,
   getBuildingById,
 } from '../src/game/logic/worldConfig.js';
+import { getEnabledMiniGames } from '../src/game/shared/gameUtils.js';
 import {
   normalizeInput,
   integrateMovement,
@@ -260,5 +263,34 @@ describe('3D Exploration Game Logic, Physics & Routing Test Suite', () => {
     const buildingsSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'world', 'createBuildings.js'), 'utf-8');
     assert.ok(buildingsSource.includes('buildSectionSignage'), 'Buildings must include 3D section signage');
     assert.ok(buildingsSource.includes('createProximityGlowTexture'), 'Buildings must include soft proximity ground glow');
+  });
+
+  it('9. Wires Hybrid Explore + Arcade entry: Navbar links directly to /play/explore and Arcade Kiosk & Quick Drawer expose enabled mini-games', () => {
+    const allInteractables = getWorldInteractables(true);
+    assert.equal(allInteractables.length, 6);
+    assert.equal(allInteractables[5].id, 'arcade');
+    assert.equal(ARCADE_KIOSK.isArcade, true);
+    assert.equal(getWorldInteractables(false).length, 5);
+
+    const enMiniGames = getEnabledMiniGames({ prefix: '/en' });
+    assert.deepEqual(
+      enMiniGames.map((g) => g.href),
+      ['/en/play/stack', '/en/play/bugs', '/en/play/runner']
+    );
+
+    const onlyRunner = getEnabledMiniGames({
+      enableStackGame: false,
+      enableBugGame: false,
+      enableRunnerGame: true,
+    });
+    assert.equal(onlyRunner.length, 1);
+    assert.equal(onlyRunner[0].id, 'runner');
+
+    const navbarSource = fs.readFileSync(path.join(rootDir, 'src', 'components', 'Navbar.jsx'), 'utf-8');
+    assert.ok(navbarSource.includes('/play/explore'), 'Navbar 3D World button must navigate directly to /play/explore');
+    assert.ok(navbarSource.includes('/en/play/explore'), 'Navbar EN 3D World button must navigate directly to /en/play/explore');
+
+    const pageSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'GamePage.jsx'), 'utf-8');
+    assert.ok(pageSource.includes('<ArcadeModal'), 'GamePage must mount ArcadeModal for 3D Kiosk & Quick-Switch HUD button');
   });
 });

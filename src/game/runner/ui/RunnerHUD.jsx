@@ -38,6 +38,7 @@ const RunnerHUD = ({
   tokenToast,
   isTouch,
   reducedMotion = false,
+  vignetteBackground,
   onStartRun,
   onTogglePause,
   onRestart,
@@ -80,6 +81,7 @@ const RunnerHUD = ({
         className="pointer-events-none fixed inset-0 z-10"
         style={{
           background:
+            vignetteBackground ||
             'radial-gradient(ellipse 90% 34% at 50% 8%, rgba(59, 130, 246, 0.14) 0%, rgba(17, 24, 39, 0.08) 45%, transparent 78%), radial-gradient(circle at 50% 54%, transparent 58%, rgba(8, 8, 8, 0.72) 100%)',
         }}
       />
@@ -99,22 +101,22 @@ const RunnerHUD = ({
           to={menuHref}
           onPointerDown={stopEvent}
           onClick={stopEvent}
-          className="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs font-bold text-[#F5F5F5] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+          className="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label={t('game.stack.backToMenuAria')}
         >
-          <FiArrowLeft size={14} className="text-[#3B82F6]" aria-hidden="true" />
+          <FiArrowLeft size={14} className="text-[var(--accent)]" aria-hidden="true" />
           <span>{t('game.stack.backToMenu')}</span>
         </RouterLink>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div
-            className="hidden sm:flex px-3 py-1.5 rounded-md bg-[#141414]/95 border border-[#27272A] font-mono text-xs text-[#A1A1AA] items-center gap-1.5 shadow-md"
+            className="hidden sm:flex px-3 py-1.5 rounded-md bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] items-center gap-1.5 shadow-md"
             aria-label={`${t('game.stack.bestLabel')}: ${bestScore}`}
           >
-            <span className="text-[#3B82F6] font-bold uppercase">
+            <span className="text-[var(--accent)] font-bold uppercase">
               {t('game.stack.bestLabel')}:
             </span>
-            <span className="text-[#F5F5F5] font-bold">{bestScore}</span>
+            <span className="text-[var(--text-primary)] font-bold">{bestScore}</span>
           </div>
 
           {isPlayable || isPaused ? (
@@ -128,10 +130,10 @@ const RunnerHUD = ({
               aria-pressed={isPaused}
               aria-label={isPaused ? t('game.stack.resumeAria') : t('game.stack.pauseAria')}
               title={isPaused ? t('game.stack.resumeAria') : t('game.stack.pauseAria')}
-              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs text-[#A1A1AA] hover:text-[#F5F5F5] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               {isPaused ? (
-                <FiPlay size={14} className="text-[#3B82F6]" aria-hidden="true" />
+                <FiPlay size={14} className="text-[var(--accent)]" aria-hidden="true" />
               ) : (
                 <FiPause size={14} aria-hidden="true" />
               )}
@@ -147,7 +149,7 @@ const RunnerHUD = ({
       {!isReady && (
         <div className="pointer-events-none fixed top-14 sm:top-16 left-0 right-0 z-20 flex flex-col items-center gap-1.5 px-3 select-none">
           <div
-            className="font-grotesk font-black text-3xl sm:text-5xl text-[#F5F5F5] tracking-tight drop-shadow-md"
+            className="font-grotesk font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight drop-shadow-md"
             aria-live="off"
             aria-label={`${t('game.stack.scoreLabel')}: ${score}`}
           >
@@ -157,60 +159,60 @@ const RunnerHUD = ({
           <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
             {/* 3 Hearts (Color + Numeric for accessibility) */}
             <div
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#141414]/95 border border-[#27272A]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--surface)]/95 border border-[var(--border)]"
               aria-label={`${t('game.runner.livesLabel')}: ${lives}/${maxLives}`}
             >
               {hearts.map((alive, idx) => (
                 <FiHeart
                   key={idx}
                   size={13}
-                  className={alive ? 'text-[#EF4444] fill-[#EF4444]' : 'text-[#3F3F46]'}
+                  className={alive ? 'text-[#EF4444] fill-[#EF4444]' : 'text-[var(--text-muted)]'}
                   aria-hidden="true"
                 />
               ))}
-              <span className="font-mono text-[10px] font-bold text-[#A1A1AA] ml-0.5">
+              <span className="font-mono text-[10px] font-bold text-[var(--text-secondary)] ml-0.5">
                 {lives}/{maxLives}
               </span>
             </div>
 
             {/* Distance */}
-            <div className="px-2.5 py-1 rounded bg-[#141414]/95 border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]">
-              <strong className="text-[#F5F5F5]">{distance}m</strong>
+            <div className="px-2.5 py-1 rounded bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)]">
+              <strong className="text-[var(--text-primary)]">{distance}m</strong>
             </div>
 
             {/* Multiplier */}
             <div
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded font-mono text-[11px] font-bold border ${
                 multiplier > 1
-                  ? 'bg-[#3B82F6]/20 border-[#3B82F6] text-[#F5F5F5]'
-                  : 'bg-[#141414]/95 border-[#27272A] text-[#A1A1AA]'
+                  ? 'bg-[var(--surface)]/95 border-[var(--accent)] text-[var(--text-primary)]'
+                  : 'bg-[var(--surface)]/95 border-[var(--border)] text-[var(--text-secondary)]'
               }`}
             >
-              <FiZap size={11} className="text-[#3B82F6]" aria-hidden="true" />
+              <FiZap size={11} className="text-[var(--accent)]" aria-hidden="true" />
               <span>×{multiplier}</span>
             </div>
 
             {/* Tokens Collected */}
             <div
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#141414]/95 border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)]"
               aria-label={`${t('game.runner.tokensLabel')}: ${tokensCollected}`}
             >
-              <FiCpu size={11} className="text-[#3B82F6]" aria-hidden="true" />
-              <span className="text-[#F5F5F5] font-bold">{tokensCollected}</span>
+              <FiCpu size={11} className="text-[var(--accent)]" aria-hidden="true" />
+              <span className="text-[var(--text-primary)] font-bold">{tokensCollected}</span>
             </div>
           </div>
 
           {/* Non-blocking status toasts (Invuln Shield / Token pickup / Milestone) */}
           <div className="flex flex-col items-center gap-1 mt-0.5">
             {invulnActive && !isGameOver && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#141414]/95 border border-[#3B82F6] font-mono text-[10px] font-bold text-[#3B82F6] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[var(--surface)]/95 border border-[var(--accent)] font-mono text-[10px] font-bold text-[var(--accent)] uppercase tracking-wider">
                 <FiShield size={10} aria-hidden="true" />
                 <span>{t('game.runner.invulnTag')}</span>
               </span>
             )}
 
             {tokenToast && !isGameOver && (
-              <span className="px-2.5 py-0.5 rounded bg-[#141414]/95 border border-[#3B82F6]/70 font-mono text-[10px] font-bold text-[#F5F5F5] uppercase tracking-wider">
+              <span className="px-2.5 py-0.5 rounded bg-[var(--surface)]/95 border border-[var(--accent)] font-mono text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider">
                 +{tokenToast.points} {tokenToast.label}
               </span>
             )}
@@ -219,7 +221,7 @@ const RunnerHUD = ({
               <div
                 role="status"
                 aria-live="polite"
-                className="px-3.5 py-1 rounded-md bg-[#141414]/95 border border-[#3B82F6] font-mono text-xs font-bold text-[#F5F5F5] uppercase tracking-wider shadow-lg"
+                className="px-3.5 py-1 rounded-md bg-[var(--surface)]/95 border border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider shadow-lg"
               >
                 {'//'} {milestoneBanner}m — {t('game.runner.milestoneTag')}
               </div>
@@ -233,17 +235,18 @@ const RunnerHUD = ({
         <div
           onPointerDown={stopEvent}
           onClick={stopEvent}
-          className="fixed inset-0 z-30 flex items-center justify-center p-4 bg-black/55 select-none"
+          className="fixed inset-0 z-30 flex items-center justify-center p-4 backdrop-blur-[2px] select-none"
+          style={{ backgroundColor: 'var(--modal-backdrop, rgba(0, 0, 0, 0.55))' }}
         >
-          <div className="w-full max-w-sm p-6 rounded-lg bg-[#141414] border border-[#27272A] text-[#F5F5F5] shadow-2xl space-y-5 text-center">
+          <div className="w-full max-w-sm p-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] shadow-2xl space-y-5 text-center">
             <div className="space-y-1.5">
-              <span className="font-mono text-[11px] text-[#3B82F6] uppercase tracking-wider font-semibold">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
                 {'//'} {t('game.runner.startTag')}
               </span>
               <h1 className="font-grotesk font-black text-3xl uppercase tracking-tight">
                 {t('game.runner.startTitle')}
               </h1>
-              <p className="font-sans text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+              <p className="font-sans text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                 {isTouch ? t('game.runner.controlsIntroTouch') : t('game.runner.controlsIntroDesktop')}
               </p>
             </div>
@@ -255,7 +258,7 @@ const RunnerHUD = ({
                 e.stopPropagation();
                 onStartRun();
               }}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
             >
               <FiPlay size={14} aria-hidden="true" />
               <span>{t('game.runner.startBtn')}</span>
@@ -270,7 +273,7 @@ const RunnerHUD = ({
           <div
             role="status"
             aria-live="assertive"
-            className="font-grotesk font-black text-6xl sm:text-7xl text-[#F5F5F5] tracking-tight drop-shadow-[0_4px_16px_rgba(59,130,246,0.45)]"
+            className="font-grotesk font-black text-6xl sm:text-7xl text-[var(--text-primary)] tracking-tight drop-shadow-lg"
           >
             {isReady && countdownValue > 0 ? countdownValue : t('game.runner.countdownGo')}
           </div>
@@ -290,7 +293,7 @@ const RunnerHUD = ({
           }`}
           aria-hidden={!hintVisible}
         >
-          <div className="px-3.5 py-1.5 rounded-md bg-[#080808]/90 border border-[#27272A] font-mono text-[11px] text-[#A1A1AA] text-center">
+          <div className="px-3.5 py-1.5 rounded-md bg-[var(--surface)]/90 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)] text-center">
             {isTouch ? t('game.runner.controlsHintTouch') : t('game.runner.controlsHintDesktop')}
           </div>
         </div>
@@ -304,14 +307,15 @@ const RunnerHUD = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="runner-pause-title"
-          className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none"
+          className="fixed inset-0 z-40 flex items-center justify-center p-4 backdrop-blur-sm select-none"
+          style={{ backgroundColor: 'var(--modal-backdrop, rgba(0, 0, 0, 0.75))' }}
         >
           <div
             ref={modalRef}
-            className="w-full max-w-sm p-6 rounded-lg bg-[#141414] border border-[#27272A] text-[#F5F5F5] shadow-2xl space-y-5 text-center"
+            className="w-full max-w-sm p-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] shadow-2xl space-y-5 text-center"
           >
             <div className="space-y-1">
-              <span className="font-mono text-[11px] text-[#3B82F6] uppercase tracking-wider font-semibold">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
                 {'//'} {t('game.stack.pausedTag')}
               </span>
               <h2 id="runner-pause-title" className="font-grotesk font-black text-2xl uppercase">
@@ -328,7 +332,7 @@ const RunnerHUD = ({
                   e.stopPropagation();
                   onTogglePause();
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
               >
                 <FiPlay size={13} aria-hidden="true" />
                 <span>{t('game.stack.resumeBtn')}</span>
@@ -338,7 +342,7 @@ const RunnerHUD = ({
                 to={menuHref}
                 onPointerDown={stopEvent}
                 onClick={stopEvent}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
               >
                 <FiArrowLeft size={13} aria-hidden="true" />
                 <span>{t('game.stack.backToMenu')}</span>
@@ -356,11 +360,12 @@ const RunnerHUD = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="runner-gameover-title"
-          className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-4 px-4 bg-black/75 backdrop-blur-sm select-none"
+          className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-4 px-4 backdrop-blur-sm select-none"
+          style={{ backgroundColor: 'var(--modal-backdrop, rgba(0, 0, 0, 0.75))' }}
         >
           <div
             ref={modalRef}
-            className="w-full max-w-md p-6 rounded-lg bg-[#141414] border border-[#27272A] text-[#F5F5F5] shadow-2xl space-y-5"
+            className="w-full max-w-md p-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] shadow-2xl space-y-5"
           >
             <div>
               <span className="font-mono text-[11px] text-[#EF4444] uppercase tracking-wider font-semibold">
@@ -372,29 +377,29 @@ const RunnerHUD = ({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="p-2.5 rounded bg-[#101010] border border-[#27272A]">
-                <div className="font-mono text-[10px] text-[#71717A] uppercase">
+              <div className="p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border)]">
+                <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase">
                   {t('game.stack.scoreLabel')}
                 </div>
-                <div className="font-grotesk font-black text-xl text-[#F5F5F5] mt-0.5">{score}</div>
+                <div className="font-grotesk font-black text-xl text-[var(--text-primary)] mt-0.5">{score}</div>
               </div>
-              <div className="p-2.5 rounded bg-[#101010] border border-[#27272A]">
-                <div className="font-mono text-[10px] text-[#71717A] uppercase">
+              <div className="p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border)]">
+                <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase">
                   {t('game.runner.distanceLabel')}
                 </div>
-                <div className="font-grotesk font-black text-xl text-[#F5F5F5] mt-0.5">{distance}m</div>
+                <div className="font-grotesk font-black text-xl text-[var(--text-primary)] mt-0.5">{distance}m</div>
               </div>
-              <div className="p-2.5 rounded bg-[#101010] border border-[#27272A]">
-                <div className="font-mono text-[10px] text-[#71717A] uppercase">
+              <div className="p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border)]">
+                <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase">
                   {t('game.runner.tokensLabel')}
                 </div>
-                <div className="font-grotesk font-black text-xl text-[#3B82F6] mt-0.5">{tokensCollected}</div>
+                <div className="font-grotesk font-black text-xl text-[var(--accent)] mt-0.5">{tokensCollected}</div>
               </div>
-              <div className="p-2.5 rounded bg-[#101010] border border-[#27272A]">
-                <div className="font-mono text-[10px] text-[#71717A] uppercase">
+              <div className="p-2.5 rounded bg-[var(--surface-alt)] border border-[var(--border)]">
+                <div className="font-mono text-[10px] text-[var(--text-muted)] uppercase">
                   {t('game.stack.bestLabel')}
                 </div>
-                <div className="font-grotesk font-black text-xl text-[#3B82F6] mt-0.5">{bestScore}</div>
+                <div className="font-grotesk font-black text-xl text-[var(--accent)] mt-0.5">{bestScore}</div>
               </div>
             </div>
 
@@ -407,7 +412,7 @@ const RunnerHUD = ({
                   e.stopPropagation();
                   onRestart();
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
               >
                 <FiRotateCcw size={13} aria-hidden="true" />
                 <span>{t('game.stack.playAgain')}</span>
@@ -418,18 +423,18 @@ const RunnerHUD = ({
                   to={stackSectionHref}
                   onPointerDown={stopEvent}
                   onClick={stopEvent}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
                 >
-                  <FiLayers size={13} className="text-[#3B82F6]" aria-hidden="true" />
+                  <FiLayers size={13} className="text-[var(--accent)]" aria-hidden="true" />
                   <span>{t('game.stack.viewTechStack')}</span>
-                  <FiArrowUpRight size={12} className="text-[#71717A]" aria-hidden="true" />
+                  <FiArrowUpRight size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                 </RouterLink>
 
                 <RouterLink
                   to={menuHref}
                   onPointerDown={stopEvent}
                   onClick={stopEvent}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                   <FiArrowLeft size={13} aria-hidden="true" />
                   <span>{t('game.stack.backToMenu')}</span>
@@ -463,6 +468,7 @@ RunnerHUD.propTypes = {
   }),
   isTouch: PropTypes.bool,
   reducedMotion: PropTypes.bool,
+  vignetteBackground: PropTypes.string,
   onStartRun: PropTypes.func.isRequired,
   onTogglePause: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,

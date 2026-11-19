@@ -122,3 +122,58 @@ export const extractTechLabels = (categories = techCategoriesData) => {
   }
   return list.length > 0 ? list : ['STACK'];
 };
+
+export const MINI_GAME_DEFS = [
+  {
+    id: 'stack',
+    number: '01',
+    path: '/play/stack',
+    bestKey: 'portfolio:stack:best',
+    badgeKey: 'game.hub.stackBadge',
+    titleKey: 'game.hub.stackTitle',
+    descKey: 'game.hub.stackDesc',
+    launchKey: 'game.hub.launchStack',
+  },
+  {
+    id: 'bugs',
+    number: '02',
+    path: '/play/bugs',
+    bestKey: 'portfolio:bugs:best',
+    badgeKey: 'game.hub.bugsBadge',
+    titleKey: 'game.hub.bugsTitle',
+    descKey: 'game.hub.bugsDesc',
+    launchKey: 'game.hub.launchBugs',
+  },
+  {
+    id: 'runner',
+    number: '03',
+    path: '/play/runner',
+    bestKey: 'portfolio:runner:best',
+    badgeKey: 'game.hub.runnerBadge',
+    titleKey: 'game.hub.runnerTitle',
+    descKey: 'game.hub.runnerDesc',
+    launchKey: 'game.hub.launchRunner',
+  },
+];
+
+/**
+ * Builds the list of enabled mini-games with localized URL prefix and current best score.
+ */
+export const getEnabledMiniGames = ({
+  prefix = '',
+  enableStackGame = true,
+  enableBugGame = true,
+  enableRunnerGame = true,
+  storage,
+} = {}) => {
+  const flagById = {
+    stack: enableStackGame,
+    bugs: enableBugGame,
+    runner: enableRunnerGame,
+  };
+  return MINI_GAME_DEFS.filter((g) => Boolean(flagById[g.id])).map((g) => ({
+    ...g,
+    href: `${prefix}${g.path}`,
+    bestScore: readBestScoreByKey(g.bestKey, storage),
+  }));
+};

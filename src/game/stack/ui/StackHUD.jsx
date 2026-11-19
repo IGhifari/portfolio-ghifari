@@ -28,6 +28,7 @@ const StackHUD = ({
   isPaused,
   isGameOver,
   isTouch,
+  vignetteBackground,
   onTogglePause,
   onRestart,
   menuHref = '/play',
@@ -54,6 +55,7 @@ const StackHUD = ({
         className="pointer-events-none fixed inset-0 z-10"
         style={{
           background:
+            vignetteBackground ||
             'radial-gradient(ellipse 90% 34% at 50% 8%, rgba(59, 130, 246, 0.14) 0%, rgba(17, 24, 39, 0.08) 45%, transparent 78%), radial-gradient(circle at 50% 54%, transparent 56%, rgba(8, 8, 8, 0.72) 100%)',
         }}
       />
@@ -73,23 +75,23 @@ const StackHUD = ({
           to={menuHref}
           onPointerDown={stopEvent}
           onClick={stopEvent}
-          className="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs font-bold text-[#F5F5F5] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+          className="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label={t('game.stack.backToMenuAria')}
         >
-          <FiArrowLeft size={14} className="text-[#3B82F6]" aria-hidden="true" />
+          <FiArrowLeft size={14} className="text-[var(--accent)]" aria-hidden="true" />
           <span>{t('game.stack.backToMenu')}</span>
         </RouterLink>
 
         <div className="flex items-center gap-2">
           {/* Best Score Pill */}
           <div
-            className="px-3 py-1.5 rounded-md bg-[#141414]/95 border border-[#27272A] font-mono text-xs text-[#A1A1AA] flex items-center gap-1.5 shadow-md"
+            className="px-3 py-1.5 rounded-md bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] flex items-center gap-1.5 shadow-md"
             aria-label={`${t('game.stack.bestLabel')}: ${bestScore}`}
           >
-            <span className="text-[#3B82F6] font-bold uppercase">
+            <span className="text-[var(--accent)] font-bold uppercase">
               {t('game.stack.bestLabel')}:
             </span>
-            <span className="text-[#F5F5F5] font-bold">{bestScore}</span>
+            <span className="text-[var(--text-primary)] font-bold">{bestScore}</span>
           </div>
 
           {/* Pause / Resume Toggle */}
@@ -104,10 +106,10 @@ const StackHUD = ({
               aria-pressed={isPaused}
               aria-label={isPaused ? t('game.stack.resumeAria') : t('game.stack.pauseAria')}
               title={isPaused ? t('game.stack.resumeAria') : t('game.stack.pauseAria')}
-              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs text-[#A1A1AA] hover:text-[#F5F5F5] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               {isPaused ? (
-                <FiPlay size={14} className="text-[#3B82F6]" aria-hidden="true" />
+                <FiPlay size={14} className="text-[var(--accent)]" aria-hidden="true" />
               ) : (
                 <FiPause size={14} aria-hidden="true" />
               )}
@@ -128,10 +130,10 @@ const StackHUD = ({
             aria-pressed={isPlaying}
             aria-label={isPlaying ? t('game.muteAria') : t('game.unmuteAria')}
             title={isPlaying ? t('game.muteAria') : t('game.unmuteAria')}
-            className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs text-[#A1A1AA] hover:text-[#F5F5F5] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+            className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             {isPlaying ? (
-              <FiVolume2 size={14} className="text-[#3B82F6]" aria-hidden="true" />
+              <FiVolume2 size={14} className="text-[var(--accent)]" aria-hidden="true" />
             ) : (
               <FiVolumeX size={14} aria-hidden="true" />
             )}
@@ -145,7 +147,7 @@ const StackHUD = ({
       {/* Live Score & Current Tech Pill */}
       <div className="pointer-events-none fixed top-20 left-0 right-0 z-20 flex flex-col items-center gap-1.5 select-none">
         <div
-          className="font-grotesk font-black text-5xl sm:text-6xl text-[#F5F5F5] tracking-tight drop-shadow-md"
+          className="font-grotesk font-black text-5xl sm:text-6xl text-[var(--text-primary)] tracking-tight drop-shadow-md"
           aria-live="polite"
           aria-label={`${t('game.stack.scoreLabel')}: ${score}`}
         >
@@ -154,14 +156,14 @@ const StackHUD = ({
 
         <div className="flex items-center gap-2">
           {currentLabel && !isGameOver && (
-            <span className="px-2.5 py-0.5 rounded bg-[#141414]/90 border border-[#27272A] font-mono text-[11px] text-[#3B82F6] font-bold tracking-wider uppercase">
+            <span className="px-2.5 py-0.5 rounded bg-[var(--surface)]/90 border border-[var(--border)] font-mono text-[11px] text-[var(--accent)] font-bold tracking-wider uppercase">
               {currentLabel}
             </span>
           )}
 
           {combo > 0 && !isGameOver && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#3B82F6]/20 border border-[#3B82F6] font-mono text-[11px] text-[#F5F5F5] font-bold uppercase">
-              <FiZap size={11} className="text-[#3B82F6]" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[var(--surface)]/95 border border-[var(--accent)] font-mono text-[11px] text-[var(--text-primary)] font-bold uppercase">
+              <FiZap size={11} className="text-[var(--accent)]" aria-hidden="true" />
               <span>
                 {t('game.stack.comboLabel')} ×{combo}
               </span>
@@ -178,7 +180,7 @@ const StackHUD = ({
           }}
           className="pointer-events-none fixed bottom-0 left-0 right-0 z-20 flex justify-center px-4 select-none"
         >
-          <div className="px-3.5 py-1.5 rounded-md bg-[#080808]/90 border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]">
+          <div className="px-3.5 py-1.5 rounded-md bg-[var(--surface)]/90 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)]">
             {isTouch ? t('game.stack.controlsHintTouch') : t('game.stack.controlsHintDesktop')}
           </div>
         </div>
@@ -192,14 +194,15 @@ const StackHUD = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="stack-pause-title"
-          className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none"
+          className="fixed inset-0 z-40 flex items-center justify-center p-4 backdrop-blur-sm select-none"
+          style={{ backgroundColor: 'var(--modal-backdrop, rgba(0, 0, 0, 0.75))' }}
         >
           <div
             ref={modalRef}
-            className="w-full max-w-sm p-6 rounded-lg bg-[#141414] border border-[#27272A] text-[#F5F5F5] shadow-2xl space-y-5 text-center"
+            className="w-full max-w-sm p-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] shadow-2xl space-y-5 text-center"
           >
             <div className="space-y-1">
-              <span className="font-mono text-[11px] text-[#3B82F6] uppercase tracking-wider font-semibold">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
                 {'//'} {t('game.stack.pausedTag')}
               </span>
               <h2
@@ -219,7 +222,7 @@ const StackHUD = ({
                   e.stopPropagation();
                   onTogglePause();
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
               >
                 <FiPlay size={13} aria-hidden="true" />
                 <span>{t('game.stack.resumeBtn')}</span>
@@ -229,7 +232,7 @@ const StackHUD = ({
                 to={menuHref}
                 onPointerDown={stopEvent}
                 onClick={stopEvent}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
               >
                 <FiArrowLeft size={13} aria-hidden="true" />
                 <span>{t('game.stack.backToMenu')}</span>
@@ -247,14 +250,15 @@ const StackHUD = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="stack-gameover-title"
-          className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-4 px-4 bg-black/75 backdrop-blur-sm select-none"
+          className="fixed inset-0 z-40 flex items-center justify-center pt-16 pb-4 px-4 backdrop-blur-sm select-none"
+          style={{ backgroundColor: 'var(--modal-backdrop, rgba(0, 0, 0, 0.75))' }}
         >
           <div
             ref={modalRef}
-            className="w-full max-w-md p-6 rounded-lg bg-[#141414] border border-[#27272A] text-[#F5F5F5] shadow-2xl space-y-5"
+            className="w-full max-w-md p-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] shadow-2xl space-y-5"
           >
             <div>
-              <span className="font-mono text-[11px] text-[#3B82F6] uppercase tracking-wider font-semibold">
+              <span className="font-mono text-[11px] text-[var(--accent)] uppercase tracking-wider font-semibold">
                 02 {'//'} {t('game.stack.gameOverTag')}
               </span>
               <h2
@@ -266,20 +270,20 @@ const StackHUD = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-md bg-[#101010] border border-[#27272A]">
-                <span className="block font-mono text-[10px] text-[#A1A1AA] uppercase">
+              <div className="p-3.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border)]">
+                <span className="block font-mono text-[10px] text-[var(--text-secondary)] uppercase">
                   {t('game.stack.scoreLabel')}
                 </span>
-                <span className="font-grotesk font-black text-3xl text-[#F5F5F5]">
+                <span className="font-grotesk font-black text-3xl text-[var(--text-primary)]">
                   {score}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-md bg-[#101010] border border-[#27272A]">
-                <span className="block font-mono text-[10px] text-[#3B82F6] uppercase font-semibold">
+              <div className="p-3.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border)]">
+                <span className="block font-mono text-[10px] text-[var(--accent)] uppercase font-semibold">
                   {t('game.stack.bestLabel')}
                 </span>
-                <span className="font-grotesk font-black text-3xl text-[#3B82F6]">
+                <span className="font-grotesk font-black text-3xl text-[var(--accent)]">
                   {bestScore}
                 </span>
               </div>
@@ -294,7 +298,7 @@ const StackHUD = ({
                   e.stopPropagation();
                   onRestart();
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
               >
                 <FiRotateCcw size={13} aria-hidden="true" />
                 <span>{t('game.stack.playAgain')}</span>
@@ -305,9 +309,9 @@ const StackHUD = ({
                   to={stackSectionHref}
                   onPointerDown={stopEvent}
                   onClick={stopEvent}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
                 >
-                  <FiLayers size={13} className="text-[#3B82F6]" aria-hidden="true" />
+                  <FiLayers size={13} className="text-[var(--accent)]" aria-hidden="true" />
                   <span>{t('game.stack.viewTechStack')}</span>
                   <FiArrowUpRight size={13} aria-hidden="true" />
                 </RouterLink>
@@ -316,7 +320,7 @@ const StackHUD = ({
                   to={menuHref}
                   onPointerDown={stopEvent}
                   onClick={stopEvent}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded bg-[#101010] hover:bg-[#1a1a1f] border border-[#27272A] hover:border-[#3B82F6] text-[#A1A1AA] hover:text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                   <FiArrowLeft size={13} aria-hidden="true" />
                   <span>{t('game.stack.backToMenu')}</span>
@@ -338,6 +342,7 @@ StackHUD.propTypes = {
   isPaused: PropTypes.bool,
   isGameOver: PropTypes.bool,
   isTouch: PropTypes.bool,
+  vignetteBackground: PropTypes.string,
   onTogglePause: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   menuHref: PropTypes.string,

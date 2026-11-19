@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useRouter } from '../context/RouterContext';
 import { updateDocumentMetadata } from '../utils/seo';
-import { siteConfig } from '../config/site';
+import { siteConfig, ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '../config/site';
+import { buildGameCssVars, getSeasonal3DTheme } from './shared/seasonalGameTheme';
 import { createWorld } from './world/createWorld';
 import GameHUD from './ui/GameHUD';
 import InfoPanel from './ui/InfoPanel';
+import ArcadeModal from './ui/ArcadeModal';
 import VirtualJoystick from './ui/VirtualJoystick';
 import WebGLFallback from './ui/WebGLFallback';
 
@@ -21,8 +24,15 @@ const detectTouchOrSmallScreen = () => {
 
 const GamePage = () => {
   const { language, t } = useLanguage();
+  const { season, seasonalEnabled } = useTheme();
   const { langPrefix } = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  const theme3D = useMemo(
+    () => getSeasonal3DTheme(season, seasonalEnabled),
+    [season, seasonalEnabled]
+  );
+  const gameCssVars = useMemo(() => buildGameCssVars(theme3D), [theme3D]);
 
   const containerRef = useRef(null);
   const worldRef = useRef(null);
@@ -30,15 +40,19 @@ const GamePage = () => {
   const touchVecRef = useRef({ x: 0, z: 0 });
   const nearestRef = useRef(null);
   const activeBuildingRef = useRef(null);
+  const isArcadeOpenRef = useRef(false);
 
   const [webglSupported, setWebglSupported] = useState(true);
   const [isTouch, setIsTouch] = useState(detectTouchOrSmallScreen);
   const [nearestBuilding, setNearestBuilding] = useState(null);
   const [activeBuilding, setActiveBuilding] = useState(null);
+  const [isArcadeOpen, setIsArcadeOpen] = useState(false);
   const [visitedIds, setVisitedIds] = useState([]);
   const [labelCoords, setLabelCoords] = useState({});
 
-  const exitHref = langPrefix === 'en' ? '/en/play' : '/play';
+  const prefix = langPrefix === 'en' ? '/en' : '';
+  const exitHref = prefix || '/';
+  const hasMiniGames = ENABLE_STACK_GAME || ENABLE_BUG_GAME || ENABLE_RUNNER_GAME;
 
   // Set noindex SEO metadata for /play/explore
   useEffect(() => {
@@ -63,18 +77,42 @@ const GamePage = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const openBuildingPanel = useCallback((building) => {
-    if (!building) return;
-    activeBuildingRef.current = building;
-    setActiveBuilding(building);
+  const openArcadePanel = useCallback(() => {
+    if (!hasMiniGames) return;
+    activeBuildingRef.current = null;
+    setActiveBuilding(null);
+    isArcadeOpenRef.current = true;
+    setIsArcadeOpen(true);
     worldRef.current?.setPaused(true);
-    setVisitedIds((prev) => {
-      if (prev.includes(building.id)) return prev;
-      const next = [...prev, building.id];
-      worldRef.current?.setVisitedSet(new Set(next));
-      return next;
-    });
+  }, [hasMiniGames]);
+
+  const closeArcadePanel = useCallback(() => {
+    isArcadeOpenRef.current = false;
+    setIsArcadeOpen(false);
+    worldRef.current?.setPaused(false);
   }, []);
+
+  const openBuildingPanel = useCallback(
+    (building) => {
+      if (!building) return;
+      if (building.isArcade || building.id === 'arcade') {
+        openArcadePanel();
+        return;
+      }
+      isArcadeOpenRef.current = false;
+      setIsArcadeOpen(false);
+      activeBuildingRef.current = building;
+      setActiveBuilding(building);
+      worldRef.current?.setPaused(true);
+      setVisitedIds((prev) => {
+        if (prev.includes(building.id)) return prev;
+        const next = [...prev, building.id];
+        worldRef.current?.setVisitedSet(new Set(next));
+        return next;
+      });
+    },
+    [openArcadePanel]
+  );
 
   const closeBuildingPanel = useCallback(() => {
     activeBuildingRef.current = null;
@@ -109,6 +147,19 @@ const GamePage = () => {
         return;
       }
 
+      if (e.code === 'Escape') {
+        if (isArcadeOpenRef.current) {
+          e.preventDefault();
+          closeArcadePanel();
+          return;
+        }
+        if (activeBuildingRef.current) {
+          e.preventDefault();
+          closeBuildingPanel();
+          return;
+        }
+      }
+
       if (
         e.target &&
         (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) ||
@@ -117,15 +168,10 @@ const GamePage = () => {
         return;
       }
 
-      if (e.code === 'Escape' && activeBuildingRef.current) {
-        e.preventDefault();
-        closeBuildingPanel();
-        return;
-      }
-
       if (
         (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') &&
         !activeBuildingRef.current &&
+        !isArcadeOpenRef.current &&
         nearestRef.current
       ) {
         e.preventDefault();
@@ -165,7 +211,7 @@ const GamePage = () => {
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
     };
-  }, [closeBuildingPanel, openBuildingPanel]);
+  }, [closeArcadePanel, closeBuildingPanel, openBuildingPanel]);
 
   // Mount Three.js world and dispose everything on unmount
   useEffect(() => {
@@ -179,6 +225,8 @@ const GamePage = () => {
     const world = createWorld(container, {
       isMobile: mobileMode,
       reducedMotion: Boolean(shouldReduceMotion),
+      includeArcade: hasMiniGames,
+      seasonalTheme: theme3D,
       getInput: computeInputVector,
       onNearestChange: (b) => {
         nearestRef.current = b;
@@ -200,47 +248,65 @@ const GamePage = () => {
       world.dispose();
       worldRef.current = null;
     };
-  }, [computeInputVector, shouldReduceMotion]);
+  }, [computeInputVector, hasMiniGames, shouldReduceMotion, theme3D]);
 
   const handleJoystickMove = useCallback((vec) => {
     touchVecRef.current = vec;
   }, []);
 
+  const anyModalOpen = Boolean(activeBuilding || isArcadeOpen);
+
   if (!webglSupported) {
     return (
-      <>
+      <div style={gameCssVars}>
         <WebGLFallback
           exitHref={exitHref}
           onSelectBuilding={openBuildingPanel}
         />
         <InfoPanel building={activeBuilding} onClose={closeBuildingPanel} />
-      </>
+      </div>
     );
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#080808] text-[#F5F5F5]">
+    <div
+      style={gameCssVars}
+      className="relative w-full h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]"
+    >
       {/* 3D Canvas Mount Container */}
       <div ref={containerRef} className="w-full h-full" />
 
-      {/* Persistent HTML HUD (Exit button always visible at z-[60]) */}
+      {/* Persistent HTML HUD (Exit & Mini-Games buttons always visible at z-[60]) */}
       <GameHUD
         nearestBuilding={nearestBuilding}
         visitedIds={visitedIds}
         labelCoords={labelCoords}
         isTouch={isTouch}
-        isPanelOpen={Boolean(activeBuilding)}
+        isPanelOpen={anyModalOpen}
+        hasArcade={hasMiniGames}
+        vignetteBackground={theme3D.vignetteBackground}
         onInteract={openBuildingPanel}
+        onOpenArcade={openArcadePanel}
         exitHref={exitHref}
       />
 
       {/* Touch Virtual Joystick (mobile / touch viewports) */}
-      {isTouch && !activeBuilding && (
+      {isTouch && !anyModalOpen && (
         <VirtualJoystick onMove={handleJoystickMove} />
       )}
 
       {/* Building Info Overlay Modal */}
       <InfoPanel building={activeBuilding} onClose={closeBuildingPanel} />
+
+      {/* Quick Arcade Lab Mini-Games Selector Modal */}
+      <ArcadeModal
+        isOpen={isArcadeOpen}
+        onClose={closeArcadePanel}
+        prefix={prefix}
+        enableStackGame={ENABLE_STACK_GAME}
+        enableBugGame={ENABLE_BUG_GAME}
+        enableRunnerGame={ENABLE_RUNNER_GAME}
+      />
     </div>
   );
 };

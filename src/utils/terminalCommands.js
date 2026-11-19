@@ -10,7 +10,8 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
-import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '../config/site.js';
+import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME, ENABLE_SEASONAL_THEMES } from '../config/site.js';
+import { parseSeasonMonth, resolveSeasonalTheme } from '../config/seasonalEvents.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -687,6 +688,45 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         message: isId
           ? "Gunakan 'project <slug>' untuk membaca detail proyek (contoh: project akseskita)."
           : "Use 'project <slug>' to inspect project details (e.g. project akseskita).",
+      };
+    }
+
+    case 'season': {
+      const isId = language === 'id';
+      if (!ENABLE_SEASONAL_THEMES) {
+        return {
+          type: 'error',
+          command,
+          args,
+          raw,
+          message: isId ? 'Tema musiman sedang dinonaktifkan.' : 'Seasonal themes are currently disabled.',
+        };
+      }
+      const arg = args[0]?.trim().toLowerCase() || '';
+      if (!arg || arg === 'auto' || arg === 'reset') {
+        const autoTheme = resolveSeasonalTheme(null, null, new Date());
+        return {
+          type: 'season',
+          command,
+          args,
+          raw,
+          month: null,
+          message: isId
+            ? `Tema musiman dikembalikan ke bulan kalender lokal (${autoTheme.name.id}).`
+            : `Seasonal theme restored to local calendar month (${autoTheme.name.en}).`,
+        };
+      }
+      const parsedMonth = parseSeasonMonth(arg, new Date());
+      const resolved = resolveSeasonalTheme(parsedMonth);
+      return {
+        type: 'season',
+        command,
+        args,
+        raw,
+        month: parsedMonth,
+        message: isId
+          ? `Pratinjau tema bulan ${parsedMonth}: ${resolved.name.id} (${resolved.mode}).`
+          : `Previewing month ${parsedMonth} theme: ${resolved.name.en} (${resolved.mode}).`,
       };
     }
 

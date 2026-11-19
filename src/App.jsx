@@ -7,7 +7,7 @@ import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
 import { isPlayRouteType } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
-import { siteConfig } from './config/site';
+import { siteConfig, ENABLE_SEASONAL_THEMES } from './config/site';
 
 // Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
 import Navbar from './components/Navbar';
@@ -36,6 +36,7 @@ const GamePage = lazy(() => import('./game/GamePage'));
 const StackPage = lazy(() => import('./game/stack/StackPage'));
 const BugsPage = lazy(() => import('./game/bugs/BugsPage'));
 const RunnerPage = lazy(() => import('./game/runner/RunnerPage'));
+const SeasonalEffects = lazy(() => import('./components/SeasonalEffects'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -145,6 +146,11 @@ const AppContent = () => {
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
             {!isPlayMode && <Navbar />}
+            {!isPlayMode && ENABLE_SEASONAL_THEMES && (
+                <Suspense fallback={null}>
+                    <SeasonalEffects />
+                </Suspense>
+            )}
 
             <main id="main-content" tabIndex={-1} className="focus:outline-none">
                 {route.type === 'home' && (

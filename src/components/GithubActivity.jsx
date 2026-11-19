@@ -338,7 +338,7 @@ const GithubActivity = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${t('github.viewProfileAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-mono text-xs font-bold transition-all shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-mono text-xs font-bold transition-all shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
               <SiGithub size={14} aria-hidden="true" />
               <span>{t('github.visitDirectly')}</span>

@@ -677,6 +677,15 @@ export const translations = {
         experience: { title: "Pengalaman", subtitle: "Magang & Perjalanan Karier" },
         contact: { title: "Kontak", subtitle: "Saluran Komunikasi Resmi" },
       },
+      arcade: {
+        title: "Arcade Lab",
+        subtitle: "Mini-Game 3D Interaktif",
+        hudBtn: "Mini-Game",
+        hudAria: "Buka menu mini-game 3D",
+        desc: "Pilih salah satu mini-game 3D di bawah untuk langsung bermain, atau tutup untuk kembali menjelajahi plaza.",
+        closeAria: "Tutup menu mini-game",
+        fallbackHeading: "Mini-Game 3D Interaktif",
+      },
       hub: {
         pageTitle: "Hub Interaktif 3D",
         pageDesc: "Pilih pengalaman 3D interaktif: jelajahi dunia portofolio low-poly atau uji presisi di mini-game Deploy Stack.",
@@ -704,8 +713,8 @@ export const translations = {
       stack: {
         pageTitle: "Deploy Stack — Mini-Game 3D",
         pageDesc: "Mini-game 3D menyusun menara teknologi dari tech stack M. Ghifari Bima Khadafi.",
-        backToMenu: "Menu /play",
-        backToMenuAria: "Kembali ke menu utama /play",
+        backToMenu: "Explore 3D",
+        backToMenuAria: "Kembali ke dunia Explore 3D",
         scoreLabel: "Skor",
         bestLabel: "Terbaik",
         comboLabel: "Combo",
@@ -1431,6 +1440,15 @@ export const translations = {
         experience: { title: "Experience", subtitle: "Internship & Career Journey" },
         contact: { title: "Contact", subtitle: "Direct Communication Channels" },
       },
+      arcade: {
+        title: "Arcade Lab",
+        subtitle: "Interactive 3D Mini-Games",
+        hudBtn: "Mini-Games",
+        hudAria: "Open 3D mini-games menu",
+        desc: "Pick any 3D mini-game below to jump straight in, or close to keep exploring the plaza.",
+        closeAria: "Close mini-games menu",
+        fallbackHeading: "Interactive 3D Mini-Games",
+      },
       hub: {
         pageTitle: "3D Interactive Hub",
         pageDesc: "Choose an interactive 3D mode: explore the low-poly portfolio world or test your precision in Deploy Stack.",
@@ -1458,8 +1476,8 @@ export const translations = {
       stack: {
         pageTitle: "Deploy Stack — 3D Mini-Game",
         pageDesc: "Interactive 3D block-stacking mini-game powered by M. Ghifari Bima Khadafi's tech stack.",
-        backToMenu: "Menu /play",
-        backToMenuAria: "Return to /play game hub",
+        backToMenu: "Explore 3D",
+        backToMenuAria: "Return to Explore 3D world",
         scoreLabel: "Score",
         bestLabel: "Best",
         comboLabel: "Combo",

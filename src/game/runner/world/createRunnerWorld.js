@@ -18,7 +18,9 @@ import {
   createChunkPoolState,
   stepChunkRecycling,
 } from '../logic/runnerGenerator.js';
-import { createRunnerAssets, RUNNER_COLORS } from './createRunnerAssets.js';
+import { createRunnerAssets } from './createRunnerAssets.js';
+import { DEFAULT_GAME_THEME } from '../../shared/seasonalGameTheme.js';
+import { createSeasonalAtmosphere } from '../../shared/createSeasonalAtmosphere.js';
 
 /**
  * Initializes the Three.js 3-lane endless runner scene for "Stack Runner".
@@ -29,6 +31,7 @@ export const createRunnerWorld = (
   {
     isMobile = false,
     reducedMotion = false,
+    seasonalTheme = DEFAULT_GAME_THEME,
     seed = Date.now(),
     onStateChange = () => {},
     onMilestone = () => {},
@@ -37,6 +40,7 @@ export const createRunnerWorld = (
   } = {}
 ) => {
   if (!container) return null;
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
 
   let renderer;
   try {
@@ -51,7 +55,7 @@ export const createRunnerWorld = (
 
   const maxDpr = isMobile ? 1.5 : 2;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-  renderer.setClearColor(RUNNER_COLORS.bg, 1);
+  renderer.setClearColor(theme.sceneBg, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const canvas = renderer.domElement;
@@ -60,31 +64,49 @@ export const createRunnerWorld = (
   container.appendChild(canvas);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(RUNNER_COLORS.bg);
-  scene.fog = new THREE.Fog(RUNNER_COLORS.bg, 36, 98);
+  scene.background = new THREE.Color(theme.sceneBg);
+  scene.fog = new THREE.Fog(
+    theme.sceneBg,
+    36 * theme.fogNearMult,
+    98 * theme.fogFarMult
+  );
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 140);
 
   // Lighting balanced for readable player silhouette, obstacles, and track depth
-  const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x09090b, 0.92);
+  const hemiLight = new THREE.HemisphereLight(
+    theme.hemiSky,
+    theme.hemiGround,
+    Math.max(0.88, theme.hemiIntensity)
+  );
   hemiLight.position.set(0, 20, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xf8fafc, 1.38);
+  const dirLight = new THREE.DirectionalLight(theme.dirLight, theme.dirIntensity);
   dirLight.position.set(8, 18, 14);
   scene.add(dirLight);
 
-  const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.72);
+  const rimLight = new THREE.DirectionalLight(theme.rimColor, Math.max(0.7, theme.rimIntensity));
   rimLight.position.set(-10, 10, -18);
   scene.add(rimLight);
 
-  const assets = createRunnerAssets({ isMobile });
+  const assets = createRunnerAssets({ isMobile, seasonalTheme: theme });
   scene.add(assets.runner.root);
   scene.add(assets.runner.shadowMesh);
   scene.add(assets.runner.shieldRing);
   for (const chunkMesh of assets.chunkPool) scene.add(chunkMesh);
   for (const obsSlot of assets.obstaclePool) scene.add(obsSlot.group);
   for (const tokSlot of assets.tokenPool) scene.add(tokSlot.group);
+
+  const seasonalAtmosphere = createSeasonalAtmosphere(scene, theme, {
+    isMobile,
+    reducedMotion,
+    spanX: 16,
+    spanY: 8,
+    spanZ: 56,
+    baseY: 0.4,
+    scrollAxisZ: true,
+  });
 
   const techLabels = extractTechLabels();
   let state = createRunnerState(GAME_STATES.READY);
@@ -346,6 +368,10 @@ export const createRunnerWorld = (
     }
 
     syncSceneToState(dt);
+    seasonalAtmosphere.update(
+      state.gameState === GAME_STATES.PAUSED || state.gameState === GAME_STATES.GAME_OVER ? 0 : dt,
+      { forwardSpeed: state.gameState === GAME_STATES.PLAYING ? state.speed : 0 }
+    );
     renderer.render(scene, camera);
   };
 
@@ -411,6 +437,7 @@ export const createRunnerWorld = (
       window.cancelAnimationFrame(rafId);
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('visibilitychange', handleVisibility);
+      seasonalAtmosphere.dispose();
       assets.dispose();
       renderer.dispose();
       if (canvas.parentNode === container) {

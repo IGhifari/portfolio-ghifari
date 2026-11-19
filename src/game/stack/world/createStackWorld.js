@@ -8,12 +8,8 @@ import {
   stepSlidingBlock,
   computePlacement,
 } from '../logic/stackLogic.js';
-
-const COLOR_BG = 0x080808;
-const COLOR_BASE = 0x121217;
-const COLOR_BLOCK = 0x16161c;
-const COLOR_EDGE = 0x3f3f46;
-const COLOR_ACCENT = 0x3b82f6;
+import { DEFAULT_GAME_THEME } from '../../shared/seasonalGameTheme.js';
+import { createSeasonalAtmosphere } from '../../shared/createSeasonalAtmosphere.js';
 
 /**
  * Creates a cached 2D CanvasTexture for a block's top face with its tech name fitted
@@ -25,6 +21,7 @@ const createBlockTopTexture = (
     isAccent = false,
     width = STACK_CONFIG.initialWidth,
     depth = STACK_CONFIG.initialDepth,
+    theme = DEFAULT_GAME_THEME,
   } = {}
 ) => {
   const canvas = document.createElement('canvas');
@@ -32,10 +29,10 @@ const createBlockTopTexture = (
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
   if (ctx) {
-    ctx.fillStyle = isAccent ? '#172554' : '#16161c';
+    ctx.fillStyle = isAccent ? theme.blockAccentFillHex : theme.blockFaceFillHex;
     ctx.fillRect(0, 0, 256, 256);
 
-    ctx.strokeStyle = isAccent ? '#3b82f6' : '#27272a';
+    ctx.strokeStyle = isAccent ? theme.blockAccentBorderHex : theme.blockFaceBorderHex;
     ctx.lineWidth = 8;
     ctx.strokeRect(8, 8, 240, 240);
 
@@ -63,7 +60,7 @@ const createBlockTopTexture = (
         ctx.font = `bold ${fontPx}px monospace`;
       }
 
-      ctx.fillStyle = '#f4f4f5';
+      ctx.fillStyle = theme.blockTextHex;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(fitted.text, 0, 0);
@@ -83,11 +80,13 @@ export const createStackWorld = (
   {
     isMobile = false,
     reducedMotion = false,
+    seasonalTheme = DEFAULT_GAME_THEME,
     onScoreChange = () => {},
     onGameOver = () => {},
   } = {}
 ) => {
   if (!container) return null;
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
 
   let renderer;
   try {
@@ -102,7 +101,7 @@ export const createStackWorld = (
 
   const maxDpr = isMobile ? 1.5 : 2;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-  renderer.setClearColor(COLOR_BG, 1);
+  renderer.setClearColor(theme.sceneBg, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const canvas = renderer.domElement;
@@ -111,22 +110,30 @@ export const createStackWorld = (
   container.appendChild(canvas);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(COLOR_BG);
-  scene.fog = new THREE.Fog(COLOR_BG, 18, 46);
+  scene.background = new THREE.Color(theme.sceneBg);
+  scene.fog = new THREE.Fog(
+    theme.sceneBg,
+    18 * theme.fogNearMult,
+    46 * theme.fogFarMult
+  );
 
   // OrthographicCamera for crisp isometric geometry and stable block size at any aspect ratio
   const camera = new THREE.OrthographicCamera(-6, 6, 6, -6, 0.1, 100);
 
-  // Lighting matching DESIGN.md & Explore
-  const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x09090b, 0.78);
+  // Lighting matching DESIGN.md & seasonal atmosphere
+  const hemiLight = new THREE.HemisphereLight(
+    theme.hemiSky,
+    theme.hemiGround,
+    theme.hemiIntensity
+  );
   hemiLight.position.set(0, 25, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xf8fafc, 1.35);
+  const dirLight = new THREE.DirectionalLight(theme.dirLight, theme.dirIntensity);
   dirLight.position.set(14, 24, 16);
   scene.add(dirLight);
 
-  const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.65);
+  const rimLight = new THREE.DirectionalLight(theme.rimColor, theme.rimIntensity);
   rimLight.position.set(-16, 14, -14);
   scene.add(rimLight);
 
@@ -134,27 +141,27 @@ export const createStackWorld = (
   const unitBoxGeo = new THREE.BoxGeometry(1, 1, 1);
   const unitEdgesGeo = new THREE.EdgesGeometry(unitBoxGeo);
   const sideMat = new THREE.MeshStandardMaterial({
-    color: COLOR_BLOCK,
+    color: theme.surface,
     roughness: 0.68,
     metalness: 0.2,
   });
   const baseMat = new THREE.MeshStandardMaterial({
-    color: COLOR_BASE,
+    color: theme.blockBase,
     roughness: 0.85,
     metalness: 0.12,
   });
   const overhangMat = new THREE.MeshStandardMaterial({
-    color: 0x1e293b,
+    color: theme.blockOverhang,
     roughness: 0.7,
     metalness: 0.15,
   });
   const edgeMat = new THREE.LineBasicMaterial({
-    color: COLOR_EDGE,
+    color: theme.edgeDefault,
     transparent: true,
     opacity: 0.88,
   });
   const accentEdgeMat = new THREE.LineBasicMaterial({
-    color: COLOR_ACCENT,
+    color: theme.accent,
     transparent: true,
     opacity: 0.96,
   });
@@ -163,7 +170,7 @@ export const createStackWorld = (
   const flashRingGeo = new THREE.RingGeometry(0.48, 0.56, 32);
   flashRingGeo.rotateX(-Math.PI / 2);
   const flashRingMat = new THREE.MeshBasicMaterial({
-    color: COLOR_ACCENT,
+    color: theme.accent,
     side: THREE.DoubleSide,
     transparent: true,
     opacity: 0,
@@ -173,9 +180,18 @@ export const createStackWorld = (
   scene.add(flashRingMesh);
 
   // Subtle floor grid directly beneath the base block
-  const gridHelper = new THREE.GridHelper(32, 16, 0x222530, 0x14161d);
+  const gridHelper = new THREE.GridHelper(32, 16, theme.gridMajor, theme.gridMinor);
   gridHelper.position.y = -STACK_CONFIG.blockHeight * 0.5;
   scene.add(gridHelper);
+
+  const seasonalAtmosphere = createSeasonalAtmosphere(scene, theme, {
+    isMobile,
+    reducedMotion,
+    spanX: 16,
+    spanY: 14,
+    spanZ: 16,
+    baseY: -4,
+  });
 
   const techLabels = extractTechLabels();
   const textureCache = new Map();
@@ -191,7 +207,7 @@ export const createStackWorld = (
     }
     let tex = textureCache.get(cacheKey);
     if (!tex) {
-      tex = createBlockTopTexture(clean, { isAccent, width, depth });
+      tex = createBlockTopTexture(clean, { isAccent, width, depth, theme });
       textureCache.set(cacheKey, tex);
     }
     const mat = new THREE.MeshStandardMaterial({
@@ -429,6 +445,8 @@ export const createStackWorld = (
     camera.position.set(11.5, camFocusY + 10.5, 11.5);
     camera.lookAt(0, camFocusY, 0);
 
+    seasonalAtmosphere.update(paused || isGameOver ? 0 : dt, { focusY: camFocusY });
+
     renderer.render(scene, camera);
     rafId = requestAnimationFrame(tick);
   };
@@ -491,6 +509,7 @@ export const createStackWorld = (
       topMaterialCache.clear();
       textureCache.forEach((tex) => tex.dispose());
       textureCache.clear();
+      seasonalAtmosphere.dispose();
 
       renderer.dispose();
       if (canvas.parentNode) {
