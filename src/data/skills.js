@@ -39,6 +39,7 @@ export const techCategoriesData = [
       { name: 'Node.js', highlight: true },
       { name: 'Express', highlight: true },
       { name: 'Laravel', highlight: false },
+      { name: 'Zod', highlight: false },
     ],
   },
   {
@@ -73,7 +74,9 @@ export const techCategoriesData = [
     skills: [
       { name: 'Vercel', highlight: true },
       { name: 'Cloudflare Pages', highlight: false },
+      { name: 'GitHub Actions', highlight: false },
       { name: 'Docker', highlight: false },
+      { name: 'npm', highlight: false },
     ],
   },
   {
@@ -87,6 +90,8 @@ export const techCategoriesData = [
       { name: 'Postman', highlight: false },
       { name: 'Bruno', highlight: false },
       { name: 'TablePlus', highlight: false },
+      { name: 'Vitest', highlight: true },
+      { name: 'tsup', highlight: false },
       { name: 'VS Code', highlight: false },
     ],
   },
@@ -111,5 +116,9 @@ export const marqueeTechnologies = [
   'MYSQL',
   'GIT',
   'GITHUB',
+  'VITEST',
+  'TSUP',
+  'ZOD',
+  'GITHUB ACTIONS',
   'POSTMAN',
 ];

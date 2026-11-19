@@ -67,6 +67,22 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.equal(parsed.hash, '#filter');
       assert.equal(parsed.route.type, 'study-case-list');
     });
+
+    await t2.test('supports /en language prefix routes cleanly with langPrefix metadata', () => {
+      const parsedEnHome = parseLocation({ pathname: '/en', search: '', hash: '' });
+      assert.equal(parsedEnHome.route.type, 'home');
+      assert.equal(parsedEnHome.langPrefix, 'en');
+
+      const parsedEnList = parseLocation({ pathname: '/en/study-case', search: '', hash: '' });
+      assert.equal(parsedEnList.route.type, 'study-case-list');
+      assert.equal(parsedEnList.langPrefix, 'en');
+
+      const parsedEnDetail = parseLocation({ pathname: '/en/study-case/id-kit', search: '', hash: '#playground' });
+      assert.equal(parsedEnDetail.route.type, 'study-case-detail');
+      assert.equal(parsedEnDetail.route.slug, 'id-kit');
+      assert.equal(parsedEnDetail.langPrefix, 'en');
+      assert.equal(parsedEnDetail.hash, '#playground');
+    });
   });
 
   await t.test('2. Project Data Resolution (getProjectBySlug & allProjects)', async (t2) => {
@@ -238,6 +254,13 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/studyflow</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/project-management</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/akseskita</loc>'));
+      assert.ok(xml.includes('<loc>https://www.ighifari.my.id/recruiter</loc>'));
+      for (const project of allProjects) {
+        assert.ok(
+          xml.includes(`<loc>https://www.ighifari.my.id/study-case/${project.id}</loc>`),
+          `sitemap.xml must include case study URL for project "${project.id}"`
+        );
+      }
 
       // Check XML well-formedness (closing tags match opening tags)
       assert.equal((xml.match(/<url>/g) || []).length, (xml.match(/<\/url>/g) || []).length);
@@ -289,6 +312,9 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.ok(indexHtml.includes('PT. AMA Salam Indonesia'));
       assert.ok(indexHtml.includes('SMKN 1 Cibinong'));
       assert.ok(indexHtml.includes('name="twitter:site" content="@IGhifari"'));
+      assert.ok(indexHtml.includes('hreflang="id"'));
+      assert.ok(indexHtml.includes('hreflang="en"'));
+      assert.ok(indexHtml.includes('hreflang="x-default"'));
     });
   });
 });
