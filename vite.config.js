@@ -483,6 +483,7 @@ export const createLocalApiGithubMiddleware = ({
       const response = await handler({
         request: {
           method: req.method,
+          url: req.url,
           headers: req.headers,
         },
       })

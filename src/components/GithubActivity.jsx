@@ -481,7 +481,7 @@ const GithubActivity = () => {
                 </div>
                 <div className="mt-4">
                   <div className="font-grotesk font-black text-2xl sm:text-3xl text-emerald-400 tracking-tight">
-                    {contributions?.total ? `${contributions.total}+` : `${initialContributionsData.total}+`}
+                    {contributions?.total ?? initialContributionsData.total}
                   </div>
                   <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
                     {t('github.totalContributionsLabel')}
@@ -489,23 +489,25 @@ const GithubActivity = () => {
                 </div>
               </div>
 
-              {/* Metric 2: Longest Streak */}
+              {/* Metric 2: Live Active Streak & Longest Streak */}
               <div className="bg-[var(--surface-muted)] border border-[var(--border)] hover:border-[var(--border-hover)] rounded-xl p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm">
                 <div className="flex items-center justify-between text-[var(--text-muted)]">
                   <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
-                    {t('github.stats.longestStreak')}
+                    {t('github.stats.currentStreak')}
                   </span>
-                  <FiZap size={15} className="text-amber-400" aria-hidden="true" />
+                  <FiZap size={15} className={stats.currentStreak > 0 ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'} aria-hidden="true" />
                 </div>
                 <div className="mt-4">
                   <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--text-primary)] tracking-tight">
-                    {stats.longestStreak}{' '}
+                    {stats.currentStreak}{' '}
                     <span className="text-xs font-mono font-normal text-[var(--text-muted)]">
                       {t('github.stats.daysLabel')}
                     </span>
                   </div>
                   <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
-                    {t('github.stats.longestStreakSub')}
+                    {language === 'id'
+                      ? `Terpanjang: ${stats.longestStreak} ${t('github.stats.daysLabel')} · ${stats.activeDays} aktif`
+                      : `Longest: ${stats.longestStreak} ${t('github.stats.daysLabel')} · ${stats.activeDays} active`}
                   </p>
                 </div>
               </div>

@@ -393,6 +393,42 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(res.status, 200);
       assert.equal(capturedAuthHeader, 'Bearer ghp_testsecrettoken123');
     });
+
+    await t2.test('preserves live contributions and bypasses cache on explicit refresh even when user API is 429', async () => {
+      let contribCallCount = 0;
+      const mockFetch = async (url) => {
+        if (url.includes('/users/IGhifari/contributions')) {
+          contribCallCount++;
+          const countToday = contribCallCount === 1 ? 3 : 7;
+          return {
+            ok: true,
+            status: 200,
+            text: async () => `
+              <h2>975 contributions in the last year</h2>
+              <td data-date="2026-11-18" id="d1" data-level="1" class="ContributionCalendar-day"></td>
+              <td data-date="2026-11-19" id="d2" data-level="2" class="ContributionCalendar-day"></td>
+              <tool-tip for="d1">2 contributions on Nov 18</tool-tip>
+              <tool-tip for="d2">${countToday} contributions on Nov 19</tool-tip>
+            `,
+          };
+        }
+        return { ok: false, status: 429, headers: new Map() };
+      };
+
+      const handler = createCloudflarePagesGithubHandler({ fetchFn: mockFetch });
+      const res1 = await handler({ request: new Request('https://www.ighifari.my.id/api/github', { method: 'GET' }) });
+      const body1 = await res1.json();
+      assert.equal(body1.contributionsLive, true);
+      assert.equal(body1.data.contributions.total, 975);
+      assert.equal(body1.data.contributions.days[1].count, 3);
+
+      const res2 = await handler({
+        request: new Request('https://www.ighifari.my.id/api/github', { method: 'GET', headers: { 'x-refresh': '1' } }),
+      });
+      const body2 = await res2.json();
+      assert.equal(contribCallCount, 2);
+      assert.equal(body2.data.contributions.days[1].count, 7);
+    });
   });
 
   await t.test('7. Bilingual Translations Parity for GitHub Activity', async (t2) => {
@@ -464,6 +500,17 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(stats.currentStreak, 3);
       assert.equal(stats.longestStreak, 3);
       assert.equal(stats.activeDays, 3);
+    });
+
+    await t2.test('returns 0 longestStreak when non-empty calendar days all have 0 count (no hardcoded 21 leak)', () => {
+      const days = [
+        { date: '2026-11-18', count: 0 },
+        { date: '2026-11-19', count: 0 },
+      ];
+      const stats = calculateContributionStats(days);
+      assert.equal(stats.currentStreak, 0);
+      assert.equal(stats.longestStreak, 0);
+      assert.equal(stats.activeDays, 0);
     });
 
     await t2.test('maintains current streak when today has 0 but yesterday was active', () => {

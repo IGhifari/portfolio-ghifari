@@ -238,7 +238,7 @@ export const calculateContributionStats = (days = []) => {
 
   return {
     currentStreak,
-    longestStreak: longestStreak || 21,
+    longestStreak,
     activeDays,
   };
 };
@@ -258,12 +258,18 @@ export const fetchGithubData = async ({ force = false, fetchFn = fetch } = {}) =
 
   // 1. Try internal /api/github Cloudflare Pages proxy if available
   try {
-    const proxyRes = await fetchFn('/api/github');
+    const proxyOptions = force
+      ? { cache: 'no-store', headers: { 'X-Refresh': '1' } }
+      : undefined;
+    const proxyRes = await fetchFn('/api/github', proxyOptions);
     if (proxyRes && proxyRes.ok) {
       const json = await proxyRes.json();
       if (json && json.ok && json.data) {
-        setCachedGithubData(json.data);
-        return { data: json.data, fromCache: false };
+        const hasLiveContributions = Boolean(json.contributionsLive ?? !json.fallback);
+        if (hasLiveContributions || !json.fallback) {
+          setCachedGithubData(json.data);
+        }
+        return { data: json.data, fromCache: Boolean(json.fromCache), contributionsLive: hasLiveContributions };
       }
     }
   } catch {

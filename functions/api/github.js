@@ -62,9 +62,17 @@ export const createCloudflarePagesGithubHandler = ({
         );
       }
 
-      // 1. Check module-scoped in-memory cache (15 mins TTL)
+      const headerRefresh = typeof request?.headers?.get === 'function'
+        ? request.headers.get('x-refresh')
+        : request?.headers?.['x-refresh'];
+      const wantsRefresh =
+        Boolean(request?.url && String(request.url).includes('refresh=1')) ||
+        headerRefresh === '1';
+
+      // 1. Check module-scoped in-memory cache (15 mins TTL, bypassed on explicit refresh)
       const CACHE_TTL_MS = 15 * 60 * 1000;
       const isFresh =
+        !wantsRefresh &&
         memoryCache.payload &&
         Date.now() - memoryCache.timestamp < CACHE_TTL_MS;
 
@@ -74,6 +82,7 @@ export const createCloudflarePagesGithubHandler = ({
             ok: true,
             data: memoryCache.payload,
             fromCache: true,
+            contributionsLive: Boolean(memoryCache.contributionsLive),
           }),
           {
             status: 200,
@@ -134,45 +143,52 @@ export const createCloudflarePagesGithubHandler = ({
       }
 
       let contributions = initialContributionsData;
+      let isContribLive = false;
       if (contribRes && contribRes.ok) {
         try {
           const contribHtml = await contribRes.text();
           contributions = parseContributionHtml(contribHtml);
+          isContribLive = Boolean(contribHtml && /ContributionCalendar-day/i.test(contribHtml) && contributions?.days?.length > 0);
         } catch {
           contributions = initialContributionsData;
+          isContribLive = false;
         }
       }
 
-      // If GitHub rate-limited or failed, fallback gracefully to verified static data or stale cache
+      // If GitHub user API rate-limited or failed, preserve live contributions if available
       if (!isUserSuccess) {
         console.warn(
-          `[GitHub API proxy] GitHub user API returned status ${userRes?.status || 'network_error'}. Serving verified fallback data.`
+          `[GitHub API proxy] GitHub user API returned status ${userRes?.status || 'network_error'}. Serving ${isContribLive ? 'live contributions + fallback profile' : 'verified fallback data'}.`
         );
 
-        const fallbackPayload = memoryCache.payload || {
-          profile: sanitizeUserProfile(userData),
-          contributions,
+        const fallbackPayload = {
+          profile: memoryCache.payload?.profile || sanitizeUserProfile(userData),
+          contributions: isContribLive ? contributions : (memoryCache.payload?.contributions || contributions),
         };
 
-        // Cache fallback payload for 5 minutes to prevent hammering rate-limited GitHub API
-        memoryCache = {
-          payload: fallbackPayload,
-          timestamp: Date.now(),
-        };
+        // Only cache fallback in memory if live contributions succeeded; otherwise let next call retry live
+        if (isContribLive) {
+          memoryCache = {
+            payload: fallbackPayload,
+            timestamp: Date.now(),
+            contributionsLive: true,
+          };
+        }
 
         return new Response(
           JSON.stringify({
             ok: true,
             data: fallbackPayload,
             fallback: true,
+            contributionsLive: isContribLive,
             rateLimited: isRateLimited,
           }),
           {
             status: 200,
             headers: {
               'Content-Type': 'application/json; charset=utf-8',
-              'Cache-Control': 'public, max-age=300, s-maxage=300',
-              'X-Data-Source': 'fallback',
+              'Cache-Control': isContribLive ? 'public, max-age=300, s-maxage=300' : 'no-store',
+              'X-Data-Source': isContribLive ? 'partial-live' : 'fallback',
               ...(isRateLimited ? { 'X-RateLimit-Fallback': 'true' } : {}),
             },
           }
@@ -188,12 +204,14 @@ export const createCloudflarePagesGithubHandler = ({
       memoryCache = {
         payload,
         timestamp: Date.now(),
+        contributionsLive: isContribLive,
       };
 
       return new Response(
         JSON.stringify({
           ok: true,
           data: payload,
+          contributionsLive: isContribLive,
         }),
         {
           status: 200,
