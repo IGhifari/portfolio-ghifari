@@ -7,9 +7,11 @@ import { siteConfig } from '../../config/site';
 import {
   readBestScore,
   writeBestScore,
+} from './logic/stackLogic';
+import {
   createInputLockUntil,
   isInputLocked,
-} from './logic/stackLogic';
+} from '../shared/gameUtils';
 import { createStackWorld } from './world/createStackWorld';
 import StackHUD from './ui/StackHUD';
 import WebGLFallback from '../ui/WebGLFallback';

@@ -55,6 +55,15 @@ const sharedStore = {
     listeners: new Set(),
 };
 
+// Helper for headless inspection and test verification of initial sound state
+export const getSharedAudioSnapshot = () => ({
+    currentIndex: sharedStore.currentIndex,
+    isPlaying: sharedStore.isPlaying,
+    currentTime: sharedStore.currentTime,
+    duration: sharedStore.duration,
+    hasAudioElement: Boolean(sharedStore.audio),
+});
+
 const notifyListeners = () => {
     const snapshot = {
         currentIndex: sharedStore.currentIndex,

@@ -3,10 +3,17 @@
  * Decoupled from React components for clean testability and Fast Refresh compliance.
  */
 
-import { ENABLE_3D_GAME, ENABLE_STACK_GAME } from '../config/site.js';
+import {
+  ENABLE_3D_GAME,
+  ENABLE_STACK_GAME,
+  ENABLE_BUG_GAME,
+} from '../config/site.js';
 
 export const isPlayRouteType = (type) =>
-  type === 'play' || type === 'play-explore' || type === 'play-stack';
+  type === 'play' ||
+  type === 'play-explore' ||
+  type === 'play-stack' ||
+  type === 'play-bugs';
 
 /**
  * Parses a window.location-like object into a strongly typed route.
@@ -18,6 +25,7 @@ export const isPlayRouteType = (type) =>
  * - '/play' -> { type: 'play' } (Game Hub)
  * - '/play/explore' -> { type: 'play-explore' } (3D World Exploration)
  * - '/play/stack' -> { type: 'play-stack' } (Deploy Stack Mini-Game)
+ * - '/play/bugs' -> { type: 'play-bugs' } (Bug Hunter Mini-Game)
  * - other -> { type: 'not-found', requestedPath: string }
  */
 export const parseLocation = (
@@ -27,6 +35,7 @@ export const parseLocation = (
   {
     enable3dGame = ENABLE_3D_GAME,
     enableStackGame = ENABLE_STACK_GAME,
+    enableBugGame = ENABLE_BUG_GAME,
   } = {}
 ) => {
   const pathname = loc.pathname || '/';
@@ -102,6 +111,17 @@ export const parseLocation = (
         search,
         hash,
         route: { type: 'play-stack' },
+      };
+    }
+
+    if (cleanPath === '/play/bugs' && enableBugGame) {
+      return {
+        pathname,
+        cleanPath: '/play/bugs',
+        langPrefix,
+        search,
+        hash,
+        route: { type: 'play-bugs' },
       };
     }
   }

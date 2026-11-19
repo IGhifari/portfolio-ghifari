@@ -56,4 +56,9 @@ export const ENABLE_3D_GAME = true;
  */
 export const ENABLE_STACK_GAME = true;
 
+/**
+ * Sub-flag to enable/disable the "Bug Hunter" 3D mini-game (/play/bugs).
+ */
+export const ENABLE_BUG_GAME = true;
+
 export default siteConfig;

@@ -34,6 +34,7 @@ const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
 const GameHub = lazy(() => import('./game/hub/GameHub'));
 const GamePage = lazy(() => import('./game/GamePage'));
 const StackPage = lazy(() => import('./game/stack/StackPage'));
+const BugsPage = lazy(() => import('./game/bugs/BugsPage'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -252,6 +253,12 @@ const AppContent = () => {
                 {route.type === 'play-stack' && (
                     <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
                         <StackPage />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-bugs' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <BugsPage />
                     </Suspense>
                 )}
 

@@ -10,7 +10,7 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
-import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME } from '../config/site.js';
+import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME, ENABLE_BUG_GAME } from '../config/site.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -43,6 +43,7 @@ export const NAVIGATION_TARGETS = {
   resume: { type: 'route', target: 'recruiter', url: '/recruiter' },
   cv: { type: 'route', target: 'recruiter', url: '/recruiter' },
   ...(ENABLE_3D_GAME ? { play: { type: 'route', target: 'play', url: '/play' } } : {}),
+  ...(ENABLE_3D_GAME && ENABLE_BUG_GAME ? { bugs: { type: 'route', target: 'play-bugs', url: '/play/bugs' } } : {}),
 };
 
 /**
@@ -497,6 +498,32 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
           url: destUrl,
           mode: 'route',
           message: isId ? 'Membuka Deploy Stack (/play/stack)...' : 'Launching Deploy Stack (/play/stack)...',
+        };
+      }
+
+      if (subTarget === 'bugs' || subTarget === 'bug') {
+        if (!ENABLE_BUG_GAME) {
+          return {
+            type: 'error',
+            command,
+            args,
+            raw,
+            message: isId ? 'Mini-game Bug Hunter sedang dinonaktifkan.' : 'Bug Hunter mini-game is currently disabled.',
+          };
+        }
+        const destUrl = '/play/bugs';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-bugs', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-bugs',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Bug Hunter (/play/bugs)...' : 'Launching Bug Hunter (/play/bugs)...',
         };
       }
 

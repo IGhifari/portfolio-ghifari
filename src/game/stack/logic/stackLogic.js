@@ -4,6 +4,15 @@
  */
 
 import { techCategoriesData } from '../../../data/skills.js';
+import {
+  createInputLockUntil,
+  isInputLocked,
+  parseBestScore,
+  readBestScoreByKey,
+  writeBestScoreByKey,
+} from '../../shared/gameUtils.js';
+
+export { createInputLockUntil, isInputLocked, parseBestScore };
 
 export const STACK_CONFIG = {
   initialWidth: 3.2,
@@ -297,77 +306,18 @@ export const computePlacement = (
 };
 
 /**
- * Pure 400ms input lock helpers to prevent accidental drops/restarts after game over or unpause.
- */
-export const createInputLockUntil = (nowMs, durationMs = STACK_CONFIG.inputLockMs) =>
-  (Number(nowMs) || 0) + Math.max(0, Number(durationMs) || 0);
-
-export const isInputLocked = (nowMs, lockUntilMs) =>
-  (Number(nowMs) || 0) < (Number(lockUntilMs) || 0);
-
-/**
- * Validates a raw best-score value from localStorage.
- * Accepts only finite non-negative integers; returns 0 for garbage/corrupted values.
- */
-export const parseBestScore = (raw) => {
-  if (raw === null || raw === undefined || raw === '' || typeof raw === 'boolean') {
-    return 0;
-  }
-  const num = typeof raw === 'number' ? raw : Number(String(raw).trim());
-  if (!Number.isFinite(num) || !Number.isInteger(num) || num < 0 || num > 1_000_000) {
-    return 0;
-  }
-  return num;
-};
-
-/**
- * Safely reads best score from storage without ever throwing if localStorage is blocked.
+ * Safely reads best score for Deploy Stack from storage without throwing if localStorage is blocked.
  */
 export const readBestScore = (
   storage,
   key = STACK_CONFIG.storageKey
-) => {
-  try {
-    const targetStorage =
-      storage !== undefined
-        ? storage
-        : typeof window !== 'undefined'
-        ? window.localStorage
-        : null;
-    if (!targetStorage || typeof targetStorage.getItem !== 'function') {
-      return 0;
-    }
-    return parseBestScore(targetStorage.getItem(key));
-  } catch {
-    return 0;
-  }
-};
+) => readBestScoreByKey(key, storage);
 
 /**
- * Safely writes a new best score if it exceeds the stored best score.
+ * Safely writes a new best score for Deploy Stack if it exceeds the stored best score.
  */
 export const writeBestScore = (
   score,
   storage,
   key = STACK_CONFIG.storageKey
-) => {
-  const validScore = parseBestScore(score);
-  const currentBest = readBestScore(storage, key);
-  const nextBest = Math.max(currentBest, validScore);
-
-  try {
-    const targetStorage =
-      storage !== undefined
-        ? storage
-        : typeof window !== 'undefined'
-        ? window.localStorage
-        : null;
-    if (targetStorage && typeof targetStorage.setItem === 'function' && nextBest > currentBest) {
-      targetStorage.setItem(key, String(nextBest));
-    }
-  } catch {
-    // Ignore storage quota or SecurityError in private browsing
-  }
-
-  return nextBest;
-};
+) => writeBestScoreByKey(key, score, storage);

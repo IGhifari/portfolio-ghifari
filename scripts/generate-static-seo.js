@@ -515,6 +515,14 @@ ${allProjects
       descId: 'Mini-game 3D menyusun menara teknologi dari tech stack M. Ghifari Bima Khadafi.',
       descEn: 'Interactive 3D block-stacking mini-game powered by M. Ghifari Bima Khadafi tech stack.',
     },
+    {
+      subSegments: ['bugs'],
+      basePath: '/play/bugs',
+      titleId: 'Bug Hunter — Mini-Game 3D | M. Ghifari Bima Khadafi',
+      titleEn: 'Bug Hunter — 3D Mini-Game | M. Ghifari Bima Khadafi',
+      descId: 'Pertahankan server pusat dari gelombang bug dan bos Production Down dalam arena 3D isometrik.',
+      descEn: 'Defend the central production server against waves of bugs and the Production Down boss in an isometric 3D arena.',
+    },
   ];
 
   for (const pr of playRoutes) {
