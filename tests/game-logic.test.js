@@ -9,9 +9,17 @@ import {
   PLAYER_CONFIG,
   BUILDINGS,
   ARCADE_KIOSK,
+  FOUNTAIN_COLLIDER,
+  FOOTBALL_FIELD,
   getWorldInteractables,
+  getWorldColliders,
   getBuildingById,
 } from '../src/game/logic/worldConfig.js';
+import {
+  EXPLORE_DAYTIME_PARK_THEME,
+  getExploreParkTheme,
+  getSeasonal3DTheme,
+} from '../src/game/shared/seasonalGameTheme.js';
 import { getEnabledMiniGames } from '../src/game/shared/gameUtils.js';
 import {
   normalizeInput,
@@ -258,7 +266,7 @@ describe('3D Exploration Game Logic, Physics & Routing Test Suite', () => {
 
     const worldSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'world', 'createWorld.js'), 'utf-8');
     assert.ok(worldSource.includes('THREE.HemisphereLight'), 'World must include HemisphereLight');
-    assert.ok(worldSource.includes('PlaneGeometry(240, 240)'), 'Ground plane must extend beyond fog to eliminate hard floor edge');
+    assert.match(worldSource, /PlaneGeometry\((240|340),\s*(240|340)\)/, 'Ground plane must extend beyond fog to eliminate hard floor edge');
 
     const buildingsSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'world', 'createBuildings.js'), 'utf-8');
     assert.ok(buildingsSource.includes('buildSectionSignage'), 'Buildings must include 3D section signage');
@@ -292,5 +300,49 @@ describe('3D Exploration Game Logic, Physics & Routing Test Suite', () => {
 
     const pageSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'GamePage.jsx'), 'utf-8');
     assert.ok(pageSource.includes('<ArcadeModal'), 'GamePage must mount ArcadeModal for 3D Kiosk & Quick-Switch HUD button');
+    assert.ok(pageSource.includes('<FootballHUD'), 'GamePage must mount FootballHUD for the East Football Field');
+  });
+
+  it('10. Expands Explore to 72x54 park with (0,0) spawn, Football Pitch, and isolated mini-game themes', () => {
+    assert.equal(WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX, 72);
+    assert.equal(WORLD_BOUNDS.maxZ - WORLD_BOUNDS.minZ, 54);
+    assert.equal(PLAYER_CONFIG.startX, 0);
+    assert.equal(PLAYER_CONFIG.startZ, 0);
+
+    // Football pitch exists inside the East zone
+    assert.ok(FOOTBALL_FIELD.centerX > 10);
+    assert.equal(FOOTBALL_FIELD.width, 16);
+    assert.equal(FOOTBALL_FIELD.depth, 10);
+
+    // Explore uses daytime park sky/grass even during non-December months, while mini-games keep their original dark/seasonal themes
+    const marchExplore = getExploreParkTheme({ id: 'default', isSeasonalActive: false, isDark: true }, true);
+    assert.equal(marchExplore.id, EXPLORE_DAYTIME_PARK_THEME.id);
+    assert.equal(marchExplore.isLight, true);
+
+    const marchStack = getSeasonal3DTheme({ id: 'default', isSeasonalActive: false, isDark: true }, true);
+    assert.equal(marchStack.isLight, false);
+    assert.equal(marchStack.bgHex, '#080808');
+  });
+
+  it('11. Centers low-poly fountain at (0,0) with solid collision and open plaza clearance', () => {
+    assert.equal(FOUNTAIN_COLLIDER.x, 0);
+    assert.equal(FOUNTAIN_COLLIDER.z, 0);
+    const colliders = getWorldColliders(true);
+    assert.ok(colliders.some((c) => c.id === 'fountain'));
+
+    // Walking straight North into the fountain stops outside its solid collider radius
+    let pState = {
+      x: 0,
+      z: PLAYER_CONFIG.startZ + 2.25,
+      angle: Math.PI,
+    };
+    assert.ok(pState.z > FOUNTAIN_COLLIDER.halfD + PLAYER_CONFIG.radius);
+    for (let i = 0; i < 20; i++) {
+      pState = stepPlayer(pState, { x: 0, z: -1 }, 0.05, { buildings: colliders });
+    }
+    assert.ok(
+      pState.z >= FOUNTAIN_COLLIDER.halfD + PLAYER_CONFIG.radius - 1e-5,
+      `Expected player to halt cleanly outside fountain perimeter, stopped at z=${pState.z}`
+    );
   });
 });

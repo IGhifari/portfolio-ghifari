@@ -686,6 +686,16 @@ export const translations = {
         closeAria: "Tutup menu mini-game",
         fallbackHeading: "Mini-Game 3D Interaktif",
       },
+      football: {
+        zoneTitle: "Lapangan Mini",
+        scoreLabel: "Gol",
+        kickHintDesktop: "Spasi: Tendang",
+        resetBtn: "Reset",
+        resetAria: "Kembalikan bola ke titik tengah lapangan",
+        goalToast: "GOL!",
+        kickAction: "Tendang bola ke gawang",
+        kickBtn: "Tendang",
+      },
       hub: {
         pageTitle: "Hub Interaktif 3D",
         pageDesc: "Pilih pengalaman 3D interaktif: jelajahi dunia portofolio low-poly atau uji presisi di mini-game Deploy Stack.",
@@ -1448,6 +1458,16 @@ export const translations = {
         desc: "Pick any 3D mini-game below to jump straight in, or close to keep exploring the plaza.",
         closeAria: "Close mini-games menu",
         fallbackHeading: "Interactive 3D Mini-Games",
+      },
+      football: {
+        zoneTitle: "Park Pitch",
+        scoreLabel: "Goals",
+        kickHintDesktop: "Space: Kick",
+        resetBtn: "Reset",
+        resetAria: "Reset soccer ball to center spot",
+        goalToast: "GOAL!",
+        kickAction: "Kick soccer ball toward goal",
+        kickBtn: "Kick",
       },
       hub: {
         pageTitle: "3D Interactive Hub",

@@ -5,9 +5,10 @@ import { useTheme } from '../context/ThemeContext';
 import { useRouter } from '../context/RouterContext';
 import { updateDocumentMetadata } from '../utils/seo';
 import { siteConfig, ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '../config/site';
-import { buildGameCssVars, getSeasonal3DTheme } from './shared/seasonalGameTheme';
+import { buildGameCssVars, getExploreParkTheme } from './shared/seasonalGameTheme';
 import { createWorld } from './world/createWorld';
 import GameHUD from './ui/GameHUD';
+import FootballHUD from './ui/FootballHUD';
 import InfoPanel from './ui/InfoPanel';
 import ArcadeModal from './ui/ArcadeModal';
 import VirtualJoystick from './ui/VirtualJoystick';
@@ -29,7 +30,7 @@ const GamePage = () => {
   const shouldReduceMotion = useReducedMotion();
 
   const theme3D = useMemo(
-    () => getSeasonal3DTheme(season, seasonalEnabled),
+    () => getExploreParkTheme(season, seasonalEnabled),
     [season, seasonalEnabled]
   );
   const gameCssVars = useMemo(() => buildGameCssVars(theme3D), [theme3D]);
@@ -41,6 +42,7 @@ const GamePage = () => {
   const nearestRef = useRef(null);
   const activeBuildingRef = useRef(null);
   const isArcadeOpenRef = useRef(false);
+  const goalTimerRef = useRef(null);
 
   const [webglSupported, setWebglSupported] = useState(true);
   const [isTouch, setIsTouch] = useState(detectTouchOrSmallScreen);
@@ -49,6 +51,12 @@ const GamePage = () => {
   const [isArcadeOpen, setIsArcadeOpen] = useState(false);
   const [visitedIds, setVisitedIds] = useState([]);
   const [labelCoords, setLabelCoords] = useState({});
+  const [footballUi, setFootballUi] = useState({
+    inZone: false,
+    inKickRange: false,
+    score: 0,
+  });
+  const [goalBannerSide, setGoalBannerSide] = useState(null);
 
   const prefix = langPrefix === 'en' ? '/en' : '';
   const exitHref = prefix || '/';
@@ -180,6 +188,17 @@ const GamePage = () => {
       }
 
       if (
+        e.code === 'Space' &&
+        !activeBuildingRef.current &&
+        !isArcadeOpenRef.current &&
+        !['BUTTON', 'A'].includes(e.target?.tagName)
+      ) {
+        e.preventDefault();
+        worldRef.current?.kickBall();
+        return;
+      }
+
+      if (
         [
           'KeyW',
           'KeyA',
@@ -235,6 +254,17 @@ const GamePage = () => {
       onLabelsUpdate: (coords) => {
         setLabelCoords(coords);
       },
+      onFootballChange: (nextFootball) => {
+        setFootballUi(nextFootball);
+      },
+      onGoalScored: (side) => {
+        if (goalTimerRef.current) clearTimeout(goalTimerRef.current);
+        setGoalBannerSide(side);
+        goalTimerRef.current = setTimeout(() => {
+          setGoalBannerSide(null);
+          goalTimerRef.current = null;
+        }, 1600);
+      },
     });
 
     if (!world) {
@@ -245,6 +275,10 @@ const GamePage = () => {
     worldRef.current = world;
 
     return () => {
+      if (goalTimerRef.current) {
+        clearTimeout(goalTimerRef.current);
+        goalTimerRef.current = null;
+      }
       world.dispose();
       worldRef.current = null;
     };
@@ -252,6 +286,14 @@ const GamePage = () => {
 
   const handleJoystickMove = useCallback((vec) => {
     touchVecRef.current = vec;
+  }, []);
+
+  const handleKickBall = useCallback(() => {
+    worldRef.current?.kickBall();
+  }, []);
+
+  const handleResetBall = useCallback(() => {
+    worldRef.current?.resetBall();
   }, []);
 
   const anyModalOpen = Boolean(activeBuilding || isArcadeOpen);
@@ -289,6 +331,19 @@ const GamePage = () => {
         onOpenArcade={openArcadePanel}
         exitHref={exitHref}
       />
+
+      {/* Zone-Scoped Football Score HUD & Touch Kick Button */}
+      {!anyModalOpen && (
+        <FootballHUD
+          inZone={footballUi.inZone}
+          inKickRange={footballUi.inKickRange}
+          score={footballUi.score}
+          goalBannerSide={goalBannerSide}
+          isTouch={isTouch}
+          onKick={handleKickBall}
+          onResetBall={handleResetBall}
+        />
+      )}
 
       {/* Touch Virtual Joystick (mobile / touch viewports) */}
       {isTouch && !anyModalOpen && (
