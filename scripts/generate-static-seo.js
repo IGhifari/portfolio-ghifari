@@ -523,6 +523,14 @@ ${allProjects
       descId: 'Pertahankan server pusat dari gelombang bug dan bos Production Down dalam arena 3D isometrik.',
       descEn: 'Defend the central production server against waves of bugs and the Production Down boss in an isometric 3D arena.',
     },
+    {
+      subSegments: ['runner'],
+      basePath: '/play/runner',
+      titleId: 'Stack Runner — Mini-Game 3D | M. Ghifari Bima Khadafi',
+      titleEn: 'Stack Runner — 3D Mini-Game | M. Ghifari Bima Khadafi',
+      descId: 'Berlari di jalur 3-lajur, lompati bug dan gerbang rendah, hindari firewall, serta kumpulkan token teknologi.',
+      descEn: 'Dash across a 3-lane track, jump over bugs and low gates, dodge firewalls, and collect tech tokens.',
+    },
   ];
 
   for (const pr of playRoutes) {

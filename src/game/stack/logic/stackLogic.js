@@ -3,16 +3,17 @@
  * Zero Three.js or DOM imports — 100% unit-testable in Node.js.
  */
 
-import { techCategoriesData } from '../../../data/skills.js';
 import {
   createInputLockUntil,
   isInputLocked,
   parseBestScore,
   readBestScoreByKey,
   writeBestScoreByKey,
+  formatTechLabel as sharedFormatTechLabel,
+  extractTechLabels,
 } from '../../shared/gameUtils.js';
 
-export { createInputLockUntil, isInputLocked, parseBestScore };
+export { createInputLockUntil, isInputLocked, parseBestScore, extractTechLabels };
 
 export const STACK_CONFIG = {
   initialWidth: 3.2,
@@ -34,15 +35,8 @@ export const STACK_CONFIG = {
 /**
  * Truncates and normalizes a technology label to fit cleanly on a 3D block face.
  */
-export const formatTechLabel = (name, maxLen = STACK_CONFIG.maxLabelLength) => {
-  if (typeof name !== 'string') return 'STACK';
-  const trimmed = name.trim();
-  if (!trimmed) return 'STACK';
-  const upper = trimmed.toUpperCase();
-  if (upper.length <= maxLen) return upper;
-  if (maxLen <= 1) return upper.slice(0, 1);
-  return `${upper.slice(0, Math.max(1, maxLen - 1)).trimEnd()}…`;
-};
+export const formatTechLabel = (name, maxLen = STACK_CONFIG.maxLabelLength) =>
+  sharedFormatTechLabel(name, maxLen);
 
 /**
  * Computes fitted label text, font scale, and orientation for a block face of size (width x depth)
@@ -85,32 +79,6 @@ export const fitLabelToBlock = (
     fontScale,
     rotate90,
   };
-};
-
-/**
- * Extracts an ordered list of technology names from `techCategoriesData` (`src/data/skills.js`).
- * Handles empty or malformed inputs safely without crashing.
- */
-export const extractTechLabels = (categories = techCategoriesData) => {
-  if (!Array.isArray(categories) || categories.length === 0) {
-    return ['STACK'];
-  }
-  const seen = new Set();
-  const list = [];
-  for (const cat of categories) {
-    if (!cat || !Array.isArray(cat.skills)) continue;
-    for (const skill of cat.skills) {
-      const raw = typeof skill === 'string' ? skill : skill?.name;
-      if (typeof raw === 'string' && raw.trim()) {
-        const clean = raw.trim();
-        if (!seen.has(clean)) {
-          seen.add(clean);
-          list.push(clean);
-        }
-      }
-    }
-  }
-  return list.length > 0 ? list : ['STACK'];
 };
 
 /**

@@ -6,6 +6,7 @@ import {
   FiCompass,
   FiLayers,
   FiCrosshair,
+  FiFastForward,
   FiAward,
 } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
@@ -15,27 +16,32 @@ import {
   siteConfig,
   ENABLE_STACK_GAME,
   ENABLE_BUG_GAME,
+  ENABLE_RUNNER_GAME,
 } from '../../config/site';
 import { readBestScoreByKey } from '../shared/gameUtils';
 
 const GameHub = ({
   enableStackGame = ENABLE_STACK_GAME,
   enableBugGame = ENABLE_BUG_GAME,
+  enableRunnerGame = ENABLE_RUNNER_GAME,
 }) => {
   const { language, t } = useLanguage();
   const { langPrefix } = useRouter();
   const [stackBest, setStackBest] = useState(0);
   const [bugsBest, setBugsBest] = useState(0);
+  const [runnerBest, setRunnerBest] = useState(0);
 
   const prefix = langPrefix === 'en' ? '/en' : '';
   const exitHref = prefix || '/';
   const exploreHref = `${prefix}/play/explore`;
   const stackHref = `${prefix}/play/stack`;
   const bugsHref = `${prefix}/play/bugs`;
+  const runnerHref = `${prefix}/play/runner`;
 
   useEffect(() => {
     setStackBest(readBestScoreByKey('portfolio:stack:best'));
     setBugsBest(readBestScoreByKey('portfolio:bugs:best'));
+    setRunnerBest(readBestScoreByKey('portfolio:runner:best'));
   }, []);
 
   useEffect(() => {
@@ -51,9 +57,12 @@ const GameHub = ({
     });
   }, [language, t]);
 
-  const cardCount = 1 + (enableStackGame ? 1 : 0) + (enableBugGame ? 1 : 0);
+  const cardCount =
+    1 + (enableStackGame ? 1 : 0) + (enableBugGame ? 1 : 0) + (enableRunnerGame ? 1 : 0);
   const gridColsClass =
-    cardCount === 3
+    cardCount === 4
+      ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'
+      : cardCount === 3
       ? 'grid-cols-1 md:grid-cols-3'
       : cardCount === 2
       ? 'grid-cols-1 md:grid-cols-2'
@@ -62,7 +71,7 @@ const GameHub = ({
   return (
     <div className="min-h-screen w-full bg-[#080808] text-[#F5F5F5] flex flex-col justify-between p-5 sm:p-8 select-none">
       {/* Top Bar */}
-      <div className="max-w-5xl w-full mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-6xl w-full mx-auto flex items-center justify-between gap-4">
         <RouterLink
           to={exitHref}
           className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#141414] hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs font-bold text-[#F5F5F5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
@@ -78,7 +87,7 @@ const GameHub = ({
       </div>
 
       {/* Main Hub Content */}
-      <div className="max-w-5xl w-full mx-auto my-auto py-10 space-y-8">
+      <div className="max-w-6xl w-full mx-auto my-auto py-10 space-y-8">
         <div className="space-y-2">
           <span className="font-mono text-xs text-[#3B82F6] uppercase tracking-wider font-semibold block">
             {'//'} {t('game.hub.tag')}
@@ -135,27 +144,28 @@ const GameHub = ({
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-[#3B82F6] font-bold uppercase tracking-wider">
+                  <span className="font-mono text-xs text-[#3B82F6] font-bold uppercase tracking-wider whitespace-nowrap">
                     02 {'//'} {t('game.hub.stackBadge')}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#101010] border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
-                      aria-label={`${t('game.stack.bestLabel')}: ${stackBest}`}
-                    >
-                      <FiAward size={12} className="text-[#3B82F6]" aria-hidden="true" />
-                      <span>{t('game.stack.bestLabel')}:</span>
-                      <strong className="text-[#F5F5F5]">{stackBest}</strong>
-                    </span>
-                    <div className="w-9 h-9 rounded-md bg-[#101010] border border-[#27272A] group-hover:border-[#3B82F6] flex items-center justify-center text-[#3B82F6] transition-colors">
-                      <FiLayers size={18} aria-hidden="true" />
-                    </div>
+                  <div className="w-9 h-9 rounded-md bg-[#101010] border border-[#27272A] group-hover:border-[#3B82F6] flex items-center justify-center text-[#3B82F6] transition-colors">
+                    <FiLayers size={18} aria-hidden="true" />
                   </div>
                 </div>
 
                 <h2 className="font-grotesk font-black text-2xl text-[#F5F5F5] uppercase tracking-tight">
                   {t('game.hub.stackTitle')}
                 </h2>
+
+                <div>
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#101010] border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
+                    aria-label={`${t('game.stack.bestLabel')}: ${stackBest}`}
+                  >
+                    <FiAward size={12} className="text-[#3B82F6]" aria-hidden="true" />
+                    <span>{t('game.stack.bestLabel')}:</span>
+                    <strong className="text-[#F5F5F5]">{stackBest}</strong>
+                  </span>
+                </div>
 
                 <p className="font-sans text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
                   {t('game.hub.stackDesc')}
@@ -181,27 +191,28 @@ const GameHub = ({
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-[#3B82F6] font-bold uppercase tracking-wider">
+                  <span className="font-mono text-xs text-[#3B82F6] font-bold uppercase tracking-wider whitespace-nowrap">
                     03 {'//'} {t('game.hub.bugsBadge')}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#101010] border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
-                      aria-label={`${t('game.stack.bestLabel')}: ${bugsBest}`}
-                    >
-                      <FiAward size={12} className="text-[#3B82F6]" aria-hidden="true" />
-                      <span>{t('game.stack.bestLabel')}:</span>
-                      <strong className="text-[#F5F5F5]">{bugsBest}</strong>
-                    </span>
-                    <div className="w-9 h-9 rounded-md bg-[#101010] border border-[#27272A] group-hover:border-[#3B82F6] flex items-center justify-center text-[#3B82F6] transition-colors">
-                      <FiCrosshair size={18} aria-hidden="true" />
-                    </div>
+                  <div className="w-9 h-9 rounded-md bg-[#101010] border border-[#27272A] group-hover:border-[#3B82F6] flex items-center justify-center text-[#3B82F6] transition-colors">
+                    <FiCrosshair size={18} aria-hidden="true" />
                   </div>
                 </div>
 
                 <h2 className="font-grotesk font-black text-2xl text-[#F5F5F5] uppercase tracking-tight">
                   {t('game.hub.bugsTitle')}
                 </h2>
+
+                <div>
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#101010] border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
+                    aria-label={`${t('game.stack.bestLabel')}: ${bugsBest}`}
+                  >
+                    <FiAward size={12} className="text-[#3B82F6]" aria-hidden="true" />
+                    <span>{t('game.stack.bestLabel')}:</span>
+                    <strong className="text-[#F5F5F5]">{bugsBest}</strong>
+                  </span>
+                </div>
 
                 <p className="font-sans text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
                   {t('game.hub.bugsDesc')}
@@ -218,11 +229,58 @@ const GameHub = ({
               </div>
             </RouterLink>
           )}
+
+          {/* Card 4: Stack Runner (/play/runner) */}
+          {enableRunnerGame && (
+            <RouterLink
+              to={runnerHref}
+              className="group p-6 rounded-lg bg-[#141414] hover:bg-[#18181d] border border-[#27272A] hover:border-[#3B82F6] flex flex-col justify-between gap-6 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs text-[#3B82F6] font-bold uppercase tracking-wider whitespace-nowrap">
+                    04 {'//'} {t('game.hub.runnerBadge')}
+                  </span>
+                  <div className="w-9 h-9 rounded-md bg-[#101010] border border-[#27272A] group-hover:border-[#3B82F6] flex items-center justify-center text-[#3B82F6] transition-colors">
+                    <FiFastForward size={18} aria-hidden="true" />
+                  </div>
+                </div>
+
+                <h2 className="font-grotesk font-black text-2xl text-[#F5F5F5] uppercase tracking-tight">
+                  {t('game.hub.runnerTitle')}
+                </h2>
+
+                <div>
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#101010] border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]"
+                    aria-label={`${t('game.stack.bestLabel')}: ${runnerBest}`}
+                  >
+                    <FiAward size={12} className="text-[#3B82F6]" aria-hidden="true" />
+                    <span>{t('game.stack.bestLabel')}:</span>
+                    <strong className="text-[#F5F5F5]">{runnerBest}</strong>
+                  </span>
+                </div>
+
+                <p className="font-sans text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+                  {t('game.hub.runnerDesc')}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-[#27272A] flex items-center justify-between font-mono text-xs font-bold text-[#F5F5F5] group-hover:text-[#3B82F6] uppercase tracking-wider transition-colors">
+                <span>{t('game.hub.launchRunner')}</span>
+                <FiArrowRight
+                  size={15}
+                  className="transform group-hover:translate-x-1 transition-transform"
+                  aria-hidden="true"
+                />
+              </div>
+            </RouterLink>
+          )}
         </div>
       </div>
 
       {/* Footer Hint */}
-      <div className="max-w-5xl w-full mx-auto flex items-center justify-between gap-4 border-t border-[#27272A]/60 pt-4 font-mono text-[11px] text-[#71717A]">
+      <div className="max-w-6xl w-full mx-auto flex items-center justify-between gap-4 border-t border-[#27272A]/60 pt-4 font-mono text-[11px] text-[#71717A]">
         <span>{t('game.hub.footerHint')}</span>
         <span className="hidden sm:inline">CTRL+J // TERMINAL</span>
       </div>
@@ -233,6 +291,7 @@ const GameHub = ({
 GameHub.propTypes = {
   enableStackGame: PropTypes.bool,
   enableBugGame: PropTypes.bool,
+  enableRunnerGame: PropTypes.bool,
 };
 
 export default GameHub;

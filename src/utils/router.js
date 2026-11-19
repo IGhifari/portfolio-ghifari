@@ -7,13 +7,15 @@ import {
   ENABLE_3D_GAME,
   ENABLE_STACK_GAME,
   ENABLE_BUG_GAME,
+  ENABLE_RUNNER_GAME,
 } from '../config/site.js';
 
 export const isPlayRouteType = (type) =>
   type === 'play' ||
   type === 'play-explore' ||
   type === 'play-stack' ||
-  type === 'play-bugs';
+  type === 'play-bugs' ||
+  type === 'play-runner';
 
 /**
  * Parses a window.location-like object into a strongly typed route.
@@ -26,6 +28,7 @@ export const isPlayRouteType = (type) =>
  * - '/play/explore' -> { type: 'play-explore' } (3D World Exploration)
  * - '/play/stack' -> { type: 'play-stack' } (Deploy Stack Mini-Game)
  * - '/play/bugs' -> { type: 'play-bugs' } (Bug Hunter Mini-Game)
+ * - '/play/runner' -> { type: 'play-runner' } (Stack Runner Mini-Game)
  * - other -> { type: 'not-found', requestedPath: string }
  */
 export const parseLocation = (
@@ -36,6 +39,7 @@ export const parseLocation = (
     enable3dGame = ENABLE_3D_GAME,
     enableStackGame = ENABLE_STACK_GAME,
     enableBugGame = ENABLE_BUG_GAME,
+    enableRunnerGame = ENABLE_RUNNER_GAME,
   } = {}
 ) => {
   const pathname = loc.pathname || '/';
@@ -122,6 +126,17 @@ export const parseLocation = (
         search,
         hash,
         route: { type: 'play-bugs' },
+      };
+    }
+
+    if (cleanPath === '/play/runner' && enableRunnerGame) {
+      return {
+        pathname,
+        cleanPath: '/play/runner',
+        langPrefix,
+        search,
+        hash,
+        route: { type: 'play-runner' },
       };
     }
   }

@@ -61,4 +61,9 @@ export const ENABLE_STACK_GAME = true;
  */
 export const ENABLE_BUG_GAME = true;
 
+/**
+ * Sub-flag to enable/disable the "Stack Runner" 3D mini-game (/play/runner).
+ */
+export const ENABLE_RUNNER_GAME = true;
+
 export default siteConfig;
