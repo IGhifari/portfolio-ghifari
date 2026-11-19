@@ -142,7 +142,7 @@ const INTENT_RULES = [
       'e-commerce', 'pertanian', 'agricultural', 'internship-journal',
       'jurnal', 'journal', '1ia08', 'class', 'kelas', 'ecovoyage',
       'pulau', 'harapan', 'day', 'home', 'sehari', 'rumah', 'tunarungu',
-      'deaf', 'slb',
+      'deaf', 'slb', 'id-kit', 'idkit', 'ghifari29', 'npm', 'library', 'terbilang', 'rupiah', 'nik', 'npwp', 'nitku', 'wilayah', 'kemendagri', 'libur', 'waktu', 'masking', 'tsup', 'vitest',
     ],
     categories: [KNOWLEDGE_CATEGORIES.SELECTED_PROJECTS, KNOWLEDGE_CATEGORIES.OTHER_PROJECTS],
     categoryBoost: 4.0,

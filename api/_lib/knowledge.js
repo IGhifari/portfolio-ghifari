@@ -317,7 +317,8 @@ const normalizeProjectEntry = (project, categoryConstant, idPrefix) => ({
           : '',
         `Teknologi: ${project.tags.join(', ')}.`,
         `GitHub: ${project.github || 'Tidak tersedia (repositori internal/lokal)'}.`,
-        `Live Demo: ${project.live || idText.projects.modal.noLiveNote}`,
+        project.npm ? `npm: ${project.npm}.` : '',
+        project.live ? `Live Demo: ${project.live}` : (project.npm ? '' : `Live Demo: ${idText.projects.modal.noLiveNote}`),
       ]
         .filter(Boolean)
         .join(' '),
@@ -339,6 +340,7 @@ const normalizeProjectEntry = (project, categoryConstant, idPrefix) => ({
         tags: project.tags,
         image: project.image,
         github: project.github,
+        npm: project.npm || null,
         live: project.live,
       },
     },
@@ -356,7 +358,8 @@ const normalizeProjectEntry = (project, categoryConstant, idPrefix) => ({
           : '',
         `Technologies: ${project.tags.join(', ')}.`,
         `GitHub: ${project.github || 'Unavailable (internal/local repository)'}.`,
-        `Live Demo: ${project.live || enText.projects.modal.noLiveNote}`,
+        project.npm ? `npm: ${project.npm}.` : '',
+        project.live ? `Live Demo: ${project.live}` : (project.npm ? '' : `Live Demo: ${enText.projects.modal.noLiveNote}`),
       ]
         .filter(Boolean)
         .join(' '),
@@ -378,6 +381,7 @@ const normalizeProjectEntry = (project, categoryConstant, idPrefix) => ({
         tags: project.tags,
         image: project.image,
         github: project.github,
+        npm: project.npm || null,
         live: project.live,
       },
     },

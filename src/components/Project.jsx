@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCheck, FiAlertCircle, FiBookOpen } from 'react-icons/fi';
+import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCheck, FiAlertCircle, FiBookOpen, FiTerminal } from 'react-icons/fi';
+import { SiNpm } from 'react-icons/si';
 import TiltedCard from './reactbits/TiltedCard';
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
@@ -8,7 +9,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { RouterLink } from '../context/RouterContext';
 import '../styles/Project.css';
 
-const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'game'];
+const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'library', 'game'];
 
 const Project = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -185,10 +186,10 @@ const Project = () => {
                             <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80 group-hover:bg-[#27c93f] transition-colors" />
                           </div>
                           <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
-                            https://{project.title.toLowerCase().replace(/\s+/g, '-')}.app
+                            {project.npm ? `npmjs.com/package/${project.title}` : `https://${project.title.toLowerCase().replace(/\s+/g, '-')}.app`}
                           </span>
                           <span className="font-mono text-[9px] text-[var(--accent)] px-1.5 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-semibold">
-                            v1.0
+                            {project.version || 'v1.0'}
                           </span>
                         </div>
 
@@ -242,6 +243,25 @@ const Project = () => {
                       {resolve(project.description)}
                     </p>
 
+                    {/* Measurable Engineering Metrics (if provided) */}
+                    {Array.isArray(project.metrics) && project.metrics.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        {project.metrics.map((metric) => (
+                          <div
+                            key={metric.value}
+                            className="px-3 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
+                          >
+                            <span className="font-mono text-xs font-bold text-[var(--accent)] block">
+                              {metric.value}
+                            </span>
+                            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+                              {resolve(metric.label)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {/* Technologies - Subtle Editorial Tags */}
                     <div className="flex flex-wrap gap-2 mt-5">
                       {project.tags.map((tag) => (
@@ -281,6 +301,32 @@ const Project = () => {
                         </a>
                       )}
 
+                      {project.npm && (
+                        <a
+                          href={project.npm}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-cursor-label="npm"
+                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:shadow-[0_0_20px_-3px_rgba(59,130,246,0.4)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                        >
+                          <SiNpm size={15} aria-hidden="true" />
+                          <span>{t('projects.npmPackage')}</span>
+                          <FiArrowUpRight size={14} aria-hidden="true" />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                        </a>
+                      )}
+
+                      {project.id === 'id-kit' && (
+                        <RouterLink
+                          to="/study-case/id-kit#playground"
+                          data-cursor-label="Demo"
+                          className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        >
+                          <FiTerminal size={14} aria-hidden="true" />
+                          <span>{language === 'id' ? 'Mini Playground' : 'Live Playground'}</span>
+                        </RouterLink>
+                      )}
                       {project.live && (
                         <a
                           href={project.live}
@@ -409,6 +455,20 @@ const Project = () => {
                           title={t('projects.githubRepo')}
                         >
                           <FiGithub size={16} />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                        </a>
+                      )}
+                      {project.npm && (
+                        <a
+                          href={project.npm}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-cursor-label="npm"
+                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                          aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                          title={t('projects.npmPackage')}
+                        >
+                          <SiNpm size={16} aria-hidden="true" />
                           <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
@@ -652,6 +712,19 @@ const Project = () => {
                       <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
                   )}
+                  {activeProject.npm && (
+                    <a
+                      href={activeProject.npm}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
+                    >
+                      <SiNpm size={14} aria-hidden="true" />
+                      <span>{t('projects.npmPackage')}</span>
+                      <FiArrowUpRight size={13} aria-hidden="true" />
+                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                    </a>
+                  )}
                   {activeProject.live ? (
                     <a
                       href={activeProject.live}
@@ -663,11 +736,11 @@ const Project = () => {
                       <FiArrowUpRight size={14} />
                       <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                     </a>
-                  ) : (
+                  ) : !activeProject.npm ? (
                     <span className="font-mono text-[11px] text-[var(--text-muted)]">
                       {t('projects.modal.noLiveNote')}
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline">

@@ -153,8 +153,102 @@ export const selectedProjects = [
     live: null,
   },
   {
-    id: "food-ecommerce",
+    id: "id-kit",
     number: "03",
+    version: "v1.2.0",
+    categoryKey: "library",
+    category: {
+      id: "OPEN-SOURCE / LIBRARY",
+      en: "OPEN-SOURCE / LIBRARY",
+    },
+    title: "@ghifari29/id-kit",
+    subtitle: {
+      id: "Library Utilitas TypeScript Offline untuk Data Indonesia",
+      en: "Offline Zero-Dependency Indonesian TypeScript Utility Library",
+    },
+    description: {
+      id: "Library utilitas TypeScript offline dan zero-dependency (Author & Maintainer) untuk kebutuhan data dan format Indonesia: Rupiah/terbilang, telepon & operator seluler, NIK, masking data pribadi, NPWP/NITKU, kode bank, hari libur SKB 3 Menteri & hari kerja, zona waktu WIB/WITA/WIT, serta data wilayah Kemendagri.",
+      en: "Offline, zero-dependency TypeScript utility library (Author & Maintainer) for Indonesian data & formatting: Rupiah/terbilang, phone numbers & carrier detection, NIK, PII masking, NPWP/NITKU, bank codes, SKB 3 Menteri holidays & working days, WIB/WITA/WIT timezones, and Kemendagri region data.",
+    },
+    metrics: [
+      { value: "0 Deps", label: { id: "Runtime Dependency", en: "Runtime Deps" } },
+      { value: "9 Modul", label: { id: "10 Subpath Exports", en: "10 Subpath Exports" } },
+      { value: "509 Test", label: { id: "Vitest di 3 Timezone", en: "Vitest across 3 TZ" } },
+      { value: "ESM + CJS", label: { id: "Strict TS + .d.ts", en: "Strict TS + .d.ts" } },
+    ],
+    details: {
+      problem: {
+        id: "Pengembangan aplikasi Indonesia sering kali bergantung pada utilitas terpisah untuk format Rupiah, validasi NIK/NPWP, daftar hari libur SKB, serta kode wilayah Kemendagri—banyak di antaranya membawa dependensi berat, gagal saat diuji di luar zona waktu Asia/Jakarta (bug DST), atau membocorkan input sensitif pada pesan error.",
+        en: "Indonesian software projects frequently rely on fragmented helpers for Rupiah formatting, NIK/NPWP checks, SKB holiday calendars, and Kemendagri region codes—many pulling heavy dependencies, failing outside Asia/Jakarta due to DST/timezone assumptions, or leaking sensitive inputs in error messages.",
+      },
+      goals: {
+        id: "Membangun satu library TypeScript strict dengan 0 runtime dependency yang berjalan 100% offline di Node.js maupun browser, deterministik di berbagai zona waktu, tree-shakeable per modul, serta tervalidasi otomatis lewat unit test dan smoke test ekspor.",
+        en: "Build a strict TypeScript library with zero runtime dependencies that executes 100% offline in both Node.js and browsers, behaves deterministically across timezones, supports tree-shakeable subpath imports, and passes automated export smoke tests.",
+      },
+      solution: {
+        id: "Merancang dan mempublikasikan @ghifari29/id-kit berisi 9 modul domain Indonesia (10 subpath exports termasuk root), dikompilasi ke format ganda ESM + CJS + .d.ts lewat tsup dengan sideEffects: false, serta dilengkapi 509 unit test Vitest yang dijalankan di 3 timezone (UTC, America/New_York, Asia/Jakarta).",
+        en: "Designed and published @ghifari29/id-kit with 9 Indonesian domain modules (10 subpath exports including root), compiled into dual ESM + CJS + .d.ts outputs via tsup with sideEffects: false, and backed by 509 Vitest unit tests verified across 3 timezones (UTC, America/New_York, Asia/Jakarta).",
+      },
+      architecture: {
+        id: "Arsitektur TypeScript strict dengan tsup dual-output (ESM + CJS + deklarasi .d.ts) dan subpath exports tree-shakeable (@ghifari29/id-kit/<modul>). Seluruh kalkulasi kalender dan zona waktu memakai aritmetika UTC murni tanpa ketergantungan locale host atau DST, serta menerapkan kontrak error konsisten (TypeError/RangeError) tanpa menyertakan nilai input sensitif seperti NIK/NPWP/telepon.",
+        en: "Strict TypeScript architecture compiled via tsup to dual ESM + CJS + .d.ts targets with tree-shakeable subpath exports (@ghifari29/id-kit/<module>). Calendar and timezone operations use pure UTC arithmetic immune to host locale/DST shifts, paired with consistent TypeError/RangeError contracts that never echo sensitive inputs.",
+      },
+      features: {
+        id: [
+          "format — terbilang, rupiah, parseRupiah, dan rupiahSingkat untuk nominal dan parsing mata uang Indonesia",
+          "phone — normalizePhone, isValidPhone, dan detectOperator berdasarkan alokasi awalan operator seluler",
+          "nik — parseNIK dan isValidNIK untuk struktur 16 digit (38 provinsi Kemendagri)",
+          "mask — mask, maskNIK, maskPhone, dan maskAccount untuk sensor tampilan UI data pribadi",
+          "npwp — parseNPWP, isValidNPWP, parseNITKU, dan isValidNITKU (NPWP 15/16 digit & NITKU 22 digit)",
+          "bank — getBank dan listBank untuk referensi 31 kode bank 3 digit di Indonesia",
+          "libur — cekLibur, daftarLibur, tahunTersedia, hitungHariKerja, dan tambahHariKerja berbasis SKB 3 Menteri 2025–2027",
+          "waktu — formatTanggal, formatWaktu, formatTanggalWaktu, keZonaWaktu, dan zonaWaktuProvinsi (WIB/WITA/WIT)",
+          "wilayah — getProvinsi, listProvinsi, getKabKota, listKabKota, dan cariWilayah (38 provinsi & 514 kab/kota Kemendagri)",
+        ],
+        en: [
+          "format — terbilang, rupiah, parseRupiah, and rupiahSingkat for Indonesian currency formatting & parsing",
+          "phone — normalizePhone, isValidPhone, and detectOperator for mobile number normalization and carrier prefixes",
+          "nik — parseNIK and isValidNIK validating 16-digit structure across 38 Kemendagri provinces",
+          "mask — mask, maskNIK, maskPhone, and maskAccount for safe UI masking of sensitive strings",
+          "npwp — parseNPWP, isValidNPWP, parseNITKU, and isValidNITKU (15/16-digit NPWP & 22-digit NITKU)",
+          "bank — getBank and listBank covering 31 official 3-digit Indonesian bank codes",
+          "libur — cekLibur, daftarLibur, tahunTersedia, hitungHariKerja, and tambahHariKerja with SKB 3 Menteri 2025–2027 data",
+          "waktu — formatTanggal, formatWaktu, formatTanggalWaktu, keZonaWaktu, and zonaWaktuProvinsi (WIB/WITA/WIT)",
+          "wilayah — getProvinsi, listProvinsi, getKabKota, listKabKota, and cariWilayah (38 provinces & 514 regencies/cities)",
+        ],
+      },
+      contribution: {
+        id: "Author & Maintainer — merancang arsitektur API 9 modul (10 subpath exports), implementasi aritmetika UTC murni bebas bug DST, konsistensi error handling TypeError/RangeError tanpa kebocoran data sensitif, kurasi data Kemendagri & SKB 3 Menteri 2025–2027, serta pipeline GitHub Actions CI (509 unit test di UTC/America-New_York/Asia-Jakarta + smoke test ESM/CJS/DTS) dan rilis ke npm.",
+        en: "Author & Maintainer — designed the 9-module API (10 subpath exports), engineered pure UTC arithmetic free of DST bugs, enforced TypeError/RangeError safety without echoing sensitive inputs, curated Kemendagri & SKB 3 Menteri 2025–2027 datasets, and built the GitHub Actions CI pipeline (509 tests across UTC/America-New_York/Asia-Jakarta + ESM/CJS/DTS export smoke tests) and npm release.",
+      },
+      process: {
+        id: [
+          "Menetapkan batasan domain dan kontrak tipe strict TypeScript untuk 9 modul utilitas Indonesia tanpa runtime dependency.",
+          "Mengimplementasikan algoritma kalender dan zona waktu berbasis UTC murni serta konsistensi error TypeError/RangeError.",
+          "Menyusun 509 unit test (Vitest) yang dijalankan pada 3 zona waktu berbeda (UTC, America/New_York, Asia/Jakarta) di GitHub Actions CI.",
+          "Mengkonfigurasi build tsup (ESM + CJS + .d.ts), smoke test ekspor package.json, dan mempublikasikan @ghifari29/id-kit ke registry npm.",
+        ],
+        en: [
+          "Defined strict TypeScript contracts and domain boundaries across 9 Indonesian utility modules with zero runtime dependencies.",
+          "Implemented pure UTC calendar/timezone arithmetic and safe TypeError/RangeError contracts that mask sensitive inputs.",
+          "Authored 509 Vitest unit tests verified across 3 distinct timezones (UTC, America/New_York, Asia/Jakarta) in GitHub Actions CI.",
+          "Configured dual ESM + CJS + .d.ts builds with tsup, subpath export smoke tests, and published @ghifari29/id-kit to npm.",
+        ],
+      },
+      learnings: {
+        id: "Menguji kode kalender di zona waktu lintas benua (UTC, America/New_York, Asia/Jakarta) mengungkap betapa mudahnya Date lokal JavaScript mengalami pergeseran tanggal akibat DST. Memakai aritmetika UTC murni, memisahkan subpath exports untuk tree-shaking, serta menjaga pesan error agar tidak memantulkan input sensitif menjadi fondasi utama reliabilitas library ini.",
+        en: "Running tests across global timezones (UTC, America/New_York, Asia/Jakarta) highlighted how easily local JavaScript Date operations drift around DST boundaries. Pure UTC arithmetic, tree-shakeable subpath exports, and redacting sensitive inputs from error messages became the core reliability pillars of this package.",
+      },
+    },
+    image: "/images/projects/id-kit.webp",
+    tags: ["TypeScript", "tsup", "Vitest", "GitHub Actions", "npm"],
+    github: "https://github.com/IGhifari/id-kit",
+    npm: "https://www.npmjs.com/package/@ghifari29/id-kit",
+    live: null,
+  },
+  {
+    id: "food-ecommerce",
+    number: "04",
     categoryKey: "fullstack",
     category: {
       id: "E-COMMERCE / FULL-STACK",
@@ -206,7 +300,7 @@ export const selectedProjects = [
   },
   {
     id: "internship-journal",
-    number: "04",
+    number: "05",
     categoryKey: "fullstack",
     category: {
       id: "MANAJEMEN / APLIKASI WEB",
@@ -258,7 +352,7 @@ export const selectedProjects = [
   },
   {
     id: "studyflow",
-    number: "05",
+    number: "06",
     categoryKey: "fullstack",
     category: {
       id: "EDUTECH / FULL-STACK & AI",
@@ -336,7 +430,7 @@ export const selectedProjects = [
   },
   {
     id: "blue-horizon",
-    number: "06",
+    number: "07",
     categoryKey: "webapp",
     category: {
       id: "LOGISTIK / APLIKASI WEB",

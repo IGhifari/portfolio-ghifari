@@ -17,6 +17,7 @@ import {
   FiCheckCircle,
   FiLayers,
 } from 'react-icons/fi';
+import { SiNpm } from 'react-icons/si';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { profileData } from '../data/profile';
@@ -572,6 +573,21 @@ const RecruiterMode = () => {
                         >
                           <FiGithub size={13} aria-hidden="true" />
                           <span>Code</span>
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                        </a>
+                      )}
+
+                      {project.npm && (
+                        <a
+                          href={project.npm}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-cursor-label="npm"
+                          className="cursor-target inline-flex items-center gap-1 text-[11px] font-mono text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors p-1"
+                          title="npm Package"
+                        >
+                          <SiNpm size={13} aria-hidden="true" />
+                          <span>npm</span>
                           <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}

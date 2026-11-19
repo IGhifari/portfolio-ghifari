@@ -14,6 +14,7 @@ import {
   FiExternalLink,
   FiCode,
 } from 'react-icons/fi';
+import { SiNpm } from 'react-icons/si';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { allProjects } from '../data/projects';
@@ -113,6 +114,8 @@ const CaseStudyList = () => {
         return t('caseStudies.filterFullstack');
       case 'webapp':
         return t('caseStudies.filterWebapp');
+      case 'library':
+        return t('caseStudies.filterLibrary');
       case 'game':
         return t('caseStudies.filterGame');
       default:
@@ -491,6 +494,20 @@ const CaseStudyList = () => {
                           className="cursor-target text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                         >
                           <FiGithub size={14} aria-hidden="true" />
+                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                        </a>
+                      )}
+                      {project.npm && (
+                        <a
+                          href={project.npm}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="npm Package"
+                          aria-label={`${project.title} npm Package (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                          data-cursor-label="npm"
+                          className="cursor-target text-[var(--text-muted)] hover:text-[var(--accent)] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                        >
+                          <SiNpm size={14} aria-hidden="true" />
                           <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
                         </a>
                       )}
