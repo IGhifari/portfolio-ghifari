@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useRouter } from '../../context/RouterContext';
 import { updateDocumentMetadata } from '../../utils/seo';
 import { siteConfig } from '../../config/site';
@@ -13,6 +14,7 @@ import {
   readRunnerBestScore,
   writeRunnerBestScore,
 } from './logic/runnerLogic';
+import { buildGameCssVars, getSeasonal3DTheme } from '../shared/seasonalGameTheme';
 import { createRunnerWorld } from './world/createRunnerWorld';
 import RunnerHUD from './ui/RunnerHUD';
 import WebGLFallback from '../ui/WebGLFallback';
@@ -28,8 +30,15 @@ const detectTouchOrSmallScreen = () => {
 
 const RunnerPage = () => {
   const { language, t } = useLanguage();
+  const { season, seasonalEnabled } = useTheme();
   const { langPrefix } = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  const theme3D = useMemo(
+    () => getSeasonal3DTheme(season, seasonalEnabled),
+    [season, seasonalEnabled]
+  );
+  const gameCssVars = useMemo(() => buildGameCssVars(theme3D), [theme3D]);
 
   const containerRef = useRef(null);
   const worldRef = useRef(null);
@@ -56,7 +65,7 @@ const RunnerPage = () => {
   const [milestoneBanner, setMilestoneBanner] = useState(null);
   const [tokenToast, setTokenToast] = useState(null);
 
-  const menuHref = langPrefix === 'en' ? '/en/play' : '/play';
+  const menuHref = langPrefix === 'en' ? '/en/play/explore' : '/play/explore';
   const stackSectionHref = langPrefix === 'en' ? '/en#stack' : '/#stack';
 
   useEffect(() => {
@@ -156,6 +165,7 @@ const RunnerPage = () => {
     const world = createRunnerWorld(container, {
       isMobile: mobileMode,
       reducedMotion: Boolean(shouldReduceMotion),
+      seasonalTheme: theme3D,
       onStateChange: (snap) => {
         const prev = gameStateRef.current;
         gameStateRef.current = snap.gameState;
@@ -218,7 +228,7 @@ const RunnerPage = () => {
       world.dispose();
       worldRef.current = null;
     };
-  }, [applyInputLock, shouldReduceMotion]);
+  }, [applyInputLock, shouldReduceMotion, theme3D]);
 
   // Pointer swipe & tap input handlers (scoped strictly to gameplay surface)
   const triggerAction = (action) => {
@@ -281,16 +291,21 @@ const RunnerPage = () => {
   };
 
   if (!webglSupported) {
-    return <WebGLFallback exitHref={menuHref} />;
+    return (
+      <div style={gameCssVars}>
+        <WebGLFallback exitHref={menuHref} />
+      </div>
+    );
   }
 
   return (
     <div
+      style={gameCssVars}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
-      className="relative w-full h-screen overflow-hidden bg-[#080808] text-[#F5F5F5] touch-none select-none"
+      className="relative w-full h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] touch-none select-none"
     >
       <div ref={containerRef} className="w-full h-full" />
 
@@ -311,6 +326,7 @@ const RunnerPage = () => {
         tokenToast={tokenToast}
         isTouch={isTouch}
         reducedMotion={Boolean(shouldReduceMotion)}
+        vignetteBackground={theme3D.vignetteBackground}
         onStartRun={handleStartRun}
         onTogglePause={handleTogglePause}
         onRestart={handleRestart}

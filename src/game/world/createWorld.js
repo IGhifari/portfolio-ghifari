@@ -1,26 +1,27 @@
 import * as THREE from 'three';
-import { WORLD_BOUNDS, PLAYER_CONFIG, BUILDINGS } from '../logic/worldConfig.js';
+import { WORLD_BOUNDS, PLAYER_CONFIG, getWorldInteractables } from '../logic/worldConfig.js';
 import { stepPlayer, findNearestBuilding } from '../logic/physics.js';
+import { DEFAULT_GAME_THEME } from '../shared/seasonalGameTheme.js';
+import { createSeasonalAtmosphere } from '../shared/createSeasonalAtmosphere.js';
 import { createBuildings } from './createBuildings.js';
 import { createPlayer } from './createPlayer.js';
 import { createProps } from './createProps.js';
 
 /**
- * Generates a radial ground gradient texture fading smoothly from the lifted dark plaza
- * tone (#1a1c24) in the center out to #08090c before reaching the fog boundary,
- * eliminating any hard floor edge.
+ * Generates a radial ground gradient texture fading smoothly from the lifted central
+ * plaza tone out to the scene horizon fog boundary, eliminating any hard floor edge.
  */
-const createGroundGradientTexture = () => {
+const createGroundGradientTexture = (theme = DEFAULT_GAME_THEME) => {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
   if (ctx) {
     const grad = ctx.createRadialGradient(256, 256, 12, 256, 256, 240);
-    grad.addColorStop(0, '#1b1d26');
-    grad.addColorStop(0.24, '#15171e');
-    grad.addColorStop(0.52, '#0e1015');
-    grad.addColorStop(1, '#08090c');
+    grad.addColorStop(0, theme.groundCenterHex);
+    grad.addColorStop(0.24, theme.groundMidHex);
+    grad.addColorStop(0.52, theme.groundEdgeHex);
+    grad.addColorStop(1, theme.groundOuterHex);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 512, 512);
   }
@@ -38,12 +39,16 @@ export const createWorld = (
   {
     isMobile = false,
     reducedMotion = false,
+    includeArcade = true,
+    seasonalTheme = DEFAULT_GAME_THEME,
     getInput = () => ({ x: 0, z: 0 }),
     onNearestChange = () => {},
     onLabelsUpdate = () => {},
   } = {}
 ) => {
   if (!container) return null;
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
+  const interactables = getWorldInteractables(includeArcade);
 
   let renderer;
   try {
@@ -58,7 +63,7 @@ export const createWorld = (
 
   const maxDpr = isMobile ? 1.5 : 2;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-  renderer.setClearColor(0x08090c, 1);
+  renderer.setClearColor(theme.exploreBg, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = !isMobile;
   if (!isMobile) {
@@ -71,18 +76,26 @@ export const createWorld = (
   container.appendChild(canvas);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x08090c);
-  scene.fog = new THREE.Fog(0x08090c, 22, 54);
+  scene.background = new THREE.Color(theme.exploreBg);
+  scene.fog = new THREE.Fog(
+    theme.exploreBg,
+    22 * theme.fogNearMult,
+    54 * theme.fogFarMult
+  );
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 180);
   let camDistScale = 1;
 
-  // Lighting: Soft Hemisphere + Key Directional + Cool Rim Light on buildings
-  const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x09090b, 0.75);
+  // Lighting: Soft Hemisphere + Key Directional + Rim Light
+  const hemiLight = new THREE.HemisphereLight(
+    theme.hemiSky,
+    theme.hemiGround,
+    theme.hemiIntensity
+  );
   hemiLight.position.set(0, 25, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xf8fafc, 1.35);
+  const dirLight = new THREE.DirectionalLight(theme.dirLight, theme.dirIntensity);
   dirLight.position.set(16, 26, 18);
   if (!isMobile) {
     dirLight.castShadow = true;
@@ -98,12 +111,12 @@ export const createWorld = (
   }
   scene.add(dirLight);
 
-  const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.65);
+  const rimLight = new THREE.DirectionalLight(theme.rimColor, theme.rimIntensity);
   rimLight.position.set(-18, 12, -16);
   scene.add(rimLight);
 
   // Extended Horizon Ground Plane (240x240) blending seamlessly into fog with zero hard edge
-  const groundGradientTex = createGroundGradientTexture();
+  const groundGradientTex = createGroundGradientTexture(theme);
   const groundMat = new THREE.MeshStandardMaterial({
     map: groundGradientTex,
     roughness: 0.92,
@@ -117,22 +130,34 @@ export const createWorld = (
   scene.add(groundMesh);
 
   // Extended subtle grid (180x180) so its outer edges dissolve completely inside the fog
-  const gridHelper = new THREE.GridHelper(180, 90, 0x222530, 0x161820);
+  const gridHelper = new THREE.GridHelper(180, 90, theme.gridMajor, theme.gridMinor);
   gridHelper.position.y = 0.006;
   if (Array.isArray(gridHelper.material)) {
     gridHelper.material.forEach((m) => {
       m.transparent = true;
-      m.opacity = 0.35;
+      m.opacity = theme.isLight ? 0.42 : 0.35;
     });
   } else if (gridHelper.material) {
     gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.35;
+    gridHelper.material.opacity = theme.isLight ? 0.42 : 0.35;
   }
   scene.add(gridHelper);
 
-  const buildingsCtrl = createBuildings(scene, { isMobile });
-  const propsCtrl = createProps(scene, { isMobile });
-  const playerCtrl = createPlayer(scene, { isMobile });
+  const buildingsCtrl = createBuildings(scene, {
+    isMobile,
+    includeArcade,
+    seasonalTheme: theme,
+  });
+  const propsCtrl = createProps(scene, { isMobile, seasonalTheme: theme });
+  const playerCtrl = createPlayer(scene, { isMobile, seasonalTheme: theme });
+  const seasonalAtmosphere = createSeasonalAtmosphere(scene, theme, {
+    isMobile,
+    reducedMotion,
+    spanX: 30,
+    spanY: 8,
+    spanZ: 24,
+    baseY: 0.4,
+  });
 
   let playerState = {
     x: PLAYER_CONFIG.startX,
@@ -292,13 +317,15 @@ export const createWorld = (
       speed: PLAYER_CONFIG.speed,
       radius: PLAYER_CONFIG.radius,
       bounds: WORLD_BOUNDS,
-      buildings: BUILDINGS,
+      buildings: interactables,
     });
 
     playerCtrl.update(playerState, dt, { reducedMotion });
     propsCtrl.update(dt, { reducedMotion });
+    buildingsCtrl.updateBeacon(dt, { reducedMotion });
+    seasonalAtmosphere.update(dt, { focusY: 0 });
 
-    const nearest = findNearestBuilding(playerState, BUILDINGS);
+    const nearest = findNearestBuilding(playerState, interactables);
     const nearestId = nearest ? nearest.building.id : null;
     if (nearestId !== lastNearestId) {
       lastNearestId = nearestId;
@@ -364,6 +391,7 @@ export const createWorld = (
       document.removeEventListener('visibilitychange', onVisibilityChange);
       groundGradientTex.dispose();
       buildingsCtrl.dispose?.();
+      seasonalAtmosphere.dispose();
 
       scene.traverse((obj) => {
         if (obj.geometry) {

@@ -102,5 +102,23 @@ export const BUILDINGS = [
   },
 ];
 
+export const ARCADE_KIOSK = {
+  id: 'arcade',
+  number: '06',
+  x: 5.2,
+  z: 6.4,
+  halfW: 0.95,
+  halfD: 0.95,
+  height: 2.35,
+  labelY: 3.35,
+  interactRadius: 2.35,
+  isArcade: true,
+  labelKey: 'game.arcade.title',
+  subtitleKey: 'game.arcade.subtitle',
+};
+
+export const getWorldInteractables = (includeArcade = true) =>
+  includeArcade ? [...BUILDINGS, ARCADE_KIOSK] : BUILDINGS;
+
 export const getBuildingById = (id) =>
   BUILDINGS.find((b) => b.id === id) || null;

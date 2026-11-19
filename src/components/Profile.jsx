@@ -15,7 +15,7 @@ const Lanyard = lazy(() => import('./Lanyard'));
 
 const Profile = () => {
   const shouldReduceMotion = useReducedMotion();
-  const { isDark } = useTheme();
+  const { isDark, season } = useTheme();
   const { t } = useLanguage();
   const { scrollY } = useScroll();
 
@@ -33,7 +33,15 @@ const Profile = () => {
 
   useEffect(() => {
     let active = true;
-    generateLanyardTextures({ isDark }).then((generated) => {
+    generateLanyardTextures({
+      isDark,
+      seasonId: season?.id,
+      accent: season?.palette?.accent,
+      bg: season?.palette?.bgPrimary,
+      surface: season?.palette?.surface,
+      surfaceAlt: season?.palette?.surfaceAlt,
+      border: season?.palette?.border,
+    }).then((generated) => {
       if (active && generated) {
         setTextures(generated);
         // Stagger Lanyard mount by 1 animation frame so DOM & Threads settle cleanly
@@ -45,7 +53,7 @@ const Profile = () => {
     return () => {
       active = false;
     };
-  }, [isDark]);
+  }, [isDark, season]);
 
   // Controlled, subtle scroll transformations away from hero
   const scrollScale = useTransform(scrollY, isDesktop ? [0, 520] : [380, 980], [1, 0.96]);
@@ -78,21 +86,20 @@ const Profile = () => {
 
   return (
     <div className="hero-wrapper bg-[var(--bg-primary)] relative min-h-screen w-full flex flex-col justify-start lg:justify-center items-center overflow-hidden">
-      {/* Background layer: ReactBits Threads WebGL animation with theme-aware color */}
+      {/* Background layer: ReactBits Threads WebGL animation with seasonal theme color */}
       <Threads
-        color={isDark ? [0.23, 0.51, 0.96] : [0.15, 0.39, 0.92]}
+        color={season?.threadsColor || (isDark ? [0.23, 0.51, 0.96] : [0.15, 0.39, 0.92])}
         amplitude={1.1}
         distance={0.38}
         enableMouseInteraction={true}
       />
 
-      {/* Subtle radial vignette overlay to preserve high text contrast in both themes */}
+      {/* Subtle radial vignette overlay adapted to seasonal background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: isDark
-            ? 'radial-gradient(ellipse at 50% 50%, rgba(8, 8, 8, 0.12) 0%, rgba(8, 8, 8, 0.78) 100%)'
-            : 'radial-gradient(ellipse at 50% 50%, rgba(247, 247, 245, 0.12) 0%, rgba(247, 247, 245, 0.82) 100%)',
+          background:
+            'radial-gradient(ellipse at 50% 50%, transparent 15%, var(--bg-primary) 96%)',
           zIndex: 1,
         }}
         aria-hidden="true"
@@ -110,8 +117,8 @@ const Profile = () => {
               frontImage={textures.frontImage}
               backImage={textures.backImage}
               strapImage={textures.strapImage}
-              cardColor={isDark ? '#141418' : '#F7F7F5'}
-              strapColor={isDark ? '#111116' : '#18181B'}
+              cardColor={season?.palette?.surface || (isDark ? '#141418' : '#F7F7F5')}
+              strapColor={season?.palette?.surfaceAlt || (isDark ? '#111116' : '#18181B')}
               finish="glossy"
               orientation="portrait"
               cornerRadius={0.22}
@@ -174,8 +181,8 @@ const Profile = () => {
                   fontWeight={800}
                   fontSize={90}
                   align={isDesktop ? 'left' : 'center'}
-                  color={isDark ? '#F7F7F5' : '#141418'}
-                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  color={season?.palette?.textPrimary || (isDark ? '#F7F7F5' : '#141418')}
+                  accentColor={season?.palette?.accent || (isDark ? '#60A5FA' : '#2563EB')}
                   reveal="letter"
                   dashLength={4}
                   dashGap={2}
@@ -192,8 +199,8 @@ const Profile = () => {
                   fontWeight={800}
                   fontSize={90}
                   align={isDesktop ? 'left' : 'center'}
-                  color={isDark ? '#94A3B8' : '#64748B'}
-                  accentColor={isDark ? '#60A5FA' : '#2563EB'}
+                  color={season?.palette?.textSecondary || (isDark ? '#94A3B8' : '#64748B')}
+                  accentColor={season?.palette?.accent || (isDark ? '#60A5FA' : '#2563EB')}
                   reveal="letter"
                   dashLength={4}
                   dashGap={2}
@@ -282,19 +289,19 @@ const Profile = () => {
                   type="button"
                   onClick={(e) => window.dispatchEvent(new CustomEvent('open-developer-terminal', { detail: { trigger: e.currentTarget } }))}
                   data-cursor-label="Terminal"
-                  className="group cursor-target inline-flex items-center justify-between gap-5 sm:gap-7 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-black/85 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all duration-200 shadow-lg hover:shadow-neutral-900/50 hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                  className="group cursor-target inline-flex items-center justify-between gap-5 sm:gap-7 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] transition-all duration-200 shadow-md hover:translate-y-[-1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                   aria-label={t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
                   title={t('terminal.invokeHint')}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-[#ff5f56] font-mono text-sm sm:text-base font-bold animate-pulse" aria-hidden="true">
+                    <span className="text-[var(--accent)] font-mono text-sm sm:text-base font-bold animate-pulse" aria-hidden="true">
                       _
                     </span>
-                    <span className="font-mono text-xs tracking-[0.2em] uppercase font-bold text-neutral-200 group-hover:text-white transition-colors">
+                    <span className="font-mono text-xs tracking-[0.2em] uppercase font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
                       {t('terminal.invokeBtn') || 'INVOKE TERMINAL'}
                     </span>
                   </div>
-                  <kbd className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[10px] sm:text-[11px] font-mono text-neutral-400 group-hover:text-neutral-200 group-hover:border-neutral-700 transition-colors shadow-inner">
+                  <kbd className="px-2 py-0.5 rounded bg-[var(--surface-alt)] border border-[var(--border)] text-[10px] sm:text-[11px] font-mono text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] group-hover:border-[var(--border-hover)] transition-colors">
                     {shortcutLabel}
                   </kbd>
                 </button>

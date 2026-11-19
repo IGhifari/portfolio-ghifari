@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PLAYER_CONFIG } from '../logic/worldConfig.js';
+import { DEFAULT_GAME_THEME } from '../shared/seasonalGameTheme.js';
 
 /**
  * Shortest angular difference between two angles in radians.
@@ -15,7 +16,8 @@ const shortestAngleDelta = (from, to) => {
  * two arms, two legs, backpack, wrap-around blue visor) with a visible walk cycle,
  * idle breathing, and a soft blue ground ring that appears only while moving.
  */
-export const createPlayer = (scene, { isMobile = false } = {}) => {
+export const createPlayer = (scene, { isMobile = false, seasonalTheme = DEFAULT_GAME_THEME } = {}) => {
+  const theme = seasonalTheme || DEFAULT_GAME_THEME;
   const castShadow = !isMobile;
 
   const root = new THREE.Group();
@@ -31,28 +33,28 @@ export const createPlayer = (scene, { isMobile = false } = {}) => {
   bodyRig.add(upperBody);
 
   const lightMat = new THREE.MeshStandardMaterial({
-    color: 0xf4f4f5,
+    color: theme.playerLight,
     roughness: 0.4,
     metalness: 0.1,
   });
   const torsoMat = new THREE.MeshStandardMaterial({
-    color: 0x18181b,
+    color: theme.playerTorso,
     roughness: 0.6,
     metalness: 0.18,
   });
   const limbMat = new THREE.MeshStandardMaterial({
-    color: 0x2d2d35,
+    color: theme.playerLimb,
     roughness: 0.65,
     metalness: 0.15,
   });
   const visorMat = new THREE.MeshStandardMaterial({
-    color: 0x3b82f6,
-    emissive: 0x3b82f6,
+    color: theme.accent,
+    emissive: theme.accent,
     emissiveIntensity: 0.78,
     roughness: 0.25,
   });
   const edgeMat = new THREE.LineBasicMaterial({
-    color: 0x3f3f46,
+    color: theme.edgeDefault,
     transparent: true,
     opacity: 0.85,
   });
@@ -125,7 +127,7 @@ export const createPlayer = (scene, { isMobile = false } = {}) => {
   const ringGeo = new THREE.RingGeometry(0.54, 0.7, 28);
   ringGeo.rotateX(-Math.PI / 2);
   const ringMat = new THREE.MeshBasicMaterial({
-    color: 0x3b82f6,
+    color: theme.accent,
     side: THREE.DoubleSide,
     transparent: true,
     opacity: 0,

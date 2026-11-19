@@ -5,7 +5,7 @@
 .project-preview-frame {
   background-color: var(--surface-muted);
   border: 1px solid var(--border);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--card-shadow);
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -13,13 +13,13 @@
 
 .project-preview-frame:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--border-hover);
+  box-shadow: var(--card-shadow-hover), 0 0 0 1px var(--border-hover);
 }
 
 .other-project-card {
   background-color: var(--surface-muted);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
@@ -30,7 +30,7 @@
   border-color: var(--border-hover);
   background-color: var(--surface-hover);
   transform: translateY(-3px);
-  box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-hover);
+  box-shadow: var(--card-shadow-hover), 0 0 0 1px var(--border-hover);
 }
 
 /* Linear-style subtle tag pills */

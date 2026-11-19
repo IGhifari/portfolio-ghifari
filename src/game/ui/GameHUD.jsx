@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
-import { FiArrowLeft, FiVolume2, FiVolumeX, FiCheck, FiCornerDownLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiVolume2, FiVolumeX, FiCheck, FiCornerDownLeft, FiGrid } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
 import { RouterLink } from '../../context/RouterContext';
 import { useAudioPlayer } from '../../hooks/useAudioPlayer';
-import { BUILDINGS } from '../logic/worldConfig';
+import { BUILDINGS, getWorldInteractables } from '../logic/worldConfig';
 
 const GameHUD = ({
   nearestBuilding,
@@ -11,7 +11,10 @@ const GameHUD = ({
   labelCoords,
   isTouch,
   isPanelOpen = false,
+  hasArcade = true,
+  vignetteBackground,
   onInteract,
+  onOpenArcade,
   exitHref = '/',
 }) => {
   const { t } = useLanguage();
@@ -19,46 +22,62 @@ const GameHUD = ({
   const { isPlaying, togglePlayback } = useAudioPlayer();
 
   const visitedCount = visitedIds ? visitedIds.length : 0;
+  const labelItems = getWorldInteractables(hasArcade);
 
   return (
     <>
-      {/* Faint horizon glow at top + subtle radial edge vignette toward the #080808 fog */}
+      {/* Faint horizon glow at top + subtle radial edge vignette */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-10"
         style={{
           background:
+            vignetteBackground ||
             'radial-gradient(ellipse 90% 34% at 50% 8%, rgba(59, 130, 246, 0.14) 0%, rgba(17, 24, 39, 0.08) 45%, transparent 78%), radial-gradient(circle at 50% 54%, transparent 56%, rgba(8, 8, 8, 0.72) 100%)',
         }}
       />
 
-      {/* Top HUD Bar — z-[60] with safe-area insets so Exit button is ALWAYS visible */}
+      {/* Top HUD Bar — z-[60] with safe-area insets so Exit & Mini-Games buttons are ALWAYS visible */}
       <div
         style={{
           paddingTop: 'max(1rem, env(safe-area-inset-top))',
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
         }}
-        className="pointer-events-none fixed top-0 left-0 right-0 sm:pt-6 sm:px-6 z-[60] flex items-center justify-between gap-3 select-none"
+        className="pointer-events-none fixed top-0 left-0 right-0 sm:pt-6 sm:px-6 z-[60] flex items-center justify-between gap-2 sm:gap-3 select-none"
       >
         <RouterLink
           to={exitHref}
-          className="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs font-bold text-[#F5F5F5] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+          className="pointer-events-auto inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs font-bold text-[var(--text-primary)] shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label={t('game.exitAria')}
         >
-          <FiArrowLeft size={14} className="text-[#3B82F6]" aria-hidden="true" />
-          <span>{t('game.exitBtn')}</span>
+          <FiArrowLeft size={14} className="text-[var(--accent)]" aria-hidden="true" />
+          <span className="hidden xs:inline sm:inline">{t('game.exitBtn')}</span>
         </RouterLink>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Quick-Switch Arcade Mini-Games Drawer Trigger */}
+          {hasArcade && onOpenArcade && (
+            <button
+              type="button"
+              onClick={onOpenArcade}
+              aria-label={t('game.arcade.hudAria')}
+              title={t('game.arcade.hudAria')}
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[var(--accent)] hover:opacity-90 font-mono text-xs font-bold text-[var(--accent-contrast)] shadow-md cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
+            >
+              <FiGrid size={14} aria-hidden="true" />
+              <span>{t('game.arcade.hudBtn')}</span>
+            </button>
+          )}
+
           {/* Visited Progress Pill */}
           <div
-            className="px-3 py-1.5 rounded-md bg-[#141414]/95 border border-[#27272A] font-mono text-xs text-[#A1A1AA] flex items-center gap-2 shadow-md"
+            className="px-2.5 sm:px-3 py-1.5 rounded-md bg-[var(--surface)]/95 border border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] flex items-center gap-1.5 sm:gap-2 shadow-md"
             aria-label={`${t('game.exploredLabel')}: ${visitedCount} / ${BUILDINGS.length}`}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6]" aria-hidden="true" />
-            <span className="hidden sm:inline">{t('game.exploredLabel')}:</span>
-            <span className="text-[#F5F5F5] font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+            <span className="hidden md:inline">{t('game.exploredLabel')}:</span>
+            <span className="text-[var(--text-primary)] font-bold">
               {visitedCount}/{BUILDINGS.length}
             </span>
           </div>
@@ -70,14 +89,14 @@ const GameHUD = ({
             aria-pressed={isPlaying}
             aria-label={isPlaying ? t('game.muteAria') : t('game.unmuteAria')}
             title={isPlaying ? t('game.muteAria') : t('game.unmuteAria')}
-            className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#141414]/95 hover:bg-[#1c1c1f] border border-[#27272A] hover:border-[#3B82F6] font-mono text-xs text-[#A1A1AA] hover:text-[#F5F5F5] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+            className="pointer-events-auto inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-md bg-[var(--surface)]/95 hover:bg-[var(--surface-hover)] border border-[var(--border)] hover:border-[var(--accent)] font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-md cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             {isPlaying ? (
-              <FiVolume2 size={14} className="text-[#3B82F6]" aria-hidden="true" />
+              <FiVolume2 size={14} className="text-[var(--accent)]" aria-hidden="true" />
             ) : (
               <FiVolumeX size={14} aria-hidden="true" />
             )}
-            <span className="hidden sm:inline">
+            <span className="hidden md:inline">
               {isPlaying ? t('game.soundOn') : t('game.soundOff')}
             </span>
           </button>
@@ -93,14 +112,14 @@ const GameHUD = ({
         }}
         className="pointer-events-none fixed inset-0 z-20 flex flex-col justify-end sm:p-6 select-none"
       >
-        {/* Floating 3D-Projected Building Labels (highlights when nearest; no duplicate Press E chip) */}
+        {/* Floating 3D-Projected Building & Arcade Kiosk Labels */}
         {!isPanelOpen && (
           <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-            {BUILDINGS.map((b) => {
+            {labelItems.map((b) => {
               const coord = labelCoords?.[b.id];
               if (!coord || !coord.visible) return null;
               const isNearest = nearestBuilding?.id === b.id;
-              const isVisited = visitedIds?.includes(b.id);
+              const isVisited = !b.isArcade && visitedIds?.includes(b.id);
               const labelOpacity = coord.opacity ?? 1;
 
               return (
@@ -115,15 +134,15 @@ const GameHUD = ({
                   <div
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-mono text-[11px] tracking-wider uppercase whitespace-nowrap shadow-md ${
                       isNearest
-                        ? 'bg-[#141414] border-[#3B82F6] text-[#F5F5F5] font-bold'
-                        : 'bg-[#080808]/90 border-[#27272A] text-[#A1A1AA]'
+                        ? 'bg-[var(--surface)] border-[var(--accent)] text-[var(--text-primary)] font-bold'
+                        : 'bg-[var(--bg-primary)]/90 border-[var(--border)] text-[var(--text-secondary)]'
                     }`}
                   >
-                    <span className="text-[#3B82F6] font-bold">{b.number}</span>
+                    <span className="text-[var(--accent)] font-bold">{b.number}</span>
                     <span>{t(b.labelKey)}</span>
                     {isVisited && (
                       <span
-                        className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500/20 border border-emerald-500/60 text-emerald-400"
+                        className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500/20 border border-emerald-500/60 text-emerald-500"
                         title={t('game.visitedBadge')}
                       >
                         <FiCheck size={9} />
@@ -143,15 +162,15 @@ const GameHUD = ({
               <div
                 role="status"
                 aria-live="polite"
-                className={`pointer-events-auto flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-lg bg-[#141414]/95 border border-[#3B82F6] shadow-lg ${
+                className={`pointer-events-auto flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-lg bg-[var(--surface)]/95 border border-[var(--accent)] shadow-lg ${
                   isTouch ? 'self-end ml-28 max-w-[235px]' : 'self-center'
                 }`}
               >
                 <div className="text-left min-w-0">
-                  <span className="block font-mono text-[10px] text-[#3B82F6] uppercase tracking-wider font-semibold truncate">
+                  <span className="block font-mono text-[10px] text-[var(--accent)] uppercase tracking-wider font-semibold truncate">
                     {nearestBuilding.number} {'//'} {t(nearestBuilding.subtitleKey)}
                   </span>
-                  <span className="block font-grotesk font-bold text-xs sm:text-sm text-[#F5F5F5] truncate">
+                  <span className="block font-grotesk font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
                     {t(nearestBuilding.labelKey)}
                   </span>
                 </div>
@@ -159,7 +178,7 @@ const GameHUD = ({
                 <button
                   type="button"
                   onClick={() => onInteract(nearestBuilding)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-[#3B82F6] hover:opacity-90 text-[#F5F5F5] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-[var(--accent)] hover:opacity-90 text-[var(--accent-contrast)] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]"
                   aria-label={`${t('game.openAction')}: ${t(nearestBuilding.labelKey)}`}
                 >
                   {isTouch ? (
@@ -175,7 +194,7 @@ const GameHUD = ({
             )}
 
             {/* Controls Hint Pill */}
-            <div className="px-3.5 py-1.5 rounded-md bg-[#080808]/90 border border-[#27272A] font-mono text-[11px] text-[#A1A1AA]">
+            <div className="px-3.5 py-1.5 rounded-md bg-[var(--bg-primary)]/90 border border-[var(--border)] font-mono text-[11px] text-[var(--text-secondary)]">
               {isTouch ? t('game.controlsHintTouch') : t('game.controlsHintDesktop')}
             </div>
           </div>
@@ -196,7 +215,10 @@ GameHUD.propTypes = {
   labelCoords: PropTypes.object,
   isTouch: PropTypes.bool,
   isPanelOpen: PropTypes.bool,
+  hasArcade: PropTypes.bool,
+  vignetteBackground: PropTypes.string,
   onInteract: PropTypes.func.isRequired,
+  onOpenArcade: PropTypes.func,
   exitHref: PropTypes.string,
 };
 

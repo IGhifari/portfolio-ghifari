@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useRouter } from '../../context/RouterContext';
 import { updateDocumentMetadata } from '../../utils/seo';
 import { siteConfig } from '../../config/site';
@@ -12,6 +13,7 @@ import {
   createInputLockUntil,
   isInputLocked,
 } from '../shared/gameUtils';
+import { buildGameCssVars, getSeasonal3DTheme } from '../shared/seasonalGameTheme';
 import { createStackWorld } from './world/createStackWorld';
 import StackHUD from './ui/StackHUD';
 import WebGLFallback from '../ui/WebGLFallback';
@@ -27,8 +29,15 @@ const detectTouchOrSmallScreen = () => {
 
 const StackPage = () => {
   const { language, t } = useLanguage();
+  const { season, seasonalEnabled } = useTheme();
   const { langPrefix } = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  const theme3D = useMemo(
+    () => getSeasonal3DTheme(season, seasonalEnabled),
+    [season, seasonalEnabled]
+  );
+  const gameCssVars = useMemo(() => buildGameCssVars(theme3D), [theme3D]);
 
   const containerRef = useRef(null);
   const worldRef = useRef(null);
@@ -45,7 +54,7 @@ const StackPage = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  const menuHref = langPrefix === 'en' ? '/en/play' : '/play';
+  const menuHref = langPrefix === 'en' ? '/en/play/explore' : '/play/explore';
   const stackSectionHref = langPrefix === 'en' ? '/en#stack' : '/#stack';
 
   useEffect(() => {
@@ -145,6 +154,7 @@ const StackPage = () => {
     const world = createStackWorld(container, {
       isMobile: mobileMode,
       reducedMotion: Boolean(shouldReduceMotion),
+      seasonalTheme: theme3D,
       onScoreChange: ({ score: nextScore, combo: nextCombo, currentLabel: nextLabel }) => {
         setScore(nextScore);
         setCombo(nextCombo);
@@ -175,7 +185,7 @@ const StackPage = () => {
       world.dispose();
       worldRef.current = null;
     };
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, theme3D]);
 
   const handleCanvasPointerDown = (e) => {
     if (e.button && e.button !== 0) return;
@@ -184,13 +194,18 @@ const StackPage = () => {
   };
 
   if (!webglSupported) {
-    return <WebGLFallback exitHref={menuHref} />;
+    return (
+      <div style={gameCssVars}>
+        <WebGLFallback exitHref={menuHref} />
+      </div>
+    );
   }
 
   return (
     <div
+      style={gameCssVars}
       onPointerDown={handleCanvasPointerDown}
-      className="relative w-full h-screen overflow-hidden bg-[#080808] text-[#F5F5F5] touch-none select-none"
+      className="relative w-full h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] touch-none select-none"
     >
       {/* 3D Canvas Container */}
       <div ref={containerRef} className="w-full h-full" />
@@ -204,6 +219,7 @@ const StackPage = () => {
         isPaused={isPaused}
         isGameOver={isGameOver}
         isTouch={isTouch}
+        vignetteBackground={theme3D.vignetteBackground}
         onTogglePause={handleTogglePause}
         onRestart={handleRestart}
         menuHref={menuHref}

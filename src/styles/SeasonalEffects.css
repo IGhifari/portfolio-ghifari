@@ -1,0 +1,276 @@
+/* ========================================================
+   MAJOR SEASONAL EFFECTS (GPU-COMPOSITED CSS KEYFRAMES)
+   Rendered exclusively during the 6 active seasonal events.
+   ======================================================== */
+
+.seasonal-effects-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+  user-select: none;
+}
+
+.seasonal-ambient-wash {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--hero-ambient-glow, none);
+  transition: background 0.5s ease;
+}
+
+.seasonal-particle {
+  position: absolute;
+  top: -8%;
+  will-change: transform, opacity;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.seasonal-particle--fall {
+  animation-name: seasonalFallSway;
+}
+
+.seasonal-particle--rise {
+  top: auto;
+  bottom: -8%;
+  animation-name: seasonalRiseGentle;
+}
+
+.seasonal-particle--glide {
+  top: 0;
+  left: -10%;
+  animation-name: seasonalGlideHorizontal;
+}
+
+.seasonal-particle--orb {
+  top: 0;
+  border-radius: 9999px;
+  filter: blur(28px);
+  animation-name: seasonalOrbDrift;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+.seasonal-particle--twinkle {
+  top: 0;
+  animation-name: seasonalSparkPulse;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+/* January: Distant New Year firework burst rings */
+.seasonal-firework-burst {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1px dashed;
+  will-change: transform, opacity;
+  animation: seasonalFireworkExpand 5.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Delicate December Winter frost micro-light strand */
+.seasonal-lights-strand {
+  position: fixed;
+  top: 3.75rem;
+  left: 0;
+  right: 0;
+  height: 18px;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 4%;
+  border-top: 1px dashed var(--border-subtle);
+  opacity: 0.78;
+}
+
+.seasonal-light-bulb {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  margin-top: -1px;
+  animation: seasonalLightTwinkle 3.2s ease-in-out infinite alternate;
+}
+
+/* June: Brighter sunshine ambient crown wash */
+.seasonal-sunshine-glow {
+  position: fixed;
+  top: -120px;
+  right: 8%;
+  width: 360px;
+  height: 360px;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(
+    circle,
+    rgba(253, 224, 71, 0.08) 0%,
+    rgba(56, 189, 248, 0.09) 42%,
+    transparent 74%
+  );
+  filter: blur(18px);
+}
+
+/* October: Restrained geometric corner pumpkin accents */
+.seasonal-halloween-pumpkin {
+  position: fixed;
+  bottom: 1.5rem;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.seasonal-halloween-pumpkin--left {
+  left: 1.5rem;
+}
+
+.seasonal-halloween-pumpkin--right {
+  right: 1.5rem;
+}
+
+/* October restrained atmospheric horizon fog */
+.seasonal-fog-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 45% at 20% 95%, rgba(168, 85, 247, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 40% at 85% 90%, rgba(249, 115, 22, 0.07) 0%, transparent 70%);
+  animation: seasonalFogBreath 14s ease-in-out infinite alternate;
+}
+
+/* Pause all seasonal animations when page tab is hidden */
+.seasonal-paused .seasonal-particle,
+.seasonal-paused .seasonal-firework-burst,
+.seasonal-paused .seasonal-light-bulb,
+.seasonal-paused .seasonal-fog-layer {
+  animation-play-state: paused !important;
+}
+
+@keyframes seasonalFallSway {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--p-opacity, 0.35);
+  }
+  50% {
+    transform: translate3d(var(--p-drift, 24px), 52vh, 0) rotate(140deg);
+  }
+  90% {
+    opacity: var(--p-opacity, 0.35);
+  }
+  100% {
+    transform: translate3d(calc(var(--p-drift, 24px) * -0.5), 112vh, 0) rotate(280deg);
+    opacity: 0;
+  }
+}
+
+@keyframes seasonalRiseGentle {
+  0% {
+    transform: translate3d(0, 8vh, 0) scale(0.85);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--p-opacity, 0.25);
+  }
+  85% {
+    opacity: var(--p-opacity, 0.25);
+  }
+  100% {
+    transform: translate3d(var(--p-drift, 18px), -108vh, 0) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes seasonalGlideHorizontal {
+  0% {
+    transform: translate3d(-12vw, var(--p-y, 18vh), 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--p-opacity, 0.28);
+  }
+  50% {
+    transform: translate3d(52vw, calc(var(--p-y, 18vh) - 18px), 0);
+  }
+  88% {
+    opacity: var(--p-opacity, 0.28);
+  }
+  100% {
+    transform: translate3d(114vw, calc(var(--p-y, 18vh) + 10px), 0);
+    opacity: 0;
+  }
+}
+
+@keyframes seasonalOrbDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(var(--p-drift, 26px), 24px, 0) scale(1.12);
+  }
+}
+
+@keyframes seasonalSparkPulse {
+  0% {
+    transform: scale(0.65) rotate(0deg);
+    opacity: 0.08;
+  }
+  100% {
+    transform: scale(1.15) rotate(25deg);
+    opacity: var(--p-opacity, 0.42);
+  }
+}
+
+@keyframes seasonalFireworkExpand {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.34;
+  }
+  70% {
+    opacity: 0.08;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes seasonalLightTwinkle {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0.92;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes seasonalFogBreath {
+  0% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seasonal-particle,
+  .seasonal-firework-burst,
+  .seasonal-fog-layer {
+    display: none !important;
+  }
+  .seasonal-light-bulb {
+    animation: none !important;
+    opacity: 0.65 !important;
+  }
+}

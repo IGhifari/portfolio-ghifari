@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useRouter } from '../../context/RouterContext';
 import { updateDocumentMetadata } from '../../utils/seo';
 import { siteConfig } from '../../config/site';
@@ -13,6 +14,7 @@ import {
   createInputLockUntil,
   isInputLocked,
 } from '../shared/gameUtils';
+import { buildGameCssVars, getSeasonal3DTheme } from '../shared/seasonalGameTheme';
 import { createBugsWorld } from './world/createBugsWorld';
 import BugsHUD from './ui/BugsHUD';
 import WebGLFallback from '../ui/WebGLFallback';
@@ -28,8 +30,15 @@ const detectTouchOrSmallScreen = () => {
 
 const BugsPage = () => {
   const { language, t } = useLanguage();
+  const { season, seasonalEnabled } = useTheme();
   const { langPrefix } = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  const theme3D = useMemo(
+    () => getSeasonal3DTheme(season, seasonalEnabled),
+    [season, seasonalEnabled]
+  );
+  const gameCssVars = useMemo(() => buildGameCssVars(theme3D), [theme3D]);
 
   const containerRef = useRef(null);
   const worldRef = useRef(null);
@@ -50,7 +59,7 @@ const BugsPage = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  const menuHref = langPrefix === 'en' ? '/en/play' : '/play';
+  const menuHref = langPrefix === 'en' ? '/en/play/explore' : '/play/explore';
   const projectsSectionHref = langPrefix === 'en' ? '/en#projects' : '/#projects';
 
   useEffect(() => {
@@ -135,6 +144,7 @@ const BugsPage = () => {
     const world = createBugsWorld(container, {
       isMobile: mobileMode,
       reducedMotion: Boolean(shouldReduceMotion),
+      seasonalTheme: theme3D,
       onStateChange: (next) => {
         setScore(next.score);
         setCombo(next.combo);
@@ -184,7 +194,7 @@ const BugsPage = () => {
       world.dispose();
       worldRef.current = null;
     };
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, theme3D]);
 
   const handleCanvasPointerDown = (e) => {
     if (e.button && e.button !== 0) return;
@@ -195,13 +205,18 @@ const BugsPage = () => {
   };
 
   if (!webglSupported) {
-    return <WebGLFallback exitHref={menuHref} />;
+    return (
+      <div style={gameCssVars}>
+        <WebGLFallback exitHref={menuHref} />
+      </div>
+    );
   }
 
   return (
     <div
+      style={gameCssVars}
       onPointerDown={handleCanvasPointerDown}
-      className="relative w-full h-screen overflow-hidden bg-[#080808] text-[#F5F5F5] touch-none select-none cursor-crosshair"
+      className="relative w-full h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] touch-none select-none cursor-crosshair"
     >
       {/* 3D Canvas Container */}
       <div ref={containerRef} className="w-full h-full" />
@@ -220,6 +235,7 @@ const BugsPage = () => {
         isGameOver={isGameOver}
         isTouch={isTouch}
         reducedMotion={Boolean(shouldReduceMotion)}
+        vignetteBackground={theme3D.vignetteBackground}
         onTogglePause={handleTogglePause}
         onRestart={handleRestart}
         menuHref={menuHref}

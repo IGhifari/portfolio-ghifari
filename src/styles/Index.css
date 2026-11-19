@@ -32,6 +32,14 @@
   --tag-border: #232328;
   --tag-text: #A1A1AA;
   --card-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+  --card-shadow-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.72);
+  --terminal-bg: #0D1117;
+  --terminal-header: #161B22;
+  --terminal-surface: #1B2028;
+  --terminal-border: #27272A;
+  --terminal-text: #E6EDF3;
+  --terminal-muted: #8B949E;
+  --hero-ambient-glow: none;
 
   /* Legacy aliases for compatibility */
   --bg-surface: var(--surface);
@@ -77,6 +85,14 @@
   --tag-border: #D5D5CF;
   --tag-text: #4B5563;
   --card-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: 0 20px 38px -12px rgba(15, 23, 42, 0.14);
+  --terminal-bg: #F8FAFC;
+  --terminal-header: #F1F5F9;
+  --terminal-surface: #FFFFFF;
+  --terminal-border: #CBD5E1;
+  --terminal-text: #0F172A;
+  --terminal-muted: #475569;
+  --hero-ambient-glow: none;
 
   /* Legacy aliases for compatibility */
   --bg-surface: var(--surface);
@@ -110,6 +126,12 @@
 html, body {
   max-width: 100%;
   overflow-x: hidden;
+  scrollbar-color: var(--border) var(--bg-primary);
+}
+
+::selection {
+  background-color: var(--accent-muted);
+  color: var(--text-primary);
 }
 
 body {

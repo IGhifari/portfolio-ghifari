@@ -81,8 +81,16 @@ const drawBarcode = (ctx, x, y, width, height, color) => {
   }
 };
 
-export const generateLanyardTextures = async ({ isDark = true } = {}) => {
-  const cacheKey = isDark ? 'dark' : 'light';
+export const generateLanyardTextures = async ({
+  isDark = true,
+  seasonId = 'default',
+  accent,
+  bg,
+  surface,
+  surfaceAlt,
+  border,
+} = {}) => {
+  const cacheKey = `${isDark ? 'dark' : 'light'}:${seasonId}:${accent || ''}`;
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey);
   }
@@ -94,26 +102,26 @@ export const generateLanyardTextures = async ({ isDark = true } = {}) => {
 
   const palette = isDark
     ? {
-        bg: '#0E0E12',
-        surface: '#16161C',
-        surfaceAlt: '#1D1D25',
-        border: '#2A2A35',
+        bg: bg || '#0E0E12',
+        surface: surface || '#16161C',
+        surfaceAlt: surfaceAlt || '#1D1D25',
+        border: border || '#2A2A35',
         textPrimary: '#F5F5F7',
         textSecondary: '#A1A1AA',
         textMuted: '#71717A',
-        accent: '#3B82F6',
+        accent: accent || '#3B82F6',
         accentSoft: 'rgba(59, 130, 246, 0.16)',
         emerald: '#10B981',
       }
     : {
-        bg: '#F7F7F5',
-        surface: '#FFFFFF',
-        surfaceAlt: '#EFEFEB',
-        border: '#D4D4CE',
+        bg: bg || '#F7F7F5',
+        surface: surface || '#FFFFFF',
+        surfaceAlt: surfaceAlt || '#EFEFEB',
+        border: border || '#D4D4CE',
         textPrimary: '#111111',
         textSecondary: '#52525B',
         textMuted: '#71717A',
-        accent: '#2563EB',
+        accent: accent || '#2563EB',
         accentSoft: 'rgba(37, 99, 235, 0.12)',
         emerald: '#059669',
       };
