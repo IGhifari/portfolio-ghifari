@@ -644,6 +644,12 @@ export const otherProjects = [
       id: "Website portofolio pengembang pribadi yang dirancang dengan estetika editorial gelap modern, mikro-interaksi taktil, tipografi responsif, dan aksen WebGL.",
       en: "Personal developer portfolio designed with modern dark editorial aesthetics, tactile micro-interactions, responsive typography, and WebGL accents.",
     },
+    metrics: [
+      { value: "ID / EN", label: { id: "Dwibahasa & hreflang", en: "Bilingual & hreflang" } },
+      { value: "WCAG 2.1 AA", label: { id: "Audit Aksesibilitas", en: "Accessibility Audit" } },
+      { value: "27 Halaman", label: { id: "Static SEO Prerender", en: "Static Prerendered Pages" } },
+      { value: "0 CLS", label: { id: "Deferred Code-Split", en: "Deferred Code-Split" } },
+    ],
     details: {
       problem: {
         id: "Menyajikan karya rekayasa perangkat lunak, latar belakang akademik, dan sertifikasi dalam satu halaman web yang cepat, responsif, dan mudah ditinjau oleh perekrut.",

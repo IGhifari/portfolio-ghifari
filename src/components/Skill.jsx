@@ -23,12 +23,16 @@ import {
   SiSupabase,
   SiRedis,
   SiCloudflare,
+  SiVitest,
+  SiZod,
+  SiGithubactions,
+  SiNpm,
 } from 'react-icons/si';
 import { BiLogoPostgresql } from 'react-icons/bi';
 import { GrMysql } from 'react-icons/gr';
 import { VscVscode, VscSparkle } from 'react-icons/vsc';
 import { TbTablePlus } from 'react-icons/tb';
-import { FiCpu } from 'react-icons/fi';
+import { FiCpu, FiPackage } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { techCategoriesData } from '../data/skills';
 import LogoLoop from './reactbits/LogoLoop';
@@ -57,6 +61,9 @@ const techLogos = [
   { node: <GrMysql size={22} />, title: 'MySQL', hoverColor: '#4479a1' },
   { node: <SiGit size={22} />, title: 'Git', hoverColor: '#f05032' },
   { node: <SiGithub size={22} />, title: 'GitHub', hoverColor: '#a855f7' },
+  { node: <SiVitest size={22} />, title: 'Vitest', hoverColor: '#6e9f18' },
+  { node: <SiZod size={22} />, title: 'Zod', hoverColor: '#3068b7' },
+  { node: <SiGithubactions size={22} />, title: 'GitHub Actions', hoverColor: '#2088ff' },
   { node: <SiPostman size={22} />, title: 'Postman', hoverColor: '#ff6c37' },
 ];
 
@@ -78,6 +85,7 @@ const skillIconsByName = {
   'Node.js': <SiNodedotjs size={18} />,
   Express: <SiExpress size={18} />,
   Laravel: <SiLaravel size={18} />,
+  Zod: <SiZod size={18} />,
 
   // Database & ORM
   PostgreSQL: <BiLogoPostgresql size={20} />,
@@ -94,7 +102,9 @@ const skillIconsByName = {
   // DevOps & Deployment
   Vercel: <SiVercel size={18} />,
   'Cloudflare Pages': <SiCloudflare size={18} />,
+  'GitHub Actions': <SiGithubactions size={18} />,
   Docker: <SiDocker size={18} />,
+  npm: <SiNpm size={18} />,
 
   // Developer Tools
   Git: <SiGit size={18} />,
@@ -102,6 +112,8 @@ const skillIconsByName = {
   Postman: <SiPostman size={18} />,
   Bruno: <SiBruno size={18} />,
   TablePlus: <TbTablePlus size={18} />,
+  Vitest: <SiVitest size={18} />,
+  tsup: <FiPackage size={18} />,
   'VS Code': <VscVscode size={18} />,
 };
 

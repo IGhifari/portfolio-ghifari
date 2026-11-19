@@ -16,12 +16,16 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
   const search = loc.search || '';
   const hash = loc.hash || '';
 
-  const cleanPath = pathname.replace(/\/+$/, '') || '/';
+  const rawCleanPath = pathname.replace(/\/+$/, '') || '/';
+  const isEnPrefix = rawCleanPath === '/en' || rawCleanPath.startsWith('/en/');
+  const cleanPath = isEnPrefix ? rawCleanPath.slice(3) || '/' : rawCleanPath;
+  const langPrefix = isEnPrefix ? 'en' : null;
 
   if (cleanPath === '/') {
     return {
-      pathname: '/',
+      pathname: isEnPrefix ? '/en' : '/',
       cleanPath: '/',
+      langPrefix,
       search,
       hash,
       route: { type: 'home' },
@@ -32,6 +36,7 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
     return {
       pathname,
       cleanPath: '/study-case',
+      langPrefix,
       search,
       hash,
       route: { type: 'study-case-list' },
@@ -42,6 +47,7 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
     return {
       pathname,
       cleanPath: '/recruiter',
+      langPrefix,
       search,
       hash,
       route: { type: 'recruiter' },
@@ -53,6 +59,7 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
     return {
       pathname,
       cleanPath,
+      langPrefix,
       search,
       hash,
       route: { type: 'study-case-detail', slug: detailMatch[1] },
@@ -62,6 +69,7 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
   return {
     pathname,
     cleanPath,
+    langPrefix,
     search,
     hash,
     route: { type: 'not-found', requestedPath: pathname },

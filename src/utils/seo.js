@@ -58,12 +58,24 @@ export const updateDocumentMetadata = ({
     : `${SITE_ORIGIN}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
   setMeta('property', 'og:image', fullOgImage);
 
-  const fullCanonicalUrl = resolvedCanonical.startsWith('http')
+  const isEnRoute =
+    typeof window !== 'undefined' &&
+    (() => {
+      const p = (window.location?.pathname || '/').replace(/\/+$/, '') || '/';
+      return p === '/en' || p.startsWith('/en/');
+    })();
+
+  const rawFullCanonical = resolvedCanonical.startsWith('http')
     ? resolvedCanonical
     : `${SITE_ORIGIN}${resolvedCanonical.startsWith('/') ? '' : '/'}${resolvedCanonical}`;
+  const baseRoutePath = (rawFullCanonical.replace(SITE_ORIGIN, '').replace(/^\/en(?=\/|$)/, '') || '/').replace(/\/+$/, '') || '/';
+  const idAltHref = `${SITE_ORIGIN}${baseRoutePath}`;
+  const enAltHref = baseRoutePath === '/' ? `${SITE_ORIGIN}/en` : `${SITE_ORIGIN}/en${baseRoutePath}`;
+  const fullCanonicalUrl = !canonicalUrl && isEnRoute ? enAltHref : rawFullCanonical;
+
   setMeta('property', 'og:url', fullCanonicalUrl);
 
-  // 5. Canonical Link Tag
+  // 5. Canonical Link Tag & Bilingual hreflang Alternates
   let linkCanonical = document.querySelector('link[rel="canonical"]');
   if (!linkCanonical) {
     linkCanonical = document.createElement('link');
@@ -72,6 +84,21 @@ export const updateDocumentMetadata = ({
   }
   linkCanonical.setAttribute('href', fullCanonicalUrl);
   linkCanonical.href = fullCanonicalUrl;
+
+  const setAlternateLink = (hreflang, href) => {
+    let alt = document.querySelector(`link[rel="alternate"][hreflang="${hreflang}"]`);
+    if (!alt) {
+      alt = document.createElement('link');
+      alt.setAttribute('rel', 'alternate');
+      alt.setAttribute('hreflang', hreflang);
+      document.head.appendChild(alt);
+    }
+    alt.setAttribute('href', href);
+    alt.href = href;
+  };
+  setAlternateLink('id', idAltHref);
+  setAlternateLink('en', enAltHref);
+  setAlternateLink('x-default', idAltHref);
 
   // 6. Twitter Card Tags
   setMeta('name', 'twitter:card', twitterCard);

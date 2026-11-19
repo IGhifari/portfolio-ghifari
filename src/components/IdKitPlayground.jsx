@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   FiTerminal,
@@ -58,6 +58,18 @@ const IdKitPlayground = () => {
 
   const [activeTab, setActiveTab] = useState('format');
 
+  // Ensure deep links to /study-case/id-kit#playground scroll accurately after lazy mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#playground') {
+      const el = document.getElementById('playground');
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    }
+  }, []);
+
   // Tab 1: Format state
   const [numberInput, setNumberInput] = useState('1250000');
   const [rupiahTextInput, setRupiahTextInput] = useState('Rp1.250.000,-');
@@ -115,7 +127,7 @@ const IdKitPlayground = () => {
     <section
       id="playground"
       aria-labelledby="idkit-playground-heading"
-      className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] overflow-hidden shadow-lg"
+      className="scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] overflow-hidden shadow-lg"
     >
       {/* Playground Header */}
       <div className="px-5 py-4 bg-[var(--surface-alt)] border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">

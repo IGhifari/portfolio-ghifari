@@ -9,6 +9,16 @@ const DEFAULT_LANGUAGE = 'id';
 
 const getInitialLanguage = () => {
   try {
+    if (typeof window !== 'undefined') {
+      const pathname = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+      if (pathname === '/en' || pathname.startsWith('/en/')) {
+        return 'en';
+      }
+      const queryLang = new URLSearchParams(window.location.search || '').get('lang');
+      if (queryLang === 'en' || queryLang === 'id') {
+        return queryLang;
+      }
+    }
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'id' || stored === 'en') {
       return stored;
