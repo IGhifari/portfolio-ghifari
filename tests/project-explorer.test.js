@@ -113,9 +113,10 @@ test('CONF-05B — Advanced Project Explorer & Case Study Filter Test Suite', as
 
     await t2.test('filters projects by specific technology', () => {
       const tsProjects = allProjects.filter((p) => matchesTechnology(p, 'TypeScript'));
-      assert.equal(tsProjects.length, 4);
+      assert.equal(tsProjects.length, 5);
       assert.ok(tsProjects.some((p) => p.id === 'akseskita'));
       assert.ok(tsProjects.some((p) => p.id === 'project-management'));
+      assert.ok(tsProjects.some((p) => p.id === 'id-kit'));
       assert.ok(tsProjects.some((p) => p.id === 'food-ecommerce'));
       assert.ok(tsProjects.some((p) => p.id === 'studyflow'));
 

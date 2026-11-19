@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -18,7 +18,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { RouterLink } from '../context/RouterContext';
 import { getProjectBySlug } from '../data/projects';
 import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../utils/seo';
+import { SiNpm } from 'react-icons/si';
 import { siteConfig } from '../config/site';
+
+const IdKitPlayground = lazy(() => import('./IdKitPlayground'));
 
 const CaseStudyDetail = ({ slug }) => {
   const { language, t } = useLanguage();
@@ -233,6 +236,25 @@ const CaseStudyDetail = ({ slug }) => {
             </div>
           )}
 
+          {/* Measurable Engineering Metrics (if provided) */}
+          {Array.isArray(project.metrics) && project.metrics.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              {project.metrics.map((metric) => (
+                <div
+                  key={metric.value}
+                  className="p-3.5 rounded-lg bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
+                >
+                  <span className="font-mono text-sm sm:text-base font-bold text-[var(--accent)] block">
+                    {metric.value}
+                  </span>
+                  <span className="font-mono text-[11px] text-[var(--text-muted)]">
+                    {metric.label[language] || metric.label.en}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Tech Stack Pills */}
           <div className="space-y-2 pt-2">
             <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider block font-semibold">
@@ -249,6 +271,36 @@ const CaseStudyDetail = ({ slug }) => {
               ))}
             </div>
           </div>
+
+          {/* Top Quick Links for Packages (GitHub & npm) */}
+          {project.npm && (
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor-label="Code"
+                  className="cursor-target inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border)] font-mono text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+                >
+                  <FiGithub size={14} aria-hidden="true" />
+                  <span>{t('caseStudies.githubAction')}</span>
+                  <FiExternalLink size={12} aria-hidden="true" />
+                </a>
+              )}
+              <a
+                href={project.npm}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor-label="npm"
+                className="cursor-target inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] hover:opacity-90 font-mono text-xs font-bold text-[var(--accent-contrast)] transition-opacity"
+              >
+                <SiNpm size={14} aria-hidden="true" />
+                <span>{t('caseStudies.npmAction')}</span>
+                <FiExternalLink size={12} aria-hidden="true" />
+              </a>
+            </div>
+          )}
         </motion.header>
 
         {/* Hero Image Showcase */}
@@ -263,6 +315,19 @@ const CaseStudyDetail = ({ slug }) => {
               className="w-full h-full object-cover object-top"
             />
           </motion.div>
+        )}
+
+        {/* Interactive Live Mini Playground for @ghifari29/id-kit */}
+        {project.id === 'id-kit' && (
+          <Suspense
+            fallback={
+              <div className="p-8 rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-center font-mono text-xs text-[var(--text-muted)]">
+                {language === 'id' ? 'Memuat playground interaktif...' : 'Loading interactive playground...'}
+              </div>
+            }
+          >
+            <IdKitPlayground />
+          </Suspense>
         )}
 
         {/* Detailed Technical Sections */}
@@ -412,6 +477,21 @@ const CaseStudyDetail = ({ slug }) => {
               >
                 <FiGithub size={14} aria-hidden="true" />
                 <span>{t('caseStudies.githubAction')}</span>
+                <FiExternalLink size={12} aria-hidden="true" />
+                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+              </a>
+            )}
+
+            {project.npm && (
+              <a
+                href={project.npm}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor-label="npm"
+                className="cursor-target inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] hover:opacity-90 font-mono text-xs font-bold text-[var(--accent-contrast)] transition-opacity"
+              >
+                <SiNpm size={14} aria-hidden="true" />
+                <span>{t('caseStudies.npmAction')}</span>
                 <FiExternalLink size={12} aria-hidden="true" />
                 <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
               </a>

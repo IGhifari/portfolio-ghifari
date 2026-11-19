@@ -224,6 +224,7 @@ ${allProjects
         applicationCategory: 'WebApplication',
         operatingSystem: 'All',
         ...(project.github && !isInternal ? { codeRepository: project.github } : {}),
+        ...(project.npm && !isInternal ? { downloadUrl: project.npm } : {}),
         ...(project.live && !isInternal ? { installUrl: project.live } : {}),
         ...(isInternal
           ? {
@@ -252,7 +253,7 @@ ${allProjects
         ${roleDesc ? `<h2>Peran &amp; Kontribusi Nyata</h2><p>${escapeHtml(roleDesc)}</p>` : ''}
         <h2>Tech Stack</h2>
         <ul>${(project.tags || []).map((t) => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
-        ${!isInternal && (project.live || project.github) ? `<h2>Tautan Proyek</h2><p>${project.live ? `<a href="${escapeHtml(project.live)}" target="_blank" rel="noopener noreferrer">Live Demo</a>` : ''}${project.live && project.github ? ' | ' : ''}${project.github ? `<a href="${escapeHtml(project.github)}" target="_blank" rel="noopener noreferrer">Source Code (GitHub)</a>` : ''}</p>` : ''}
+        ${!isInternal && (project.live || project.npm || project.github) ? `<h2>Tautan Proyek</h2><p>${[project.live ? `<a href="${escapeHtml(project.live)}" target="_blank" rel="noopener noreferrer">Live Demo</a>` : '', project.npm ? `<a href="${escapeHtml(project.npm)}" target="_blank" rel="noopener noreferrer">npm Package</a>` : '', project.github ? `<a href="${escapeHtml(project.github)}" target="_blank" rel="noopener noreferrer">Source Code (GitHub)</a>` : ''].filter(Boolean).join(' | ')}</p>` : ''}
         <p><a href="/study-case">Lihat Semua Studi Kasus</a> | <a href="/">Kembali ke Beranda</a></p>
       </div>`;
 
