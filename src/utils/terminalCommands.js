@@ -10,7 +10,7 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
-import { siteConfig } from '../config/site.js';
+import { siteConfig, ENABLE_3D_GAME } from '../config/site.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -42,6 +42,7 @@ export const NAVIGATION_TARGETS = {
   recruiter: { type: 'route', target: 'recruiter', url: '/recruiter' },
   resume: { type: 'route', target: 'recruiter', url: '/recruiter' },
   cv: { type: 'route', target: 'recruiter', url: '/recruiter' },
+  ...(ENABLE_3D_GAME ? { play: { type: 'route', target: 'play', url: '/play' } } : {}),
 };
 
 /**
@@ -112,6 +113,7 @@ export const getAvailableCommands = (t = (k) => k) => [
   { cmd: 'github', desc: t('terminal.cmdGithubDesc') || 'Display GitHub profile summary and activity metrics.' },
   { cmd: 'contact', desc: t('terminal.cmdContactDesc') || 'Display direct email and verified communication channels.' },
   { cmd: 'recruiter', desc: t('terminal.cmdRecruiterDesc') || 'Open recruiter mode executive overview.' },
+  ...(ENABLE_3D_GAME ? [{ cmd: 'play', desc: t('terminal.cmdPlayDesc') || 'Launch interactive 3D world exploration mode (/play).' }] : []),
   { cmd: 'whoami', desc: t('terminal.cmdWhoamiDesc') || 'Display current guest explorer session information.' },
   { cmd: 'open <target>', desc: t('terminal.cmdOpenDesc') || 'Navigate to a portfolio section or case study.' },
   { cmd: 'date', desc: t('terminal.cmdDateDesc') || 'Display current local date and time.' },
@@ -439,6 +441,33 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         url: destUrl,
         mode: 'route',
         message: isId ? 'Membuka Mode Rekruter...' : 'Navigating to Recruiter Mode...',
+      };
+    }
+
+    case 'play': {
+      if (!ENABLE_3D_GAME) {
+        return {
+          type: 'error',
+          command,
+          args,
+          raw,
+          message: language === 'id' ? 'Mode dunia 3D sedang dinonaktifkan.' : '3D world mode is currently disabled.',
+        };
+      }
+      const isId = language === 'id';
+      const destUrl = '/play';
+      if (typeof onNavigate === 'function') {
+        onNavigate(destUrl, { type: 'route', target: 'play', url: destUrl });
+      }
+      return {
+        type: 'navigate',
+        command,
+        args,
+        raw,
+        target: 'play',
+        url: destUrl,
+        mode: 'route',
+        message: isId ? 'Membuka Dunia 3D (/play)...' : 'Launching 3D World (/play)...',
       };
     }
 

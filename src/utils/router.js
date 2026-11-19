@@ -11,7 +11,9 @@
  * - '/study-case/:slug' -> { type: 'study-case-detail', slug: string }
  * - other -> { type: 'not-found', requestedPath: string }
  */
-export const parseLocation = (loc = typeof window !== 'undefined' ? window.location : { pathname: '/', search: '', hash: '' }) => {
+import { ENABLE_3D_GAME } from '../config/site.js';
+
+export const parseLocation = (loc = typeof window !== 'undefined' ? window.location : { pathname: '/', search: '', hash: '' }, { enable3dGame = ENABLE_3D_GAME } = {}) => {
   const pathname = loc.pathname || '/';
   const search = loc.search || '';
   const hash = loc.hash || '';
@@ -51,6 +53,17 @@ export const parseLocation = (loc = typeof window !== 'undefined' ? window.locat
       search,
       hash,
       route: { type: 'recruiter' },
+    };
+  }
+
+  if (cleanPath === '/play' && enable3dGame) {
+    return {
+      pathname,
+      cleanPath: '/play',
+      langPrefix,
+      search,
+      hash,
+      route: { type: 'play' },
     };
   }
 

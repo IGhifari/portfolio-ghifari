@@ -40,6 +40,7 @@ const injectSeoMetadata = (baseHtml, {
   ogType = 'website',
   schemaData = null,
   noscriptContent = '',
+  noindex = false,
 }) => {
   let html = baseHtml;
   const { idUrl, enUrl, xDefaultUrl } = buildAlternates(basePath);
@@ -65,9 +66,10 @@ const injectSeoMetadata = (baseHtml, {
   ].join('\n');
 
   html = html.replace(/\s*<link\s+rel=["']alternate["']\s+hreflang=["'][^"']*["']\s+href=["'][^"']*["']\s*\/?>/gi, '');
+  const robotsMeta = noindex ? '\n    <meta name="robots" content="noindex, nofollow" />' : '';
   html = html.replace(
     /<link\s+rel=["']canonical["']\s+href=["'][^"']*["']\s*\/?>/i,
-    canonicalAndHreflang
+    canonicalAndHreflang + robotsMeta
   );
 
   // 4. Replace Open Graph Tags & Locale
@@ -485,6 +487,46 @@ ${allProjects
     writePage(isEn ? ['en', 'recruiter'] : ['recruiter'], recruiterHtml);
     generatedCount++;
     console.log(`[prerender-seo] Generated ${prefix}/recruiter/index.html`);
+  }
+
+  // 3b. Generate /play/index.html & /en/play/index.html (with noindex, excluded from sitemap.xml)
+  for (const lang of ['id', 'en']) {
+    const isEn = lang === 'en';
+    const prefix = isEn ? '/en' : '';
+    const playTitle = isEn
+      ? '3D World Exploration | M. Ghifari Bima Khadafi'
+      : 'Eksplorasi Dunia 3D | M. Ghifari Bima Khadafi';
+    const playDesc = isEn
+      ? 'Interactive 3D low-poly world exploration mode for M. Ghifari Bima Khadafi portfolio.'
+      : 'Mode eksplorasi dunia 3D low-poly interaktif untuk portofolio M. Ghifari Bima Khadafi.';
+    const playCanonical = `${SITE_ORIGIN}${prefix}/play`;
+    const playNoscript = `      <div style="padding: 24px; max-width: 800px; margin: 0 auto; font-family: sans-serif; line-height: 1.6;">
+        <h1>${escapeHtml(playTitle)}</h1>
+        <p>${escapeHtml(playDesc)}</p>
+        <ul>
+          <li><a href="${prefix || '/'}#projects">${isEn ? 'Selected Projects' : 'Proyek Pilihan'}</a></li>
+          <li><a href="${prefix || '/'}#about">${isEn ? 'About Me' : 'Tentang Saya'}</a></li>
+          <li><a href="${prefix || '/'}#stack">${isEn ? 'Tech Stack' : 'Teknologi'}</a></li>
+          <li><a href="${prefix || '/'}#experience">${isEn ? 'Work Experience' : 'Pengalaman Kerja'}</a></li>
+          <li><a href="${prefix || '/'}#contact">${isEn ? 'Contact' : 'Kontak'}</a></li>
+        </ul>
+        <p><a href="${prefix || '/'}">${isEn ? 'Back to Portfolio Home' : 'Kembali ke Beranda Portofolio'}</a></p>
+      </div>`;
+
+    const playHtml = injectSeoMetadata(baseHtml, {
+      lang,
+      basePath: '/play',
+      title: playTitle,
+      description: playDesc,
+      canonicalUrl: playCanonical,
+      ogImage: DEFAULT_IMAGE,
+      ogType: 'website',
+      noscriptContent: playNoscript,
+      noindex: true,
+    });
+    writePage(isEn ? ['en', 'play'] : ['play'], playHtml);
+    generatedCount++;
+    console.log(`[prerender-seo] Generated ${prefix}/play/index.html (noindex)`);
   }
 
   // 4. Generate synchronized dist/sitemap.xml covering both ID and EN routes

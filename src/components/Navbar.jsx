@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoMenu, IoClose } from 'react-icons/io5';
-import { FiSun, FiMoon, FiDownload, FiBriefcase } from 'react-icons/fi';
+import { FiSun, FiMoon, FiDownload, FiBriefcase, FiBox } from 'react-icons/fi';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useRouter, RouterLink } from '../context/RouterContext';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
-import { siteConfig } from '../config/site';
+import { siteConfig, ENABLE_3D_GAME } from '../config/site';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -185,6 +185,24 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-2">
           {/* Subtle Dock Divider */}
           <div className="h-4 w-px bg-[var(--border)] dark:bg-white/[0.1] mx-1 select-none" aria-hidden="true" />
+
+          {/* Optional 3D World Exploration Trigger */}
+          {ENABLE_3D_GAME && (
+            <RouterLink
+              to={language === 'en' ? '/en/play' : '/play'}
+              className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
+                route?.cleanPath === '/play'
+                  ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
+                  : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)]'
+              }`}
+              data-cursor-label="Play 3D"
+              title={t('nav.playAria')}
+              aria-label={t('nav.playAria')}
+            >
+              <FiBox size={12} className="text-[var(--accent)]" aria-hidden="true" />
+              <span>{t('nav.play')}</span>
+            </RouterLink>
+          )}
 
           {/* Recruiter Mode Overview Trigger */}
           <RouterLink
@@ -408,6 +426,23 @@ const Navbar = () => {
               </a>
             );
           })}
+          {/* Mobile 3D World Link */}
+          {ENABLE_3D_GAME && (
+            <RouterLink
+              to={language === 'en' ? '/en/play' : '/play'}
+              onClick={closeMenu}
+              className="py-2.5 px-4 rounded-xl font-grotesk font-semibold text-sm tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-between text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+            >
+              <div className="flex items-center gap-2">
+                <FiBox size={15} aria-hidden="true" className="text-[var(--accent)]" />
+                <span>{t('nav.play')}</span>
+              </div>
+              <span className="font-mono text-[10px] text-[var(--accent)] bg-[var(--surface-alt)] border border-[var(--border)] px-2 py-0.5 rounded">
+                3D
+              </span>
+            </RouterLink>
+          )}
+
           {/* Mobile Recruiter Mode Link */}
           <RouterLink
             to="/recruiter"

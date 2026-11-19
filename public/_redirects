@@ -1,8 +1,11 @@
-# SPA Rewrites for Project Case Studies
+# SPA Rewrites for Project Case Studies & 3D Exploration Game
 /study-case         /index.html         200
 /study-case/*       /index.html         200
 /en                 /index.html         200
 /en/*               /index.html         200
+/play               /index.html         200
+/play/              /index.html         200
+/en/play            /index.html         200
 
 # Legacy Asset 301 Redirects
 /M.GhifariBimaKhadafi_CV.pdf        /docs/M.GhifariBimaKhadafi_CV.pdf        301

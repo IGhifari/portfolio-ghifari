@@ -30,6 +30,7 @@ const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
+const GamePage = lazy(() => import('./game/GamePage'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -120,6 +121,7 @@ const AppContent = () => {
         }
     }, [route.type]);
 
+
     return (
         <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
             {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
@@ -136,7 +138,7 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            <Navbar />
+            {route.type !== 'play' && <Navbar />}
 
             <main id="main-content" tabIndex={-1} className="focus:outline-none">
                 {route.type === 'home' && (
@@ -231,6 +233,12 @@ const AppContent = () => {
                     </Suspense>
                 )}
 
+                {route.type === 'play' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <GamePage />
+                    </Suspense>
+                )}
+
                 {route.type === 'not-found' && (
                     <Suspense fallback={<div className="min-h-screen pt-28 max-w-4xl mx-auto px-5 sm:px-6" />}>
                         <NotFound />
@@ -239,17 +247,19 @@ const AppContent = () => {
             </main>
 
             {/* Footer */}
-            <Suspense fallback={null}>
-                <Footer />
-            </Suspense>
+            {route.type !== 'play' && (
+                <Suspense fallback={null}>
+                    <Footer />
+                </Suspense>
+            )}
 
-            {/* Floating Utilities (Placed after main content for logical tab order) */}
+            {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play for Ctrl+J) */}
             <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
                 <Suspense fallback={null}>
-                    <SoundButton />
-                    <ChatAssistant />
+                    {route.type !== 'play' && <SoundButton />}
+                    {route.type !== 'play' && <ChatAssistant />}
                     <DeveloperTerminal />
-                    <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
+                    {route.type !== 'play' && <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />}
                 </Suspense>
             </aside>
         </div>

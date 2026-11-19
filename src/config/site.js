@@ -46,4 +46,9 @@ export const siteConfig = {
   },
 };
 
+/**
+ * Single feature flag to quickly enable/disable the optional 3D exploration world (/play).
+ */
+export const ENABLE_3D_GAME = true;
+
 export default siteConfig;
