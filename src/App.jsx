@@ -5,6 +5,7 @@ import './styles/Components.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
+import { isPlayRouteType } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
 import { siteConfig } from './config/site';
 
@@ -30,7 +31,9 @@ const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
+const GameHub = lazy(() => import('./game/hub/GameHub'));
 const GamePage = lazy(() => import('./game/GamePage'));
+const StackPage = lazy(() => import('./game/stack/StackPage'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -92,6 +95,7 @@ DeferredSection.propTypes = {
 const AppContent = () => {
     const { route } = useRouter();
     const { t } = useLanguage();
+    const isPlayMode = isPlayRouteType(route.type);
 
     // Restore home page document metadata on returning to home route
     useEffect(() => {
@@ -138,7 +142,7 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            {route.type !== 'play' && <Navbar />}
+            {!isPlayMode && <Navbar />}
 
             <main id="main-content" tabIndex={-1} className="focus:outline-none">
                 {route.type === 'home' && (
@@ -235,7 +239,19 @@ const AppContent = () => {
 
                 {route.type === 'play' && (
                     <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <GameHub />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-explore' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
                         <GamePage />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-stack' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <StackPage />
                     </Suspense>
                 )}
 
@@ -247,19 +263,19 @@ const AppContent = () => {
             </main>
 
             {/* Footer */}
-            {route.type !== 'play' && (
+            {!isPlayMode && (
                 <Suspense fallback={null}>
                     <Footer />
                 </Suspense>
             )}
 
-            {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play for Ctrl+J) */}
+            {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play* for Ctrl+J) */}
             <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
                 <Suspense fallback={null}>
-                    {route.type !== 'play' && <SoundButton />}
-                    {route.type !== 'play' && <ChatAssistant />}
+                    {!isPlayMode && <SoundButton />}
+                    {!isPlayMode && <ChatAssistant />}
                     <DeveloperTerminal />
-                    {route.type !== 'play' && <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />}
+                    {!isPlayMode && <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />}
                 </Suspense>
             </aside>
         </div>

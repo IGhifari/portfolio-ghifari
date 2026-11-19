@@ -489,18 +489,42 @@ ${allProjects
     console.log(`[prerender-seo] Generated ${prefix}/recruiter/index.html`);
   }
 
-  // 3b. Generate /play/index.html & /en/play/index.html (with noindex, excluded from sitemap.xml)
-  for (const lang of ['id', 'en']) {
-    const isEn = lang === 'en';
-    const prefix = isEn ? '/en' : '';
-    const playTitle = isEn
-      ? '3D World Exploration | M. Ghifari Bima Khadafi'
-      : 'Eksplorasi Dunia 3D | M. Ghifari Bima Khadafi';
-    const playDesc = isEn
-      ? 'Interactive 3D low-poly world exploration mode for M. Ghifari Bima Khadafi portfolio.'
-      : 'Mode eksplorasi dunia 3D low-poly interaktif untuk portofolio M. Ghifari Bima Khadafi.';
-    const playCanonical = `${SITE_ORIGIN}${prefix}/play`;
-    const playNoscript = `      <div style="padding: 24px; max-width: 800px; margin: 0 auto; font-family: sans-serif; line-height: 1.6;">
+  // 3b. Generate /play, /play/explore, /play/stack & /en variants (with noindex, excluded from sitemap.xml)
+  const playRoutes = [
+    {
+      subSegments: [],
+      basePath: '/play',
+      titleId: 'Hub Interaktif 3D | M. Ghifari Bima Khadafi',
+      titleEn: '3D Interactive Hub | M. Ghifari Bima Khadafi',
+      descId: 'Pilih mode 3D interaktif: jelajahi dunia portofolio low-poly atau mainkan Deploy Stack.',
+      descEn: 'Choose an interactive 3D mode: explore the low-poly portfolio world or play Deploy Stack.',
+    },
+    {
+      subSegments: ['explore'],
+      basePath: '/play/explore',
+      titleId: 'Eksplorasi Dunia 3D | M. Ghifari Bima Khadafi',
+      titleEn: '3D World Exploration | M. Ghifari Bima Khadafi',
+      descId: 'Mode eksplorasi dunia 3D low-poly interaktif untuk portofolio M. Ghifari Bima Khadafi.',
+      descEn: 'Interactive 3D low-poly world exploration mode for M. Ghifari Bima Khadafi portfolio.',
+    },
+    {
+      subSegments: ['stack'],
+      basePath: '/play/stack',
+      titleId: 'Deploy Stack — Mini-Game 3D | M. Ghifari Bima Khadafi',
+      titleEn: 'Deploy Stack — 3D Mini-Game | M. Ghifari Bima Khadafi',
+      descId: 'Mini-game 3D menyusun menara teknologi dari tech stack M. Ghifari Bima Khadafi.',
+      descEn: 'Interactive 3D block-stacking mini-game powered by M. Ghifari Bima Khadafi tech stack.',
+    },
+  ];
+
+  for (const pr of playRoutes) {
+    for (const lang of ['id', 'en']) {
+      const isEn = lang === 'en';
+      const prefix = isEn ? '/en' : '';
+      const playTitle = isEn ? pr.titleEn : pr.titleId;
+      const playDesc = isEn ? pr.descEn : pr.descId;
+      const playCanonical = `${SITE_ORIGIN}${prefix}${pr.basePath}`;
+      const playNoscript = `      <div style="padding: 24px; max-width: 800px; margin: 0 auto; font-family: sans-serif; line-height: 1.6;">
         <h1>${escapeHtml(playTitle)}</h1>
         <p>${escapeHtml(playDesc)}</p>
         <ul>
@@ -513,20 +537,22 @@ ${allProjects
         <p><a href="${prefix || '/'}">${isEn ? 'Back to Portfolio Home' : 'Kembali ke Beranda Portofolio'}</a></p>
       </div>`;
 
-    const playHtml = injectSeoMetadata(baseHtml, {
-      lang,
-      basePath: '/play',
-      title: playTitle,
-      description: playDesc,
-      canonicalUrl: playCanonical,
-      ogImage: DEFAULT_IMAGE,
-      ogType: 'website',
-      noscriptContent: playNoscript,
-      noindex: true,
-    });
-    writePage(isEn ? ['en', 'play'] : ['play'], playHtml);
-    generatedCount++;
-    console.log(`[prerender-seo] Generated ${prefix}/play/index.html (noindex)`);
+      const playHtml = injectSeoMetadata(baseHtml, {
+        lang,
+        basePath: pr.basePath,
+        title: playTitle,
+        description: playDesc,
+        canonicalUrl: playCanonical,
+        ogImage: DEFAULT_IMAGE,
+        ogType: 'website',
+        noscriptContent: playNoscript,
+        noindex: true,
+      });
+      const segments = isEn ? ['en', 'play', ...pr.subSegments] : ['play', ...pr.subSegments];
+      writePage(segments, playHtml);
+      generatedCount++;
+      console.log(`[prerender-seo] Generated ${prefix}${pr.basePath}/index.html (noindex)`);
+    }
   }
 
   // 4. Generate synchronized dist/sitemap.xml covering both ID and EN routes

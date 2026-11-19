@@ -10,7 +10,7 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
-import { siteConfig, ENABLE_3D_GAME } from '../config/site.js';
+import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME } from '../config/site.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -455,6 +455,51 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         };
       }
       const isId = language === 'id';
+      const subTarget = args[0]?.toLowerCase() || '';
+
+      if (subTarget === 'explore') {
+        const destUrl = '/play/explore';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-explore', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-explore',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Eksplorasi Dunia 3D (/play/explore)...' : 'Launching 3D World Exploration (/play/explore)...',
+        };
+      }
+
+      if (subTarget === 'stack') {
+        if (!ENABLE_STACK_GAME) {
+          return {
+            type: 'error',
+            command,
+            args,
+            raw,
+            message: isId ? 'Mini-game Deploy Stack sedang dinonaktifkan.' : 'Deploy Stack mini-game is currently disabled.',
+          };
+        }
+        const destUrl = '/play/stack';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-stack', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-stack',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Deploy Stack (/play/stack)...' : 'Launching Deploy Stack (/play/stack)...',
+        };
+      }
+
       const destUrl = '/play';
       if (typeof onNavigate === 'function') {
         onNavigate(destUrl, { type: 'route', target: 'play', url: destUrl });
@@ -467,7 +512,7 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         target: 'play',
         url: destUrl,
         mode: 'route',
-        message: isId ? 'Membuka Dunia 3D (/play)...' : 'Launching 3D World (/play)...',
+        message: isId ? 'Membuka Game Hub 3D (/play)...' : 'Launching 3D Game Hub (/play)...',
       };
     }
 

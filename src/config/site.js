@@ -47,8 +47,13 @@ export const siteConfig = {
 };
 
 /**
- * Single feature flag to quickly enable/disable the optional 3D exploration world (/play).
+ * Master feature flag to quickly enable/disable everything under /play.
  */
 export const ENABLE_3D_GAME = true;
+
+/**
+ * Sub-flag to enable/disable the "Deploy Stack" 3D mini-game (/play/stack).
+ */
+export const ENABLE_STACK_GAME = true;
 
 export default siteConfig;

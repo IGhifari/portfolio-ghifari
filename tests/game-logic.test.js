@@ -228,8 +228,8 @@ describe('3D Exploration Game Logic, Physics & Routing Test Suite', () => {
 
     const appSource = fs.readFileSync(path.join(rootDir, 'src', 'App.jsx'), 'utf-8');
     assert.ok(
-      appSource.includes("{route.type !== 'play' && <TargetCursor"),
-      'TargetCursor must be disabled on /play route'
+      appSource.includes('{!isPlayMode && <TargetCursor'),
+      'TargetCursor must be disabled on /play* routes'
     );
 
     const hudSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'ui', 'GameHUD.jsx'), 'utf-8');

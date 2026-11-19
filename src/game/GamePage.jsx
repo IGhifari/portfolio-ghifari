@@ -38,16 +38,16 @@ const GamePage = () => {
   const [visitedIds, setVisitedIds] = useState([]);
   const [labelCoords, setLabelCoords] = useState({});
 
-  const exitHref = langPrefix === 'en' ? '/en' : '/';
+  const exitHref = langPrefix === 'en' ? '/en/play' : '/play';
 
-  // Set noindex SEO metadata for /play
+  // Set noindex SEO metadata for /play/explore
   useEffect(() => {
     const title = `${t('game.pageTitle')} | ${siteConfig.name}`;
     const desc = t('game.pageDesc');
     updateDocumentMetadata({
       title,
       description: desc,
-      canonicalPath: '/play',
+      canonicalPath: '/play/explore',
       ogTitle: title,
       ogDescription: desc,
       noindex: true,
