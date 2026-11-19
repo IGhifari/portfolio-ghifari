@@ -5,6 +5,7 @@ import './styles/Components.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
+import { isPlayRouteType } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
 import { siteConfig } from './config/site';
 
@@ -30,6 +31,11 @@ const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
+const GameHub = lazy(() => import('./game/hub/GameHub'));
+const GamePage = lazy(() => import('./game/GamePage'));
+const StackPage = lazy(() => import('./game/stack/StackPage'));
+const BugsPage = lazy(() => import('./game/bugs/BugsPage'));
+const RunnerPage = lazy(() => import('./game/runner/RunnerPage'));
 const NotFound = lazy(() => import('./components/NotFound'));
 
 /**
@@ -91,6 +97,7 @@ DeferredSection.propTypes = {
 const AppContent = () => {
     const { route } = useRouter();
     const { t } = useLanguage();
+    const isPlayMode = isPlayRouteType(route.type);
 
     // Restore home page document metadata on returning to home route
     useEffect(() => {
@@ -120,6 +127,7 @@ const AppContent = () => {
         }
     }, [route.type]);
 
+
     return (
         <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
             {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
@@ -136,7 +144,7 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            <Navbar />
+            {!isPlayMode && <Navbar />}
 
             <main id="main-content" tabIndex={-1} className="focus:outline-none">
                 {route.type === 'home' && (
@@ -231,6 +239,36 @@ const AppContent = () => {
                     </Suspense>
                 )}
 
+                {route.type === 'play' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <GameHub />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-explore' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <GamePage />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-stack' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <StackPage />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-bugs' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <BugsPage />
+                    </Suspense>
+                )}
+
+                {route.type === 'play-runner' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#080808]" />}>
+                        <RunnerPage />
+                    </Suspense>
+                )}
+
                 {route.type === 'not-found' && (
                     <Suspense fallback={<div className="min-h-screen pt-28 max-w-4xl mx-auto px-5 sm:px-6" />}>
                         <NotFound />
@@ -239,17 +277,19 @@ const AppContent = () => {
             </main>
 
             {/* Footer */}
-            <Suspense fallback={null}>
-                <Footer />
-            </Suspense>
+            {!isPlayMode && (
+                <Suspense fallback={null}>
+                    <Footer />
+                </Suspense>
+            )}
 
-            {/* Floating Utilities (Placed after main content for logical tab order) */}
+            {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play* for Ctrl+J) */}
             <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
                 <Suspense fallback={null}>
-                    <SoundButton />
-                    <ChatAssistant />
+                    {!isPlayMode && <SoundButton />}
+                    {!isPlayMode && <ChatAssistant />}
                     <DeveloperTerminal />
-                    <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />
+                    {!isPlayMode && <TargetCursor spinDuration={2} hideDefaultCursor parallaxOn />}
                 </Suspense>
             </aside>
         </div>

@@ -18,6 +18,7 @@ export const updateDocumentMetadata = ({
   ogType = 'website',
   twitterCard = 'summary_large_image',
   schemaData = null,
+  noindex = false,
 } = {}) => {
   if (typeof document === 'undefined') return;
 
@@ -44,6 +45,18 @@ export const updateDocumentMetadata = ({
   // 3. Meta Description
   if (description) {
     setMeta('name', 'description', description);
+  }
+
+  // 3b. Robots noindex directive for non-indexed interactive routes (/play)
+  const existingRobots = document.querySelector('meta[name="robots"]');
+  if (noindex) {
+    setMeta('name', 'robots', 'noindex, nofollow');
+  } else if (existingRobots) {
+    if (typeof existingRobots.remove === 'function') {
+      existingRobots.remove();
+    } else if (existingRobots.parentNode && typeof existingRobots.parentNode.removeChild === 'function') {
+      existingRobots.parentNode.removeChild(existingRobots);
+    }
   }
 
   // 4. Open Graph Tags

@@ -10,7 +10,7 @@ import { techCategoriesData } from '../data/skills.js';
 import { educationMetadata } from '../data/education.js';
 import { directEmail, contactChannelsData } from '../data/contact.js';
 import { GITHUB_TOTAL_CONTRIBUTIONS } from '../data/githubContributions.js';
-import { siteConfig } from '../config/site.js';
+import { siteConfig, ENABLE_3D_GAME, ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '../config/site.js';
 
 export const MAX_COMMAND_LENGTH = 100;
 
@@ -42,6 +42,9 @@ export const NAVIGATION_TARGETS = {
   recruiter: { type: 'route', target: 'recruiter', url: '/recruiter' },
   resume: { type: 'route', target: 'recruiter', url: '/recruiter' },
   cv: { type: 'route', target: 'recruiter', url: '/recruiter' },
+  ...(ENABLE_3D_GAME ? { play: { type: 'route', target: 'play', url: '/play' } } : {}),
+  ...(ENABLE_3D_GAME && ENABLE_BUG_GAME ? { bugs: { type: 'route', target: 'play-bugs', url: '/play/bugs' } } : {}),
+  ...(ENABLE_3D_GAME && ENABLE_RUNNER_GAME ? { runner: { type: 'route', target: 'play-runner', url: '/play/runner' } } : {}),
 };
 
 /**
@@ -112,6 +115,7 @@ export const getAvailableCommands = (t = (k) => k) => [
   { cmd: 'github', desc: t('terminal.cmdGithubDesc') || 'Display GitHub profile summary and activity metrics.' },
   { cmd: 'contact', desc: t('terminal.cmdContactDesc') || 'Display direct email and verified communication channels.' },
   { cmd: 'recruiter', desc: t('terminal.cmdRecruiterDesc') || 'Open recruiter mode executive overview.' },
+  ...(ENABLE_3D_GAME ? [{ cmd: 'play', desc: t('terminal.cmdPlayDesc') || 'Launch interactive 3D world exploration mode (/play).' }] : []),
   { cmd: 'whoami', desc: t('terminal.cmdWhoamiDesc') || 'Display current guest explorer session information.' },
   { cmd: 'open <target>', desc: t('terminal.cmdOpenDesc') || 'Navigate to a portfolio section or case study.' },
   { cmd: 'date', desc: t('terminal.cmdDateDesc') || 'Display current local date and time.' },
@@ -439,6 +443,130 @@ export const executeTerminalCommand = (rawInput, context = {}) => {
         url: destUrl,
         mode: 'route',
         message: isId ? 'Membuka Mode Rekruter...' : 'Navigating to Recruiter Mode...',
+      };
+    }
+
+    case 'play': {
+      if (!ENABLE_3D_GAME) {
+        return {
+          type: 'error',
+          command,
+          args,
+          raw,
+          message: language === 'id' ? 'Mode dunia 3D sedang dinonaktifkan.' : '3D world mode is currently disabled.',
+        };
+      }
+      const isId = language === 'id';
+      const subTarget = args[0]?.toLowerCase() || '';
+
+      if (subTarget === 'explore') {
+        const destUrl = '/play/explore';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-explore', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-explore',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Eksplorasi Dunia 3D (/play/explore)...' : 'Launching 3D World Exploration (/play/explore)...',
+        };
+      }
+
+      if (subTarget === 'stack') {
+        if (!ENABLE_STACK_GAME) {
+          return {
+            type: 'error',
+            command,
+            args,
+            raw,
+            message: isId ? 'Mini-game Deploy Stack sedang dinonaktifkan.' : 'Deploy Stack mini-game is currently disabled.',
+          };
+        }
+        const destUrl = '/play/stack';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-stack', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-stack',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Deploy Stack (/play/stack)...' : 'Launching Deploy Stack (/play/stack)...',
+        };
+      }
+
+      if (subTarget === 'bugs' || subTarget === 'bug') {
+        if (!ENABLE_BUG_GAME) {
+          return {
+            type: 'error',
+            command,
+            args,
+            raw,
+            message: isId ? 'Mini-game Bug Hunter sedang dinonaktifkan.' : 'Bug Hunter mini-game is currently disabled.',
+          };
+        }
+        const destUrl = '/play/bugs';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-bugs', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-bugs',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Bug Hunter (/play/bugs)...' : 'Launching Bug Hunter (/play/bugs)...',
+        };
+      }
+
+      if (subTarget === 'runner') {
+        if (!ENABLE_RUNNER_GAME) {
+          return {
+            type: 'error',
+            command,
+            args,
+            raw,
+            message: isId ? 'Mini-game Stack Runner sedang dinonaktifkan.' : 'Stack Runner mini-game is currently disabled.',
+          };
+        }
+        const destUrl = '/play/runner';
+        if (typeof onNavigate === 'function') {
+          onNavigate(destUrl, { type: 'route', target: 'play-runner', url: destUrl });
+        }
+        return {
+          type: 'navigate',
+          command,
+          args,
+          raw,
+          target: 'play-runner',
+          url: destUrl,
+          mode: 'route',
+          message: isId ? 'Membuka Stack Runner (/play/runner)...' : 'Launching Stack Runner (/play/runner)...',
+        };
+      }
+
+      const destUrl = '/play';
+      if (typeof onNavigate === 'function') {
+        onNavigate(destUrl, { type: 'route', target: 'play', url: destUrl });
+      }
+      return {
+        type: 'navigate',
+        command,
+        args,
+        raw,
+        target: 'play',
+        url: destUrl,
+        mode: 'route',
+        message: isId ? 'Membuka Game Hub 3D (/play)...' : 'Launching 3D Game Hub (/play)...',
       };
     }
 

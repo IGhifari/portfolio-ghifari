@@ -1,12 +1,12 @@
-import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail, FiBriefcase } from 'react-icons/fi';
+import { FiArrowUp, FiGithub, FiLinkedin, FiInstagram, FiMail, FiBriefcase, FiBox } from 'react-icons/fi';
 import { RouterLink } from '../context/RouterContext';
 import LastUpdated from './LastUpdated';
 import { useLanguage } from '../context/LanguageContext';
-import { siteConfig } from '../config/site';
+import { siteConfig, ENABLE_3D_GAME } from '../config/site';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const scrollToTop = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -64,6 +64,16 @@ const Footer = () => {
               <FiBriefcase size={14} aria-hidden="true" />
               <span>{t('nav.recruiter')}</span>
             </RouterLink>
+            {ENABLE_3D_GAME && (
+              <RouterLink
+                to={language === 'en' ? '/en/play' : '/play'}
+                data-cursor-label="Play 3D"
+                className="cursor-target inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] py-1 rounded font-semibold"
+              >
+                <FiBox size={14} className="text-[var(--accent)]" aria-hidden="true" />
+                <span>{t('nav.play')}</span>
+              </RouterLink>
+            )}
             <span className="text-[var(--border)] select-none hidden sm:inline" aria-hidden="true">|</span>
             {footerLinks.map((link) => {
               const isExternal = !link.href.startsWith('mailto:');
