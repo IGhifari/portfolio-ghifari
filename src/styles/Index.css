@@ -40,6 +40,15 @@
   --terminal-text: #E6EDF3;
   --terminal-muted: #8B949E;
   --hero-ambient-glow: none;
+  --github-accent: #34D399;
+  --github-glow: rgba(16, 185, 129, 0.10);
+  --github-level-1: #0e4429;
+  --github-level-1-border: rgba(0, 109, 50, 0.4);
+  --github-level-2: #006d32;
+  --github-level-2-border: rgba(38, 166, 65, 0.5);
+  --github-level-3: #26a641;
+  --github-level-3-border: rgba(57, 211, 83, 0.6);
+  --github-level-4: #39d353;
 
   /* Legacy aliases for compatibility */
   --bg-surface: var(--surface);
@@ -93,6 +102,15 @@
   --terminal-text: #0F172A;
   --terminal-muted: #475569;
   --hero-ambient-glow: none;
+  --github-accent: #15803D;
+  --github-glow: rgba(22, 163, 74, 0.12);
+  --github-level-1: #9be9a8;
+  --github-level-1-border: rgba(64, 196, 99, 0.55);
+  --github-level-2: #40c463;
+  --github-level-2-border: rgba(48, 161, 78, 0.6);
+  --github-level-3: #30a14e;
+  --github-level-3-border: rgba(33, 110, 57, 0.6);
+  --github-level-4: #216e39;
 
   /* Legacy aliases for compatibility */
   --bg-surface: var(--surface);
@@ -162,4 +180,30 @@ textarea,
 .contact-card,
 .other-project-card {
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* GitHub contribution heatmap levels (default green in inactive months, seasonal in active months) */
+.github-cell-level-1 {
+  background-color: var(--github-level-1);
+  border: 1px solid var(--github-level-1-border);
+}
+.github-cell-level-2 {
+  background-color: var(--github-level-2);
+  border: 1px solid var(--github-level-2-border);
+}
+.github-cell-level-3 {
+  background-color: var(--github-level-3);
+  border: 1px solid var(--github-level-3-border);
+}
+.github-cell-level-4 {
+  background-color: var(--github-level-4);
+  border: 1px solid var(--github-level-4);
+}
+.github-cell-level-1:hover,
+.github-cell-level-2:hover,
+.github-cell-level-3:hover {
+  border-color: var(--github-level-4);
+}
+.github-cell-level-4:hover {
+  box-shadow: 0 0 0 1px var(--github-level-4);
 }

@@ -125,6 +125,12 @@ describe('Major Seasonal Events Theme System Test Suite', () => {
       assert.ok(contrastRatio(p.textSecondary, p.surface) >= 4.5, `Month ${m} secondary text on surface`);
       assert.ok(contrastRatio(p.accent, p.accentContrast) >= 4.5, `Month ${m} button accent contrast`);
       assert.ok(contrastRatio(p.terminalText, p.terminalBg) >= 7, `Month ${m} terminal contrast`);
+
+      // GitHub heatmap & accent must follow seasonal accent rather than static GitHub green
+      assert.equal(cssVars['--github-accent'], p.accent, `Month ${m} GitHub accent`);
+      assert.equal(cssVars['--github-level-4'], p.accent, `Month ${m} GitHub level 4`);
+      assert.notEqual(cssVars['--github-level-1'].toLowerCase(), '#0e4429');
+      assert.notEqual(cssVars['--github-level-4'].toLowerCase(), '#39d353');
     }
   });
 
