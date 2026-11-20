@@ -96,23 +96,30 @@ DeferredSection.propTypes = {
 };
 
 const AppContent = () => {
-    const { route } = useRouter();
-    const { t } = useLanguage();
+    const { route, langPrefix } = useRouter();
+    const { language, t } = useLanguage();
     const isPlayMode = isPlayRouteType(route.type);
 
-    // Restore home page document metadata on returning to home route
+    // Restore localized home page document metadata on returning to home or toggling language
     useEffect(() => {
         if (route.type === 'home') {
+            const isEn = language === 'en' || langPrefix === 'en';
+            const homeTitle = `${siteConfig.name} | Web Developer & Software Engineer Portfolio`;
+            const homeDesc = isEn
+                ? 'Official portfolio of M. Ghifari Bima Khadafi (IGhifari) — Web Developer from Bogor, Indonesia. Focused on Frontend React, TypeScript & Tailwind CSS, with backend experience in Node.js and Laravel.'
+                : 'Portofolio resmi M. Ghifari Bima Khadafi (IGhifari) — Web Developer asal Bogor, Indonesia. Berfokus pada Frontend React, TypeScript & Tailwind CSS, serta berpengalaman dengan Node.js dan Laravel.';
             updateDocumentMetadata({
-                title: siteConfig.title,
-                description: siteConfig.description,
+                title: homeTitle,
+                description: homeDesc,
                 canonicalPath: '/',
-                ogTitle: siteConfig.title,
-                ogDescription: siteConfig.description,
+                ogTitle: homeTitle,
+                ogDescription: homeDesc,
                 ogImage: siteConfig.seo?.ogImage || '/portfolio.png',
+                ogType: 'profile',
+                lang: isEn ? 'en' : 'id',
             });
         }
-    }, [route.type]);
+    }, [route.type, language, langPrefix]);
 
     // Scroll restoration for anchor links when switching back to home view
     useEffect(() => {

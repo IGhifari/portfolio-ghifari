@@ -18,10 +18,7 @@ const getInitialLanguage = () => {
       if (queryLang === 'en' || queryLang === 'id') {
         return queryLang;
       }
-    }
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'id' || stored === 'en') {
-      return stored;
+      return DEFAULT_LANGUAGE;
     }
     return DEFAULT_LANGUAGE;
   } catch {

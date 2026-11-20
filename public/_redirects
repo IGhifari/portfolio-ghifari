@@ -1,6 +1,8 @@
 # SPA Rewrites for Project Case Studies & 3D Exploration Game
 /study-case         /index.html         200
 /study-case/*       /index.html         200
+/recruiter          /index.html         200
+/recruiter/         /index.html         200
 /en                 /index.html         200
 /en/*               /index.html         200
 /play               /index.html         200

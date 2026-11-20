@@ -194,6 +194,59 @@ ${allProjects
         </ul>
       </div>`;
 
+    const enHomeSchema = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': `${SITE_ORIGIN}/#website`,
+          url: `${SITE_ORIGIN}/`,
+          name: 'M. Ghifari Bima Khadafi Portfolio',
+          description: enHomeDesc,
+          inLanguage: ['id', 'en'],
+          publisher: { '@id': `${SITE_ORIGIN}/#person` },
+        },
+        {
+          '@type': 'Person',
+          '@id': `${SITE_ORIGIN}/#person`,
+          name: 'M. Ghifari Bima Khadafi',
+          alternateName: [
+            'M Ghifari Bima Khadafi',
+            'Ghifari Bima Khadafi',
+            'Muhammad Ghifari Bima Khadafi',
+            'IGhifari',
+          ],
+          jobTitle: 'Web Developer & Software Engineer',
+          description:
+            'Web Developer and Software Engineer focused on frontend engineering with React, TypeScript, and Tailwind CSS, with hands-on experience in Node.js, PostgreSQL, and Laravel.',
+          url: `${SITE_ORIGIN}/en`,
+          image: DEFAULT_IMAGE,
+          worksFor: { '@type': 'Organization', name: 'PT. AMA Salam Indonesia' },
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Bogor',
+            addressRegion: 'West Java',
+            addressCountry: 'ID',
+          },
+          sameAs: [
+            'https://github.com/IGhifari',
+            'https://www.linkedin.com/in/ighifari/',
+            'https://www.instagram.com/ghfrriii/',
+          ],
+        },
+        {
+          '@type': 'ProfilePage',
+          '@id': `${enHomeCanonical}#webpage`,
+          url: enHomeCanonical,
+          name: enHomeTitle,
+          inLanguage: 'en',
+          isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+          about: { '@id': `${SITE_ORIGIN}/#person` },
+          mainEntity: { '@id': `${SITE_ORIGIN}/#person` },
+        },
+      ],
+    };
+
     const enHomeHtml = injectSeoMetadata(baseHtml, {
       lang: 'en',
       basePath: '/',
@@ -202,6 +255,7 @@ ${allProjects
       canonicalUrl: enHomeCanonical,
       ogImage: DEFAULT_IMAGE,
       ogType: 'profile',
+      schemaData: enHomeSchema,
       noscriptContent: enHomeNoscript,
     });
     writePage(['en'], enHomeHtml);
