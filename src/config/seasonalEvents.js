@@ -351,6 +351,15 @@ export const SEASONAL_CSS_VAR_KEYS = [
   '--terminal-muted',
   '--hero-ambient-glow',
   '--nb-shadow-color',
+  '--github-accent',
+  '--github-glow',
+  '--github-level-1',
+  '--github-level-1-border',
+  '--github-level-2',
+  '--github-level-2-border',
+  '--github-level-3',
+  '--github-level-3-border',
+  '--github-level-4',
 ];
 
 /**
@@ -494,6 +503,48 @@ export const resolveSeasonalTheme = (month, requestedMode = null, date = new Dat
   };
 };
 
+const parseHexRgb = (hex) => {
+  const clean = String(hex || '').replace('#', '').trim();
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) return [59, 130, 246];
+  const n = parseInt(full, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+const mixHex = (hexA, hexB, weightB) => {
+  const [r1, g1, b1] = parseHexRgb(hexA);
+  const [r2, g2, b2] = parseHexRgb(hexB);
+  const t = Math.max(0, Math.min(1, weightB));
+  const lerp = (a, b) => Math.round(a + (b - a) * t).toString(16).padStart(2, '0');
+  return `#${lerp(r1, r2)}${lerp(g1, g2)}${lerp(b1, b2)}`.toUpperCase();
+};
+
+const hexToRgba = (hex, alpha) => {
+  const [r, g, b] = parseHexRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const buildGithubTokens = (palette, isLight) => {
+  const baseHex = isLight ? palette.surface : palette.bgPrimary;
+  const weights = isLight ? [0.22, 0.44, 0.70] : [0.25, 0.50, 0.75];
+  const level1 = mixHex(baseHex, palette.accent, weights[0]);
+  const level2 = mixHex(baseHex, palette.accent, weights[1]);
+  const level3 = mixHex(baseHex, palette.accent, weights[2]);
+  const level4 = palette.accent;
+
+  return {
+    '--github-accent': palette.accent,
+    '--github-glow': hexToRgba(palette.accent, isLight ? 0.14 : 0.12),
+    '--github-level-1': level1,
+    '--github-level-1-border': hexToRgba(level2, isLight ? 0.45 : 0.4),
+    '--github-level-2': level2,
+    '--github-level-2-border': hexToRgba(level3, 0.5),
+    '--github-level-3': level3,
+    '--github-level-3-border': hexToRgba(level4, 0.6),
+    '--github-level-4': level4,
+  };
+};
+
 /**
  * Converts an active seasonal theme into a CSS variable map, or returns `{}` for default months
  * so the original CSS stylesheet tokens in `Index.css` stay completely untouched.
@@ -538,5 +589,6 @@ export const buildSeasonCssVariables = (resolvedTheme) => {
     '--terminal-muted': p.terminalMuted || p.textSecondary,
     '--hero-ambient-glow': p.heroGlow || 'none',
     '--nb-shadow-color': p.border,
+    ...buildGithubTokens(p, isLight),
   };
 };

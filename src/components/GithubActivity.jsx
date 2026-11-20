@@ -199,20 +199,12 @@ const GithubActivity = () => {
     return calculateContributionStats(contributions?.days);
   }, [contributions?.days]);
 
-  // GitHub official contribution levels
+  // GitHub contribution levels (official green by default, adapted to active seasonal theme)
   const getCellClass = (level = 0) => {
-    switch (level) {
-      case 1:
-        return 'bg-[#0e4429] border border-[#006d32]/40 hover:border-[#39d353]';
-      case 2:
-        return 'bg-[#006d32] border border-[#26a641]/50 hover:border-[#39d353]';
-      case 3:
-        return 'bg-[#26a641] border border-[#39d353]/60 hover:border-[#39d353]';
-      case 4:
-        return 'bg-[#39d353] border border-[#39d353] hover:ring-1 hover:ring-[#39d353]';
-      default:
-        return 'bg-[var(--surface-alt)] border border-[var(--border-subtle)] hover:border-[var(--border)]';
+    if (level >= 1 && level <= 4) {
+      return `github-cell-level-${level}`;
     }
+    return 'bg-[var(--surface-alt)] border border-[var(--border-subtle)] hover:border-[var(--border)]';
   };
 
   const formatDayTooltip = (day) => {
@@ -362,7 +354,7 @@ const GithubActivity = () => {
             <div className="lg:col-span-7 bg-[var(--surface-muted)] border border-[var(--border)] rounded-xl p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden shadow-sm group">
               {/* Subtle ambient radial glow */}
               <div
-                className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 bg-emerald-500/10 rounded-full blur-3xl transition-opacity group-hover:opacity-100 opacity-60"
+                className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 bg-[var(--github-glow)] rounded-full blur-3xl transition-opacity group-hover:opacity-100 opacity-60"
                 aria-hidden="true"
               />
 
@@ -395,7 +387,8 @@ const GithubActivity = () => {
                       </div>
                     )}
                     <span
-                      className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[var(--surface-muted)] ring-1 ring-emerald-400/40"
+                      className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[var(--github-accent)] border-2 border-[var(--surface-muted)]"
+                      style={{ boxShadow: '0 0 0 2px var(--github-glow)' }}
                       title={t('github.verifiedBadge')}
                       aria-hidden="true"
                     />
@@ -414,7 +407,7 @@ const GithubActivity = () => {
 
                     <div className="flex flex-wrap items-center gap-2 pt-0.5">
                       <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] text-[var(--text-secondary)] px-2.5 py-0.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border-subtle)] font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--github-accent)]" aria-hidden="true" />
                         {t('github.verifiedBadge')}
                       </span>
 
@@ -477,10 +470,10 @@ const GithubActivity = () => {
                   <span className="font-mono text-[10px] uppercase tracking-wider font-semibold">
                     {t('github.stats.contributions')}
                   </span>
-                  <FiActivity size={15} className="text-emerald-400" aria-hidden="true" />
+                  <FiActivity size={15} className="text-[var(--github-accent)]" aria-hidden="true" />
                 </div>
                 <div className="mt-4">
-                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-emerald-400 tracking-tight">
+                  <div className="font-grotesk font-black text-2xl sm:text-3xl text-[var(--github-accent)] tracking-tight">
                     {contributions?.total ?? initialContributionsData.total}
                   </div>
                   <p className="font-mono text-[10px] text-[var(--text-muted)] mt-1 truncate">
@@ -573,8 +566,8 @@ const GithubActivity = () => {
                 </span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-mono text-[10px] text-emerald-400 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-mono text-[10px] text-[var(--github-accent)] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--github-accent)] animate-pulse" aria-hidden="true" />
                 <span>
                   {contributions?.total || initialContributionsData.total} {t('github.totalContributionsLabel')}
                 </span>
@@ -641,7 +634,7 @@ const GithubActivity = () => {
                             }}
                             onBlur={() => setHoveredDay(null)}
                             onKeyDown={(e) => handleCellKeyDown(e, idx)}
-                            className={`w-[11px] h-[11px] rounded-[2px] hover:scale-125 hover:z-20 transition-all duration-150 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:z-10 ${getCellClass(
+                            className={`w-[11px] h-[11px] rounded-[2px] hover:scale-125 hover:z-20 transition-all duration-150 cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--github-accent)] focus-visible:z-10 ${getCellClass(
                               day.level
                             )}`}
                           />
@@ -658,7 +651,7 @@ const GithubActivity = () => {
                 <div className="min-h-[2rem] flex items-center">
                   {hoveredDay ? (
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-primary)] font-mono text-xs font-semibold shadow-sm">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                      <span className="w-2 h-2 rounded-full bg-[var(--github-accent)] animate-pulse" aria-hidden="true" />
                       <span>{formatDayTooltip(hoveredDay)}</span>
                     </div>
                   ) : (
@@ -685,19 +678,19 @@ const GithubActivity = () => {
                       title="Level 0: No contributions"
                     />
                     <div
-                      className="w-2.5 h-2.5 rounded-[2px] bg-[#0e4429] border border-[#006d32]/40"
+                      className="w-2.5 h-2.5 rounded-[2px] github-cell-level-1"
                       title="Level 1: 1-3 contributions"
                     />
                     <div
-                      className="w-2.5 h-2.5 rounded-[2px] bg-[#006d32] border border-[#26a641]/50"
+                      className="w-2.5 h-2.5 rounded-[2px] github-cell-level-2"
                       title="Level 2: 4-9 contributions"
                     />
                     <div
-                      className="w-2.5 h-2.5 rounded-[2px] bg-[#26a641] border border-[#39d353]/60"
+                      className="w-2.5 h-2.5 rounded-[2px] github-cell-level-3"
                       title="Level 3: 10-19 contributions"
                     />
                     <div
-                      className="w-2.5 h-2.5 rounded-[2px] bg-[#39d353] border border-[#39d353]"
+                      className="w-2.5 h-2.5 rounded-[2px] github-cell-level-4"
                       title="Level 4: 20+ contributions"
                     />
                   </div>
