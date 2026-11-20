@@ -196,10 +196,6 @@ const SeasonalEffects = () => {
       ].slice(0, isMobile ? 2 : 3)
     : [];
 
-  // December subtle winter silver & icy-blue frost lights
-  const winterLights = ['#0369A1', '#CBD5E1', '#38BDF8', '#E2E8F0'];
-  const lightBulbCount = isMobile ? 6 : 10;
-
   return (
     <div className={isHidden ? 'seasonal-paused' : ''} aria-hidden="true">
       <div className="seasonal-ambient-wash" />
@@ -207,25 +203,6 @@ const SeasonalEffects = () => {
       {effect.hasSunshine && <div className="seasonal-sunshine-glow" />}
 
       {effect.hasFog && !shouldReduceMotion && <div className="seasonal-fog-layer" />}
-
-      {effect.hasLights && (
-        <div className="seasonal-lights-strand">
-          {Array.from({ length: lightBulbCount }, (_, idx) => {
-            const bulbColor = winterLights[idx % winterLights.length];
-            return (
-              <span
-                key={idx}
-                className="seasonal-light-bulb"
-                style={{
-                  backgroundColor: bulbColor,
-                  boxShadow: `0 0 5px ${bulbColor}`,
-                  animationDelay: `${(idx * 0.35).toFixed(2)}s`,
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
 
       {!shouldReduceMotion && (
         <div className="seasonal-effects-layer">

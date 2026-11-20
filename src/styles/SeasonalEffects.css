@@ -70,31 +70,6 @@
   animation: seasonalFireworkExpand 5.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-/* Delicate December Winter frost micro-light strand */
-.seasonal-lights-strand {
-  position: fixed;
-  top: 3.75rem;
-  left: 0;
-  right: 0;
-  height: 18px;
-  z-index: 4;
-  pointer-events: none;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 4%;
-  border-top: 1px dashed var(--border-subtle);
-  opacity: 0.78;
-}
-
-.seasonal-light-bulb {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  margin-top: -1px;
-  animation: seasonalLightTwinkle 3.2s ease-in-out infinite alternate;
-}
-
 /* June: Brighter sunshine ambient crown wash */
 .seasonal-sunshine-glow {
   position: fixed;
@@ -144,7 +119,6 @@
 /* Pause all seasonal animations when page tab is hidden */
 .seasonal-paused .seasonal-particle,
 .seasonal-paused .seasonal-firework-burst,
-.seasonal-paused .seasonal-light-bulb,
 .seasonal-paused .seasonal-fog-layer {
   animation-play-state: paused !important;
 }
@@ -243,17 +217,6 @@
   }
 }
 
-@keyframes seasonalLightTwinkle {
-  0% {
-    opacity: 0.35;
-    transform: scale(0.9);
-  }
-  100% {
-    opacity: 0.92;
-    transform: scale(1.1);
-  }
-}
-
 @keyframes seasonalFogBreath {
   0% {
     opacity: 0.65;
@@ -268,9 +231,5 @@
   .seasonal-firework-burst,
   .seasonal-fog-layer {
     display: none !important;
-  }
-  .seasonal-light-bulb {
-    animation: none !important;
-    opacity: 0.65 !important;
   }
 }
