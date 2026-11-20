@@ -271,18 +271,21 @@ export const stepFootball = (
   const insideGoalWidth =
     Math.abs(z - field.centerZ) <= field.goalHalfWidth - r * 0.45 &&
     y <= field.goalHeight + r * 0.25;
+  const wasWithinMouthWidth = Math.abs(ball.z - field.centerZ) <= field.goalHalfWidth;
 
   const isLeftGoal =
     insideGoalWidth &&
     x < field.minX - r * 0.35 &&
     x >= field.minX - field.goalDepth - 1.2 &&
-    ball.x >= field.minX - r * 0.6;
+    ball.x >= field.minX - r * 0.6 &&
+    (ball.x >= field.minX || wasWithinMouthWidth);
 
   const isRightGoal =
     insideGoalWidth &&
     x > field.maxX + r * 0.35 &&
     x <= field.maxX + field.goalDepth + 1.2 &&
-    ball.x <= field.maxX + r * 0.6;
+    ball.x <= field.maxX + r * 0.6 &&
+    (ball.x <= field.maxX || wasWithinMouthWidth);
 
   if (isLeftGoal || isRightGoal) {
     const scoredSide = isLeftGoal ? 'left' : 'right';
@@ -324,19 +327,40 @@ export const stepFootball = (
     vz = res.vz;
   }
 
-  // 7. Prevent ball shot from behind the goal entering through the exterior back/side net
-  const goalZMin = field.centerZ - field.goalHalfWidth - r * 0.6;
-  const goalZMax = field.centerZ + field.goalHalfWidth + r * 0.6;
-  if (z > goalZMin && z < goalZMax) {
-    const leftBackMin = field.minX - field.goalDepth - r;
-    if (x < field.minX && x >= leftBackMin && ball.x < field.minX - field.goalDepth) {
-      x = leftBackMin;
-      vx = -Math.abs(vx) * 0.55;
-    }
-    const rightBackMax = field.maxX + field.goalDepth + r;
-    if (x > field.maxX && x <= rightBackMax && ball.x > field.maxX + field.goalDepth) {
-      x = rightBackMax;
-      vx = Math.abs(vx) * 0.55;
+  // 7. Prevent ball entering goal pockets through exterior back or side nets
+  const northNetZ = field.centerZ - field.goalHalfWidth;
+  const southNetZ = field.centerZ + field.goalHalfWidth;
+  const sideNetHalfThick = 0.06;
+  const netBounce = 0.55;
+  if (y <= field.goalHeight + r * 0.25) {
+    const goalPockets = [
+      { dir: -1, lineX: field.minX, backX: field.minX - field.goalDepth },
+      { dir: 1, lineX: field.maxX, backX: field.maxX + field.goalDepth },
+    ];
+    for (const { dir, lineX, backX } of goalPockets) {
+      if (z > northNetZ - r * 0.6 && z < southNetZ + r * 0.6) {
+        const backLimit = backX + dir * r;
+        const hitBackNet =
+          dir < 0
+            ? x < lineX && x >= backLimit && ball.x <= backX
+            : x > lineX && x <= backLimit && ball.x >= backX;
+        if (hitBackNet) {
+          x = backLimit;
+          vx = vx === 0 ? 0 : dir * Math.abs(vx) * netBounce;
+        }
+      }
+      const inGoalDepth =
+        dir < 0 ? x >= backX - r * 0.5 && x < lineX : x > lineX && x <= backX + r * 0.5;
+      if (inGoalDepth) {
+        if (ball.z <= northNetZ && z > northNetZ - sideNetHalfThick - r) {
+          z = northNetZ - sideNetHalfThick - r;
+          vz = vz === 0 ? 0 : -Math.abs(vz) * netBounce;
+        }
+        if (ball.z >= southNetZ && z < southNetZ + sideNetHalfThick + r) {
+          z = southNetZ + sideNetHalfThick + r;
+          vz = vz === 0 ? 0 : Math.abs(vz) * netBounce;
+        }
+      }
     }
   }
 

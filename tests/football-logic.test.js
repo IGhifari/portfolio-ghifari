@@ -17,6 +17,7 @@ import {
   kickFootball,
   stepFootball,
 } from '../src/game/logic/footballPhysics.js';
+import { stepPlayer } from '../src/game/logic/physics.js';
 
 describe('Explore Football Pitch & Ball Physics Suite', () => {
   it('1. Spawns ball at center of East Football Field completely clear of buildings and bounds', () => {
@@ -204,5 +205,57 @@ describe('Explore Football Pitch & Ball Physics Suite', () => {
           c.z === FOOTBALL_FIELD.centerZ - FOOTBALL_FIELD.goalHalfWidth
       )
     );
+  });
+
+  it('9. Blocks player and ball from passing through side goal nets while preserving front goal scoring', () => {
+    const colliders = getWorldColliders(true);
+    const northNetZ = FOOTBALL_FIELD.centerZ - FOOTBALL_FIELD.goalHalfWidth;
+    const southNetZ = FOOTBALL_FIELD.centerZ + FOOTBALL_FIELD.goalHalfWidth;
+
+    // Player walking South into Left Goal North side net must stop outside the net wall
+    let pState = {
+      x: FOOTBALL_FIELD.minX - FOOTBALL_FIELD.goalDepth * 0.5,
+      z: northNetZ - 1.5,
+      angle: 0,
+    };
+    for (let i = 0; i < 25; i++) {
+      pState = stepPlayer(pState, { x: 0, z: 1 }, 0.04, { buildings: colliders });
+    }
+    assert.ok(
+      pState.z <= northNetZ - 0.12 - PLAYER_CONFIG.radius + 1e-5,
+      `Player must stop outside left north side net, got z=${pState.z}`
+    );
+
+    // Ball kicked South into Right Goal North side net rebounds North (-Z) and does not score
+    const rightSideHit = stepFootball(
+      {
+        ...createFootballState(),
+        x: FOOTBALL_FIELD.maxX + FOOTBALL_FIELD.goalDepth * 0.5,
+        z: northNetZ - 0.25,
+        vx: 0,
+        vz: 11,
+      },
+      null,
+      0.04
+    );
+    assert.equal(rightSideHit.scoredSide, null);
+    assert.ok(rightSideHit.ball.vz < 0, `Ball must rebound off exterior north side net, got vz=${rightSideHit.ball.vz}`);
+    assert.ok(rightSideHit.ball.z < northNetZ);
+
+    // Ball kicked North into Left Goal South side net rebounds South (+Z) and does not score
+    const leftSouthHit = stepFootball(
+      {
+        ...createFootballState(),
+        x: FOOTBALL_FIELD.minX - FOOTBALL_FIELD.goalDepth * 0.5,
+        z: southNetZ + 0.25,
+        vx: 0,
+        vz: -11,
+      },
+      null,
+      0.04
+    );
+    assert.equal(leftSouthHit.scoredSide, null);
+    assert.ok(leftSouthHit.ball.vz > 0, `Ball must rebound off exterior south side net, got vz=${leftSouthHit.ball.vz}`);
+    assert.ok(leftSouthHit.ball.z > southNetZ);
   });
 });
