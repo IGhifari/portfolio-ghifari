@@ -81,15 +81,15 @@ const Navbar = () => {
     <header
       className={`dark-navbar fixed top-0 inset-x-0 z-50 transition-all duration-300 ease-out ${
         isScrolled
-          ? 'dark-navbar-scrolled pt-2.5 sm:pt-3.5 px-3 sm:px-6 pointer-events-none'
+          ? 'dark-navbar-scrolled pt-2.5 sm:pt-3.5 px-3 xl:px-6 pointer-events-none'
           : 'dark-navbar-transparent pt-0 px-0'
       }`}
     >
       <div
         className={`w-full mx-auto flex items-center justify-between transition-all duration-300 ease-out ${
           isScrolled
-            ? 'pointer-events-auto max-w-5xl h-14 px-4 sm:px-6 rounded-full bg-[var(--nav-bg)] backdrop-blur-xl border border-[var(--border)] shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_16px_50px_-8px_rgba(0,0,0,0.7)]'
-            : 'max-w-6xl h-16 px-5 sm:px-6'
+            ? 'pointer-events-auto max-w-6xl h-14 px-4 xl:px-6 rounded-full bg-[var(--nav-bg)] backdrop-blur-xl border border-[var(--border)] shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_16px_50px_-8px_rgba(0,0,0,0.7)]'
+            : 'max-w-6xl h-16 px-4 xl:px-6'
         }`}
       >
         {/* Brand */}
@@ -100,7 +100,7 @@ const Navbar = () => {
             smooth={true}
             duration={600}
             offset={-80}
-            className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-3 xl:mr-6 flex items-center gap-1"
+            className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-2 xl:mr-5 flex items-center gap-1"
             data-cursor-label="Home"
             aria-label={`${siteConfig.shortName || siteConfig.brandName} - Home`}
           >
@@ -114,7 +114,7 @@ const Navbar = () => {
               e.preventDefault();
               navigate('/');
             }}
-            className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-3 xl:mr-6 flex items-center gap-1"
+            className="group cursor-pointer font-grotesk font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target shrink-0 mr-2 xl:mr-5 flex items-center gap-1"
             data-cursor-label="Home"
             aria-label={`${siteConfig.shortName || siteConfig.brandName} - Home`}
           >
@@ -124,7 +124,7 @@ const Navbar = () => {
         )}
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-2" aria-label="Main Navigation">
           {desktopNavItems.map(({ to, label, isRoute }) => {
             if (isRoute) {
               const isActive = route?.cleanPath?.startsWith('/study-case');
@@ -137,7 +137,7 @@ const Navbar = () => {
                     e.preventDefault();
                     navigate(to);
                   }}
-                  className={`dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
+                  className={`dark-nav-link whitespace-nowrap cursor-pointer uppercase px-2 xl:px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                     isActive
                       ? '!text-[var(--text-primary)] !bg-[var(--surface-alt)] font-bold shadow-xs'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
@@ -159,7 +159,7 @@ const Navbar = () => {
                   offset={-70}
                   spy={true}
                   activeClass="!text-[var(--text-primary)] !bg-[var(--surface-alt)] font-bold shadow-xs"
-                  className="dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  className="dark-nav-link whitespace-nowrap cursor-pointer uppercase px-2 xl:px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 >
                   {label}
                 </Link>
@@ -174,7 +174,7 @@ const Navbar = () => {
                   e.preventDefault();
                   navigate(`/#${to}`);
                 }}
-                className="dark-nav-link cursor-pointer uppercase px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="dark-nav-link whitespace-nowrap cursor-pointer uppercase px-2 xl:px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
                 {label}
               </a>
@@ -183,7 +183,7 @@ const Navbar = () => {
         </nav>
 
         {/* Desktop Controls (Recruiter Mode + CV + Language Selector + Theme Toggle) */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-1.5 xl:gap-2 shrink-0">
           {/* Subtle Dock Divider */}
           <div className="h-4 w-px bg-[var(--border)] dark:bg-white/[0.1] mx-1 select-none" aria-hidden="true" />
 
@@ -191,7 +191,7 @@ const Navbar = () => {
           {ENABLE_3D_GAME && (
             <RouterLink
               to={language === 'en' ? '/en/play/explore' : '/play/explore'}
-              className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
+              className={`whitespace-nowrap inline-flex items-center gap-1.5 h-8 px-2 xl:px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 route?.cleanPath?.startsWith('/play')
                   ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
                   : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)]'
@@ -212,7 +212,7 @@ const Navbar = () => {
           {/* Recruiter Mode Overview Trigger */}
           <RouterLink
             to="/recruiter"
-            className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
+            className={`whitespace-nowrap inline-flex items-center gap-1.5 h-8 px-2 xl:px-2.5 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
               route?.cleanPath === '/recruiter'
                 ? 'bg-[var(--accent)] text-[var(--accent-contrast)] shadow-sm'
                 : 'bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -233,7 +233,7 @@ const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${t('hero.downloadCvAria')} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[11px] font-mono font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer cursor-target focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              className="whitespace-nowrap inline-flex items-center gap-1.5 h-8 px-2 xl:px-2.5 rounded-full bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[11px] font-mono font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer cursor-target focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               data-cursor-label="CV"
             >
               <FiDownload size={12} aria-hidden="true" />
