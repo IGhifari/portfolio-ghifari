@@ -50,6 +50,8 @@ export const getFocusableElements = (container, additionalElements = []) => {
   });
 };
 
+const EMPTY_ARRAY = [];
+
 /**
  * Custom hook to trap focus within a modal/drawer container, manage initial focus,
  * handle escape key closure, and restore focus to trigger element on deactivation.
@@ -76,14 +78,26 @@ export const useFocusTrap = ({
   closeOnEscape = true,
   enableTrap = true,
   restoreFocus = true,
-  additionalElements = [],
+  additionalElements = EMPTY_ARRAY,
 }) => {
   const lastActiveElementRef = useRef(null);
   const wasOpenRef = useRef(false);
+  const restoreTimerRef = useRef(null);
+  const additionalElementsRef = useRef(additionalElements);
+  const initialFocusRefRef = useRef(initialFocusRef);
+  const onCloseRef = useRef(onClose);
+
+  additionalElementsRef.current = additionalElements;
+  initialFocusRefRef.current = initialFocusRef;
+  onCloseRef.current = onClose;
 
   // Capture active element before dialog opens if not explicitly passed
   useEffect(() => {
     if (isOpen) {
+      if (restoreTimerRef.current) {
+        clearTimeout(restoreTimerRef.current);
+        restoreTimerRef.current = null;
+      }
       if (!triggerRef?.current && typeof document !== 'undefined') {
         const active = document.activeElement;
         if (active && active !== document.body) {
@@ -93,18 +107,19 @@ export const useFocusTrap = ({
     }
   }, [isOpen, triggerRef]);
 
-  // Handle initial focus when opened
+  // Handle initial focus once when opened
   useEffect(() => {
     if (!isOpen) return;
 
     const timer = setTimeout(() => {
-      if (initialFocusRef?.current && typeof initialFocusRef.current.focus === 'function') {
-        initialFocusRef.current.focus();
+      const targetFocusEl = initialFocusRefRef.current?.current;
+      if (targetFocusEl && typeof targetFocusEl.focus === 'function') {
+        targetFocusEl.focus();
         return;
       }
 
       if (containerRef?.current) {
-        const focusable = getFocusableElements(containerRef.current, additionalElements);
+        const focusable = getFocusableElements(containerRef.current, additionalElementsRef.current);
         if (focusable.length > 0) {
           focusable[0].focus();
         } else if (containerRef.current.getAttribute('tabindex') !== null) {
@@ -114,7 +129,7 @@ export const useFocusTrap = ({
     }, 50);
 
     return () => clearTimeout(timer);
-  }, [isOpen, containerRef, initialFocusRef, additionalElements]);
+  }, [isOpen, containerRef]);
 
   // Handle Tab trapping and Escape key
   useEffect(() => {
@@ -125,14 +140,15 @@ export const useFocusTrap = ({
       if (e.key === 'Escape' && closeOnEscape) {
         e.preventDefault();
         e.stopPropagation();
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
       // 2. Tab key trapping
       if (e.key === 'Tab' && enableTrap) {
         const container = containerRef?.current;
-        const focusable = getFocusableElements(container, additionalElements);
+        const extras = additionalElementsRef.current;
+        const focusable = getFocusableElements(container, extras);
 
         if (focusable.length === 0) {
           e.preventDefault();
@@ -145,7 +161,7 @@ export const useFocusTrap = ({
 
         const isInside =
           (container && container.contains(currentActive)) ||
-          additionalElements.some(
+          extras.some(
             (item) => (item && 'current' in item ? item.current : item) === currentActive
           );
 
@@ -169,7 +185,7 @@ export const useFocusTrap = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true);
     };
-  }, [isOpen, containerRef, onClose, closeOnEscape, enableTrap, additionalElements]);
+  }, [isOpen, containerRef, closeOnEscape, enableTrap]);
 
   // Handle focus restoration when closed
   const restoreFocusHandler = useCallback(() => {
@@ -177,7 +193,11 @@ export const useFocusTrap = ({
 
     const target = triggerRef?.current || lastActiveElementRef.current;
 
-    setTimeout(() => {
+    if (restoreTimerRef.current) {
+      clearTimeout(restoreTimerRef.current);
+    }
+    restoreTimerRef.current = setTimeout(() => {
+      restoreTimerRef.current = null;
       if (target && target.isConnected && typeof target.focus === 'function') {
         target.focus();
       } else if (fallbackSelector) {

@@ -182,6 +182,110 @@ textarea,
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
+/* Tailwind v3 cannot apply /<opacity> modifiers to hex-valued CSS custom properties; provide color-mix utilities */
+@layer utilities {
+  .bg-\[var\(--surface\)\]\/95 {
+    background-color: var(--surface);
+    background-color: color-mix(in srgb, var(--surface) 95%, transparent);
+  }
+  .bg-\[var\(--surface\)\]\/90 {
+    background-color: var(--surface);
+    background-color: color-mix(in srgb, var(--surface) 90%, transparent);
+  }
+  .bg-\[var\(--surface-muted\)\]\/95 {
+    background-color: var(--surface-muted);
+    background-color: color-mix(in srgb, var(--surface-muted) 95%, transparent);
+  }
+  .bg-\[var\(--surface-muted\)\]\/90 {
+    background-color: var(--surface-muted);
+    background-color: color-mix(in srgb, var(--surface-muted) 90%, transparent);
+  }
+  .bg-\[var\(--surface-muted\)\]\/80 {
+    background-color: var(--surface-muted);
+    background-color: color-mix(in srgb, var(--surface-muted) 80%, transparent);
+  }
+  .bg-\[var\(--surface-alt\)\]\/90 {
+    background-color: var(--surface-alt);
+    background-color: color-mix(in srgb, var(--surface-alt) 90%, transparent);
+  }
+  .bg-\[var\(--surface-alt\)\]\/80 {
+    background-color: var(--surface-alt);
+    background-color: color-mix(in srgb, var(--surface-alt) 80%, transparent);
+  }
+  .bg-\[var\(--surface-alt\)\]\/60 {
+    background-color: var(--surface-alt);
+    background-color: color-mix(in srgb, var(--surface-alt) 60%, transparent);
+  }
+  .bg-\[var\(--surface-alt\)\]\/50 {
+    background-color: var(--surface-alt);
+    background-color: color-mix(in srgb, var(--surface-alt) 50%, transparent);
+  }
+  .bg-\[var\(--terminal-surface\)\]\/70 {
+    background-color: var(--terminal-surface);
+    background-color: color-mix(in srgb, var(--terminal-surface) 70%, transparent);
+  }
+  .bg-\[var\(--bg-primary\)\]\/60 {
+    background-color: var(--bg-primary);
+    background-color: color-mix(in srgb, var(--bg-primary) 60%, transparent);
+  }
+  .bg-\[var\(--bg-primary\)\]\/40 {
+    background-color: var(--bg-primary);
+    background-color: color-mix(in srgb, var(--bg-primary) 40%, transparent);
+  }
+  .bg-\[var\(--accent\)\]\/5 {
+    background-color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+  .bg-\[var\(--accent\)\]\/\[0\.04\] {
+    background-color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 4%, transparent);
+  }
+
+  .border-\[var\(--accent\)\]\/70 {
+    border-color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  .border-\[var\(--accent\)\]\/60 {
+    border-color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+  .border-\[var\(--accent\)\]\/50 {
+    border-color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+  .border-\[var\(--accent\)\]\/40 {
+    border-color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .border-\[var\(--border\)\]\/60 {
+    border-color: var(--border);
+    border-color: color-mix(in srgb, var(--border) 60%, transparent);
+  }
+  .border-\[var\(--text-primary\)\]\/20 {
+    border-color: var(--text-primary);
+    border-color: color-mix(in srgb, var(--text-primary) 20%, transparent);
+  }
+
+  .ring-\[var\(--accent\)\]\/40 {
+    --tw-ring-color: var(--accent);
+    --tw-ring-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .ring-\[var\(--accent\)\]\/30 {
+    --tw-ring-color: var(--accent);
+    --tw-ring-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  .via-\[var\(--accent\)\]\/60 {
+    --tw-gradient-stops: var(--tw-gradient-from), var(--accent) var(--tw-gradient-via-position), var(--tw-gradient-to);
+    --tw-gradient-stops: var(--tw-gradient-from), color-mix(in srgb, var(--accent) 60%, transparent) var(--tw-gradient-via-position), var(--tw-gradient-to);
+  }
+  .via-\[var\(--accent\)\]\/40 {
+    --tw-gradient-stops: var(--tw-gradient-from), var(--accent) var(--tw-gradient-via-position), var(--tw-gradient-to);
+    --tw-gradient-stops: var(--tw-gradient-from), color-mix(in srgb, var(--accent) 40%, transparent) var(--tw-gradient-via-position), var(--tw-gradient-to);
+  }
+}
+
+
 /* GitHub contribution heatmap levels (default green in inactive months, seasonal in active months) */
 .github-cell-level-1 {
   background-color: var(--github-level-1);

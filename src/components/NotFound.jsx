@@ -1,11 +1,32 @@
+import { useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FiAlertCircle, FiArrowLeft, FiCompass } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
-import { RouterLink } from '../context/RouterContext';
+import { RouterLink, useRouter } from '../context/RouterContext';
+import { updateDocumentMetadata } from '../utils/seo';
+import { siteConfig } from '../config/site';
 
 const NotFound = () => {
   const { language } = useLanguage();
+  const { cleanPath } = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const isId = language === 'id';
+    const title = isId
+      ? `Halaman Tidak Ditemukan | ${siteConfig.name}`
+      : `Page Not Found | ${siteConfig.name}`;
+    const desc = isId
+      ? 'Halaman yang Anda cari tidak tersedia atau telah dipindahkan.'
+      : 'The requested page could not be found or has moved.';
+    updateDocumentMetadata({
+      title,
+      description: desc,
+      canonicalPath: cleanPath || '/',
+      noindex: true,
+      lang: language,
+    });
+  }, [language, cleanPath]);
 
   const easeCurve = [0.16, 1, 0.3, 1];
 

@@ -272,6 +272,10 @@ export const createFootballField = (
   buildGoal(field.maxX, 1);  // Right goal extends outward toward +X
 
   // 3. Soccer Ball, Contact Shadow & Contextual Kick Ring
+  const PITCH_SURFACE_Y = 0.065;
+  const BALL_SHADOW_Y = 0.068;
+  const KICK_RING_Y = 0.072;
+
   const ballTex = trackTex(createBallTexture());
   const ballGeo = new THREE.IcosahedronGeometry(FOOTBALL_PHYSICS.ballRadius, 1);
   const ballMat = new THREE.MeshStandardMaterial({
@@ -281,7 +285,11 @@ export const createFootballField = (
   });
   const ballMesh = new THREE.Mesh(ballGeo, ballMat);
   ballMesh.castShadow = !isMobile;
-  ballMesh.position.set(field.centerX, FOOTBALL_PHYSICS.ballRadius, field.centerZ);
+  ballMesh.position.set(
+    field.centerX,
+    FOOTBALL_PHYSICS.ballRadius + PITCH_SURFACE_Y,
+    field.centerZ
+  );
   group.add(ballMesh);
 
   const ballShadowGeo = new THREE.CircleGeometry(FOOTBALL_PHYSICS.ballRadius * 1.15, 16);
@@ -293,7 +301,7 @@ export const createFootballField = (
     depthWrite: false,
   });
   const ballShadow = new THREE.Mesh(ballShadowGeo, ballShadowMat);
-  ballShadow.position.set(field.centerX, 0.06, field.centerZ);
+  ballShadow.position.set(field.centerX, BALL_SHADOW_Y, field.centerZ);
   group.add(ballShadow);
 
   const kickRingGeo = new THREE.RingGeometry(0.5, 0.64, 24);
@@ -306,7 +314,7 @@ export const createFootballField = (
     depthWrite: false,
   });
   const kickRing = new THREE.Mesh(kickRingGeo, kickRingMat);
-  kickRing.position.set(field.centerX, 0.07, field.centerZ);
+  kickRing.position.set(field.centerX, KICK_RING_Y, field.centerZ);
   group.add(kickRing);
 
   // 4. Pooled Subtle Goal Celebration Burst (pre-allocated, 0 runtime allocations)
@@ -358,7 +366,7 @@ export const createFootballField = (
   let ringAlpha = 0;
 
   const update = (ballState, dt, { inKickRange = false, reducedMotion = false } = {}) => {
-    ballMesh.position.set(ballState.x, ballState.y + 0.04, ballState.z);
+    ballMesh.position.set(ballState.x, ballState.y + PITCH_SURFACE_Y, ballState.z);
 
     // Subtle rolling spin
     spinAxisVec.set(ballState.spinAxisX || 0, 0, ballState.spinAxisZ || 1).normalize();
@@ -367,13 +375,13 @@ export const createFootballField = (
 
     // Ground contact shadow & hop scaling
     const hopHeight = Math.max(0, ballState.y - FOOTBALL_PHYSICS.ballRadius);
-    ballShadow.position.set(ballState.x, 0.058, ballState.z);
+    ballShadow.position.set(ballState.x, BALL_SHADOW_Y, ballState.z);
     ballShadow.scale.setScalar(Math.max(0.55, 1 - hopHeight * 0.25));
 
     // Contextual kick ring under ball when in kick range
     const targetAlpha = inKickRange && ballState.goalResetTimer <= 0 ? 0.78 : 0;
     ringAlpha += (targetAlpha - ringAlpha) * Math.min(1, dt * 14);
-    kickRing.position.set(ballState.x, 0.065, ballState.z);
+    kickRing.position.set(ballState.x, KICK_RING_Y, ballState.z);
     kickRingMat.opacity = ringAlpha;
     kickRing.visible = ringAlpha > 0.02;
 

@@ -65,7 +65,9 @@ const CaseStudyDetail = ({ slug }) => {
         ogTitle: pageTitle,
         ogDescription: pageDesc,
         ogImage: project.image || '/portfolio.png',
-        schemaData: generateCaseStudyDetailSchema(project),
+        ogType: 'article',
+        schemaData: generateCaseStudyDetailSchema(project, language),
+        lang: language,
       });
     } else {
       const notFoundTitle =
@@ -76,6 +78,8 @@ const CaseStudyDetail = ({ slug }) => {
         title: notFoundTitle,
         description: 'The requested case study could not be found.',
         canonicalPath: `/study-case/${slug || ''}`,
+        noindex: true,
+        lang: language,
       });
     }
   }, [project, slug, language]);

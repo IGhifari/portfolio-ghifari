@@ -19,6 +19,7 @@ export const updateDocumentMetadata = ({
   twitterCard = 'summary_large_image',
   schemaData = null,
   noindex = false,
+  lang,
 } = {}) => {
   if (typeof document === 'undefined') return;
 
@@ -86,7 +87,10 @@ export const updateDocumentMetadata = ({
   const enAltHref = baseRoutePath === '/' ? `${SITE_ORIGIN}/en` : `${SITE_ORIGIN}/en${baseRoutePath}`;
   const fullCanonicalUrl = !canonicalUrl && isEnRoute ? enAltHref : rawFullCanonical;
 
+  const activeLang = lang === 'en' || lang === 'id' ? lang : (isEnRoute ? 'en' : 'id');
   setMeta('property', 'og:url', fullCanonicalUrl);
+  setMeta('property', 'og:locale', activeLang === 'en' ? 'en_US' : 'id_ID');
+  setMeta('property', 'og:locale:alternate', activeLang === 'en' ? 'id_ID' : 'en_US');
 
   // 5. Canonical Link Tag & Bilingual hreflang Alternates
   let linkCanonical = document.querySelector('link[rel="canonical"]');
@@ -144,15 +148,22 @@ export const updateDocumentMetadata = ({
 /**
  * Generates Schema.org CollectionPage JSON-LD for the case study catalog.
  */
-export const generateCaseStudyListSchema = (projects = []) => {
+export const generateCaseStudyListSchema = (projects = [], lang = 'id') => {
+  const isEn = lang === 'en';
+  const prefix = isEn ? '/en' : '';
+  const listUrl = `${SITE_ORIGIN}${prefix}/study-case`;
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    '@id': `${SITE_ORIGIN}/study-case#collection`,
-    url: `${SITE_ORIGIN}/study-case`,
-    name: 'Studi Kasus Rekayasa Perangkat Lunak | M. Ghifari Bima Khadafi',
-    description:
-      'Direktori studi kasus arsitektur perangkat lunak, perancangan sistem, dan pengembangan web modern oleh M. Ghifari Bima Khadafi.',
+    '@id': `${listUrl}#collection`,
+    url: listUrl,
+    inLanguage: lang,
+    name: isEn
+      ? 'Software Engineering Case Studies | M. Ghifari Bima Khadafi'
+      : 'Studi Kasus Rekayasa Perangkat Lunak | M. Ghifari Bima Khadafi',
+    description: isEn
+      ? 'Directory of software engineering case studies, system architecture, and modern web development by M. Ghifari Bima Khadafi.'
+      : 'Direktori studi kasus arsitektur perangkat lunak, perancangan sistem, dan pengembangan web modern oleh M. Ghifari Bima Khadafi.',
     isPartOf: {
       '@type': 'WebSite',
       name: 'Portfolio Ghifari',
@@ -166,8 +177,9 @@ export const generateCaseStudyListSchema = (projects = []) => {
     hasPart: projects.map((p) => ({
       '@type': 'TechArticle',
       name: p.title,
-      url: `${SITE_ORIGIN}/study-case/${p.id}`,
-      description: typeof p.description === 'object' ? p.description.id : p.description,
+      url: `${SITE_ORIGIN}${prefix}/study-case/${p.id}`,
+      description:
+        typeof p.description === 'object' ? (p.description[lang] || p.description.id) : p.description,
     })),
   };
 };
@@ -175,10 +187,16 @@ export const generateCaseStudyListSchema = (projects = []) => {
 /**
  * Generates Schema.org TechArticle & SoftwareApplication JSON-LD for individual project case studies.
  */
-export const generateCaseStudyDetailSchema = (project) => {
+export const generateCaseStudyDetailSchema = (project, lang = 'id') => {
   if (!project) return null;
 
-  const desc = typeof project.description === 'object' ? project.description.id : project.description;
+  const isEn = lang === 'en';
+  const prefix = isEn ? '/en' : '';
+  const detailUrl = `${SITE_ORIGIN}${prefix}/study-case/${project.id}`;
+  const desc =
+    typeof project.description === 'object'
+      ? (project.description[lang] || project.description.id)
+      : project.description;
   const isInternal = project.id === 'project-management';
   const fullImage = project.image
     ? (project.image.startsWith('http') ? project.image : `${SITE_ORIGIN}${project.image}`)
@@ -187,13 +205,15 @@ export const generateCaseStudyDetailSchema = (project) => {
   return {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    '@id': `${SITE_ORIGIN}/study-case/${project.id}#article`,
-    url: `${SITE_ORIGIN}/study-case/${project.id}`,
-    headline: `${project.title} — Studi Kasus Arsitektur & Rekayasa Perangkat Lunak`,
+    '@id': `${detailUrl}#article`,
+    url: detailUrl,
+    headline: isEn
+      ? `${project.title} — Architecture & Software Engineering Case Study`
+      : `${project.title} — Studi Kasus Arsitektur & Rekayasa Perangkat Lunak`,
     name: project.title,
     description: desc,
     image: fullImage,
-    inLanguage: ['id', 'en'],
+    inLanguage: lang,
     author: {
       '@type': 'Person',
       name: 'M. Ghifari Bima Khadafi',
@@ -227,16 +247,22 @@ export const generateCaseStudyDetailSchema = (project) => {
 /**
  * Generates Schema.org ProfilePage & Person JSON-LD for the recruiter overview.
  */
-export const generateRecruiterSchema = () => {
-  const recruiterCanonical = `${SITE_ORIGIN}/recruiter`;
+export const generateRecruiterSchema = (lang = 'id') => {
+  const isEn = lang === 'en';
+  const prefix = isEn ? '/en' : '';
+  const recruiterCanonical = `${SITE_ORIGIN}${prefix}/recruiter`;
   return {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     '@id': `${recruiterCanonical}#webpage`,
     url: recruiterCanonical,
-    name: 'Ringkasan Eksekutif & Mode Rekruter | M. Ghifari Bima Khadafi',
-    description:
-      'Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi, keahlian teknis, dan proyek unggulan M. Ghifari Bima Khadafi untuk peninjauan rekruter dan hiring manager.',
+    inLanguage: lang,
+    name: isEn
+      ? 'Recruiter Mode & Executive Summary | M. Ghifari Bima Khadafi'
+      : 'Ringkasan Eksekutif & Mode Rekruter | M. Ghifari Bima Khadafi',
+    description: isEn
+      ? 'Executive summary of software engineering qualifications, formal education, verified work experience, technical skills, and flagship projects by M. Ghifari Bima Khadafi for recruiters and hiring managers.'
+      : 'Ringkasan profesional profil rekayasa perangkat lunak, riwayat pendidikan formal, pengalaman kerja terverifikasi, keahlian teknis, dan proyek unggulan M. Ghifari Bima Khadafi untuk peninjauan rekruter dan hiring manager.',
     mainEntity: {
       '@type': 'Person',
       '@id': `${SITE_ORIGIN}/#person`,

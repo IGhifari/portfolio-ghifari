@@ -36,11 +36,17 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
   'https://ighifari.my.id',
   'https://portfolio-ghifari.pages.dev',
   'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
   'http://localhost:3000',
   'http://localhost:4173',
   'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  'http://127.0.0.1:5175',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:4173',
+  'http://[::1]:5173',
+  'http://[::1]:4173',
 ]);
 
 /**
@@ -329,8 +335,8 @@ export const createChatHandler = ({
     if (rawOrigin !== undefined && rawOrigin !== null) {
       const activeAllowedOrigins = allowedOrigins || [
         ...DEFAULT_ALLOWED_ORIGINS,
-        ...(env?.ALLOWED_ORIGIN ? [env.ALLOWED_ORIGIN] : []),
-        ...(env?.ALLOWED_ORIGINS ? env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()) : []),
+        ...(env?.ALLOWED_ORIGIN ? env.ALLOWED_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean) : []),
+        ...(env?.ALLOWED_ORIGINS ? env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean) : []),
       ];
       if (!isAllowedOrigin(rawOrigin, activeAllowedOrigins)) {
         return sendJson(res, 403, {

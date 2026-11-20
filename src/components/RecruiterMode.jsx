@@ -52,7 +52,9 @@ const RecruiterMode = () => {
       ogTitle: title,
       ogDescription: description,
       ogImage: '/portfolio.png',
-      schemaData: generateRecruiterSchema(),
+      ogType: 'profile',
+      schemaData: generateRecruiterSchema(language),
+      lang: language,
     });
   }, [language]);
 

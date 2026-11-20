@@ -13,8 +13,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isDark, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
-  const { route, navigate } = useRouter();
+  const { language, t } = useLanguage();
+  const { route, navigate, localizePath, switchLanguage } = useRouter();
   const mobileDrawerRef = useRef(null);
   const menuBtnRef = useRef(null);
 
@@ -109,7 +109,7 @@ const Navbar = () => {
           </Link>
         ) : (
           <a
-            href="/"
+            href={localizePath('/')}
             onClick={(e) => {
               e.preventDefault();
               navigate('/');
@@ -128,10 +128,11 @@ const Navbar = () => {
           {desktopNavItems.map(({ to, label, isRoute }) => {
             if (isRoute) {
               const isActive = route?.cleanPath?.startsWith('/study-case');
+              const hrefTarget = localizePath(to);
               return (
                 <a
                   key={to}
-                  href={to}
+                  href={hrefTarget}
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(to);
@@ -168,7 +169,7 @@ const Navbar = () => {
             return (
               <a
                 key={to}
-                href={`/#${to}`}
+                href={localizePath(`/#${to}`)}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate(`/#${to}`);
@@ -249,7 +250,7 @@ const Navbar = () => {
           >
             <button
               type="button"
-              onClick={() => setLanguage('id')}
+              onClick={() => switchLanguage('id')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'id'
                   ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
@@ -264,7 +265,7 @@ const Navbar = () => {
             <span className="text-[var(--border)] select-none text-[9px] px-0.5" aria-hidden="true">|</span>
             <button
               type="button"
-              onClick={() => setLanguage('en')}
+              onClick={() => switchLanguage('en')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] cursor-target ${
                 language === 'en'
                   ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
@@ -301,7 +302,7 @@ const Navbar = () => {
           >
             <button
               type="button"
-              onClick={() => setLanguage('id')}
+              onClick={() => switchLanguage('id')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                 language === 'id'
                   ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
@@ -315,7 +316,7 @@ const Navbar = () => {
             <span className="text-[var(--border)] select-none text-[9px]" aria-hidden="true">|</span>
             <button
               type="button"
-              onClick={() => setLanguage('en')}
+              onClick={() => switchLanguage('en')}
               className={`h-full px-2 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                 language === 'en'
                   ? 'bg-[var(--surface-alt)] text-[var(--text-primary)] shadow-xs'
@@ -379,7 +380,7 @@ const Navbar = () => {
               return (
                 <a
                   key={to}
-                  href={to}
+                  href={localizePath(to)}
                   onClick={(e) => {
                     e.preventDefault();
                     closeMenu();
@@ -418,7 +419,7 @@ const Navbar = () => {
             return (
               <a
                 key={to}
-                href={`/#${to}`}
+                href={localizePath(`/#${to}`)}
                 onClick={(e) => {
                   e.preventDefault();
                   closeMenu();
@@ -494,7 +495,7 @@ const Navbar = () => {
             >
               <button
                 type="button"
-                onClick={() => setLanguage('id')}
+                onClick={() => switchLanguage('id')}
                 className={`h-full px-3 rounded-full text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                   language === 'id'
                     ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)]'
@@ -506,7 +507,7 @@ const Navbar = () => {
               <span className="text-[var(--border)] dark:text-white/[0.1] select-none text-[10px]" aria-hidden="true">|</span>
               <button
                 type="button"
-                onClick={() => setLanguage('en')}
+                onClick={() => switchLanguage('en')}
                 className={`h-full px-3 rounded-full text-xs font-mono font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] ${
                   language === 'en'
                     ? 'bg-[var(--surface-alt)] dark:bg-white/[0.12] text-[var(--text-primary)]'

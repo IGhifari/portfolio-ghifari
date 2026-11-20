@@ -17,6 +17,35 @@ export const isPlayRouteType = (type) =>
   type === 'play-bugs' ||
   type === 'play-runner';
 
+const NON_SPA_PREFIX_RE = /^\/(?:docs|images|audio|assets|api)(?:\/|$)/i;
+const FILE_EXT_RE = /\.[a-z0-9]{1,8}$/i;
+
+/**
+ * Converts an internal SPA URL to the target language prefix ('id' -> unprefixed, 'en' -> '/en...'),
+ * preserving query string and hash while leaving external URLs, bare hashes, and static assets untouched.
+ */
+export const buildLocalizedPath = (to = '/', targetLang = 'id') => {
+  if (!to || typeof to !== 'string') return targetLang === 'en' ? '/en' : '/';
+  if (/^(?:https?:|mailto:|tel:)/i.test(to) || to.startsWith('#')) return to;
+
+  const match = to.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
+  const rawPath = (match?.[1] || '/').replace(/\/+$/, '') || '/';
+  const search = match?.[2] || '';
+  const hash = match?.[3] || '';
+
+  if (NON_SPA_PREFIX_RE.test(rawPath) || FILE_EXT_RE.test(rawPath)) {
+    return to;
+  }
+
+  const withoutEn = rawPath.replace(/^\/en(?=\/|$)/, '') || '/';
+  if (targetLang === 'en') {
+    const enPath = withoutEn === '/' ? '/en' : `/en${withoutEn}`;
+    return `${enPath}${search}${hash}`;
+  }
+
+  return `${withoutEn}${search}${hash}`;
+};
+
 /**
  * Parses a window.location-like object into a strongly typed route.
  * Supported routes:

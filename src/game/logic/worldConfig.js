@@ -165,25 +165,37 @@ export const PARK_BENCHES = [
   { id: 'bench-arcade', x: -13.6, z: 6.2, halfW: 0.95, halfD: 0.42, rotY: 0.6 },
 ];
 
-export const getFootballPostColliders = (field = FOOTBALL_FIELD) => [
-  { x: field.minX, z: field.centerZ - field.goalHalfWidth, halfW: 0.16, halfD: 0.16 },
-  { x: field.minX, z: field.centerZ + field.goalHalfWidth, halfW: 0.16, halfD: 0.16 },
-  { x: field.maxX, z: field.centerZ - field.goalHalfWidth, halfW: 0.16, halfD: 0.16 },
-  { x: field.maxX, z: field.centerZ + field.goalHalfWidth, halfW: 0.16, halfD: 0.16 },
-  // Goal back net walls so player cannot walk through the back of a net
-  {
-    x: field.minX - field.goalDepth,
-    z: field.centerZ,
-    halfW: 0.12,
-    halfD: field.goalHalfWidth + 0.12,
-  },
-  {
-    x: field.maxX + field.goalDepth,
-    z: field.centerZ,
-    halfW: 0.12,
-    halfD: field.goalHalfWidth + 0.12,
-  },
-];
+export const getFootballPostColliders = (field = FOOTBALL_FIELD) => {
+  const sideNetHalfW = field.goalDepth * 0.5;
+  const sideNetXLeft = field.minX - sideNetHalfW;
+  const sideNetXRight = field.maxX + sideNetHalfW;
+  const northNetZ = field.centerZ - field.goalHalfWidth;
+  const southNetZ = field.centerZ + field.goalHalfWidth;
+
+  return [
+    { x: field.minX, z: northNetZ, halfW: 0.16, halfD: 0.16 },
+    { x: field.minX, z: southNetZ, halfW: 0.16, halfD: 0.16 },
+    { x: field.maxX, z: northNetZ, halfW: 0.16, halfD: 0.16 },
+    { x: field.maxX, z: southNetZ, halfW: 0.16, halfD: 0.16 },
+    // Goal back & side net walls so player cannot walk through any part of the net
+    {
+      x: field.minX - field.goalDepth,
+      z: field.centerZ,
+      halfW: 0.12,
+      halfD: field.goalHalfWidth + 0.12,
+    },
+    {
+      x: field.maxX + field.goalDepth,
+      z: field.centerZ,
+      halfW: 0.12,
+      halfD: field.goalHalfWidth + 0.12,
+    },
+    { x: sideNetXLeft, z: northNetZ, halfW: sideNetHalfW, halfD: 0.12 },
+    { x: sideNetXLeft, z: southNetZ, halfW: sideNetHalfW, halfD: 0.12 },
+    { x: sideNetXRight, z: northNetZ, halfW: sideNetHalfW, halfD: 0.12 },
+    { x: sideNetXRight, z: southNetZ, halfW: sideNetHalfW, halfD: 0.12 },
+  ];
+};
 
 export const getWorldInteractables = (includeArcade = true) =>
   includeArcade ? [...BUILDINGS, ARCADE_KIOSK] : BUILDINGS;

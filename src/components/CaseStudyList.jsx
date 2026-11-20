@@ -75,7 +75,8 @@ const CaseStudyList = () => {
       ogTitle: title,
       ogDescription: description,
       ogImage: '/portfolio.png',
-      schemaData: generateCaseStudyListSchema(allProjects),
+      schemaData: generateCaseStudyListSchema(allProjects, language),
+      lang: language,
     });
   }, [language]);
 

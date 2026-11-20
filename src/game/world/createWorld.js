@@ -508,6 +508,7 @@ export const createWorld = (
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       groundGradientTex.dispose();
+      playerCtrl.dispose?.();
       propsCtrl.dispose?.();
       footballCtrl.dispose?.();
       buildingsCtrl.dispose?.();
@@ -529,6 +530,7 @@ export const createWorld = (
         }
       });
 
+      scene.clear();
       renderer.dispose();
       if (canvas.parentNode) {
         canvas.parentNode.removeChild(canvas);

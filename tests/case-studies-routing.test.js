@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parseLocation } from '../src/utils/router.js';
+import { parseLocation, buildLocalizedPath } from '../src/utils/router.js';
 import { allProjects, getProjectBySlug, selectedProjects, otherProjects } from '../src/data/projects.js';
 import { translations } from '../src/data/translations.js';
 import {
@@ -82,6 +82,19 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.equal(parsedEnDetail.route.slug, 'id-kit');
       assert.equal(parsedEnDetail.langPrefix, 'en');
       assert.equal(parsedEnDetail.hash, '#playground');
+    });
+
+    await t2.test('buildLocalizedPath toggles /en prefix consistently without mutating assets or external links', () => {
+      assert.equal(buildLocalizedPath('/', 'en'), '/en');
+      assert.equal(buildLocalizedPath('/en', 'id'), '/');
+      assert.equal(buildLocalizedPath('/#experience', 'en'), '/en#experience');
+      assert.equal(buildLocalizedPath('/en#experience', 'id'), '/#experience');
+      assert.equal(buildLocalizedPath('/study-case/id-kit#playground', 'en'), '/en/study-case/id-kit#playground');
+      assert.equal(buildLocalizedPath('/en/study-case/id-kit?tab=a#playground', 'id'), '/study-case/id-kit?tab=a#playground');
+      assert.equal(buildLocalizedPath('/recruiter', 'en'), '/en/recruiter');
+      assert.equal(buildLocalizedPath('/en/play/explore', 'en'), '/en/play/explore');
+      assert.equal(buildLocalizedPath('/docs/M.GhifariBimaKhadafi_CV.pdf', 'en'), '/docs/M.GhifariBimaKhadafi_CV.pdf');
+      assert.equal(buildLocalizedPath('https://github.com/IGhifari', 'en'), 'https://github.com/IGhifari');
     });
   });
 
@@ -190,6 +203,9 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
         head: {
           appendChild: (el) => {
             if (el.tagName === 'link' && el.rel === 'canonical') tags['link[rel="canonical"]'] = el;
+            if (el.tagName === 'link' && el.rel === 'alternate' && el.hreflang) {
+              tags[`link[rel="alternate"][hreflang="${el.hreflang}"]`] = el;
+            }
             if (el.tagName === 'meta' && el.name) tags[`meta[name="${el.name}"]`] = el;
             if (el.tagName === 'meta' && el.property) tags[`meta[property="${el.property}"]`] = el;
             if (el.id) tags[`#${el.id}`] = el;
@@ -205,22 +221,31 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
           canonicalUrl: 'https://www.ighifari.my.id/study-case/studyflow',
           ogImage: 'https://www.ighifari.my.id/images/preview.webp',
           schemaData: { '@context': 'https://schema.org', '@type': 'WebPage' },
+          lang: 'id',
         });
 
         assert.equal(mockDoc.title, 'Custom Title');
         assert.equal(tags['meta[name="description"]']?.content, 'Custom Description');
         assert.equal(tags['link[rel="canonical"]']?.href, 'https://www.ighifari.my.id/study-case/studyflow');
+        assert.equal(tags['link[rel="alternate"][hreflang="id"]']?.href, 'https://www.ighifari.my.id/study-case/studyflow');
+        assert.equal(tags['link[rel="alternate"][hreflang="en"]']?.href, 'https://www.ighifari.my.id/en/study-case/studyflow');
+        assert.equal(tags['link[rel="alternate"][hreflang="x-default"]']?.href, 'https://www.ighifari.my.id/study-case/studyflow');
+        assert.equal(tags['meta[property="og:locale"]']?.content, 'id_ID');
+        assert.equal(tags['meta[property="og:locale:alternate"]']?.content, 'en_US');
         assert.equal(tags['meta[property="og:title"]']?.content, 'Custom Title');
         assert.equal(tags['meta[name="twitter:card"]']?.content, 'summary_large_image');
         assert.equal(tags['meta[name="twitter:creator"]']?.content, TWITTER_HANDLE);
         assert.ok(tags['#schema-structured-data']?.textContent?.includes('WebPage'));
 
-        // Calling updateDocumentMetadata without schemaData removes lingering structured data tag
+        // Calling updateDocumentMetadata with lang: 'en' updates og:locale cleanly and clears schema when null
         updateDocumentMetadata({
-          title: 'Home Title',
-          canonicalUrl: 'https://www.ighifari.my.id/',
+          title: 'Home Title EN',
+          canonicalUrl: 'https://www.ighifari.my.id/en',
           schemaData: null,
+          lang: 'en',
         });
+        assert.equal(tags['meta[property="og:locale"]']?.content, 'en_US');
+        assert.equal(tags['meta[property="og:locale:alternate"]']?.content, 'id_ID');
         assert.equal(tags['#schema-structured-data'], undefined, 'schema-structured-data tag must be removed when schemaData is null');
       } finally {
         delete global.document;
@@ -242,23 +267,38 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
         /^\/study-case\/\*\s+\/index\.html\s+200/m.test(content),
         '_redirects must have /study-case/* -> /index.html 200'
       );
+      assert.ok(
+        /^\/recruiter\s+\/index\.html\s+200/m.test(content),
+        '_redirects must have /recruiter -> /index.html 200'
+      );
+      assert.ok(
+        /^\/en\s+\/index\.html\s+200/m.test(content),
+        '_redirects must have /en -> /index.html 200'
+      );
     });
 
-    await t2.test('public/sitemap.xml contains home, listing, and project URLs', () => {
+    await t2.test('public/sitemap.xml contains home, listing, and project URLs in both ID and EN', () => {
       const sitemapPath = path.join(rootDir, 'public', 'sitemap.xml');
       assert.ok(fs.existsSync(sitemapPath), 'sitemap.xml must exist');
 
       const xml = fs.readFileSync(sitemapPath, 'utf-8');
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/</loc>'));
+      assert.ok(xml.includes('<loc>https://www.ighifari.my.id/en</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case</loc>'));
+      assert.ok(xml.includes('<loc>https://www.ighifari.my.id/en/study-case</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/studyflow</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/project-management</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/study-case/akseskita</loc>'));
       assert.ok(xml.includes('<loc>https://www.ighifari.my.id/recruiter</loc>'));
+      assert.ok(xml.includes('<loc>https://www.ighifari.my.id/en/recruiter</loc>'));
       for (const project of allProjects) {
         assert.ok(
           xml.includes(`<loc>https://www.ighifari.my.id/study-case/${project.id}</loc>`),
           `sitemap.xml must include case study URL for project "${project.id}"`
+        );
+        assert.ok(
+          xml.includes(`<loc>https://www.ighifari.my.id/en/study-case/${project.id}</loc>`),
+          `sitemap.xml must include /en case study URL for project "${project.id}"`
         );
       }
 
@@ -273,8 +313,13 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       const schema = generateCaseStudyListSchema(allProjects);
       assert.equal(schema['@context'], 'https://schema.org');
       assert.equal(schema['@type'], 'CollectionPage');
+      assert.equal(schema.url, 'https://www.ighifari.my.id/study-case');
       assert.ok(schema.hasPart.length > 0, 'hasPart must contain projects');
       assert.equal(schema.about['@type'], 'Person');
+
+      const enSchema = generateCaseStudyListSchema(allProjects, 'en');
+      assert.equal(enSchema.url, 'https://www.ighifari.my.id/en/study-case');
+      assert.equal(enSchema.inLanguage, 'en');
     });
 
     await t2.test('generateCaseStudyDetailSchema correctly configures TechArticle and internal attribution', () => {
@@ -283,6 +328,10 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.equal(sfSchema['@type'], 'TechArticle');
       assert.equal(sfSchema.headline, 'StudyFlow — Studi Kasus Arsitektur & Rekayasa Perangkat Lunak');
       assert.ok(sfSchema.about.codeRepository, 'Public projects must link code repository');
+
+      const sfEnSchema = generateCaseStudyDetailSchema(sf, 'en');
+      assert.equal(sfEnSchema.url, 'https://www.ighifari.my.id/en/study-case/studyflow');
+      assert.equal(sfEnSchema.inLanguage, 'en');
 
       const pm = getProjectBySlug('project-management');
       const pmSchema = generateCaseStudyDetailSchema(pm);
