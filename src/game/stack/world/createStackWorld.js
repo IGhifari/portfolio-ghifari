@@ -510,6 +510,7 @@ export const createStackWorld = (
       textureCache.forEach((tex) => tex.dispose());
       textureCache.clear();
       seasonalAtmosphere.dispose();
+      scene.clear();
 
       renderer.dispose();
       if (canvas.parentNode) {

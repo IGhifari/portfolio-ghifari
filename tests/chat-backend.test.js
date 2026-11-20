@@ -1714,6 +1714,8 @@ describe('PHASE 2 — Google Gemini (`@google/genai`) Retrieval & Chat API Backe
       assert.equal(isAllowedOrigin('https://portfolio-ghifari.vercel.app', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('https://portfolio-ghifari-preview-123.vercel.app', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('http://localhost:5173', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('http://localhost:5174', DEFAULT_ALLOWED_ORIGINS), true);
+      assert.equal(isAllowedOrigin('http://[::1]:5173', DEFAULT_ALLOWED_ORIGINS), true);
       assert.equal(isAllowedOrigin('https://attacker.com', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('https://attacker.pages.dev', DEFAULT_ALLOWED_ORIGINS), false);
       assert.equal(isAllowedOrigin('https://evil-portfolio-ghifari.pages.dev', DEFAULT_ALLOWED_ORIGINS), false);

@@ -439,6 +439,7 @@ export const createRunnerWorld = (
       document.removeEventListener('visibilitychange', handleVisibility);
       seasonalAtmosphere.dispose();
       assets.dispose();
+      scene.clear();
       renderer.dispose();
       if (canvas.parentNode === container) {
         container.removeChild(canvas);

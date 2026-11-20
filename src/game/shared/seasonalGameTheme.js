@@ -529,8 +529,6 @@ export const EXPLORE_DAYTIME_PARK_THEME = {
   dirIntensity: 1.46,
   rimColor: 0x7dd3fc,
   rimIntensity: 0.5,
-  gridMajor: 0x45804b,
-  gridMinor: 0x559c54,
 
   // Portfolio buildings + signage + pink/cyan accents
   accent: 0x06b6d4,

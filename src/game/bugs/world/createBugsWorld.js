@@ -580,6 +580,7 @@ export const createBugsWorld = (
       } else {
         gridHelper.material?.dispose?.();
       }
+      scene.clear();
 
       renderer.dispose();
       if (canvas.parentNode) {
