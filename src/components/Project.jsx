@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCheck, FiAlertCircle, FiBookOpen, FiTerminal } from 'react-icons/fi';
 import { SiNpm } from 'react-icons/si';
-import TiltedCard from './reactbits/TiltedCard';
+import SpotlightCard from './reactbits/SpotlightCard';
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -11,11 +11,76 @@ import '../styles/Project.css';
 
 const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'library', 'game'];
 
+const MASONRY_ASPECT_CLASSES = {
+  akseskita: 'aspect-video lg:aspect-[5/4]',
+  'project-management': 'aspect-video lg:aspect-[16/10]',
+  'id-kit': 'aspect-video',
+  'food-ecommerce': 'aspect-video lg:aspect-[16/11]',
+  'internship-journal': 'aspect-video lg:aspect-[5/4]',
+  studyflow: 'aspect-video lg:aspect-[4/3]',
+  'blue-horizon': 'aspect-video',
+};
+
+const getDisplayHost = (project) => {
+  if (project.live) {
+    try {
+      return new URL(project.live).host;
+    } catch {
+      return project.live;
+    }
+  }
+  if (project.npm) {
+    return `npmjs.com/package/${project.title}`;
+  }
+  if (project.id === 'project-management') {
+    return 'internal // pt-ama-salam';
+  }
+  if (project.github) {
+    try {
+      const parsed = new URL(project.github);
+      return `${parsed.host}${parsed.pathname}`;
+    } catch {
+      return project.github;
+    }
+  }
+  return project.id;
+};
+
+const useMasonryColumnCount = () => {
+  const [cols, setCols] = useState(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 3;
+    if (window.matchMedia('(min-width: 1024px)').matches) return 3;
+    if (window.matchMedia('(min-width: 768px)').matches) return 2;
+    return 1;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined;
+    const lgQuery = window.matchMedia('(min-width: 1024px)');
+    const mdQuery = window.matchMedia('(min-width: 768px)');
+    const sync = () => {
+      if (lgQuery.matches) setCols(3);
+      else if (mdQuery.matches) setCols(2);
+      else setCols(1);
+    };
+    sync();
+    lgQuery.addEventListener('change', sync);
+    mdQuery.addEventListener('change', sync);
+    return () => {
+      lgQuery.removeEventListener('change', sync);
+      mdQuery.removeEventListener('change', sync);
+    };
+  }, []);
+
+  return cols;
+};
+
 const Project = () => {
   const shouldReduceMotion = useReducedMotion();
   const { language, t, resolve } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeProject, setActiveProject] = useState(null);
+  const columnCount = useMasonryColumnCount();
   const lastTriggerRef = useRef(null);
   const closeBtnRef = useRef(null);
   const modalContainerRef = useRef(null);
@@ -32,10 +97,10 @@ const Project = () => {
       };
     }
     return {
-      initial: { opacity: 0, y: 24 },
+      initial: { opacity: 0, y: 20 },
       whileInView: { opacity: 1, y: 0 },
-      viewport: { once: true, amount: 0.2 },
-      transition: { duration: 0.5, delay, ease: easeCurve },
+      viewport: { once: true, amount: 0.15 },
+      transition: { duration: 0.45, delay, ease: easeCurve },
     };
   };
 
@@ -67,13 +132,29 @@ const Project = () => {
     }
   }, [activeProject]);
 
-  const filteredSelected = activeCategory === 'all'
-    ? selectedProjects
-    : selectedProjects.filter((p) => p.categoryKey === activeCategory);
+  const filteredSelected = useMemo(
+    () =>
+      activeCategory === 'all'
+        ? selectedProjects
+        : selectedProjects.filter((p) => p.categoryKey === activeCategory),
+    [activeCategory]
+  );
 
-  const filteredOther = activeCategory === 'all'
-    ? otherProjects
-    : otherProjects.filter((p) => p.categoryKey === activeCategory);
+  const filteredOther = useMemo(
+    () =>
+      activeCategory === 'all'
+        ? otherProjects
+        : otherProjects.filter((p) => p.categoryKey === activeCategory),
+    [activeCategory]
+  );
+
+  const masonryColumns = useMemo(() => {
+    const columns = Array.from({ length: columnCount }, () => []);
+    filteredSelected.forEach((project, idx) => {
+      columns[idx % columnCount].push({ project, orderIndex: idx });
+    });
+    return columns.filter((col) => col.length > 0);
+  }, [filteredSelected, columnCount]);
 
   const totalMatches = filteredSelected.length + filteredOther.length;
 
@@ -145,32 +226,24 @@ const Project = () => {
       )}
 
       {/* ==================================================
-          FEATURED PROJECTS (EDITORIAL ALTERNATING SHOWCASE)
+          FEATURED PROJECTS (3-COLUMN ASYMMETRIC MASONRY)
           ================================================== */}
       {filteredSelected.length > 0 && (
-        <div className="space-y-20 md:space-y-32">
-          {filteredSelected.map((project, index) => {
-            const isEven = index % 2 === 1;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-start">
+          {masonryColumns.map((colItems, colIdx) => (
+            <div key={colIdx} className="flex flex-col gap-5 lg:gap-6 min-w-0">
+              {colItems.map(({ project, orderIndex }) => {
+                const aspectClass = MASONRY_ASPECT_CLASSES[project.id] || 'aspect-video';
+                const displayHost = getDisplayHost(project);
 
-            return (
-              <motion.article
-                key={project.id}
-                {...getFadeMotion(0.1)}
-                className="group"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  {/* Visual Screenshot (Desktop Alternating Order) */}
-                  <div
-                    className={`w-full lg:col-span-7 ${
-                      isEven ? 'lg:order-2' : 'lg:order-1'
-                    }`}
+                return (
+                  <motion.article
+                    key={project.id}
+                    {...getFadeMotion(Math.min(orderIndex * 0.05, 0.25))}
+                    className="group min-w-0"
                   >
-                    <TiltedCard
-                      maxTilt={2.8}
-                      scale={1.012}
-                      showGlare={true}
-                      className="project-preview-frame rounded-lg overflow-hidden cursor-pointer"
-                    >
+                    <SpotlightCard className="project-masonry-card rounded-lg flex flex-col">
+                      {/* Clickable Screenshot & Authentic Frame Header */}
                       <button
                         type="button"
                         onClick={(e) => openModal(project, e.currentTarget)}
@@ -178,175 +251,180 @@ const Project = () => {
                         data-cursor-label="Preview"
                         className="cursor-target w-full text-left appearance-none bg-transparent border-0 p-0 m-0 cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                       >
-                        {/* Window Header Frame */}
-                        <div className="px-3.5 py-2.5 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between select-none">
-                          <div className="flex items-center gap-1.5" aria-hidden="true">
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80 group-hover:bg-[#ff5f56] transition-colors" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80 group-hover:bg-[#ffbd2e] transition-colors" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80 group-hover:bg-[#27c93f] transition-colors" />
+                        <div className="px-3.5 py-2 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between gap-2 select-none">
+                          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+                            <span className="w-2 h-2 rounded-full bg-[#ff5f56]/75 group-hover:bg-[#ff5f56] transition-colors" />
+                            <span className="w-2 h-2 rounded-full bg-[#ffbd2e]/75 group-hover:bg-[#ffbd2e] transition-colors" />
+                            <span className="w-2 h-2 rounded-full bg-[#27c93f]/75 group-hover:bg-[#27c93f] transition-colors" />
                           </div>
-                          <span className="font-mono text-[11px] text-[var(--text-muted)] tracking-wider">
-                            {project.npm ? `npmjs.com/package/${project.title}` : `https://${project.title.toLowerCase().replace(/\s+/g, '-')}.app`}
+                          <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wide truncate">
+                            {displayHost}
                           </span>
-                          <span className="font-mono text-[9px] text-[var(--accent)] px-1.5 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-semibold">
-                            {project.version || 'v1.0'}
-                          </span>
+                          {project.version ? (
+                            <span className="font-mono text-[9px] text-[var(--accent)] px-1.5 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-semibold shrink-0">
+                              {project.version}
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
+                              {project.number}
+                            </span>
+                          )}
                         </div>
 
-                        {/* Screenshot Preview */}
-                        <div className="relative aspect-video w-full bg-[var(--surface-muted)] overflow-hidden">
+                        <div className={`relative ${aspectClass} w-full bg-[var(--bg-primary)] overflow-hidden border-b border-[var(--border-subtle)]`}>
                           <img
                             src={project.image}
                             alt={`${project.title} interface preview`}
-                            loading={index === 0 ? 'eager' : 'lazy'}
+                            loading={orderIndex === 0 ? 'eager' : 'lazy'}
                             // eslint-disable-next-line react/no-unknown-property
-                            fetchpriority={index === 0 ? 'high' : undefined}
+                            fetchpriority={orderIndex === 0 ? 'high' : undefined}
                             decoding="async"
                             width={1280}
                             height={720}
-                            className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.015]"
+                            className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                           />
                         </div>
                       </button>
-                    </TiltedCard>
-                  </div>
 
-                  {/* Metadata & Description */}
-                  <div
-                    className={`w-full lg:col-span-5 flex flex-col justify-center ${
-                      isEven ? 'lg:order-1' : 'lg:order-2'
-                    }`}
-                  >
-                    {/* Category & Project Index */}
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-[var(--accent)] tracking-[0.2em]">
-                        {project.number}
-                      </span>
-                      <span className="text-[var(--border)]" aria-hidden="true">/</span>
-                      <span className="font-mono text-[11px] text-[var(--text-secondary)] tracking-[0.16em] uppercase">
-                        {resolve(project.category)}
-                      </span>
-                    </div>
-
-                    {/* Project Title */}
-                    <h3 className="font-grotesk font-black text-2xl sm:text-3xl lg:text-4xl text-[var(--text-primary)] uppercase tracking-tight mt-2.5 leading-none">
-                      {project.title}
-                    </h3>
-
-                    {/* Subtitle */}
-                    <p className="font-mono text-xs text-[var(--text-secondary)] tracking-wider uppercase mt-1.5">
-                      {resolve(project.subtitle)}
-                    </p>
-
-                    {/* Description */}
-                    <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed mt-4 font-normal">
-                      {resolve(project.description)}
-                    </p>
-
-                    {/* Measurable Engineering Metrics (if provided) */}
-                    {Array.isArray(project.metrics) && project.metrics.length > 0 && (
-                      <div className="grid grid-cols-2 gap-2 mt-4">
-                        {project.metrics.map((metric) => (
-                          <div
-                            key={metric.value}
-                            className="px-3 py-2 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)]"
-                          >
-                            <span className="font-mono text-xs font-bold text-[var(--accent)] block">
-                              {metric.value}
+                      {/* Restrained Editorial Metadata Body */}
+                      <div className="p-4 sm:p-5 flex flex-col gap-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-mono text-[11px] font-bold text-[var(--accent)] tracking-widest shrink-0">
+                              {project.number}
                             </span>
-                            <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                              {resolve(metric.label)}
+                            <span className="text-[var(--border)]" aria-hidden="true">/</span>
+                            <span className="font-mono text-[10px] text-[var(--text-secondary)] tracking-wider uppercase truncate">
+                              {resolve(project.category)}
                             </span>
                           </div>
-                        ))}
+                          {project.year && (
+                            <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
+                              {project.year}
+                            </span>
+                          )}
+                        </div>
+
+                        <div>
+                          <h3 className="font-grotesk font-bold text-lg sm:text-xl text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
+                            {project.title}
+                          </h3>
+                          {project.subtitle && (
+                            <p className="font-mono text-[11px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5 line-clamp-1">
+                              {resolve(project.subtitle)}
+                            </p>
+                          )}
+                        </div>
+
+                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">
+                          {resolve(project.description)}
+                        </p>
+
+                        {/* Authentic Engineering Metrics (rendered only when present in data) */}
+                        {Array.isArray(project.metrics) && project.metrics.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2 pt-0.5">
+                            {project.metrics.map((metric) => (
+                              <div
+                                key={metric.value}
+                                className="px-2.5 py-1.5 rounded bg-[var(--bg-primary)]/40 border border-[var(--border-subtle)]"
+                              >
+                                <span className="font-mono text-[11px] font-bold text-[var(--accent)] block">
+                                  {metric.value}
+                                </span>
+                                <span className="font-mono text-[10px] text-[var(--text-muted)] leading-tight block">
+                                  {resolve(metric.label)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Compact Tech Stack Tags */}
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {project.tags.slice(0, 5).map((tag) => (
+                            <span
+                              key={tag}
+                              className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Compact Footer Actions */}
+                        <div className="pt-3 mt-0.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2">
+                          <RouterLink
+                            to={`/study-case/${project.id}`}
+                            data-cursor-label="Study"
+                            className="cursor-target inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 py-0.5"
+                            aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
+                          >
+                            <FiBookOpen size={13} aria-hidden="true" />
+                            <span>{t('caseStudies.readCaseStudy')}</span>
+                          </RouterLink>
+
+                          <div className="flex items-center gap-1.5">
+                            {project.id === 'id-kit' && (
+                              <RouterLink
+                                to="/study-case/id-kit#playground"
+                                data-cursor-label="Demo"
+                                className="cursor-target inline-flex items-center gap-1 px-2 py-1 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--accent)] font-mono text-[10px] font-semibold uppercase text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                              >
+                                <FiTerminal size={11} aria-hidden="true" />
+                                <span>{language === 'id' ? 'Demo' : 'Playground'}</span>
+                              </RouterLink>
+                            )}
+                            {project.github && (
+                              <a
+                                href={project.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-cursor-label="Code"
+                                className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                                aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                                title={t('projects.sourceCode')}
+                              >
+                                <FiGithub size={15} aria-hidden="true" />
+                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                              </a>
+                            )}
+                            {project.npm && (
+                              <a
+                                href={project.npm}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-cursor-label="npm"
+                                className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                                aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                                title={t('projects.npmPackage')}
+                              >
+                                <SiNpm size={15} aria-hidden="true" />
+                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                              </a>
+                            )}
+                            {project.live && (
+                              <a
+                                href={project.live}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-cursor-label="Live Demo"
+                                className="cursor-target inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-mono text-[10px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                                aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                              >
+                                <span>Live</span>
+                                <FiArrowUpRight size={12} aria-hidden="true" />
+                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    )}
-
-                    {/* Technologies - Subtle Editorial Tags */}
-                    <div className="flex flex-wrap gap-2 mt-5">
-                      {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="linear-tag-pill inline-flex items-center px-2.5 py-1 text-[11px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded-md tracking-wide"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Verified Links & Case Study Modal Trigger */}
-                    <div className="flex flex-wrap items-center gap-3 mt-7 pt-1">
-                      <RouterLink
-                        to={`/study-case/${project.id}`}
-                        data-cursor-label="Study"
-                        className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--accent)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
-                      >
-                        <FiBookOpen size={15} />
-                        <span>{t('caseStudies.readCaseStudy')}</span>
-                      </RouterLink>
-
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="Code"
-                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                        >
-                          <FiGithub size={15} />
-                          <span>{t('projects.sourceCode')}</span>
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
-
-                      {project.npm && (
-                        <a
-                          href={project.npm}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="npm"
-                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:shadow-[0_0_20px_-3px_rgba(59,130,246,0.4)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                        >
-                          <SiNpm size={15} aria-hidden="true" />
-                          <span>{t('projects.npmPackage')}</span>
-                          <FiArrowUpRight size={14} aria-hidden="true" />
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
-
-                      {project.id === 'id-kit' && (
-                        <RouterLink
-                          to="/study-case/id-kit#playground"
-                          data-cursor-label="Demo"
-                          className="cursor-target inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--surface-muted)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        >
-                          <FiTerminal size={14} aria-hidden="true" />
-                          <span>{language === 'id' ? 'Mini Playground' : 'Live Playground'}</span>
-                        </RouterLink>
-                      )}
-                      {project.live && (
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="Live Demo"
-                          className="cursor-target inline-flex items-center gap-2.5 px-5 py-2.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded-md text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 shadow-sm hover:shadow-[0_0_20px_-3px_rgba(59,130,246,0.4)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                        >
-                          <span>{t('projects.liveDemo')}</span>
-                          <FiArrowUpRight size={15} />
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.article>
-            );
-          })}
+                    </SpotlightCard>
+                  </motion.article>
+                );
+              })}
+            </div>
+          ))}
         </div>
       )}
 
@@ -354,15 +432,15 @@ const Project = () => {
           SECTION DIVIDER
           ================================================== */}
       {filteredSelected.length > 0 && filteredOther.length > 0 && (
-        <div className="w-full h-[1px] bg-[var(--border-subtle)] my-20 md:my-28" aria-hidden="true" />
+        <div className="w-full h-[1px] bg-[var(--border-subtle)] my-16 md:my-24" aria-hidden="true" />
       )}
 
       {/* ==================================================
-          OTHER PROJECTS (COMPACT SECONDARY ARCHIVE)
+          OTHER PROJECTS (COMPACT 2x2 ARCHIVE GRID)
           ================================================== */}
       {filteredOther.length > 0 && (
         <>
-          <motion.div {...getFadeMotion(0)} className="mb-10 sm:mb-12">
+          <motion.div {...getFadeMotion(0)} className="mb-8 sm:mb-10">
             <div className="flex items-center gap-3 mb-2">
               <span className="font-mono text-xs text-[var(--text-muted)] tracking-[0.2em] uppercase font-semibold">
                 {t('projects.archiveTag')}
@@ -377,119 +455,140 @@ const Project = () => {
             </p>
           </motion.div>
 
-          {/* 2-Column Responsive Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-7">
+          {/* 2x2 Responsive Grid on Desktop & Tablet */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
             {filteredOther.map((project, index) => (
-              <motion.div
+              <motion.article
                 key={project.id}
-                {...getFadeMotion(index * 0.08)}
-                className="other-project-card rounded-lg overflow-hidden flex flex-col justify-between group"
+                {...getFadeMotion(index * 0.06)}
+                className="group min-w-0"
               >
-                {/* Project Image Preview (MED-04 semantic button) */}
-                <button
+                <SpotlightCard className="other-project-card rounded-lg h-full flex flex-col justify-between">
+                  {/* Project Image Preview (MED-04 semantic button) */}
+                  <button
                   type="button"
                   onClick={(e) => openModal(project, e.currentTarget)}
                   aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
                   data-cursor-label="Preview"
-                  className="cursor-target w-full text-left appearance-none p-0 m-0 relative aspect-video bg-[var(--surface-muted)] overflow-hidden border-0 border-b border-[var(--border)] cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                >
-                  <img
-                    src={project.image}
-                    alt={`${project.title} thumbnail`}
-                    loading="lazy"
-                    decoding="async"
-                    width={1280}
-                    height={720}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </button>
+                  className="cursor-target w-full text-left appearance-none p-0 m-0 relative aspect-video bg-[var(--bg-primary)] overflow-hidden border-0 border-b border-[var(--border)] cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                  >
+                    <img
+                      src={project.image}
+                      alt={`${project.title} thumbnail`}
+                      loading="lazy"
+                      decoding="async"
+                      width={1280}
+                      height={720}
+                      className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    />
+                  </button>
 
-                {/* Card Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    {project.category && (
-                      <span className="font-mono text-[10px] text-[var(--accent)] tracking-[0.16em] uppercase block mb-1">
-                        {resolve(project.category)}
-                      </span>
-                    )}
-                    <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
-                      {project.title}
-                    </h4>
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2 line-clamp-2">
-                      {resolve(project.description)}
-                    </p>
-                  </div>
-
-                  <div className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
-                    {/* Tech tags - Subtle Editorial Badges */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded-md"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                  {/* Card Content */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        {project.category && (
+                          <span className="font-mono text-[10px] text-[var(--accent)] tracking-[0.16em] uppercase truncate">
+                            {resolve(project.category)}
+                          </span>
+                        )}
+                        {project.year && (
+                          <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
+                            {project.year}
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
+                        {project.title}
+                      </h4>
+                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2 line-clamp-2">
+                        {resolve(project.description)}
+                      </p>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={(e) => openModal(project, e.currentTarget)}
-                        data-cursor-label="Details"
-                        className="cursor-target px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] shadow-sm"
-                        aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                      >
-                        {t('projects.viewDetails')}
-                      </button>
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="Code"
-                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                          title={t('projects.githubRepo')}
+                    <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] space-y-3">
+                      {/* Tech tags - Subtle Editorial Badges */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Actions: Study Case link + Modal Details + External Links */}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <RouterLink
+                          to={`/study-case/${project.id}`}
+                          data-cursor-label="Study"
+                          className="cursor-target inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 py-0.5"
+                          aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
                         >
-                          <FiGithub size={16} />
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
-                      {project.npm && (
-                        <a
-                          href={project.npm}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="npm"
-                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                          title={t('projects.npmPackage')}
-                        >
-                          <SiNpm size={16} aria-hidden="true" />
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
-                      {project.live && (
-                        <a
-                          href={project.live}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-cursor-label="Live Demo"
-                          className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                          aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                          title={t('projects.liveDeployment')}
-                        >
-                          <FiArrowUpRight size={17} />
-                          <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                        </a>
-                      )}
+                          <FiBookOpen size={12} aria-hidden="true" />
+                          <span>{t('caseStudies.readCaseStudy')}</span>
+                        </RouterLink>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => openModal(project, e.currentTarget)}
+                            data-cursor-label="Details"
+                            className="cursor-target px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                            aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
+                          >
+                            {t('projects.viewDetails')}
+                          </button>
+                          {project.github && (
+                            <a
+                              href={project.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-cursor-label="Code"
+                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                              aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                              title={t('projects.githubRepo')}
+                            >
+                              <FiGithub size={15} aria-hidden="true" />
+                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                            </a>
+                          )}
+                          {project.npm && (
+                            <a
+                              href={project.npm}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-cursor-label="npm"
+                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                              aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                              title={t('projects.npmPackage')}
+                            >
+                              <SiNpm size={15} aria-hidden="true" />
+                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                            </a>
+                          )}
+                          {project.live && (
+                            <a
+                              href={project.live}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-cursor-label="Live Demo"
+                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                              aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
+                              title={t('projects.liveDeployment')}
+                            >
+                              <FiArrowUpRight size={16} aria-hidden="true" />
+                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
+                </SpotlightCard>
+              </motion.article>
             ))}
           </div>
         </>

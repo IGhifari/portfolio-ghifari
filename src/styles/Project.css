@@ -1,19 +1,21 @@
 /* ========================================================
-   PROJECTS SECTION (LINEAR-STYLE BENTO & CARD POLISH)
+   PROJECTS SECTION (ASYMMETRIC EDITORIAL MASONRY)
    ======================================================== */
 
+.project-masonry-card,
 .project-preview-frame {
   background-color: var(--surface-muted);
   border: 1px solid var(--border);
   box-shadow: var(--card-shadow);
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+              background-color 0.25s ease;
 }
 
+.project-masonry-card:hover,
 .project-preview-frame:hover {
   border-color: var(--border-hover);
-  box-shadow: var(--card-shadow-hover), 0 0 0 1px var(--border-hover);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .other-project-card {
@@ -29,8 +31,14 @@
 .other-project-card:hover {
   border-color: var(--border-hover);
   background-color: var(--surface-hover);
-  transform: translateY(-3px);
-  box-shadow: var(--card-shadow-hover), 0 0 0 1px var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .other-project-card:hover {
+    transform: none;
+  }
 }
 
 /* Linear-style subtle tag pills */
