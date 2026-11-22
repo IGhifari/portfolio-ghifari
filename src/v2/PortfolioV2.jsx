@@ -219,10 +219,16 @@ OverlappingSection.propTypes = {
 };
 
 /**
- * Work Showcase Card with Floating Cursor-Following "VIEW PROJECT" Circular Badge
- * (Exact Nakula Video 00:08–00:11)
+ * Scroll-Driven Editorial Project Card with Sticky Layering & Cursor-Following "VIEW PROJECT" Badge
  */
-function WorkShowcaseCard({ project, index, onVisible, isEn }) {
+function WorkShowcaseCard({
+  project,
+  index,
+  totalCount,
+  onVisible,
+  isEn,
+  shouldReduceMotion,
+}) {
   const cardRef = useRef(null);
   const [orbPos, setOrbPos] = useState({ x: 50, y: 50 });
 
@@ -238,7 +244,7 @@ function WorkShowcaseCard({ project, index, onVisible, isEn }) {
           }
         });
       },
-      { rootMargin: '-32% 0px -38% 0px', threshold: 0.15 }
+      { rootMargin: '-28% 0px -36% 0px', threshold: 0.15 }
     );
 
     observer.observe(el);
@@ -254,111 +260,130 @@ function WorkShowcaseCard({ project, index, onVisible, isEn }) {
 
   const subtitleText = isEn ? project.subtitle.en : project.subtitle.id;
   const categoryText = isEn ? project.category.en : project.category.id;
+  const descriptionText = isEn ? project.description.en : project.description.id;
 
   return (
     <article
       id={`v2-work-item-${project.id}`}
       ref={cardRef}
-      className="group space-y-6"
+      style={{
+        zIndex: index + 1,
+      }}
+      className={`${
+        shouldReduceMotion ? 'relative' : 'v2-work-sticky-card'
+      } group rounded-[18px] bg-[#0a0a0a] pt-2 pb-10 sm:pb-14 ${
+        index > 0 ? 'shadow-[0_-24px_56px_rgba(0,0,0,0.92)]' : ''
+      }`}
     >
-      <RouterLink
-        to={`/study-case/${project.id}`}
-        aria-label={`${project.title} — ${subtitleText}`}
-        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[16px]"
-      >
-        <div
-          className="v2-work-mockup-stage"
-          onMouseMove={handleMouseMove}
+      <div className="space-y-5">
+        {/* Clean Editorial Visual Container (No Fake Browser Chrome) */}
+        <RouterLink
+          to={`/study-case/${project.id}`}
+          aria-label={`${project.title} — ${subtitleText}`}
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[16px]"
         >
-          {/* Floating Cursor-Following Circular "VIEW PROJECT" Badge */}
           <div
-            className="v2-view-project-orb"
-            style={{
-              left: `${orbPos.x}px`,
-              top: `${orbPos.y}px`,
-            }}
-            aria-hidden="true"
+            className="v2-work-mockup-stage"
+            onMouseMove={handleMouseMove}
           >
-            {isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}
-          </div>
-
-          {/* Dark Hardware/Browser Screen Frame inside Subtle Spotlight Stage */}
-          <div className="v2-work-device-frame">
-            <div className="v2-work-device-topbar">
-              <span className="v2-work-device-dot" />
-              <span className="v2-work-device-dot" />
-              <span className="v2-work-device-dot" />
-              <span className="ml-2 font-mono text-[10px] text-[#77777e] truncate">
-                {project.live
-                  ? project.live.replace(/^https?:\/\//, '')
-                  : project.npm
-                  ? 'npmjs.com/package/@ghifari29/id-kit'
-                  : `${project.id}.internal`}
-              </span>
+            {/* Floating Cursor-Following Circular "VIEW PROJECT" Badge */}
+            <div
+              className="v2-view-project-orb"
+              style={{
+                left: `${orbPos.x}px`,
+                top: `${orbPos.y}px`,
+              }}
+              aria-hidden="true"
+            >
+              {isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}
             </div>
-            <img
-              src={project.image}
-              alt={project.title}
-              loading={index < 2 ? 'eager' : 'lazy'}
-              className="v2-work-device-img"
-            />
-          </div>
-        </div>
-      </RouterLink>
 
-      {/* Bottom Row: Mobile Title/Subtitle + Quick Action Links */}
-      <div className="flex flex-wrap items-end justify-between gap-4 pt-1">
-        <div className="lg:hidden space-y-1">
-          <p className="font-mono text-xs text-[#ff4925]">
-            {project.number}. {categoryText}
-          </p>
-          <h3 className="text-2xl font-semibold tracking-[-0.04em] text-white">
+            <div className="v2-work-device-frame">
+              <img
+                src={project.image}
+                alt={project.title}
+                loading={index < 2 ? 'eager' : 'lazy'}
+                className="v2-work-device-img"
+              />
+            </div>
+          </div>
+        </RouterLink>
+
+        {/* Mobile & Tablet Project Metadata (Desktop displays primary title/number in sticky left rail) */}
+        <div className="lg:hidden space-y-2.5 pt-1">
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className="text-[#ff4925]">
+              {project.number} / {String(totalCount).padStart(2, '0')}
+            </span>
+            <span className="text-[#8f8f8f] uppercase">{categoryText}</span>
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-semibold tracking-[-0.04em] text-white">
             {project.title}
           </h3>
-          <p className="text-sm text-[#8f8f8f]">{subtitleText}</p>
+          <p className="text-sm font-medium text-[#cacaca]">{subtitleText}</p>
+          <p className="text-sm text-[#8f8f8f] leading-relaxed">{descriptionText}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {project.tags.slice(0, 5).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-[#262626] bg-[#111111] px-3 py-1 text-[11px] font-medium text-[#9f9f9f]"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* Bottom Bar: Tech Tags + Authentic Project Action Links */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {project.version && (
+              <span className="rounded-full border border-[#ff4925]/40 bg-[#220f0d] px-2.5 py-1 font-mono text-[11px] font-semibold text-[#ff4925]">
+                {project.version}
+              </span>
+            )}
+            {project.tags.slice(0, 5).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-[#262626] bg-[#111111] px-3 py-1 text-[11px] font-medium text-[#9f9f9f]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[-0.02em]">
-          <RouterLink
-            to={`/study-case/${project.id}`}
-            className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
-          >
-            <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-            <FiArrowUpRight size={14} className="text-[#ff4925]" />
-          </RouterLink>
-          {project.live && (
-            <a
-              href={project.live}
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className="flex flex-wrap items-center gap-4 text-xs font-semibold uppercase tracking-[-0.02em]">
+            <RouterLink
+              to={`/study-case/${project.id}`}
               className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
             >
-              <span>Live</span>
+              <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
               <FiArrowUpRight size={14} className="text-[#ff4925]" />
-            </a>
-          )}
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[#8f8f8f] hover:text-[#ff4925] transition-colors"
-            >
-              <span>GitHub</span>
-              <FiArrowUpRight size={14} className="text-[#ff4925]" />
-            </a>
-          )}
+            </RouterLink>
+            {project.live && (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
+              >
+                <span>{isEn ? 'Live Demo' : 'Demo Langsung'}</span>
+                <FiArrowUpRight size={14} className="text-[#ff4925]" />
+              </a>
+            )}
+            {project.npm && (
+              <a
+                href={project.npm}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
+              >
+                <span>npm</span>
+                <FiArrowUpRight size={14} className="text-[#ff4925]" />
+              </a>
+            )}
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[#8f8f8f] hover:text-[#ff4925] transition-colors"
+              >
+                <span>GitHub</span>
+                <FiArrowUpRight size={14} className="text-[#ff4925]" />
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </article>
@@ -368,8 +393,10 @@ function WorkShowcaseCard({ project, index, onVisible, isEn }) {
 WorkShowcaseCard.propTypes = {
   project: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
+  totalCount: PropTypes.number.isRequired,
   onVisible: PropTypes.func.isRequired,
   isEn: PropTypes.bool.isRequired,
+  shouldReduceMotion: PropTypes.bool,
 };
 
 /* ==========================================================================
@@ -1086,104 +1113,154 @@ export default function PortfolioV2() {
         />
 
         {/* ------------------------------------------------------------------
-            3. LATEST WORK (07) — (z-30, Slides up to cover About, Sticky Left Rail)
+            3. SELECTED WORK (07) — Scroll-Driven Editorial Project Showcase
+               (z-30, Slides up to cover About, Sticky Left Rail + Sequential Sticky Visual Cards)
             ------------------------------------------------------------------ */}
         <OverlappingSection
           id="v2-work"
           zIndex={30}
           shouldReduceMotion={Boolean(shouldReduceMotion)}
-          className="pt-14 pb-24 sm:pt-20 sm:pb-36"
+          className="pt-16 pb-24 sm:pt-24 sm:pb-36"
         >
           <div className="v2-container">
-            {/* Centered Massive "LATEST WORK (07)" Heading */}
-            <div className="flex justify-center mb-12 sm:mb-16">
+            {/* 1. Section Introduction: Small Label + Massive Bold Heading */}
+            <div className="flex flex-col items-center text-center mb-16 sm:mb-24">
+              <p className="v2-section-tag mb-4">
+                ({isEn ? 'FEATURED PORTFOLIO' : 'PORTOFOLIO UNGGULAN'})
+              </p>
               <div className="relative inline-flex items-start">
                 <h2 className="v2-display-heading text-center text-[clamp(4.25rem,11vw,8.75rem)]">
-                  {isEn ? 'LATEST WORK' : 'KARYA PILIHAN'}
+                  {isEn ? 'SELECTED WORK' : 'KARYA PILIHAN'}
                 </h2>
-                <span className="ml-2 mt-1 font-sans text-base sm:text-xl font-semibold tracking-[-0.03em] text-[#cacaca]">
+                <span className="ml-2.5 mt-1 font-sans text-base sm:text-xl font-semibold tracking-[-0.03em] text-[#cacaca]">
                   ({String(selectedProjects.length).padStart(2, '0')})
                 </span>
               </div>
             </div>
 
-            {/* 2-Column Split: Sticky Left Index Rail (01. + Project List + Active Title/Subtitle) & Right Mockup Stack */}
+            {/* 2. Editorial Showcase Layout: Sticky Left Index/Details Rail & Right Sequential Sticky Visuals */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
               {/* Left Sticky Column (Desktop) */}
               <div className="hidden lg:flex lg:col-span-4 sticky top-24 flex-col justify-between h-[calc(100vh-8rem)] pr-4 pb-4">
-                {/* Top Giant Muted Index + Project Anchor List */}
-                <div className="space-y-8">
-                  <div
-                    aria-live="polite"
-                    className="v2-display-heading text-[clamp(5.5rem,8vw,7.5rem)] leading-none !text-[#2a2a2a] select-none"
-                  >
-                    {activeWork.number}.
+                {/* Top Giant Animated Project Number + Project Index Navigation */}
+                <div className="space-y-7">
+                  <div className="overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeWork.number}
+                        initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={shouldReduceMotion ? undefined : { y: -24, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                        aria-live="polite"
+                        className="v2-display-heading text-[clamp(5.5rem,8vw,7.5rem)] leading-none !text-[#2a2a2a] select-none"
+                      >
+                        {activeWork.number}.
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
 
-                  <ul className="space-y-2 text-sm font-medium">
-                    {selectedProjects.map((proj, idx) => {
-                      const isCurrent = idx === activeWorkIdx;
-                      return (
-                        <li key={proj.id}>
-                          <button
-                            type="button"
-                            onClick={() => scrollToSection(`v2-work-item-${proj.id}`)}
-                            className={`inline-flex items-center gap-2.5 text-left transition-colors ${
-                              isCurrent
-                                ? 'text-white font-semibold'
-                                : 'text-[#666666] hover:text-[#cacaca]'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-[1.5px] transition-all duration-200 ${
-                                isCurrent ? 'w-3.5 bg-[#ff4925]' : 'w-0 bg-transparent'
+                  <nav aria-label={isEn ? 'Selected projects index' : 'Indeks proyek pilihan'}>
+                    <ul className="space-y-2 text-sm font-medium">
+                      {selectedProjects.map((proj, idx) => {
+                        const isCurrent = idx === activeWorkIdx;
+                        return (
+                          <li key={proj.id}>
+                            <button
+                              type="button"
+                              onClick={() => scrollToSection(`v2-work-item-${proj.id}`)}
+                              className={`inline-flex items-center gap-2.5 text-left transition-colors ${
+                                isCurrent
+                                  ? 'text-white font-semibold'
+                                  : 'text-[#666666] hover:text-[#cacaca]'
                               }`}
-                              aria-hidden="true"
-                            />
-                            <span>{proj.title}</span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                            >
+                              <span
+                                className={`inline-block h-[1.5px] transition-all duration-200 ${
+                                  isCurrent ? 'w-3.5 bg-[#ff4925]' : 'w-0 bg-transparent'
+                                }`}
+                                aria-hidden="true"
+                              />
+                              <span>{proj.title}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
                 </div>
 
-                {/* Bottom Active Project Title & Subtitle */}
-                <div className="space-y-2 pt-8">
-                  <h3 className="text-3xl xl:text-4xl font-semibold tracking-[-0.05em] text-[#cacaca]">
-                    {activeWork.title}
-                  </h3>
-                  <p className="text-base text-[#8f8f8f] leading-snug max-w-xs">
-                    {isEn ? activeWork.subtitle.en : activeWork.subtitle.id}
-                  </p>
+                {/* Bottom Active Project Category, Title, Subtitle & Short Description */}
+                <div className="pt-6">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeWork.id}
+                      initial={shouldReduceMotion ? false : { y: 14, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={shouldReduceMotion ? undefined : { y: -14, opacity: 0 }}
+                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      className="space-y-2.5"
+                    >
+                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.04em] text-[#ff4925]">
+                        {isEn ? activeWork.category.en : activeWork.category.id}
+                      </p>
+                      <h3 className="text-3xl xl:text-4xl font-semibold tracking-[-0.05em] text-[#cacaca]">
+                        {activeWork.title}
+                      </h3>
+                      <p className="text-base font-medium text-[#cacaca]/90 leading-snug max-w-xs">
+                        {isEn ? activeWork.subtitle.en : activeWork.subtitle.id}
+                      </p>
+                      <p className="text-sm text-[#8f8f8f] leading-relaxed max-w-xs line-clamp-3">
+                        {isEn ? activeWork.description.en : activeWork.description.id}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </div>
 
-              {/* Right Column: Vertically Stacked Large Showcase Mockups */}
-              <div className="lg:col-span-8 space-y-16 sm:space-y-24">
+              {/* Right Column: Sequential Sticky Visual Showcase Cards */}
+              <div className="lg:col-span-8 space-y-16 lg:space-y-[24vh]">
                 {selectedProjects.map((project, idx) => (
                   <WorkShowcaseCard
                     key={project.id}
                     project={project}
                     index={idx}
+                    totalCount={selectedProjects.length}
                     onVisible={setActiveWorkIdx}
                     isEn={isEn}
+                    shouldReduceMotion={Boolean(shouldReduceMotion)}
                   />
                 ))}
+              </div>
+            </div>
 
-                {/* Bottom "MORE PROJECTS" Pill CTA */}
-                <div className="pt-4 flex flex-wrap items-center justify-between gap-4">
+            {/* 6. Other Projects: Clean MORE PROJECTS Transition & Compact Archive Grid */}
+            <div className="relative z-20 mt-20 sm:mt-28 border-t border-[#1e1e1e] pt-12 sm:pt-16 bg-[#0a0a0a]">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                <div className="space-y-2">
+                  <p className="v2-section-tag">
+                    ({isEn ? 'PROJECT ARCHIVE' : 'ARSIP PROYEK'} — 0{otherProjects.length})
+                  </p>
+                  <h3 className="text-2xl sm:text-3xl font-semibold tracking-[-0.04em] text-[#cacaca]">
+                    {isEn
+                      ? 'Additional Web Applications & Educational Games'
+                      : 'Aplikasi Web & Game Edukasi Tambahan'}
+                  </h3>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setShowAllWorks((prev) => !prev)}
+                    aria-expanded={showAllWorks}
                     className="v2-pill-btn"
                   >
                     <RolloverLabel
                       text={
                         showAllWorks
                           ? isEn
-                            ? 'HIDE ARCHIVE PROJECTS'
-                            : 'SEMBUNYIKAN ARSIP PROYEK'
+                            ? 'HIDE MORE PROJECTS'
+                            : 'SEMBUNYIKAN ARSIP'
                           : isEn
                           ? `MORE PROJECTS (+${otherProjects.length})`
                           : `PROYEK LAINNYA (+${otherProjects.length})`
@@ -1196,68 +1273,79 @@ export default function PortfolioV2() {
                     <FiArrowUpRight size={16} />
                   </RouterLink>
                 </div>
+              </div>
 
-                {showAllWorks && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                    {otherProjects.map((proj, index) => (
-                      <article
-                        key={proj.id}
-                        className="rounded-[16px] border border-[#222222] bg-[#0e0e0e] p-5 flex flex-col justify-between gap-4"
-                      >
-                        <div className="space-y-3">
-                          <div className="aspect-[16/10] w-full overflow-hidden rounded-[12px] border border-[#222222] bg-[#141414]">
-                            <img
-                              src={proj.image}
-                              alt={proj.title}
-                              loading="lazy"
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-[#8f8f8f]">
-                            <span className="font-mono text-[#ff4925]">
-                              0{selectedProjects.length + index + 1}.
-                            </span>
-                            <span>{isEn ? proj.category.en : proj.category.id}</span>
-                          </div>
-                          <h4 className="text-xl font-semibold tracking-[-0.04em] text-white">
-                            {proj.title}
-                          </h4>
-                          <p className="text-sm text-[#8f8f8f] line-clamp-2">
-                            {isEn ? proj.description.en : proj.description.id}
-                          </p>
+              {showAllWorks && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-10">
+                  {otherProjects.map((proj, index) => (
+                    <article
+                      key={proj.id}
+                      className="rounded-[16px] border border-[#222222] bg-[#0e0e0e] p-5 sm:p-6 flex flex-col justify-between gap-4"
+                    >
+                      <div className="space-y-3.5">
+                        <div className="aspect-[16/10] w-full overflow-hidden rounded-[12px] border border-[#222222] bg-[#141414]">
+                          <img
+                            src={proj.image}
+                            alt={proj.title}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
                         </div>
+                        <div className="flex items-center justify-between text-xs text-[#8f8f8f]">
+                          <span className="font-mono text-[#ff4925]">
+                            0{selectedProjects.length + index + 1}.
+                          </span>
+                          <span>{isEn ? proj.category.en : proj.category.id}</span>
+                        </div>
+                        <h4 className="text-xl font-semibold tracking-[-0.04em] text-white">
+                          {proj.title}
+                        </h4>
+                        <p className="text-sm text-[#8f8f8f] line-clamp-2">
+                          {isEn ? proj.description.en : proj.description.id}
+                        </p>
+                      </div>
 
-                        <div className="flex items-center gap-3 pt-2">
-                          <RouterLink
-                            to={`/study-case/${proj.id}`}
+                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                        <RouterLink
+                          to={`/study-case/${proj.id}`}
+                          className="v2-pill-btn !py-2 !px-4 !text-xs"
+                        >
+                          <RolloverLabel text={isEn ? 'CASE STUDY' : 'STUDI KASUS'} />
+                          <FiArrowUpRight size={14} className="text-[#ff4925]" />
+                        </RouterLink>
+                        {proj.live && (
+                          <a
+                            href={proj.live}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="v2-pill-btn !py-2 !px-4 !text-xs"
                           >
-                            <RolloverLabel text={isEn ? 'CASE STUDY' : 'STUDI KASUS'} />
+                            <RolloverLabel text="LIVE" />
                             <FiArrowUpRight size={14} className="text-[#ff4925]" />
-                          </RouterLink>
-                          {proj.live && (
-                            <a
-                              href={proj.live}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="v2-pill-btn !py-2 !px-4 !text-xs"
-                            >
-                              <RolloverLabel text="LIVE" />
-                              <FiArrowUpRight size={14} className="text-[#ff4925]" />
-                            </a>
-                          )}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                )}
-              </div>
+                          </a>
+                        )}
+                        {proj.github && (
+                          <a
+                            href={proj.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="v2-pill-btn !py-2 !px-4 !text-xs"
+                          >
+                            <RolloverLabel text="GITHUB" />
+                            <FiArrowUpRight size={14} className="text-[#ff4925]" />
+                          </a>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </OverlappingSection>
 
         {/* ------------------------------------------------------------------
-            4. (WHY US) NUMBERS DON'T LIE — (z-40, Slides up to cover Latest Work)
+            4. NEXT SECTION TRANSITION — BEYOND THE CODE (z-40, Slides up to cover Selected Work)
             ------------------------------------------------------------------ */}
         <OverlappingSection
           id="v2-metrics"
@@ -1267,9 +1355,11 @@ export default function PortfolioV2() {
         >
           <div className="v2-container space-y-20">
             <div>
-              <p className="v2-section-tag mb-4">(WHY ME)</p>
+              <p className="v2-section-tag mb-4">
+                ({isEn ? 'ENGINEERING IN NUMBERS' : 'REKAM JEJAK REKAYASA'})
+              </p>
               <h2 className="v2-display-heading text-[clamp(3.5rem,9vw,6.75rem)]">
-                {isEn ? "NUMBERS DON'T LIE" : 'ANGKA & REKAM JEJAK'}
+                {isEn ? 'BEYOND THE CODE' : 'DI BALIK BARIS KODE'}
               </h2>
             </div>
 
@@ -1293,7 +1383,7 @@ export default function PortfolioV2() {
               ))}
             </div>
 
-            {/* 2-Column Editorial Statement + Tilted Dark Showcase Card (Exact Nakula Screenshot 2) */}
+            {/* 2-Column Editorial Statement + Clean Real Project Visual */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center pt-12">
               <div className="lg:col-span-7 space-y-8">
                 <p className="text-[clamp(1.75rem,3.3vw,3rem)] font-semibold tracking-[-0.055em] leading-[1.08]">
@@ -1338,11 +1428,6 @@ export default function PortfolioV2() {
               <div className="lg:col-span-5">
                 <div className="v2-work-mockup-stage !aspect-[4/4.2]">
                   <div className="v2-work-device-frame -rotate-2">
-                    <div className="v2-work-device-topbar">
-                      <span className="v2-work-device-dot" />
-                      <span className="v2-work-device-dot" />
-                      <span className="v2-work-device-dot" />
-                    </div>
                     <img
                       src="/images/projects/project_management.webp"
                       alt="Project Management System"

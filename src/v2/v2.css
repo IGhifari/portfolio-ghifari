@@ -231,73 +231,54 @@ html.v2-scroll-root body {
 }
 
 /* ==========================================================================
-   Latest Work — Dark Mockup Frame & Floating Circular "VIEW PROJECT" Badge
+   Selected Work — Editorial Screenshot Stage & Floating Circular "VIEW PROJECT" Badge
+   (Clean real project visuals without fake browser bars)
    ========================================================================== */
 .v2-work-mockup-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10.5;
+  aspect-ratio: 16 / 10.2;
   border-radius: 16px;
   overflow: hidden;
-  background: radial-gradient(circle at 55% 40%, #242428 0%, #101012 72%, #0a0a0a 100%);
+  background: radial-gradient(circle at 50% 35%, #202024 0%, #0f0f11 72%, #0a0a0a 100%);
   border: 1px solid #222222;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1.25rem, 3.5vw, 3.25rem);
+  padding: clamp(1rem, 2.6vw, 2.4rem);
 }
 
 .v2-work-device-frame {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 11px;
   overflow: hidden;
   background: #08080a;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   box-shadow:
-    0 30px 70px rgba(0, 0, 0, 0.78),
-    0 0 0 1px rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    0 28px 64px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(0, 0, 0, 0.88);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .v2-work-mockup-stage:hover .v2-work-device-frame {
-  transform: scale(1.025) translateY(-3px);
-}
-
-.v2-work-device-topbar {
-  height: 22px;
-  background: #141417;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.v2-work-device-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: #333338;
+  transform: scale(1.02);
 }
 
 .v2-work-device-img {
   width: 100%;
-  height: calc(100% - 22px);
+  height: 100%;
   object-fit: cover;
   object-position: top center;
 }
 
 .v2-view-project-orb {
   position: absolute;
-  width: 118px;
-  height: 118px;
+  width: 116px;
+  height: 116px;
   border-radius: 9999px;
-  background: rgba(14, 14, 16, 0.72);
+  background: rgba(14, 14, 16, 0.76);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.24);
@@ -316,13 +297,21 @@ html.v2-scroll-root body {
   transform: translate(-50%, -50%) scale(0.75);
   transition:
     opacity 0.22s ease,
-    transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 20;
 }
 
 .v2-work-mockup-stage:hover .v2-view-project-orb {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* Stacked Sticky Project Cards inside #v2-work (Desktop) */
+@media (min-width: 1024px) {
+  .v2-work-sticky-card {
+    position: sticky;
+    top: 6.25rem;
+  }
 }
 
 /* ==========================================================================
