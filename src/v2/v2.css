@@ -1,0 +1,414 @@
+/* ==========================================================================
+   Portfolio V2 — Nakula Design Studio Exact Editorial & Scroll Architecture
+   Strictly scoped to `.v2-portfolio-root` so Portfolio 1 remains untouched.
+   ========================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+/* Restore viewport-level position:sticky inside Portfolio V2 without affecting Portfolio 1 */
+html.v2-scroll-root,
+html.v2-scroll-root body {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.v2-portfolio-root {
+  --v2-bg: #0a0a0a;
+  --v2-surface: #0e0e0e;
+  --v2-surface-elevated: #141414;
+  --v2-surface-accent: #220f0d;
+  --v2-border: #222222;
+  --v2-border-strong: #333333;
+  --v2-text: #cacaca;
+  --v2-text-bright: #ffffff;
+  --v2-text-muted: #8f8f8f;
+  --v2-text-dim: #555555;
+  --v2-accent: #ff4925;
+  --v2-accent-hover: #d93311;
+  --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
+  --v2-font-sans: 'Geist Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --v2-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  background-color: var(--v2-bg);
+  color: var(--v2-text);
+  font-family: var(--v2-font-sans);
+  position: relative;
+  isolation: isolate;
+  -webkit-font-smoothing: antialiased;
+}
+
+.v2-portfolio-main {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.v2-container {
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.25rem, 3.2vw, 3rem);
+  padding-right: clamp(1.25rem, 3.2vw, 3rem);
+}
+
+/* Display Typography (Anton Condensed All-Caps) */
+.v2-display-heading {
+  font-family: var(--v2-font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 0.94;
+  color: var(--v2-text);
+}
+
+.v2-section-tag {
+  font-family: var(--v2-font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--v2-text-muted);
+}
+
+/* Nakula Vertical Text-Rollover Pill Button */
+.v2-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 9999px;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--v2-font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text-bright);
+  transition:
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.v2-pill-btn:hover {
+  border-color: #4a4a4a;
+  color: var(--v2-text-bright);
+}
+
+.v2-pill-btn--accent {
+  background-color: var(--v2-surface-accent);
+  border-color: rgba(255, 73, 37, 0.45);
+  color: var(--v2-accent);
+}
+
+.v2-pill-btn--accent:hover {
+  background-color: var(--v2-accent);
+  border-color: var(--v2-accent);
+  color: #0a0a0a;
+}
+
+.v2-rollover-wrap {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+.v2-rollover-track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-rollover-line {
+  display: block;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+.v2-pill-btn:hover .v2-rollover-track {
+  transform: translate3d(0, -50%, 0);
+}
+
+/* Nakula Menu Drawer Link Underline & Social Hover */
+.v2-drawer-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.v2-drawer-nav-label {
+  position: relative;
+  display: inline-block;
+}
+
+.v2-drawer-nav-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background-color: var(--v2-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-drawer-nav-btn:hover .v2-drawer-nav-label::after,
+.v2-drawer-nav-btn:focus-visible .v2-drawer-nav-label::after {
+  transform: scaleX(1);
+}
+
+/* ==========================================================================
+   Hero Diagonal Spotlight Portrait Slash (Exact Nakula Video Match)
+   ========================================================================== */
+.v2-hero-diagonal-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.v2-hero-diagonal-mask {
+  position: relative;
+  width: min(760px, 88vw);
+  height: min(680px, 82vh);
+  clip-path: polygon(34% 0%, 100% 0%, 66% 100%, 0% 100%);
+  -webkit-mask-image: radial-gradient(ellipse 68% 68% at 50% 48%, #000 45%, transparent 95%);
+  mask-image: radial-gradient(ellipse 68% 68% at 50% 48%, #000 45%, transparent 95%);
+}
+
+.v2-hero-diagonal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  filter: contrast(1.22) saturate(1.12) sepia(0.28) hue-rotate(-14deg) brightness(0.82);
+  transform: scale(1.06);
+}
+
+.v2-hero-diagonal-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 52% 45%, rgba(255, 73, 37, 0.28) 0%, rgba(10, 10, 10, 0.85) 68%),
+    linear-gradient(135deg, rgba(10, 10, 10, 0.85) 12%, transparent 48%, rgba(10, 10, 10, 0.92) 86%);
+  mix-blend-mode: screen;
+}
+
+/* ==========================================================================
+   Latest Work — Dark Mockup Frame & Floating Circular "VIEW PROJECT" Badge
+   ========================================================================== */
+.v2-work-mockup-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10.5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: radial-gradient(circle at 55% 40%, #242428 0%, #101012 72%, #0a0a0a 100%);
+  border: 1px solid #222222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.25rem, 3.5vw, 3.25rem);
+}
+
+.v2-work-device-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.78),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.v2-work-mockup-stage:hover .v2-work-device-frame {
+  transform: scale(1.025) translateY(-3px);
+}
+
+.v2-work-device-topbar {
+  height: 22px;
+  background: #141417;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.v2-work-device-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #333338;
+}
+
+.v2-work-device-img {
+  width: 100%;
+  height: calc(100% - 22px);
+  object-fit: cover;
+  object-position: top center;
+}
+
+.v2-view-project-orb {
+  position: absolute;
+  width: 118px;
+  height: 118px;
+  border-radius: 9999px;
+  background: rgba(14, 14, 16, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  font-family: var(--v2-font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.75);
+  transition:
+    opacity 0.22s ease,
+    transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+.v2-work-mockup-stage:hover .v2-view-project-orb {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ==========================================================================
+   Why Us / Metrics Grid with Top Tick Marks (Exact Nakula Screenshot 1)
+   ========================================================================== */
+.v2-metric-cell {
+  position: relative;
+  padding: clamp(2rem, 3.8vw, 3.5rem);
+  border-left: 1px solid #222222;
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.v2-metric-ticks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    to right,
+    #333333 0px,
+    #333333 1px,
+    transparent 1px,
+    transparent 24px
+  );
+  opacity: 0.75;
+}
+
+/* ==========================================================================
+   Scroll-Driven Overlapping Section Stack (Nakula Layered Curtain Architecture)
+   ========================================================================== */
+.v2-stack-layer {
+  position: relative;
+  width: 100%;
+  background-color: var(--v2-bg);
+}
+
+.v2-stack-layer--overlap {
+  box-shadow:
+    0 -28px 64px rgba(0, 0, 0, 0.92),
+    0 -1px 0 rgba(255, 255, 255, 0.06);
+  border-top: 1px solid #1a1a1a;
+}
+
+/* Desktop & Tablet (>= 768px): Sticky layered overlap where incoming section slides up and covers the previous section */
+@media (min-width: 768px) {
+  .v2-stack-layer--sticky-top {
+    position: sticky;
+    top: 0;
+  }
+
+  .v2-stack-layer--sticky-bottom {
+    position: sticky;
+  }
+}
+
+/* Mobile (< 768px): Prioritize natural touch scrolling while keeping sticky (ABOUT) word-by-word read completion */
+@media (max-width: 767px) {
+  .v2-stack-layer--sticky-top,
+  .v2-stack-layer--sticky-bottom {
+    position: relative;
+    top: auto !important;
+  }
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  .v2-stack-layer--sticky-top,
+  .v2-stack-layer--sticky-bottom {
+    position: relative !important;
+    top: auto !important;
+  }
+
+  .v2-rollover-track,
+  .v2-drawer-nav-label::after,
+  .v2-work-device-frame,
+  .v2-pill-btn,
+  .v2-view-project-orb {
+    transition: none !important;
+  }
+
+  .v2-pill-btn:hover .v2-rollover-track,
+  .v2-work-mockup-stage:hover .v2-work-device-frame {
+    transform: none !important;
+  }
+}

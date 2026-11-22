@@ -13,6 +13,8 @@ import { siteConfig, ENABLE_SEASONAL_THEMES } from './config/site';
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
 import Project from './components/Project';
+import PortfolioSwitcher from './components/PortfolioSwitcher';
+import PortfolioV2 from './v2/PortfolioV2';
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -96,9 +98,10 @@ DeferredSection.propTypes = {
 };
 
 const AppContent = () => {
-    const { route, langPrefix } = useRouter();
+    const { route, langPrefix, portfolioVersion, switchPortfolioVersion } = useRouter();
     const { language, t } = useLanguage();
     const isPlayMode = isPlayRouteType(route.type);
+    const isV2Active = route.type === 'home' && portfolioVersion !== '1';
 
     // Restore localized home page document metadata on returning to home or toggling language
     useEffect(() => {
@@ -123,7 +126,7 @@ const AppContent = () => {
 
     // Scroll restoration for anchor links when switching back to home view
     useEffect(() => {
-        if (route.type === 'home' && window.location.hash) {
+        if (!isV2Active && route.type === 'home' && window.location.hash) {
             const id = window.location.hash.replace(/^#/, '');
             const timer = setTimeout(() => {
                 const el = document.getElementById(id);
@@ -133,11 +136,26 @@ const AppContent = () => {
             }, 80);
             return () => clearTimeout(timer);
         }
-    }, [route.type]);
+    }, [isV2Active, route.type]);
 
+    if (isV2Active) {
+        return (
+            <>
+                <PortfolioV2 />
+                <PortfolioSwitcher
+                    version={portfolioVersion}
+                    onChange={switchPortfolioVersion}
+                />
+            </>
+        );
+    }
 
     return (
-        <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
+        <div
+            className='tampilan'
+            data-portfolio-version="1"
+            style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}
+        >
             {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
             <a
                 href="#main-content"
@@ -298,6 +316,12 @@ const AppContent = () => {
 
             {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play* for Ctrl+J) */}
             <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
+                {!isPlayMode && (
+                    <PortfolioSwitcher
+                        version={portfolioVersion}
+                        onChange={switchPortfolioVersion}
+                    />
+                )}
                 <Suspense fallback={null}>
                     {!isPlayMode && <SoundButton />}
                     {!isPlayMode && <ChatAssistant />}

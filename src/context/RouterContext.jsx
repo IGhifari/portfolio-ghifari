@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { parseLocation, buildLocalizedPath } from '../utils/router';
+import {
+  parseLocation,
+  buildLocalizedPath,
+  buildVersionedUrl,
+  withVersionParam,
+  DEFAULT_PORTFOLIO_VERSION,
+} from '../utils/router';
 import { useLanguage } from './LanguageContext';
 
 const RouterContext = createContext(null);
@@ -11,6 +17,7 @@ export const RouterProvider = ({ children }) => {
 
   const activeLang =
     currentLocation.langPrefix === 'en' || language === 'en' ? 'en' : 'id';
+  const portfolioVersion = currentLocation.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
 
   useEffect(() => {
     const handlePopState = () => {
@@ -31,8 +38,8 @@ export const RouterProvider = ({ children }) => {
   }, [setLanguage]);
 
   const localizePath = useCallback(
-    (to) => buildLocalizedPath(to, activeLang),
-    [activeLang]
+    (to) => withVersionParam(buildLocalizedPath(to, activeLang), portfolioVersion),
+    [activeLang, portfolioVersion]
   );
 
   const commitNavigation = useCallback(
@@ -83,12 +90,13 @@ export const RouterProvider = ({ children }) => {
       }
 
       const explicitEn = /^\/en(?=[/?#]|$)/.test(to);
-      const targetUrl =
+      const localizedUrl =
         !preserveLang || explicitEn
           ? to
           : activeLang === 'en'
           ? buildLocalizedPath(to, 'en')
           : to;
+      const targetUrl = withVersionParam(localizedUrl, portfolioVersion);
 
       if (explicitEn && language !== 'en') {
         setLanguage('en');
@@ -96,7 +104,7 @@ export const RouterProvider = ({ children }) => {
 
       commitNavigation(targetUrl, { replace, scrollToTop, handleHashScroll: true });
     },
-    [activeLang, commitNavigation, language, setLanguage]
+    [activeLang, commitNavigation, language, portfolioVersion, setLanguage]
   );
 
   const switchLanguage = useCallback(
@@ -117,14 +125,37 @@ export const RouterProvider = ({ children }) => {
     [commitNavigation, setLanguage]
   );
 
+  const switchPortfolioVersion = useCallback(
+    (targetVersion) => {
+      if (typeof window === 'undefined') return;
+      const normalized = targetVersion === '1' ? '1' : DEFAULT_PORTFOLIO_VERSION;
+      const targetUrl = buildVersionedUrl(window.location, normalized);
+      commitNavigation(targetUrl, {
+        replace: false,
+        scrollToTop: true,
+        handleHashScroll: false,
+      });
+    },
+    [commitNavigation]
+  );
+
   const contextValue = useMemo(
     () => ({
       ...currentLocation,
+      portfolioVersion,
       navigate,
       localizePath,
       switchLanguage,
+      switchPortfolioVersion,
     }),
-    [currentLocation, navigate, localizePath, switchLanguage]
+    [
+      currentLocation,
+      portfolioVersion,
+      navigate,
+      localizePath,
+      switchLanguage,
+      switchPortfolioVersion,
+    ]
   );
 
   return <RouterContext.Provider value={contextValue}>{children}</RouterContext.Provider>;

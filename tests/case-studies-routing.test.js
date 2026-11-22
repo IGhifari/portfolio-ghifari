@@ -4,7 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parseLocation, buildLocalizedPath } from '../src/utils/router.js';
+import {
+  parseLocation,
+  buildLocalizedPath,
+  parsePortfolioVersion,
+  buildVersionedUrl,
+  withVersionParam,
+  DEFAULT_PORTFOLIO_VERSION,
+} from '../src/utils/router.js';
 import { allProjects, getProjectBySlug, selectedProjects, otherProjects } from '../src/data/projects.js';
 import { translations } from '../src/data/translations.js';
 import {
@@ -95,6 +102,48 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.equal(buildLocalizedPath('/en/play/explore', 'en'), '/en/play/explore');
       assert.equal(buildLocalizedPath('/docs/M.GhifariBimaKhadafi_CV.pdf', 'en'), '/docs/M.GhifariBimaKhadafi_CV.pdf');
       assert.equal(buildLocalizedPath('https://github.com/IGhifari', 'en'), 'https://github.com/IGhifari');
+    });
+
+    await t2.test('parses portfolioVersion with Portfolio 2 default and safe fallback on invalid values', () => {
+      assert.equal(DEFAULT_PORTFOLIO_VERSION, '2');
+      assert.equal(parsePortfolioVersion(''), '2');
+      assert.equal(parsePortfolioVersion('?version=2'), '2');
+      assert.equal(parsePortfolioVersion('?version=1'), '1');
+      assert.equal(parsePortfolioVersion('?version=3'), '2');
+      assert.equal(parsePortfolioVersion('?version=invalid'), '2');
+      assert.equal(parsePortfolioVersion('?version='), '2');
+
+      const defaultHome = parseLocation({ pathname: '/', search: '', hash: '' });
+      assert.equal(defaultHome.portfolioVersion, '2');
+
+      const v1Home = parseLocation({ pathname: '/', search: '?version=1', hash: '' });
+      assert.equal(v1Home.portfolioVersion, '1');
+
+      const v2Home = parseLocation({ pathname: '/', search: '?version=2', hash: '' });
+      assert.equal(v2Home.portfolioVersion, '2');
+
+      const invalidHome = parseLocation({ pathname: '/', search: '?version=99', hash: '' });
+      assert.equal(invalidHome.portfolioVersion, '2');
+    });
+
+    await t2.test('buildVersionedUrl and withVersionParam preserve version query state cleanly', () => {
+      assert.equal(
+        buildVersionedUrl({ pathname: '/', search: '', hash: '' }, '1'),
+        '/?version=1'
+      );
+      assert.equal(
+        buildVersionedUrl({ pathname: '/en', search: '?version=1', hash: '#projects' }, '2'),
+        '/en?version=2#projects'
+      );
+      assert.equal(
+        buildVersionedUrl({ pathname: '/', search: '', hash: '' }, 'invalid'),
+        '/?version=2'
+      );
+      assert.equal(withVersionParam('/study-case', '1'), '/study-case?version=1');
+      assert.equal(withVersionParam('/#experience', '1'), '/?version=1#experience');
+      assert.equal(withVersionParam('/study-case?version=2', '1'), '/study-case?version=2');
+      assert.equal(withVersionParam('/study-case', '2'), '/study-case');
+      assert.equal(withVersionParam('https://github.com/IGhifari', '1'), 'https://github.com/IGhifari');
     });
   });
 
