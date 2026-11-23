@@ -7,7 +7,7 @@ import {
   withVersionParam,
   DEFAULT_PORTFOLIO_VERSION,
 } from '../utils/router';
-import { useLanguage } from './LanguageContext';
+import { useLanguage, DEFAULT_LANGUAGE } from './LanguageContext';
 
 const RouterContext = createContext(null);
 
@@ -29,7 +29,7 @@ export const RouterProvider = ({ children }) => {
           ? 'en'
           : queryLang === 'en' || queryLang === 'id'
           ? queryLang
-          : 'id';
+          : DEFAULT_LANGUAGE;
       setLanguage(nextLang);
     };
 

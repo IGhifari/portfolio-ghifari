@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Portfolio V2 — Nakula Design Studio Exact Editorial & Scroll Architecture
+   Portfolio V2 — Editorial Architecture, Typography & Motion Primitives
    Strictly scoped to `.v2-portfolio-root` so Portfolio 1 remains untouched.
    ========================================================================== */
 
@@ -13,6 +13,7 @@ html.v2-scroll-root,
 html.v2-scroll-root body {
   overflow-x: clip !important;
   overflow-y: visible !important;
+  scroll-behavior: auto !important;
 }
 
 .lenis.lenis-smooth {
@@ -29,17 +30,18 @@ html.v2-scroll-root body {
 
 .v2-portfolio-root {
   --v2-bg: #0a0a0a;
-  --v2-surface: #0e0e0e;
-  --v2-surface-elevated: #141414;
-  --v2-surface-accent: #220f0d;
-  --v2-border: #222222;
-  --v2-border-strong: #333333;
-  --v2-text: #cacaca;
-  --v2-text-bright: #ffffff;
-  --v2-text-muted: #8f8f8f;
-  --v2-text-dim: #555555;
+  --v2-surface: #0f0f10;
+  --v2-surface-elevated: #141416;
+  --v2-surface-accent: #1d0d0a;
+  --v2-hairline: #1b1b1d;
+  --v2-border: #252528;
+  --v2-border-strong: #36363a;
+  --v2-text: #d4d4d4;
+  --v2-text-bright: #f7f7f7;
+  --v2-text-muted: #8a8a8e;
+  --v2-text-dim: #4c4c50;
   --v2-accent: #ff4925;
-  --v2-accent-hover: #d93311;
+  --v2-accent-hover: #e03715;
   --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
   --v2-font-sans: 'Geist Variable', 'Inter', system-ui, -apple-system, sans-serif;
   --v2-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
@@ -53,6 +55,7 @@ html.v2-scroll-root body {
   position: relative;
   isolation: isolate;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .v2-portfolio-main {
@@ -63,11 +66,11 @@ html.v2-scroll-root body {
 
 .v2-container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1440px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: clamp(1.25rem, 3.2vw, 3rem);
-  padding-right: clamp(1.25rem, 3.2vw, 3rem);
+  padding-left: clamp(1.25rem, 3.6vw, 3.5rem);
+  padding-right: clamp(1.25rem, 3.6vw, 3.5rem);
 }
 
 /* Display Typography (Anton Condensed All-Caps) */
@@ -75,41 +78,40 @@ html.v2-scroll-root body {
   font-family: var(--v2-font-display);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.005em;
-  line-height: 0.94;
+  letter-spacing: 0.008em;
+  line-height: 0.92;
   color: var(--v2-text);
 }
 
 .v2-section-tag {
-  font-family: var(--v2-font-sans);
-  font-size: 0.78rem;
+  font-family: var(--v2-font-mono);
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--v2-text-muted);
 }
 
-/* Nakula Vertical Text-Rollover Pill Button */
+/* Editorial Vertical Text-Rollover Action Button */
 .v2-pill-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
   border-radius: 9999px;
-  padding: 0.875rem 1.75rem;
+  padding: 0.85rem 1.7rem;
   font-family: var(--v2-font-sans);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   border: 1px solid var(--v2-border-strong);
   background-color: var(--v2-bg);
   color: var(--v2-text-bright);
   transition:
-    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
   position: relative;
@@ -117,13 +119,13 @@ html.v2-scroll-root body {
 }
 
 .v2-pill-btn:hover {
-  border-color: #4a4a4a;
+  border-color: #5c5c62;
   color: var(--v2-text-bright);
 }
 
 .v2-pill-btn--accent {
   background-color: var(--v2-surface-accent);
-  border-color: rgba(255, 73, 37, 0.45);
+  border-color: rgba(255, 73, 37, 0.48);
   color: var(--v2-accent);
 }
 
@@ -145,7 +147,7 @@ html.v2-scroll-root body {
   display: flex;
   flex-direction: column;
   will-change: transform;
-  transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .v2-rollover-line {
@@ -154,16 +156,17 @@ html.v2-scroll-root body {
   line-height: 1.25em;
 }
 
-.v2-pill-btn:hover .v2-rollover-track {
+.v2-pill-btn:hover .v2-rollover-track,
+.v2-pill-btn:focus-visible .v2-rollover-track {
   transform: translate3d(0, -50%, 0);
 }
 
-/* Nakula Menu Drawer Link Underline & Social Hover */
+/* Menu Drawer Link Underline */
 .v2-drawer-nav-item {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.65rem;
 }
 
 .v2-drawer-nav-label {
@@ -175,13 +178,13 @@ html.v2-scroll-root body {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -4px;
+  bottom: -3px;
   width: 100%;
   height: 2px;
   background-color: var(--v2-accent);
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .v2-drawer-nav-btn:hover .v2-drawer-nav-label::after,
@@ -190,7 +193,7 @@ html.v2-scroll-root body {
 }
 
 /* ==========================================================================
-   Hero Diagonal Spotlight Portrait Slash (Exact Nakula Video Match)
+   Hero Diagonal Spotlight Portrait Slash
    ========================================================================== */
 .v2-hero-diagonal-wrap {
   position: absolute;
@@ -205,65 +208,62 @@ html.v2-scroll-root body {
 
 .v2-hero-diagonal-mask {
   position: relative;
-  width: min(760px, 88vw);
-  height: min(680px, 82vh);
-  clip-path: polygon(34% 0%, 100% 0%, 66% 100%, 0% 100%);
-  -webkit-mask-image: radial-gradient(ellipse 68% 68% at 50% 48%, #000 45%, transparent 95%);
-  mask-image: radial-gradient(ellipse 68% 68% at 50% 48%, #000 45%, transparent 95%);
+  width: min(740px, 86vw);
+  height: min(670px, 80vh);
+  clip-path: polygon(31% 0%, 96% 0%, 64% 100%, 2% 100%);
+  -webkit-mask-image: radial-gradient(ellipse 68% 70% at 50% 48%, #000 44%, transparent 94%);
+  mask-image: radial-gradient(ellipse 68% 70% at 50% 48%, #000 44%, transparent 94%);
 }
 
 .v2-hero-diagonal-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 22%;
-  filter: contrast(1.22) saturate(1.12) sepia(0.28) hue-rotate(-14deg) brightness(0.82);
-  transform: scale(1.06);
+  object-position: center 20%;
+  filter: contrast(1.16) saturate(1.04) sepia(0.18) hue-rotate(-10deg) brightness(0.84);
+  transform: scale(1.05);
 }
 
 .v2-hero-diagonal-glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 52% 45%, rgba(255, 73, 37, 0.28) 0%, rgba(10, 10, 10, 0.85) 68%),
-    linear-gradient(135deg, rgba(10, 10, 10, 0.85) 12%, transparent 48%, rgba(10, 10, 10, 0.92) 86%);
+    radial-gradient(circle at 54% 42%, rgba(255, 73, 37, 0.22) 0%, rgba(10, 10, 10, 0.72) 66%),
+    linear-gradient(128deg, rgba(10, 10, 10, 0.88) 10%, transparent 46%, rgba(10, 10, 10, 0.94) 88%);
   mix-blend-mode: screen;
 }
 
 /* ==========================================================================
-   Selected Work — Editorial Screenshot Stage & Floating Circular "VIEW PROJECT" Badge
-   (Clean real project visuals without fake browser bars)
+   Selected Work — Architectural Screenshot Stage & Spring Cursor Orb
    ========================================================================== */
 .v2-work-mockup-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10.2;
-  border-radius: 16px;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 35%, #202024 0%, #0f0f11 72%, #0a0a0a 100%);
-  border: 1px solid #222222;
+  background: linear-gradient(180deg, #131316 0%, #0d0d0f 100%);
+  border: 1px solid var(--v2-hairline);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 2.6vw, 2.4rem);
+  padding: clamp(0.85rem, 2.2vw, 1.85rem);
+  transition: border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-work-mockup-stage:hover {
+  border-color: var(--v2-border-strong);
 }
 
 .v2-work-device-frame {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 11px;
+  border-radius: 6px;
   overflow: hidden;
   background: #08080a;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow:
-    0 28px 64px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(0, 0, 0, 0.88);
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.v2-work-mockup-stage:hover .v2-work-device-frame {
-  transform: scale(1.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.72);
 }
 
 .v2-work-device-img {
@@ -271,60 +271,63 @@ html.v2-scroll-root body {
   height: 100%;
   object-fit: cover;
   object-position: top center;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.v2-work-mockup-stage:hover .v2-work-device-img {
+  transform: scale(1.03);
 }
 
 .v2-view-project-orb {
   position: absolute;
-  width: 116px;
-  height: 116px;
+  top: 0;
+  left: 0;
+  width: 104px;
+  height: 104px;
+  margin-left: -52px;
+  margin-top: -52px;
   border-radius: 9999px;
-  background: rgba(14, 14, 16, 0.76);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(12, 12, 14, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   color: #ffffff;
-  font-family: var(--v2-font-sans);
-  font-size: 11px;
+  font-family: var(--v2-font-mono);
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.75);
-  transition:
-    opacity 0.22s ease,
-    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 20;
+  will-change: transform, opacity;
 }
 
-.v2-work-mockup-stage:hover .v2-view-project-orb {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-/* Stacked Sticky Project Cards inside #v2-work (Desktop) */
+/* Stacked Sticky Project Cards inside #v2-work (Desktop only) */
 @media (min-width: 1024px) {
   .v2-work-sticky-card {
     position: sticky;
-    top: 6.25rem;
+    top: 5.5rem;
   }
 }
 
 /* ==========================================================================
-   Why Us / Metrics Grid with Top Tick Marks (Exact Nakula Screenshot 1)
+   Metrics — Swiss Editorial Typographic Grid
    ========================================================================== */
 .v2-metric-cell {
   position: relative;
-  padding: clamp(2rem, 3.8vw, 3.5rem);
-  border-left: 1px solid #222222;
-  min-height: 270px;
+  padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1.25rem, 2.4vw, 2.25rem);
+  border-top: 1px solid var(--v2-hairline);
+  border-left: 1px solid var(--v2-hairline);
+  min-height: 230px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  font-variant-numeric: tabular-nums;
 }
 
 .v2-metric-ticks {
@@ -332,19 +335,33 @@ html.v2-scroll-root body {
   top: 0;
   left: 0;
   right: 0;
-  height: 8px;
+  height: 6px;
   background-image: repeating-linear-gradient(
     to right,
-    #333333 0px,
-    #333333 1px,
+    #2e2e32 0px,
+    #2e2e32 1px,
     transparent 1px,
-    transparent 24px
+    transparent 22px
   );
-  opacity: 0.75;
+  opacity: 0.7;
 }
 
 /* ==========================================================================
-   Scroll-Driven Overlapping Section Stack (Nakula Layered Curtain Architecture)
+   Editorial Timeline & Row Interactions
+   ========================================================================== */
+.v2-editorial-row {
+  border-top: 1px solid var(--v2-hairline);
+  transition:
+    background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-editorial-row:hover {
+  border-top-color: var(--v2-border-strong);
+}
+
+/* ==========================================================================
+   Controlled Overlapping Layer Architecture
    ========================================================================== */
 .v2-stack-layer {
   position: relative;
@@ -354,12 +371,12 @@ html.v2-scroll-root body {
 
 .v2-stack-layer--overlap {
   box-shadow:
-    0 -28px 64px rgba(0, 0, 0, 0.92),
-    0 -1px 0 rgba(255, 255, 255, 0.06);
-  border-top: 1px solid #1a1a1a;
+    0 -24px 56px rgba(0, 0, 0, 0.9),
+    0 -1px 0 rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--v2-hairline);
 }
 
-/* Desktop & Tablet (>= 768px): Sticky layered overlap where incoming section slides up and covers the previous section */
+/* Desktop & Tablet (>= 768px): Sticky layered overlap where explicitly enabled */
 @media (min-width: 768px) {
   .v2-stack-layer--sticky-top {
     position: sticky;
@@ -371,7 +388,7 @@ html.v2-scroll-root body {
   }
 }
 
-/* Mobile (< 768px): Prioritize natural touch scrolling while keeping sticky (ABOUT) word-by-word read completion */
+/* Mobile (< 768px): Natural vertical document scrolling */
 @media (max-width: 767px) {
   .v2-stack-layer--sticky-top,
   .v2-stack-layer--sticky-bottom {
@@ -390,14 +407,15 @@ html.v2-scroll-root body {
 
   .v2-rollover-track,
   .v2-drawer-nav-label::after,
-  .v2-work-device-frame,
+  .v2-work-device-img,
   .v2-pill-btn,
-  .v2-view-project-orb {
+  .v2-editorial-row {
     transition: none !important;
   }
 
   .v2-pill-btn:hover .v2-rollover-track,
-  .v2-work-mockup-stage:hover .v2-work-device-frame {
+  .v2-pill-btn:focus-visible .v2-rollover-track,
+  .v2-work-mockup-stage:hover .v2-work-device-img {
     transform: none !important;
   }
 }
