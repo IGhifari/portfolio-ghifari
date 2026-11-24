@@ -3,81 +3,111 @@ import PropTypes from 'prop-types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { markV2OpeningCompleted } from './v2OpeningState';
 
-// Piecewise organic progress keyframes [normalizedTime, progressValue]
-// Mirrors the reference video's cadence (smooth pauses near 34%, 71%, 97% -> 100%)
-const PROGRESS_KEYFRAMES = [
-  [0.0, 0.0],
-  [0.16, 0.14],
-  [0.23, 0.16],
-  [0.34, 0.34],
-  [0.4, 0.36],
-  [0.54, 0.58],
-  [0.64, 0.71],
-  [0.71, 0.73],
-  [0.83, 0.9],
-  [0.92, 0.97],
-  [0.97, 0.985],
-  [1.0, 1.0],
-];
-
-function sampleOrganicProgress(t) {
-  const clamped = Math.max(0, Math.min(1, t));
-  for (let i = 0; i < PROGRESS_KEYFRAMES.length - 1; i += 1) {
-    const [t0, p0] = PROGRESS_KEYFRAMES[i];
-    const [t1, p1] = PROGRESS_KEYFRAMES[i + 1];
-    if (clamped >= t0 && clamped <= t1) {
-      const local = (clamped - t0) / Math.max(0.0001, t1 - t0);
-      // Smoothstep interpolation between keyframes
-      const smooth = local * local * (3 - 2 * local);
-      return p0 + (p1 - p0) * smooth;
-    }
-  }
-  return 1;
-}
-
 function clamp01(v) {
   return Math.max(0, Math.min(1, v));
 }
 
-function easeInOutCubic(t) {
+// Quintic smootherstep: zero 1st AND 2nd derivatives at endpoints -> zero jerk!
+function smootherstep(t) {
   const x = clamp01(t);
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
-function easeOutCubic(t) {
-  const x = clamp01(t);
-  return 1 - Math.pow(1 - x, 3);
+// Smooth bell envelope: fades 0 -> 1 over [inStart, inEnd], holds 1, fades 1 -> 0 over [outStart, outEnd]
+function envelope(t, inStart, inEnd, outStart, outEnd) {
+  if (t <= inStart || t >= outEnd) return 0;
+  if (t < inEnd) return smootherstep((t - inStart) / Math.max(0.0001, inEnd - inStart));
+  if (t > outStart) return 1 - smootherstep((t - outStart) / Math.max(0.0001, outEnd - outStart));
+  return 1;
 }
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
 }
 
-// Deterministic ambient particles so SSR/hydration and canvas redraws are clean
-const AMBIENT_PARTICLES = Array.from({ length: 38 }, (_, i) => {
+// Continuous monotonic progress curve (strictly positive velocity everywhere — never freezes!)
+function continuousOrganicProgress(t) {
+  const x = clamp01(t);
+  // Base linear + gentle harmonic pacing waves that slow slightly around 34%, 70%, and 94% without ever stalling
+  const wave =
+    0.028 * Math.sin(x * Math.PI * 2) +
+    0.016 * Math.sin(x * Math.PI * 6);
+  const eased = clamp01(x + wave * Math.sin(x * Math.PI));
+  // Blend 85% harmonic curve + 15% smootherstep for soft start & finish
+  return clamp01(eased * 0.86 + smootherstep(x) * 0.14);
+}
+
+// Multi-keyframe smooth quintic value track [[t0, val0], [t1, val1], ...]
+function sampleTrack(keyframes, t) {
+  if (t <= keyframes[0][0]) return keyframes[0][1];
+  const last = keyframes[keyframes.length - 1];
+  if (t >= last[0]) return last[1];
+  for (let i = 0; i < keyframes.length - 1; i += 1) {
+    const [t0, v0] = keyframes[i];
+    const [t1, v1] = keyframes[i + 1];
+    if (t >= t0 && t <= t1) {
+      const u = smootherstep((t - t0) / Math.max(0.0001, t1 - t0));
+      return lerp(v0, v1, u);
+    }
+  }
+  return last[1];
+}
+
+// Continuous main ring radius track (px at 1x scale) — zero discontinuities!
+const MAIN_RING_TRACK = [
+  [0.0, 168],
+  [0.19, 168],
+  [0.29, 64],
+  [0.38, 128],
+  [0.51, 128],
+  [0.6, 78],
+  [0.69, 78],
+  [0.79, 204],
+  [0.89, 204],
+  [0.97, 46],
+  [1.0, 38],
+];
+
+// Continuous inner ring radius track (px at 1x scale)
+const INNER_RING_TRACK = [
+  [0.0, 106],
+  [0.19, 106],
+  [0.29, 23],
+  [0.52, 23],
+  [0.62, 42],
+  [0.72, 42],
+  [0.8, 134],
+  [0.89, 134],
+  [0.97, 24],
+  [1.0, 18],
+];
+
+// Deterministic ambient particles
+const AMBIENT_PARTICLES = Array.from({ length: 40 }, (_, i) => {
   const seed1 = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
   const seed2 = Math.sin(i * 45.164 + 19.123) * 24634.6345;
   return {
     nx: seed1 - Math.floor(seed1),
     ny: seed2 - Math.floor(seed2),
-    r: i % 5 === 0 ? 1.35 : 0.85,
-    alpha: 0.1 + (i % 4) * 0.06,
-    drift: (i % 2 === 0 ? 1 : -1) * (4 + (i % 5) * 2),
+    r: i % 5 === 0 ? 1.3 : 0.85,
+    alpha: 0.09 + (i % 4) * 0.055,
+    drift: (i % 2 === 0 ? 1 : -1) * (3.2 + (i % 5) * 1.4),
   };
 });
 
 /**
- * Architectural Orbital Telemetry Opening Sequence (`000% -> 100%` + Luminous Reveal)
- * Plays once before entering Portfolio V2 on initial load / refresh.
+ * Architectural Orbital Telemetry Opening Sequence (`000% -> 100%` + Radial Luminous Dissolve)
+ * Zero React per-frame re-renders + continuous quintic overlapping geometry for 60/120fps fluidity.
  */
 export default function V2OpeningSequence({ isEn = true, onComplete, onRevealStart }) {
   const canvasRef = useRef(null);
+  const counterRef = useRef(null);
+  const progressBarRef = useRef(null);
   const completedRef = useRef(false);
   const revealFiredRef = useRef(false);
 
-  const [percent, setPercent] = useState(0);
   const [phaseIndex, setPhaseIndex] = useState(0);
-  const [flashPhase, setFlashPhase] = useState('idle'); // 'idle' | 'flash' | 'dissolve'
+  const [exitState, setExitState] = useState('running'); // 'running' | 'bloom' | 'dissolve'
 
   const finishSequence = useCallback(() => {
     if (completedRef.current) return;
@@ -92,35 +122,17 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     }
   }, [onComplete, onRevealStart]);
 
-  const triggerLuminousExit = useCallback(() => {
-    if (completedRef.current) return;
-    setFlashPhase((prev) => {
-      if (prev !== 'idle') return prev;
-      setTimeout(() => {
-        setFlashPhase('dissolve');
-        if (!revealFiredRef.current && typeof onRevealStart === 'function') {
-          revealFiredRef.current = true;
-          onRevealStart();
-        }
-      }, 220);
-      setTimeout(() => {
-        finishSequence();
-      }, 1060);
-      return 'flash';
-    });
-  }, [finishSequence, onRevealStart]);
-
   const handleSkip = useCallback(() => {
     if (completedRef.current) return;
     markV2OpeningCompleted();
-    setFlashPhase('dissolve');
+    setExitState('dissolve');
     if (!revealFiredRef.current && typeof onRevealStart === 'function') {
       revealFiredRef.current = true;
       onRevealStart();
     }
     setTimeout(() => {
       finishSequence();
-    }, 420);
+    }, 650);
   }, [finishSequence, onRevealStart]);
 
   // Allow Escape key to skip cleanly
@@ -144,11 +156,11 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     };
   }, []);
 
-  // 60fps High-DPI Canvas Orbital Telemetry Animation
+  // Continuous 60/120fps High-DPI Canvas Orbital Choreography
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return undefined;
 
     let width = window.innerWidth;
@@ -167,14 +179,18 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    const DURATION_MS = 5600;
+    // Calm, cinematic ~8.6s 000%->100% progression + ~0.55s radial light bloom + ~1.25s silk dissolve
+    const PROGRESS_DURATION_MS = 8600;
+    const BLOOM_DURATION_MS = 560;
     const startTime = performance.now();
+
     let rafId = null;
     let lastPct = -1;
     let lastStage = -1;
-    let exitTriggered = false;
+    let dissolveScheduled = false;
 
     const drawCross = (x, y, size, alpha, rotate45 = false) => {
+      if (alpha <= 0.004) return;
       ctx.save();
       ctx.translate(x, y);
       if (rotate45) ctx.rotate(Math.PI / 4);
@@ -189,15 +205,16 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
       ctx.restore();
     };
 
-    const drawSectorWedge = (cx, cy, radius, startAngle, sweepAngle, alphaPeak) => {
-      const steps = 22;
+    const drawSectorWedge = (cx, cy, radius, headAngle, sweepAngle, alphaPeak) => {
+      if (alphaPeak <= 0.004 || radius <= 1) return;
+      const steps = 28;
       for (let i = 0; i < steps; i += 1) {
         const f0 = i / steps;
         const f1 = (i + 1) / steps;
-        const a0 = startAngle - sweepAngle * (1 - f0);
-        const a1 = startAngle - sweepAngle * (1 - f1) + 0.008;
-        const sliceAlpha = alphaPeak * Math.pow(f1, 1.75);
-        ctx.fillStyle = `rgba(210, 225, 250, ${sliceAlpha})`;
+        const a0 = headAngle - sweepAngle * (1 - f0);
+        const a1 = headAngle - sweepAngle * (1 - f1) + 0.006;
+        const sliceAlpha = alphaPeak * Math.pow(f1, 1.85);
+        ctx.fillStyle = `rgba(210, 226, 252, ${sliceAlpha})`;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, radius, a0, a1);
@@ -207,17 +224,17 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     };
 
     const drawNode = (x, y, radius = 5.5, alpha = 1) => {
-      // Subtle electric-blue outer aura
-      const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 3.4);
-      glow.addColorStop(0, `rgba(59, 130, 246, ${0.38 * alpha})`);
+      if (alpha <= 0.005) return;
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 3.8);
+      glow.addColorStop(0, `rgba(59, 130, 246, ${0.42 * alpha})`);
+      glow.addColorStop(0.5, `rgba(147, 197, 253, ${0.14 * alpha})`);
       glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(x, y, radius * 3.4, 0, Math.PI * 2);
+      ctx.arc(x, y, radius * 3.8, 0, Math.PI * 2);
       ctx.fill();
 
-      // Crisp white telemetry dot
-      ctx.fillStyle = `rgba(244, 246, 250, ${alpha})`;
+      ctx.fillStyle = `rgba(248, 250, 252, ${alpha})`;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
@@ -225,41 +242,68 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
 
     const renderFrame = (now) => {
       const elapsed = now - startTime;
-      const rawT = clamp01(elapsed / DURATION_MS);
-      const p = sampleOrganicProgress(rawT);
+      const sec = elapsed * 0.001;
+      const t = clamp01(elapsed / PROGRESS_DURATION_MS);
+      const p = continuousOrganicProgress(t);
       const pctInt = Math.min(100, Math.round(p * 100));
 
+      // Direct DOM updates for 0-jank 60/120fps tabular counter & bottom progress bar
       if (pctInt !== lastPct) {
         lastPct = pctInt;
-        setPercent(pctInt);
+        if (counterRef.current) {
+          counterRef.current.textContent = String(pctInt).padStart(3, '0');
+        }
+      }
+      if (progressBarRef.current) {
+        progressBarRef.current.style.transform = `scaleX(${p.toFixed(4)})`;
       }
 
-      const stage = p < 0.22 ? 0 : p < 0.56 ? 1 : p < 0.78 ? 2 : 3;
+      // Update caption stage at most 3 times across the entire 8.6s run
+      const stage = t < 0.25 ? 0 : t < 0.54 ? 1 : t < 0.76 ? 2 : 3;
       if (stage !== lastStage) {
         lastStage = stage;
         setPhaseIndex(stage);
       }
 
-      if (rawT >= 1 && !exitTriggered) {
-        exitTriggered = true;
-        triggerLuminousExit();
+      // Smooth radial bloom progress once t hits 1.0
+      const bloomT =
+        elapsed > PROGRESS_DURATION_MS
+          ? clamp01((elapsed - PROGRESS_DURATION_MS) / BLOOM_DURATION_MS)
+          : 0;
+
+      if (bloomT > 0 && !dissolveScheduled) {
+        dissolveScheduled = true;
+        setExitState('bloom');
+        setTimeout(() => {
+          setExitState('dissolve');
+          if (!revealFiredRef.current && typeof onRevealStart === 'function') {
+            revealFiredRef.current = true;
+            onRevealStart();
+          }
+        }, BLOOM_DURATION_MS);
+        setTimeout(() => {
+          finishSequence();
+        }, BLOOM_DURATION_MS + 1280);
       }
 
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // 1. Base architectural dark slate-obsidian fill
+      // Soft entrance fade from pure black over first 0.55s
+      const masterIn = smootherstep(clamp01(elapsed / 550));
+
+      // 1. Base architectural obsidian fill
       ctx.fillStyle = '#0b0c0f';
       ctx.fillRect(0, 0, width, height);
 
       const cx = width * 0.5;
       const cy = height * 0.5;
       const unit = Math.min(width, height);
-      const scale = Math.max(0.62, Math.min(1.15, unit / 920));
+      const scale = Math.max(0.64, Math.min(1.15, unit / 920));
 
-      // 2. Subtle architectural drafting grid (`96px` cell spacing)
+      // 2. Fine architectural drafting grid
       const gridStep = Math.round(96 * scale);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.024)';
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.024 * masterIn})`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       const offsetX = cx % gridStep;
@@ -274,361 +318,309 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
       }
       ctx.stroke();
 
-      // 3. Concentric stepped matte radial elevation halos
-      const haloRadii = [430, 330, 235, 148].map((r) => r * scale);
-      const haloAlphas = [0.014, 0.018, 0.022, 0.026];
+      // 3. Concentric stepped matte radial elevation halos (gently breathing)
+      const breath = 1 + 0.015 * Math.sin(sec * 1.3);
+      const haloRadii = [435, 332, 236, 148].map((r) => r * scale * breath);
+      const haloAlphas = [0.013, 0.017, 0.021, 0.025];
       haloRadii.forEach((hr, idx) => {
-        ctx.fillStyle = `rgba(226, 234, 248, ${haloAlphas[idx]})`;
+        ctx.fillStyle = `rgba(226, 234, 248, ${haloAlphas[idx] * masterIn})`;
         ctx.beginPath();
         ctx.arc(cx, cy, hr, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // 4. Ambient drifting telemetry dust & outer fiducial markers
-      const driftSec = elapsed * 0.001;
+      // 4. Ambient drifting telemetry particles & outer fiducial markers
       AMBIENT_PARTICLES.forEach((pt) => {
-        const px = (pt.nx * width + driftSec * pt.drift + width) % width;
-        const py = (pt.ny * height - driftSec * pt.drift * 0.5 + height) % height;
-        ctx.fillStyle = `rgba(226, 232, 240, ${pt.alpha})`;
+        const px = (pt.nx * width + sec * pt.drift + width) % width;
+        const py = (pt.ny * height - sec * pt.drift * 0.45 + height) % height;
+        ctx.fillStyle = `rgba(226, 232, 240, ${pt.alpha * masterIn})`;
         ctx.beginPath();
         ctx.arc(px, py, pt.r, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      drawCross(cx - 295 * scale, cy + 255 * scale, 5, 0.2, false);
-      drawCross(cx + 285 * scale, cy + 195 * scale, 5, 0.18, false);
-      drawCross(cx - 245 * scale, cy - 195 * scale, 5, 0.16, true);
-      drawCross(cx + 205 * scale, cy - 165 * scale, 5, 0.18, true);
-      drawCross(cx - 90 * scale, cy + 390 * scale, 5, 0.18, false);
+      drawCross(cx - 295 * scale, cy + 255 * scale, 5, 0.2 * masterIn, false);
+      drawCross(cx + 285 * scale, cy + 195 * scale, 5, 0.18 * masterIn, false);
+      drawCross(cx - 245 * scale, cy - 195 * scale, 5, 0.16 * masterIn, true);
+      drawCross(cx + 205 * scale, cy - 165 * scale, 5, 0.18 * masterIn, true);
+      drawCross(cx - 90 * scale, cy + 390 * scale, 5, 0.18 * masterIn, false);
 
       // ======================================================================
-      // 5. CENTRAL 5-ACT GEOMETRIC ORBITAL CHOREOGRAPHY
+      // 5. CONTINUOUS OVERLAPPING ORBITAL LAYERS (ZERO HARD CUTS)
       // ======================================================================
 
-      if (p < 0.28) {
-        // ACT 1: Radar Sweep & Concentric Contraction (`0% -> 28%`)
-        const local = p / 0.28;
-        const shrink = local > 0.68 ? easeInOutCubic((local - 0.68) / 0.32) : 0;
+      const rMain = sampleTrack(MAIN_RING_TRACK, t) * scale;
+      const rInner = sampleTrack(INNER_RING_TRACK, t) * scale;
 
-        const rOuter = lerp(172, 68, shrink) * scale;
-        const rInner = lerp(108, 22, shrink) * scale;
-        const angle = -Math.PI * 0.65 + local * Math.PI * 2.15;
+      // Continuous uninterrupted orbital angle driven by real seconds
+      const continuousOrbitAngle = -Math.PI * 0.68 + sec * 1.48;
 
-        // Radar sector wedge (fades smoothly during final contraction)
-        const wedgeAlpha = (1 - shrink) * 0.17;
-        if (wedgeAlpha > 0.005) {
-          drawSectorWedge(cx, cy, rOuter, angle, Math.PI * 0.32, wedgeAlpha);
-        }
+      // --- LAYER A: Act 1 Radar Fan & Diagonal Telemetry Ray (`0.00 -> 0.28`) ---
+      const envAct1 = envelope(t, 0.0, 0.06, 0.19, 0.29) * masterIn;
+      if (envAct1 > 0.004) {
+        drawSectorWedge(cx, cy, rMain, continuousOrbitAngle, Math.PI * 0.34, 0.17 * envAct1);
 
-        // Long lower-left radial vector ray
-        if (shrink < 0.85) {
-          const rayAlpha = (1 - shrink / 0.85) * 0.22;
-          const rayAngle = Math.PI * 0.82;
-          ctx.strokeStyle = `rgba(226, 232, 240, ${rayAlpha})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(cx + Math.cos(rayAngle) * rOuter, cy + Math.sin(rayAngle) * rOuter);
-          ctx.lineTo(cx + Math.cos(rayAngle) * unit * 0.9, cy + Math.sin(rayAngle) * unit * 0.9);
-          ctx.stroke();
-        }
-
-        // Concentric rings
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.48)';
+        const rayAngle = Math.PI * 0.82;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.22 * envAct1})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+        ctx.moveTo(cx + Math.cos(rayAngle) * rMain, cy + Math.sin(rayAngle) * rMain);
+        ctx.lineTo(cx + Math.cos(rayAngle) * unit * 0.88, cy + Math.sin(rayAngle) * unit * 0.88);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.24)';
+        // Subtle middle harmonic ring
+        const midHarmonicEnv = envelope(t, 0.05, 0.12, 0.17, 0.25);
+        if (midHarmonicEnv > 0.005) {
+          ctx.strokeStyle = `rgba(147, 197, 253, ${0.2 * midHarmonicEnv})`;
+          ctx.beginPath();
+          ctx.arc(cx, cy, lerp(rInner, rMain, 0.52), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      // --- LAYER B: Act 2 Horizontal Beam Cone & Satellite Ring (`0.27 -> 0.56`) ---
+      const envAct2 = envelope(t, 0.27, 0.36, 0.46, 0.56);
+      const beamDisplacement = 212 * scale * envAct2;
+      if (envAct2 > 0.004) {
+        const beamX = cx + beamDisplacement;
+        const coneHalfH = 38 * scale * envAct2;
+
+        const coneGrad = ctx.createLinearGradient(cx, cy, beamX, cy);
+        coneGrad.addColorStop(0, `rgba(226, 232, 240, ${0.02 * envAct2})`);
+        coneGrad.addColorStop(0.68, `rgba(191, 219, 254, ${0.13 * envAct2})`);
+        coneGrad.addColorStop(1, `rgba(226, 232, 240, ${0.23 * envAct2})`);
+        ctx.fillStyle = coneGrad;
         ctx.beginPath();
-        ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(beamX, cy - coneHalfH);
+        ctx.lineTo(beamX, cy + coneHalfH);
+        ctx.closePath();
+        ctx.fill();
 
-        // Extra harmonic ripple ring mid-sweep
-        if (local > 0.25 && local < 0.72) {
-          const midAlpha = Math.sin(((local - 0.25) / 0.47) * Math.PI) * 0.22;
-          ctx.strokeStyle = `rgba(147, 197, 253, ${midAlpha})`;
-          ctx.beginPath();
-          ctx.arc(cx, cy, lerp(rInner, rOuter, 0.55), 0, Math.PI * 2);
-          ctx.stroke();
-        }
-
-        drawCross(cx, cy, 5, 0.32, true);
-
-        // Node pulls smoothly from outer orbit into exact `(cx, cy)`
-        const nodeDist = lerp(rOuter, 0, easeInOutCubic(clamp01((local - 0.62) / 0.38)));
-        const nx = cx + Math.cos(angle) * nodeDist;
-        const ny = cy + Math.sin(angle) * nodeDist;
-        drawNode(nx, ny, 5.5 * scale, 1);
-      } else if (p < 0.56) {
-        // ACT 2: Horizontal Beam Projection & Satellite Orbit (`28% -> 56%`)
-        const local = (p - 0.28) / 0.28;
-        const extend =
-          local < 0.45
-            ? easeOutCubic(local / 0.45)
-            : local > 0.8
-            ? 1 - easeInOutCubic((local - 0.8) / 0.2)
-            : 1;
-
-        const baseRadius = lerp(68, 128, easeOutCubic(clamp01(local / 0.35))) * scale;
-        const innerReticleR = 23 * scale;
-        const beamX = cx + lerp(0, 215 * scale, extend);
-        const coneHalfH = 38 * scale * extend;
-
-        // Horizontal projection light cone
-        if (extend > 0.04) {
-          const coneGrad = ctx.createLinearGradient(cx, cy, beamX, cy);
-          coneGrad.addColorStop(0, 'rgba(226, 232, 240, 0.03)');
-          coneGrad.addColorStop(0.7, 'rgba(191, 219, 254, 0.14)');
-          coneGrad.addColorStop(1, 'rgba(226, 232, 240, 0.24)');
-          ctx.fillStyle = coneGrad;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(beamX, cy - coneHalfH);
-          ctx.lineTo(beamX, cy + coneHalfH);
-          ctx.closePath();
-          ctx.fill();
-
-          // Horizontal axis line extending past node to fiducial `+`
-          const axisEnd = cx + 285 * scale * extend;
-          ctx.strokeStyle = 'rgba(226, 232, 240, 0.24)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(cx - innerReticleR, cy);
-          ctx.lineTo(axisEnd, cy);
-          ctx.stroke();
-          drawCross(axisEnd, cy, 4.5, 0.32 * extend, false);
-        }
-
-        // Primary circle & inner star reticle
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.34)';
+        const axisEnd = cx + 286 * scale * envAct2;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.24 * envAct2})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
+        ctx.moveTo(cx - rInner, cy);
+        ctx.lineTo(axisEnd, cy);
         ctx.stroke();
+        drawCross(axisEnd, cy, 4.5, 0.32 * envAct2, false);
 
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.38)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, innerReticleR, 0, Math.PI * 2);
-        ctx.stroke();
-        drawCross(cx, cy, 8 * scale, 0.45, false);
-        drawCross(cx, cy, 5 * scale, 0.3, true);
-
-        // Dashed satellite target ring around projected node
-        if (local > 0.32 && local < 0.92) {
-          const satAlpha = Math.sin(((local - 0.32) / 0.6) * Math.PI) * 0.28;
+        // Rotating dashed satellite target orbit around displaced node
+        const satEnv = envelope(t, 0.32, 0.39, 0.45, 0.53);
+        if (satEnv > 0.005) {
           ctx.save();
+          ctx.translate(beamX, cy);
+          ctx.rotate(sec * 0.45);
           ctx.setLineDash([4, 5]);
-          ctx.strokeStyle = `rgba(226, 232, 240, ${satAlpha})`;
+          ctx.strokeStyle = `rgba(226, 232, 240, ${0.28 * satEnv})`;
           ctx.beginPath();
-          ctx.arc(beamX, cy, 52 * scale, 0, Math.PI * 2);
+          ctx.arc(0, 0, 50 * scale, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
         }
+      }
 
-        drawNode(beamX, cy, 6.2 * scale, 1);
-      } else if (p < 0.77) {
-        // ACT 3: Viewfinder Target Lock -> Twin Intersecting Vesica Circles (`56% -> 77%`)
-        const local = (p - 0.56) / 0.21;
+      // --- LAYER C: Act 3 Viewfinder Brackets & Micro Squares (`0.51 -> 0.72`) ---
+      const envAct3 = envelope(t, 0.51, 0.58, 0.64, 0.72);
+      if (envAct3 > 0.004) {
+        const bracketScale = lerp(1.18, 1.0, smootherstep(clamp01((t - 0.51) / 0.1)));
+        const box = 42 * scale * bracketScale;
+        const arm = 13 * scale;
 
-        if (local < 0.58) {
-          const sub = local / 0.58;
-          const fade = sub < 0.2 ? sub / 0.2 : sub > 0.8 ? (1 - sub) / 0.2 : 1;
-          const dashR = 76 * scale;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.52 * envAct3})`;
+        ctx.lineWidth = 1.15;
+        ctx.beginPath();
+        ctx.moveTo(cx - box, cy - box + arm);
+        ctx.lineTo(cx - box, cy - box);
+        ctx.lineTo(cx - box + arm, cy - box);
+        ctx.moveTo(cx + box - arm, cy - box);
+        ctx.lineTo(cx + box, cy - box);
+        ctx.lineTo(cx + box, cy - box + arm);
+        ctx.moveTo(cx - box, cy + box - arm);
+        ctx.lineTo(cx - box, cy + box);
+        ctx.lineTo(cx - box + arm, cy + box);
+        ctx.moveTo(cx + box - arm, cy + box);
+        ctx.lineTo(cx + box, cy + box);
+        ctx.lineTo(cx + box, cy + box - arm);
+        ctx.stroke();
 
-          // Dashed outer lock circle
-          ctx.save();
-          ctx.setLineDash([5, 7]);
-          ctx.strokeStyle = `rgba(226, 232, 240, ${0.32 * fade})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.arc(cx, cy, dashR, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.restore();
+        // Micro telemetry squares
+        ctx.fillStyle = `rgba(226, 232, 240, ${0.25 * envAct3})`;
+        ctx.fillRect(cx - 39 * scale, cy - 39 * scale, 18 * scale, 18 * scale);
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.34 * envAct3})`;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cx - 58 * scale, cy - 14 * scale, 11 * scale, 11 * scale);
 
-          // 4 precision L-corner viewfinder brackets
-          const box = 42 * scale;
-          const arm = 13 * scale;
-          ctx.strokeStyle = `rgba(226, 232, 240, ${0.55 * fade})`;
-          ctx.lineWidth = 1.15;
-          ctx.beginPath();
-          // Top-left
-          ctx.moveTo(cx - box, cy - box + arm);
-          ctx.lineTo(cx - box, cy - box);
-          ctx.lineTo(cx - box + arm, cy - box);
-          // Top-right
-          ctx.moveTo(cx + box - arm, cy - box);
-          ctx.lineTo(cx + box, cy - box);
-          ctx.lineTo(cx + box, cy - box + arm);
-          // Bottom-left
-          ctx.moveTo(cx - box, cy + box - arm);
-          ctx.lineTo(cx - box, cy + box);
-          ctx.lineTo(cx - box + arm, cy + box);
-          // Bottom-right
-          ctx.moveTo(cx + box - arm, cy + box);
-          ctx.lineTo(cx + box, cy + box);
-          ctx.lineTo(cx + box, cy + box - arm);
-          ctx.stroke();
+        // Smoothly gliding twin telemetry rays
+        const sweepProgress = clamp01((t - 0.51) / 0.21);
+        const ray1 = Math.PI * 0.16 + sweepProgress * 0.28;
+        const ray2 = Math.PI * 0.37 + sweepProgress * 0.22;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.22 * envAct3})`;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(ray1) * 235 * scale, cy + Math.sin(ray1) * 235 * scale);
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(ray2) * 325 * scale, cy + Math.sin(ray2) * 325 * scale);
+        ctx.stroke();
+      }
 
-          // Floating micro telemetry squares (exact `o_07.png` detail)
-          ctx.fillStyle = `rgba(226, 232, 240, ${0.26 * fade})`;
-          ctx.fillRect(cx - 39 * scale, cy - 39 * scale, 19 * scale, 19 * scale);
-          ctx.strokeStyle = `rgba(226, 232, 240, ${0.36 * fade})`;
-          ctx.strokeRect(cx - 58 * scale, cy - 14 * scale, 11 * scale, 11 * scale);
+      // --- LAYER D: Twin Intersecting Vertical Vesica Circles (`0.65 -> 0.81`) ---
+      const envVesica = envelope(t, 0.65, 0.71, 0.75, 0.82);
+      if (envVesica > 0.004) {
+        const vesicaGrow = smootherstep(clamp01((t - 0.65) / 0.15));
+        const vRadius = lerp(96, 238, vesicaGrow) * scale;
+        const vOffset = lerp(42, 162, vesicaGrow) * scale;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.24 * envVesica})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy - vOffset, vRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy + vOffset, vRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
 
-          // Twin sweeping telemetry rays downward-right
-          const ray1 = Math.PI * 0.18 + sub * 0.24;
-          const ray2 = Math.PI * 0.39 + sub * 0.18;
-          ctx.strokeStyle = `rgba(226, 232, 240, ${0.22 * fade})`;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(cx + Math.cos(ray1) * 230 * scale, cy + Math.sin(ray1) * 230 * scale);
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(cx + Math.cos(ray2) * 320 * scale, cy + Math.sin(ray2) * 320 * scale);
-          ctx.stroke();
-
-          drawNode(cx, cy, 7 * scale, 1);
-        } else {
-          // Twin large vertical intersecting Vesica circles (`#09` & `#10`)
-          const sub = (local - 0.58) / 0.42;
-          const expand = easeInOutCubic(sub);
-          const vRadius = lerp(90, 235, expand) * scale;
-          const vOffset = lerp(45, 165, expand) * scale;
-          const alpha = Math.sin(sub * Math.PI) * 0.24 + 0.08;
-
-          ctx.strokeStyle = `rgba(226, 232, 240, ${alpha})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.arc(cx, cy - vOffset, vRadius, 0, Math.PI * 2);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(cx, cy + vOffset, vRadius, 0, Math.PI * 2);
-          ctx.stroke();
-
-          drawNode(cx, cy, lerp(6, 2.5, expand) * scale, 0.9);
-        }
-      } else if (p < 0.95) {
-        // ACT 4: Precision 48-Tick Calibrated Dial & High-Speed Orbit (`77% -> 95%`, `o_11.png`)
-        const local = (p - 0.77) / 0.18;
-        const intro = easeOutCubic(clamp01(local / 0.25));
-        const outro = local > 0.8 ? easeInOutCubic((local - 0.8) / 0.2) : 0;
-
-        const coreR = lerp(18, 72, intro) * (1 - outro * 0.55) * scale;
-        const innerRingR = coreR * 0.52;
-        const tickInnerR = lerp(70, 96, intro) * (1 - outro * 0.45) * scale;
-        const midRingR = lerp(95, 134, intro) * (1 - outro * 0.55) * scale;
-        const outerOrbitR = lerp(130, 206, intro) * (1 - outro * 0.65) * scale;
+      // --- LAYER E: Act 4 Calibrated 48-Tick Compass Dial & Matte Core (`0.74 -> 0.95`) ---
+      const envAct4 = envelope(t, 0.74, 0.81, 0.89, 0.96);
+      if (envAct4 > 0.004) {
+        const coreR = 70 * scale * envAct4;
+        const tickBaseR = lerp(74, 96, envAct4) * scale;
 
         // Vertical North meridian line
-        ctx.strokeStyle = `rgba(226, 232, 240, ${0.22 * (1 - outro)})`;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.22 * envAct4})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(cx, cy - coreR);
         ctx.lineTo(cx, cy - 330 * scale);
         ctx.stroke();
 
-        // Orbiting radar sector wedge (appears in second half of Act 4 like `#12`)
-        const orbitAngle = Math.PI * 0.38 + local * Math.PI * 2.4;
-        if (local > 0.35 && outro < 0.8) {
-          drawSectorWedge(
-            cx,
-            cy,
-            outerOrbitR,
-            orbitAngle,
-            Math.PI * 0.14,
-            0.22 * (1 - outro)
-          );
-        }
+        // Outer orbit radar wedge
+        drawSectorWedge(cx, cy, rMain, continuousOrbitAngle, Math.PI * 0.18, 0.2 * envAct4);
 
-        // Solid matte architectural disc + inner crosshair (`o_11.png`)
-        ctx.fillStyle = `rgba(203, 213, 225, ${0.58 * intro * (1 - outro * 0.85)})`;
+        // Matte silver-slate central disc
+        ctx.fillStyle = `rgba(203, 213, 225, ${0.58 * envAct4})`;
         ctx.beginPath();
         ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = `rgba(15, 23, 42, ${0.42 * intro * (1 - outro)})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(15, 23, 42, ${0.42 * envAct4})`;
         ctx.beginPath();
-        ctx.arc(cx, cy, innerRingR, 0, Math.PI * 2);
-        ctx.moveTo(cx - 10 * scale, cy);
-        ctx.lineTo(cx + 10 * scale, cy);
-        ctx.moveTo(cx, cy - 10 * scale);
-        ctx.lineTo(cx, cy + 10 * scale);
+        ctx.arc(cx, cy, coreR * 0.52, 0, Math.PI * 2);
+        ctx.moveTo(cx - 9 * scale, cy);
+        ctx.lineTo(cx + 9 * scale, cy);
+        ctx.moveTo(cx, cy - 9 * scale);
+        ctx.lineTo(cx, cy + 9 * scale);
         ctx.stroke();
 
-        // 48-tick radial compass dial
-        const tickAlpha = 0.28 * intro * (1 - outro);
-        if (tickAlpha > 0.01) {
-          ctx.strokeStyle = `rgba(226, 232, 240, ${tickAlpha})`;
-          ctx.beginPath();
-          for (let i = 0; i < 48; i += 1) {
-            const ta = (i / 48) * Math.PI * 2;
-            const len = (i % 4 === 0 ? 13 : 7) * scale;
-            ctx.moveTo(cx + Math.cos(ta) * tickInnerR, cy + Math.sin(ta) * tickInnerR);
-            ctx.lineTo(
-              cx + Math.cos(ta) * (tickInnerR + len),
-              cy + Math.sin(ta) * (tickInnerR + len)
-            );
-          }
-          ctx.stroke();
+        // Gently rotating 48-tick precision compass dial
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(sec * 0.12);
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.28 * envAct4})`;
+        ctx.beginPath();
+        for (let i = 0; i < 48; i += 1) {
+          const ta = (i / 48) * Math.PI * 2;
+          const len = (i % 4 === 0 ? 13 : 7) * scale;
+          ctx.moveTo(Math.cos(ta) * tickBaseR, Math.sin(ta) * tickBaseR);
+          ctx.lineTo(Math.cos(ta) * (tickBaseR + len), Math.sin(ta) * (tickBaseR + len));
         }
-
-        // Middle & outer orbital rings
-        ctx.strokeStyle = `rgba(226, 232, 240, ${0.26 * (1 - outro * 0.5)})`;
-        ctx.beginPath();
-        ctx.arc(cx, cy, midRingR, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
+      }
 
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.48)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, outerOrbitR, 0, Math.PI * 2);
-        ctx.stroke();
+      // --- LAYER F: Act 5 Final Iris Convergence (`0.91 -> 1.00`) ---
+      const envAct5 = smootherstep(clamp01((t - 0.91) / 0.06));
+      if (envAct5 > 0.004) {
+        drawSectorWedge(cx, cy, rMain, continuousOrbitAngle, Math.PI * 0.42, 0.16 * envAct5);
 
-        const nx = cx + Math.cos(orbitAngle) * outerOrbitR;
-        const ny = cy + Math.sin(orbitAngle) * outerOrbitR;
-        drawNode(nx, ny, 5.5 * scale, 1);
-      } else {
-        // ACT 5: Tight Final Iris Lock at `95% -> 100%` (`exit_sheet.png` 7.70s -> 7.90s)
-        const local = clamp01((p - 0.95) / 0.05);
-        const rOuter = lerp(68, 46, easeOutCubic(local)) * scale;
-        const rInner = lerp(34, 24, easeOutCubic(local)) * scale;
-        const angle = lerp(-Math.PI * 1.15, -Math.PI * 0.5, easeInOutCubic(local));
-
-        drawSectorWedge(cx, cy, rOuter, angle, Math.PI * 0.45, 0.16 * (1 - local * 0.5));
-
-        // Lower-left diagonal lock line
         const rayAngle = Math.PI * 0.82;
-        ctx.strokeStyle = `rgba(226, 232, 240, ${0.24 * (1 - local * 0.35)})`;
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.24 * envAct5})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(rayAngle) * rOuter, cy + Math.sin(rayAngle) * rOuter);
+        ctx.moveTo(cx + Math.cos(rayAngle) * rMain, cy + Math.sin(rayAngle) * rMain);
         ctx.lineTo(
-          cx + Math.cos(rayAngle) * lerp(360, 180, local) * scale,
-          cy + Math.sin(rayAngle) * lerp(360, 180, local) * scale
+          cx + Math.cos(rayAngle) * 240 * scale,
+          cy + Math.sin(rayAngle) * 240 * scale
         );
         ctx.stroke();
+      }
 
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.48)';
+      // --- PERSISTENT PRIMARY & INNER RINGS (Never cut, smoothly morph across all 5 acts!) ---
+      const dashedBlend = envelope(t, 0.53, 0.58, 0.65, 0.71);
+      const solidMainAlpha = (0.44 - dashedBlend * 0.34) * masterIn;
+      if (solidMainAlpha > 0.01) {
+        ctx.strokeStyle = `rgba(226, 232, 240, ${solidMainAlpha})`;
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rMain, 0, Math.PI * 2);
         ctx.stroke();
+      }
+      if (dashedBlend > 0.01) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(-sec * 0.22);
+        ctx.setLineDash([5, 7]);
+        ctx.strokeStyle = `rgba(226, 232, 240, ${0.38 * dashedBlend})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, 0, rMain, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
 
-        ctx.strokeStyle = 'rgba(226, 232, 240, 0.28)';
+      const innerAlpha = (1 - envelope(t, 0.56, 0.61, 0.71, 0.77) * 0.75) * 0.28 * masterIn;
+      if (innerAlpha > 0.01) {
+        ctx.strokeStyle = `rgba(226, 232, 240, ${innerAlpha})`;
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
         ctx.stroke();
+      }
 
-        drawCross(cx, cy, 3.5, 0.35, true);
+      // Center subtle reticle
+      const centerReticleAlpha = (1 - envAct4) * 0.34 * masterIn;
+      drawCross(cx, cy, 5 * scale, centerReticleAlpha, true);
+      if (envAct2 > 0.02) {
+        drawCross(cx, cy, 8 * scale, 0.4 * envAct2, false);
+      }
 
-        const nx = cx + Math.cos(angle) * rOuter;
-        const ny = cy + Math.sin(angle) * rOuter;
-        drawNode(nx, ny, 4.5 * scale, 1);
+      // --- PERSISTENT PRIMARY NODE (Continuous position across all 5 acts!) ---
+      const orbitWeight =
+        (1 - smootherstep(clamp01((t - 0.19) / 0.09))) +
+        smootherstep(clamp01((t - 0.75) / 0.08));
+      const clampedOrbitW = clamp01(orbitWeight);
+
+      const orbitX = cx + Math.cos(continuousOrbitAngle) * rMain;
+      const orbitY = cy + Math.sin(continuousOrbitAngle) * rMain;
+      const centerOrBeamX = cx + beamDisplacement;
+      const centerOrBeamY = cy;
+
+      const nodeX = lerp(centerOrBeamX, orbitX, clampedOrbitW);
+      const nodeY = lerp(centerOrBeamY, orbitY, clampedOrbitW);
+      const nodeRadius =
+        lerp(6.2, 5.4, clampedOrbitW) *
+        (1 - envelope(t, 0.67, 0.71, 0.73, 0.77) * 0.45) *
+        scale;
+
+      drawNode(nodeX, nodeY, nodeRadius, masterIn);
+
+      // --- RADIAL LUMINOUS BLOOM AT 100% (`bloomT: 0 -> 1`) ---
+      if (bloomT > 0) {
+        const bloomEase = smootherstep(bloomT);
+        const maxDiag = Math.hypot(width, height) * 0.75;
+        const bloomR = Math.max(8, bloomEase * maxDiag * 1.35);
+        const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, bloomR);
+        radGrad.addColorStop(0, `rgba(248, 250, 252, ${clamp01(bloomEase * 1.25)})`);
+        radGrad.addColorStop(0.55, `rgba(241, 245, 249, ${bloomEase * 0.92})`);
+        radGrad.addColorStop(1, `rgba(241, 245, 249, ${bloomEase * bloomEase})`);
+        ctx.fillStyle = radGrad;
+        ctx.fillRect(0, 0, width, height);
       }
 
       ctx.restore();
 
-      if (!completedRef.current && rawT < 1) {
+      if (!completedRef.current && bloomT < 1) {
         rafId = requestAnimationFrame(renderFrame);
       }
     };
@@ -639,15 +631,14 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
     };
-  }, [triggerLuminousExit]);
+  }, [finishSequence, onRevealStart]);
 
   const captions = isEn
     ? ['', 'From idea', 'Through engineering', 'To real impact']
     : ['', 'Dari gagasan', 'Melalui rekayasa', 'Menjadi solusi nyata'];
 
   const activeCaption = captions[phaseIndex] || '';
-  const paddedPercent = String(percent).padStart(3, '0');
-  const isDissolving = flashPhase === 'dissolve';
+  const isDissolving = exitState === 'dissolve';
 
   return (
     <motion.div
@@ -655,91 +646,94 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
       data-v2-opening="active"
       initial={{ opacity: 1 }}
       animate={{ opacity: isDissolving ? 0 : 1 }}
-      transition={{ duration: isDissolving ? 0.84 : 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed inset-0 z-[180] select-none overflow-hidden ${
+      transition={{ duration: isDissolving ? 1.25 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+      className={`fixed inset-0 z-[180] select-none overflow-hidden bg-[#0b0c0f] ${
         isDissolving ? 'pointer-events-none' : 'pointer-events-auto'
       }`}
       aria-live="polite"
       aria-label="Loading portfolio"
     >
-      {/* 60fps Orbital Telemetry Canvas */}
+      {/* 60/120fps Continuous Orbital Telemetry Canvas */}
       <canvas ref={canvasRef} className="block h-full w-full" />
 
-      {/* Top-Left HUD Label */}
-      <div className="pointer-events-none absolute top-6 left-5 sm:top-7 sm:left-7 flex items-center gap-3">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#e2e8f0] shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.34em] text-white/55">
-          PAGE PRELOADER
-        </span>
-      </div>
-
-      {/* Top-Right Subtle Skip Control */}
-      <button
-        type="button"
-        onClick={handleSkip}
-        className="absolute top-5 right-5 sm:top-6 sm:right-7 rounded-full border border-white/10 bg-white/[0.02] px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45 hover:border-[#3b82f6]/60 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+      {/* HUD Overlay (fades gently as 100% radial light bloom expands) */}
+      <div
+        className={`transition-opacity duration-500 ${
+          exitState !== 'running' ? 'opacity-0' : 'opacity-100'
+        }`}
       >
-        {isEn ? 'SKIP' : 'LEWATI'}
-      </button>
+        {/* Top-Left HUD Label */}
+        <div className="pointer-events-none absolute top-6 left-5 sm:top-7 sm:left-7 flex items-center gap-3">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#e2e8f0] shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.34em] text-white/55">
+            PAGE PRELOADER
+          </span>
+        </div>
 
-      {/* Bottom-Left Sequence Stamp */}
-      <div className="pointer-events-none absolute bottom-6 left-5 sm:bottom-7 sm:left-7 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.28em] text-white/40">
-        SEQ 001 &nbsp;—&nbsp; EST.2026
-      </div>
+        {/* Top-Right Subtle Skip Control */}
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="absolute top-5 right-5 sm:top-6 sm:right-7 rounded-full border border-white/10 bg-white/[0.02] px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45 hover:border-[#3b82f6]/60 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+        >
+          {isEn ? 'SKIP' : 'LEWATI'}
+        </button>
 
-      {/* Bottom-Center Stage Caption (`From idea` -> `Through engineering` -> `To real impact`) */}
-      <div className="pointer-events-none absolute bottom-12 sm:bottom-14 inset-x-0 flex justify-center">
-        <AnimatePresence mode="wait">
-          {activeCaption && (
-            <motion.p
-              key={activeCaption}
-              initial={{ opacity: 0, y: 6, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -6, filter: 'blur(6px)' }}
-              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-              className="font-mono text-[11px] sm:text-[13px] tracking-[0.16em] text-white/38"
+        {/* Bottom-Left Sequence Stamp */}
+        <div className="pointer-events-none absolute bottom-6 left-5 sm:bottom-7 sm:left-7 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.28em] text-white/40">
+          SEQ 001 &nbsp;—&nbsp; EST.2026
+        </div>
+
+        {/* Bottom-Center Stage Caption */}
+        <div className="pointer-events-none absolute bottom-12 sm:bottom-14 inset-x-0 flex justify-center">
+          <AnimatePresence mode="wait">
+            {activeCaption && (
+              <motion.p
+                key={activeCaption}
+                initial={{ opacity: 0, y: 6, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -6, filter: 'blur(6px)' }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="font-mono text-[11px] sm:text-[13px] tracking-[0.16em] text-white/38"
+              >
+                {activeCaption}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Bottom-Right Oversized 3-Digit Tabular Percentage (Direct DOM Ref = 0 React re-render jitter!) */}
+        <div className="pointer-events-none absolute bottom-4 right-5 sm:bottom-5 sm:right-7 text-right">
+          <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.36em] text-white/45">
+            LOADING
+          </p>
+          <div className="flex items-baseline justify-end leading-none text-[#f4f4f5] tabular-nums">
+            <span
+              ref={counterRef}
+              className="text-[54px] sm:text-[78px] font-light tracking-[-0.03em]"
             >
-              {activeCaption}
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </div>
+              000
+            </span>
+            <span className="ml-1.5 text-[20px] sm:text-[26px] font-light text-white/50">
+              %
+            </span>
+          </div>
+        </div>
 
-      {/* Bottom-Right Oversized 3-Digit Tabular Percentage (`000% -> 100%`) */}
-      <div className="pointer-events-none absolute bottom-4 right-5 sm:bottom-5 sm:right-7 text-right">
-        <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.36em] text-white/45">
-          LOADING
-        </p>
-        <div className="flex items-baseline justify-end leading-none text-[#f4f4f5] tabular-nums">
-          <span className="text-[54px] sm:text-[78px] font-light tracking-[-0.03em]">
-            {paddedPercent}
-          </span>
-          <span className="ml-1.5 text-[20px] sm:text-[26px] font-light text-white/50">
-            %
-          </span>
+        {/* Bottom-Edge GPU `scaleX` Hairline Progress Bar */}
+        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-[2px] bg-white/[0.06] overflow-hidden">
+          <div
+            ref={progressBarRef}
+            style={{ transform: 'scaleX(0)', transformOrigin: 'left center' }}
+            className="h-full w-full bg-gradient-to-r from-[#3b82f6] via-[#93c5fd] to-[#f8fafc] shadow-[0_0_12px_rgba(59,130,246,0.75)] will-change-transform"
+          />
         </div>
       </div>
 
-      {/* Bottom-Edge Hairline Progress Bar */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-[2px] bg-white/[0.06]">
-        <div
-          style={{ width: `${percent}%` }}
-          className="h-full bg-gradient-to-r from-[#3b82f6] via-[#93c5fd] to-[#f8fafc] shadow-[0_0_12px_rgba(59,130,246,0.75)] transition-[width] duration-100 ease-out"
-        />
-      </div>
-
-      {/* Luminous 100% Flash Veil (`exit_sheet.png` 8.10s -> 8.60s smooth white-icy reveal) */}
-      <AnimatePresence>
-        {flashPhase !== 'idle' && (
-          <motion.div
-            key="v2-luminous-veil"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="pointer-events-none absolute inset-0 bg-[#f1f5f9]"
-          />
-        )}
-      </AnimatePresence>
+      {/* Silk Luminous Veil held seamlessly across dissolve */}
+      {exitState === 'dissolve' && (
+        <div className="pointer-events-none absolute inset-0 bg-[#f1f5f9]" />
+      )}
     </motion.div>
   );
 }
