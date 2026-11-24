@@ -25,11 +25,12 @@ import { directEmail, contactChannelsData } from '../data/contact';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink, useRouter } from '../context/RouterContext';
+import V2OpeningSequence from './V2OpeningSequence';
+import { hasCompletedV2Opening } from './v2OpeningState';
 import './v2.css';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 const SERVICES_EASE = [0.4, 0, 0.2, 1];
-let hasPlayedV2Splash = false;
 
 /* ==========================================================================
    Scroll & Typography Primitives (1:1 Nakula Mechanics)
@@ -620,15 +621,15 @@ export default function PortfolioV2() {
   const { navigate, switchLanguage } = useRouter();
   const isEn = language === 'en';
 
-  const hasInitialHash =
-    typeof window !== 'undefined' && Boolean(window.location.hash);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showOpening, setShowOpening] = useState(
+    () => !shouldReduceMotion && !hasCompletedV2Opening()
+  );
   const [showSplash, setShowSplash] = useState(
-    () => !shouldReduceMotion && !hasPlayedV2Splash && !hasInitialHash
+    () => !shouldReduceMotion && hasCompletedV2Opening()
   );
   const [heroIntroComplete, setHeroIntroComplete] = useState(() =>
-    Boolean(shouldReduceMotion || hasPlayedV2Splash || hasInitialHash)
+    Boolean(shouldReduceMotion)
   );
   const [isWordmarkCompact, setIsWordmarkCompact] = useState(false);
   const [isHeroExited, setIsHeroExited] = useState(false);
@@ -703,16 +704,26 @@ export default function PortfolioV2() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Nakula Full-Screen Blue Splash Preloader -> Pure Black Beat -> Hero Blur-Reveal
+  // Initial site entry plays Orbital Telemetry Opening (`showOpening`);
+  // Returning to Home from another V2 page plays the `#3b82f6` Blue Curtain (`showSplash`).
   useEffect(() => {
-    if (shouldReduceMotion || hasPlayedV2Splash || hasInitialHash) {
-      hasPlayedV2Splash = true;
+    if (shouldReduceMotion) {
+      setShowOpening(false);
       setShowSplash(false);
       setHeroIntroComplete(true);
       return undefined;
     }
 
-    hasPlayedV2Splash = true;
+    if (!hasCompletedV2Opening()) {
+      setShowOpening(true);
+      setShowSplash(false);
+      setHeroIntroComplete(false);
+      return undefined;
+    }
+
+    setShowOpening(false);
+    setShowSplash(true);
+    setHeroIntroComplete(false);
 
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
@@ -726,9 +737,9 @@ export default function PortfolioV2() {
       clearTimeout(splashTimer);
       clearTimeout(readyTimer);
     };
-  }, [hasInitialHash, shouldReduceMotion]);
+  }, [shouldReduceMotion]);
 
-  // Scroll to target anchor on hash arrival (e.g. from `/study-case` -> `/#v2-about`) or reset to top
+  // Scroll to target anchor underneath blue curtain on hash arrival (e.g. `/#v2-about`) or reset to top
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     if (window.location.hash) {
@@ -737,9 +748,9 @@ export default function PortfolioV2() {
         const el = document.getElementById(id);
         if (el) {
           if (lenisRef.current) {
-            lenisRef.current.scrollTo(el, { offset: -72 });
+            lenisRef.current.scrollTo(el, { offset: -72, immediate: true });
           } else {
-            el.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
+            el.scrollIntoView({ behavior: 'auto' });
           }
         }
       }, 60);
@@ -1082,7 +1093,21 @@ export default function PortfolioV2() {
   return (
     <div className="v2-portfolio-root" data-portfolio-version="2">
       {/* ====================================================================
-          0. NAKULA ELECTRIC BLUE (#3B82F6) SPLASH PRELOADER
+          0A. INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
+          ==================================================================== */}
+      {showOpening && (
+        <V2OpeningSequence
+          isEn={isEn}
+          onRevealStart={() => setHeroIntroComplete(true)}
+          onComplete={() => {
+            setHeroIntroComplete(true);
+            setShowOpening(false);
+          }}
+        />
+      )}
+
+      {/* ====================================================================
+          0B. PAGE TRANSITION — ELECTRIC BLUE (#3B82F6) CURTAIN
           ==================================================================== */}
       <AnimatePresence>
         {showSplash && (

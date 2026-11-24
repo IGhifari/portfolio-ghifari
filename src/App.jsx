@@ -15,6 +15,7 @@ import Profile from './components/Profile';
 import Project from './components/Project';
 import PortfolioSwitcher from './components/PortfolioSwitcher';
 import PortfolioV2 from './v2/PortfolioV2';
+import { hasCompletedV2Opening } from './v2/v2OpeningState';
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -145,16 +146,17 @@ const AppContent = () => {
     }, [isV2Active, route.type]);
 
     if (isV2Active) {
+        const v2FallbackBg = hasCompletedV2Opening() ? 'bg-[#3b82f6]' : 'bg-[#0b0c0f]';
         return (
             <>
                 {route.type === 'home' && <PortfolioV2 />}
                 {route.type === 'study-case-list' && (
-                    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+                    <Suspense fallback={<div className={`fixed inset-0 z-[150] ${v2FallbackBg}`} />}>
                         <WorksListV2 />
                     </Suspense>
                 )}
                 {route.type === 'study-case-detail' && (
-                    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+                    <Suspense fallback={<div className={`fixed inset-0 z-[150] ${v2FallbackBg}`} />}>
                         <WorkDetailV2 slug={route.slug} />
                     </Suspense>
                 )}

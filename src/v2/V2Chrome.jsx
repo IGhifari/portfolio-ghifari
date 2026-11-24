@@ -17,6 +17,8 @@ import { directEmail, contactChannelsData } from '../data/contact';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink, useRouter } from '../context/RouterContext';
+import V2OpeningSequence from './V2OpeningSequence';
+import { hasCompletedV2Opening } from './v2OpeningState';
 import './v2.css';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -244,6 +246,20 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [jakartaTime, setJakartaTime] = useState('');
+  const [activeScrollKey, setActiveScrollKey] = useState(scrollKey);
+  const [showOpening, setShowOpening] = useState(
+    () => !shouldReduceMotion && !hasCompletedV2Opening()
+  );
+  const [showPageCurtain, setShowPageCurtain] = useState(
+    () => !shouldReduceMotion && hasCompletedV2Opening()
+  );
+
+  if (activeScrollKey !== scrollKey) {
+    setActiveScrollKey(scrollKey);
+    if (!shouldReduceMotion && hasCompletedV2Opening()) {
+      setShowPageCurtain(true);
+    }
+  }
 
   const lenisRef = useRef(null);
   const ctaSectionRef = useRef(null);
@@ -290,14 +306,33 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
     };
   }, [shouldReduceMotion]);
 
-  // Reset scroll to top cleanly when switching between projects
+  // Reset scroll to top cleanly when switching between projects + run blue page curtain
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
     }
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [scrollKey]);
+
+    if (shouldReduceMotion) {
+      setShowOpening(false);
+      setShowPageCurtain(false);
+      return undefined;
+    }
+
+    if (!hasCompletedV2Opening()) {
+      setShowOpening(true);
+      setShowPageCurtain(false);
+      return undefined;
+    }
+
+    setShowPageCurtain(true);
+    const curtainTimer = setTimeout(() => {
+      setShowPageCurtain(false);
+    }, 1250);
+
+    return () => clearTimeout(curtainTimer);
+  }, [scrollKey, shouldReduceMotion]);
 
   // Live GMT+7 clock
   useEffect(() => {
@@ -361,6 +396,57 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
   return (
     <div className="v2-portfolio-root" data-portfolio-version="2">
+      {/* ====================================================================
+          INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
+          ==================================================================== */}
+      {showOpening && (
+        <V2OpeningSequence
+          isEn={isEn}
+          onComplete={() => setShowOpening(false)}
+        />
+      )}
+
+      {/* ====================================================================
+          ELECTRIC BLUE (#3B82F6) PAGE TRANSITION CURTAIN
+          ==================================================================== */}
+      <AnimatePresence>
+        {showPageCurtain && (
+          <motion.div
+            key={`v2-subpage-curtain-${scrollKey}`}
+            data-v2-splash="active"
+            initial={{ y: '0%' }}
+            exit={{
+              y: '-100%',
+              transition: {
+                duration: 1.12,
+                ease: [0.65, 0, 0.35, 1],
+              },
+            }}
+            className="fixed inset-0 z-[150] flex items-center justify-center bg-[#3b82f6] select-none pointer-events-none will-change-transform"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, filter: 'blur(6px)' }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                filter: 'blur(0px)',
+                transition: {
+                  duration: 0.65,
+                  delay: 0.14,
+                  ease: NAKULA_EASE,
+                },
+              }}
+              className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,5.8vw,5.25rem)] leading-none px-4 py-2 will-change-transform"
+            >
+              {siteConfig.brandName}
+              <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
+                ®
+              </span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ====================================================================
           FIXED COMPACT NAKULA NAVBAR (Wordmark starts Small on `/works` & `/works/:slug`)
           ==================================================================== */}
