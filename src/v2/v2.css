@@ -38,8 +38,8 @@ html.v2-scroll-root body {
   --v2-text-bright: #ffffff;
   --v2-text-muted: #858585;
   --v2-text-dim: #555555;
-  --v2-accent: #ff4925;
-  --v2-accent-hover: #bd2608;
+  --v2-accent: #3b82f6;
+  --v2-accent-hover: #2563eb;
   --v2-online: #47c554;
   --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
   --v2-font-sans: 'Geist Variable', 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
@@ -268,8 +268,8 @@ html.v2-scroll-root body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 22%;
-  filter: contrast(1.24) saturate(1.18) sepia(0.28) hue-rotate(-14deg) brightness(0.84);
+  object-position: center 58%;
+  filter: grayscale(0.45) contrast(1.22) brightness(0.84);
   transform: scale(1.06);
 }
 
@@ -277,9 +277,48 @@ html.v2-scroll-root body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 48% 52%, rgba(255, 73, 37, 0.32) 0%, rgba(10, 10, 10, 0.78) 70%),
+    radial-gradient(circle at 48% 52%, rgba(59, 130, 246, 0.36) 0%, rgba(10, 10, 10, 0.78) 70%),
     linear-gradient(155deg, rgba(10, 10, 10, 0.85) 8%, transparent 45%, rgba(10, 10, 10, 0.92) 90%);
   mix-blend-mode: screen;
+}
+
+/* Nakula Hero Bottom "TRUSTED BY / VERIFIED TRACK" Edge-Faded Infinite Marquee */
+.v2-hero-marquee-mask {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000000 14%,
+    #000000 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000000 14%,
+    #000000 86%,
+    transparent 100%
+  );
+}
+
+@keyframes v2-marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.v2-hero-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: v2-marquee-scroll 24s linear infinite;
+  will-change: transform;
+}
+
+.v2-hero-marquee-mask:hover .v2-hero-marquee-track {
+  animation-play-state: paused;
 }
 
 /* ==========================================================================
@@ -377,12 +416,46 @@ html.v2-scroll-root body {
 }
 
 /* ==========================================================================
-   Pre-Footer Contact Spotlight Atmospheric Layer
+   Pre-Footer Contact Spotlight Atmospheric Layer (Electric Cobalt Blue)
    ========================================================================== */
 .v2-cta-spotlight {
   background:
-    radial-gradient(ellipse 38% 58% at 54% 44%, rgba(255, 118, 64, 0.26) 0%, rgba(255, 73, 37, 0.09) 42%, rgba(10, 10, 10, 0) 72%),
-    linear-gradient(125deg, rgba(10, 10, 10, 0.96) 28%, rgba(255, 255, 255, 0.04) 50%, rgba(10, 10, 10, 0.98) 74%);
+    radial-gradient(ellipse 38% 58% at 54% 44%, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.11) 42%, rgba(10, 10, 10, 0) 72%),
+    linear-gradient(125deg, rgba(10, 10, 10, 0.96) 28%, rgba(147, 197, 253, 0.05) 50%, rgba(10, 10, 10, 0.98) 74%);
+}
+
+/* ==========================================================================
+   /works & MORE WORKS Grid Card — Exact Nakula Hover Scale(0.92) + Inner Counter-Scale(1.09)
+   ========================================================================== */
+.v2-works-grid-mask {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.3518;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #141414;
+  border: 1px solid #1e1e1e;
+  transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.v2-works-grid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v2-works-grid-card:hover .v2-works-grid-mask {
+    transform: scale(0.92);
+  }
+
+  .v2-works-grid-card:hover .v2-works-grid-img {
+    transform: scale(1.09);
+  }
 }
 
 /* Reduced Motion Compliance */
@@ -395,13 +468,21 @@ html.v2-scroll-root body {
   .v2-rollover-track,
   .v2-drawer-nav-label::after,
   .v2-work-card-img,
+  .v2-works-grid-mask,
+  .v2-works-grid-img,
   .v2-pill-btn {
     transition: none !important;
   }
 
+  .v2-hero-marquee-track {
+    animation: none !important;
+  }
+
   .v2-pill-btn:hover .v2-rollover-track,
   .v2-pill-btn:focus-visible .v2-rollover-track,
-  .v2-work-card-frame:hover .v2-work-card-img {
+  .v2-work-card-frame:hover .v2-work-card-img,
+  .v2-works-grid-card:hover .v2-works-grid-mask,
+  .v2-works-grid-card:hover .v2-works-grid-img {
     transform: none !important;
   }
 }

@@ -17,7 +17,7 @@ import { FiArrowUpRight, FiCheck, FiCopy, FiMinus, FiPlus, FiX } from 'react-ico
 
 import { siteConfig } from '../config/site';
 import { profileData } from '../data/profile';
-import { selectedProjects, otherProjects, allProjects } from '../data/projects';
+import { selectedProjects, allProjects } from '../data/projects';
 import { experiences } from '../data/experience';
 import { educationMetadata } from '../data/education';
 import { techCategoriesData } from '../data/skills';
@@ -28,6 +28,8 @@ import { RouterLink, useRouter } from '../context/RouterContext';
 import './v2.css';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
+const SERVICES_EASE = [0.4, 0, 0.2, 1];
+let hasPlayedV2Splash = false;
 
 /* ==========================================================================
    Scroll & Typography Primitives (1:1 Nakula Mechanics)
@@ -97,7 +99,7 @@ function CountUpMetricCell({ numeral, suffix, label, index, isTriggered, shouldR
         <span className="text-[52px] sm:text-[76px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[#cacaca]">
           {count}
         </span>
-        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[#ff4925]">
+        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[#3b82f6]">
           {suffix}
         </span>
       </div>
@@ -355,7 +357,7 @@ function WorkShowcaseCard({
         <RouterLink
           to={`/study-case/${project.id}`}
           aria-label={`${project.title} — ${subtitleText}`}
-          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[12px]"
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-[12px]"
         >
           <div
             className="v2-work-card-frame aspect-[16/11] lg:aspect-auto"
@@ -399,7 +401,7 @@ function WorkShowcaseCard({
         <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.05] text-[#cacaca]">
           <RouterLink
             to={`/study-case/${project.id}`}
-            className="hover:text-[#ff4925] transition-colors"
+            className="hover:text-[#3b82f6] transition-colors"
           >
             {project.title}
           </RouterLink>
@@ -411,10 +413,10 @@ function WorkShowcaseCard({
         <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-semibold uppercase tracking-[-0.02em]">
           <RouterLink
             to={`/study-case/${project.id}`}
-            className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925]"
+            className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#3b82f6]"
           >
             <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
           </RouterLink>
           {project.live && (
             <a
@@ -424,7 +426,7 @@ function WorkShowcaseCard({
               className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
             >
               <span>Live</span>
-              <FiArrowUpRight size={13} className="text-[#ff4925]" />
+              <FiArrowUpRight size={13} className="text-[#3b82f6]" />
             </a>
           )}
           {project.github && (
@@ -435,7 +437,7 @@ function WorkShowcaseCard({
               className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
             >
               <span>GitHub</span>
-              <FiArrowUpRight size={13} className="text-[#ff4925]" />
+              <FiArrowUpRight size={13} className="text-[#3b82f6]" />
             </a>
           )}
         </div>
@@ -511,7 +513,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
                   <div className="space-y-1">
                     <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
                       {item.step}
-                      <span className="text-[#ff4925]">.</span>
+                      <span className="text-[#3b82f6]">.</span>
                     </p>
                     <p className="text-[12px] font-medium uppercase text-[#555555]">
                       {item.period}
@@ -521,7 +523,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
                     <h3 className="text-[34px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
                       {item.title}
                     </h3>
-                    <p className="text-[14px] font-semibold text-[#ff4925]">{item.subtitle}</p>
+                    <p className="text-[14px] font-semibold text-[#3b82f6]">{item.subtitle}</p>
                     <p className="text-[15px] leading-[1.4] text-[#858585]">{item.body}</p>
                   </div>
                 </article>
@@ -574,7 +576,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
                 <div className="space-y-1.5">
                   <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
                     {item.step}
-                    <span className="text-[#ff4925]">.</span>
+                    <span className="text-[#3b82f6]">.</span>
                   </p>
                   <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#555555]">
                     {item.period}
@@ -585,7 +587,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
                   <h3 className="text-[40px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
                     {item.title}
                   </h3>
-                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[#ff4925]">
+                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[#3b82f6]">
                     {item.subtitle}
                   </p>
                   <p className="text-[16px] leading-[1.35] tracking-[-0.02em] text-[#858585]">
@@ -615,12 +617,19 @@ NakulaProcessSection.propTypes = {
 export default function PortfolioV2() {
   const shouldReduceMotion = useReducedMotion();
   const { language } = useLanguage();
-  const { switchLanguage } = useRouter();
+  const { navigate, switchLanguage } = useRouter();
   const isEn = language === 'en';
 
+  const hasInitialHash =
+    typeof window !== 'undefined' && Boolean(window.location.hash);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showSplash, setShowSplash] = useState(() => !shouldReduceMotion);
-  const [heroIntroComplete, setHeroIntroComplete] = useState(() => Boolean(shouldReduceMotion));
+  const [showSplash, setShowSplash] = useState(
+    () => !shouldReduceMotion && !hasPlayedV2Splash && !hasInitialHash
+  );
+  const [heroIntroComplete, setHeroIntroComplete] = useState(() =>
+    Boolean(shouldReduceMotion || hasPlayedV2Splash || hasInitialHash)
+  );
   const [isWordmarkCompact, setIsWordmarkCompact] = useState(false);
   const [isHeroExited, setIsHeroExited] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() =>
@@ -631,13 +640,13 @@ export default function PortfolioV2() {
   );
   const [activeSection, setActiveSection] = useState('v2-top');
   const [activeWorkIdx, setActiveWorkIdx] = useState(0);
-  const [openCapabilityIdx, setOpenCapabilityIdx] = useState(0);
+  const [openCapabilityIdx, setOpenCapabilityIdx] = useState(-1);
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
-  const [showAllWorks, setShowAllWorks] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [jakartaTime, setJakartaTime] = useState('');
 
   const lenisRef = useRef(null);
+  const capabilityLeaveTimerRef = useRef(null);
   const metricsGridRef = useRef(null);
   const highlightImgRef = useRef(null);
   const ctaSectionRef = useRef(null);
@@ -675,12 +684,12 @@ export default function PortfolioV2() {
   });
   const ctaSpotlightY = useTransform(ctaProgress, [0, 1], [0, 72]);
 
-  // 5) Footer Bottom Orange Banner Curtain-Slide (`translateY -340px -> 0px` from behind `z-3` Dark Footer)
+  // 5) Footer Bottom Blue Banner Curtain-Slide (`translateY -340px -> 0px` from behind `z-3` Dark Footer)
   const { scrollYProgress: footerProgress } = useScroll({
     target: footerRef,
     offset: ['start end', 'end end'],
   });
-  const orangeBannerY = useTransform(footerProgress, [0, 1], [-340, 0]);
+  const accentBannerY = useTransform(footerProgress, [0, 1], [-340, 0]);
 
   // Viewport responsive breakpoint tracking
   useEffect(() => {
@@ -694,26 +703,50 @@ export default function PortfolioV2() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Nakula Splash Preloader
+  // Nakula Full-Screen Blue Splash Preloader -> Pure Black Beat -> Hero Blur-Reveal
   useEffect(() => {
-    if (shouldReduceMotion) {
+    if (shouldReduceMotion || hasPlayedV2Splash || hasInitialHash) {
+      hasPlayedV2Splash = true;
       setShowSplash(false);
       setHeroIntroComplete(true);
       return undefined;
     }
 
+    hasPlayedV2Splash = true;
+
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 760);
+    }, 1850);
 
     const readyTimer = setTimeout(() => {
       setHeroIntroComplete(true);
-    }, 840);
+    }, 2920);
 
     return () => {
       clearTimeout(splashTimer);
       clearTimeout(readyTimer);
     };
+  }, [hasInitialHash, shouldReduceMotion]);
+
+  // Scroll to target anchor on hash arrival (e.g. from `/study-case` -> `/#v2-about`) or reset to top
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (window.location.hash) {
+      const id = window.location.hash.replace(/^#/, '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (lenisRef.current) {
+            lenisRef.current.scrollTo(el, { offset: -72 });
+          } else {
+            el.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
+          }
+        }
+      }, 60);
+      return () => clearTimeout(timer);
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    return undefined;
   }, [shouldReduceMotion]);
 
   // Enable viewport-level position:sticky strictly inside Portfolio V2
@@ -827,6 +860,35 @@ export default function PortfolioV2() {
     },
     [shouldReduceMotion]
   );
+
+  // Cleanup capability hover timer on unmount
+  useEffect(
+    () => () => {
+      if (capabilityLeaveTimerRef.current) {
+        clearTimeout(capabilityLeaveTimerRef.current);
+      }
+    },
+    []
+  );
+
+  const handleCapabilityEnter = useCallback((idx) => {
+    if (capabilityLeaveTimerRef.current) {
+      clearTimeout(capabilityLeaveTimerRef.current);
+      capabilityLeaveTimerRef.current = null;
+    }
+    setOpenCapabilityIdx(idx);
+  }, []);
+
+  const handleCapabilityLeave = useCallback(() => {
+    if (!isDesktopViewport) return;
+    if (capabilityLeaveTimerRef.current) {
+      clearTimeout(capabilityLeaveTimerRef.current);
+    }
+    capabilityLeaveTimerRef.current = setTimeout(() => {
+      setOpenCapabilityIdx(-1);
+      capabilityLeaveTimerRef.current = null;
+    }, 140);
+  }, [isDesktopViewport]);
 
   const handleCopyEmail = useCallback(async () => {
     try {
@@ -1002,10 +1064,17 @@ export default function PortfolioV2() {
     : 'Saya memadukan ketelitian rekayasa frontend dengan arsitektur full-stack untuk merancang pengalaman web yang bermakna, aksesibel, dan andal.';
 
   const drawerLinks = [
-    { id: 'v2-top', label: 'HOME' },
-    { id: 'v2-work', label: 'WORKS' },
-    { id: 'v2-about', label: 'ABOUT' },
-    { id: 'v2-contact', label: 'CONTACT' },
+    { id: 'v2-top', label: 'HOME', action: () => scrollToSection('v2-top') },
+    {
+      id: 'v2-work',
+      label: 'WORKS',
+      action: () => {
+        setIsMenuOpen(false);
+        navigate('/study-case');
+      },
+    },
+    { id: 'v2-about', label: 'ABOUT', action: () => scrollToSection('v2-about') },
+    { id: 'v2-contact', label: 'CONTACT', action: () => scrollToSection('v2-contact') },
   ];
 
   const useHeroScrollExit = isTabletUp && !shouldReduceMotion;
@@ -1013,7 +1082,7 @@ export default function PortfolioV2() {
   return (
     <div className="v2-portfolio-root" data-portfolio-version="2">
       {/* ====================================================================
-          0. NAKULA #FF4925 SPLASH PRELOADER
+          0. NAKULA ELECTRIC BLUE (#3B82F6) SPLASH PRELOADER
           ==================================================================== */}
       <AnimatePresence>
         {showSplash && (
@@ -1024,38 +1093,31 @@ export default function PortfolioV2() {
             exit={{
               y: '-100%',
               transition: {
-                duration: 0.62,
-                ease: [0.76, 0, 0.24, 1],
+                duration: 1.12,
+                ease: [0.65, 0, 0.35, 1],
               },
             }}
-            className="fixed inset-0 z-[150] flex items-center justify-center bg-[#ff4925] select-none pointer-events-none will-change-transform"
+            className="fixed inset-0 z-[150] flex items-center justify-center bg-[#3b82f6] select-none pointer-events-none will-change-transform"
           >
-            <div className="overflow-hidden px-4 py-2">
-              <motion.div
-                initial={{ y: '110%' }}
-                animate={{
-                  y: '0%',
-                  transition: {
-                    duration: 0.48,
-                    delay: 0.06,
-                    ease: NAKULA_EASE,
-                  },
-                }}
-                exit={{
-                  y: '-30%',
-                  transition: {
-                    duration: 0.5,
-                    ease: [0.76, 0, 0.24, 1],
-                  },
-                }}
-                className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,6.5vw,5.75rem)] leading-none will-change-transform"
-              >
-                {siteConfig.brandName}
-                <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
-                  ®
-                </span>
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, filter: 'blur(6px)' }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                filter: 'blur(0px)',
+                transition: {
+                  duration: 0.72,
+                  delay: 0.22,
+                  ease: NAKULA_EASE,
+                },
+              }}
+              className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,5.8vw,5.25rem)] leading-none px-4 py-2 will-change-transform"
+            >
+              {siteConfig.brandName}
+              <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
+                ®
+              </span>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1064,13 +1126,13 @@ export default function PortfolioV2() {
           FIXED NAKULA TOP HEADER (Variant-Switching Wordmark + Blend-Difference Right Nav)
           ==================================================================== */}
       <motion.header
-        initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, filter: 'blur(8px)' }}
         animate={
           heroIntroComplete || shouldReduceMotion
-            ? { opacity: 1, y: 0 }
-            : { opacity: 0, y: -12 }
+            ? { opacity: 1, filter: 'blur(0px)' }
+            : { opacity: 0, filter: 'blur(8px)' }
         }
-        transition={{ duration: 0.6, ease: NAKULA_EASE }}
+        transition={{ duration: 0.82, delay: 0.04, ease: NAKULA_EASE }}
         className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none"
       >
         <div className="v2-container flex items-start justify-between pt-4 md:pt-6">
@@ -1087,7 +1149,7 @@ export default function PortfolioV2() {
             }}
             transition={{ duration: 0.48, ease: NAKULA_EASE }}
             style={{ transformOrigin: 'top left' }}
-            className="hidden md:inline-block pointer-events-auto v2-display-heading text-[clamp(5.5rem,13.4vw,12rem)] leading-[0.80] text-[#cacaca] hover:text-white transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm will-change-transform"
+            className="hidden md:inline-block pointer-events-auto v2-display-heading text-[clamp(5.5rem,14.8vw,13.5rem)] leading-[0.80] text-[#cacaca] hover:text-white transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-sm will-change-transform"
           >
             {siteConfig.brandName}
             <span className="text-[0.26em] align-top ml-1.5 font-sans font-normal text-[#cacaca]">
@@ -1136,11 +1198,11 @@ export default function PortfolioV2() {
                 type="button"
                 onClick={() => switchLanguage(isEn ? 'id' : 'en')}
                 aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
-                className="inline-flex h-[43px] items-center rounded-full border border-[#333333] bg-[#0a0a0a] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[#cacaca] hover:border-[#ff4925] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                className="inline-flex h-[43px] items-center rounded-full border border-[#333333] bg-[#0a0a0a] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[#cacaca] hover:border-[#3b82f6] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
               >
-                <span className={!isEn ? 'text-[#ff4925]' : 'text-[#777777]'}>ID</span>
+                <span className={!isEn ? 'text-[#3b82f6]' : 'text-[#777777]'}>ID</span>
                 <span className="mx-1 text-[#444444]">/</span>
-                <span className={isEn ? 'text-[#ff4925]' : 'text-[#777777]'}>EN</span>
+                <span className={isEn ? 'text-[#3b82f6]' : 'text-[#777777]'}>EN</span>
               </button>
 
               <a
@@ -1159,7 +1221,7 @@ export default function PortfolioV2() {
                 onClick={() => setIsMenuOpen(true)}
                 aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
                 aria-expanded={isMenuOpen}
-                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[#333333] bg-[#0a0a0a] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[#333333] bg-[#0a0a0a] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
               >
                 <span className="flex flex-col gap-1.5" aria-hidden="true">
                   <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
@@ -1199,14 +1261,14 @@ export default function PortfolioV2() {
             >
               <div className="flex items-center justify-between border-b border-[#333333] pb-5">
                 <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[#858585]">
-                  <span className="inline-block h-1.5 w-1.5 bg-[#ff4925]" aria-hidden="true" />
+                  <span className="inline-block h-1.5 w-1.5 bg-[#3b82f6]" aria-hidden="true" />
                   <span>MENU</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
                   aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
-                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#333333] bg-[#141414] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#333333] bg-[#141414] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                 >
                   <FiX
                     size={17}
@@ -1230,8 +1292,8 @@ export default function PortfolioV2() {
                             delay: 0.06 + idx * 0.05,
                             ease: NAKULA_EASE,
                           }}
-                          onClick={() => scrollToSection(item.id)}
-                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                          onClick={item.action}
+                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                         >
                           <span className="v2-drawer-nav-item">
                             <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[#cacaca] group-hover:text-white transition-colors duration-300">
@@ -1239,7 +1301,7 @@ export default function PortfolioV2() {
                             </span>
                             {isCurrent && (
                               <span
-                                className="inline-block h-2 w-2 bg-[#ff4925] self-center"
+                                className="inline-block h-2 w-2 bg-[#3b82f6] self-center"
                                 aria-hidden="true"
                               />
                             )}
@@ -1263,7 +1325,7 @@ export default function PortfolioV2() {
                   </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[#ff4925] hover:opacity-85 transition-opacity break-all"
+                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[#3b82f6] hover:opacity-85 transition-opacity break-all"
                   >
                     {directEmail}
                   </a>
@@ -1284,7 +1346,7 @@ export default function PortfolioV2() {
                         <span>{ch.name}</span>
                         <FiArrowUpRight
                           size={14}
-                          className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
+                          className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#3b82f6]"
                         />
                       </a>
                     ))}
@@ -1295,7 +1357,7 @@ export default function PortfolioV2() {
                       <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
                       <FiArrowUpRight
                         size={14}
-                        className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
+                        className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#3b82f6]"
                       />
                     </RouterLink>
                   </div>
@@ -1325,17 +1387,21 @@ export default function PortfolioV2() {
                 }
               : undefined
           }
-          className="v2-hero-sticky z-[1] min-h-[680px] md:h-screen md:min-h-[700px] w-full flex flex-col justify-between pt-[84px] pb-6 md:pt-28 md:pb-6 overflow-hidden bg-[#0a0a0a] origin-center will-change-transform"
+          className="v2-hero-sticky z-[1] min-h-[680px] md:h-screen md:min-h-[700px] w-full flex flex-col justify-between pt-[84px] pb-16 md:pt-28 md:pb-14 overflow-hidden bg-[#0a0a0a] origin-center will-change-transform"
         >
-          {/* Center Diagonal Spotlight Slit Portrait */}
+          {/* Center Diagonal Cobalt-Blue Spotlight Slit Portrait (Original Profile Photo) */}
           <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.05 }}
+            initial={
+              shouldReduceMotion
+                ? false
+                : { opacity: 0, scale: 1.06, filter: 'blur(10px)' }
+            }
             animate={
               heroIntroComplete || shouldReduceMotion
-                ? { opacity: 1, scale: 1 }
-                : { opacity: 0, scale: 1.05 }
+                ? { opacity: 1, scale: 1, filter: 'blur(0px)' }
+                : { opacity: 0, scale: 1.06, filter: 'blur(10px)' }
             }
-            transition={{ duration: 0.9, delay: 0.05, ease: NAKULA_EASE }}
+            transition={{ duration: 0.95, delay: 0.05, ease: NAKULA_EASE }}
             className="v2-hero-diagonal-wrap"
             aria-hidden="true"
           >
@@ -1373,22 +1439,26 @@ export default function PortfolioV2() {
           <div className="v2-container relative z-10 my-auto flex justify-end pt-4 md:pt-8">
             <h1 className="text-right text-[clamp(2.65rem,3.9vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.0] max-w-[300px] sm:max-w-[340px]">
               {[
-                { text: isEn ? 'Beyond' : 'Melampaui', highlight: false, delay: 0.08 },
-                { text: isEn ? 'Visuals.' : 'Visual.', highlight: false, delay: 0.15 },
-                { text: isEn ? 'Built with' : 'Dibangun dengan', highlight: true, delay: 0.22 },
-                { text: isEn ? 'Vision.' : 'Visi Rekayasa.', highlight: true, delay: 0.29 },
+                { text: isEn ? 'Beyond' : 'Melampaui', highlight: false, delay: 0.1 },
+                { text: isEn ? 'Visuals.' : 'Visual.', highlight: false, delay: 0.2 },
+                { text: isEn ? 'Built with' : 'Dibangun dengan', highlight: true, delay: 0.32 },
+                { text: isEn ? 'Vision.' : 'Visi Rekayasa.', highlight: true, delay: 0.44 },
               ].map((line) => (
-                <span key={line.text} className="block overflow-hidden py-[0.03em]">
+                <span key={line.text} className="block py-[0.02em]">
                   <motion.span
-                    initial={shouldReduceMotion ? false : { y: '108%', opacity: 0 }}
+                    initial={
+                      shouldReduceMotion
+                        ? false
+                        : { y: 14, opacity: 0, filter: 'blur(12px)' }
+                    }
                     animate={
                       heroIntroComplete || shouldReduceMotion
-                        ? { y: '0%', opacity: 1 }
-                        : { y: '108%', opacity: 0 }
+                        ? { y: 0, opacity: 1, filter: 'blur(0px)' }
+                        : { y: 14, opacity: 0, filter: 'blur(12px)' }
                     }
-                    transition={{ duration: 0.62, delay: line.delay, ease: NAKULA_EASE }}
+                    transition={{ duration: 0.78, delay: line.delay, ease: NAKULA_EASE }}
                     className={`block will-change-transform ${
-                      line.highlight ? 'text-[#cacaca]' : 'text-[#8f8f8f]'
+                      line.highlight ? 'text-[#cacaca]' : 'text-[#858585]'
                     }`}
                   >
                     {line.text}
@@ -1398,59 +1468,97 @@ export default function PortfolioV2() {
             </h1>
           </div>
 
-          {/* Bottom Section: Indented Two-Tone Statement + Verified Track & Oversized Pill CTA */}
+          {/* Bottom Section: Blur-Revealed Two-Tone Statement + Infinite Track Marquee & Outlined Blue Pill CTA */}
           <div className="v2-container relative z-10 space-y-8 md:space-y-12 pt-16 md:pt-0">
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
-              animate={
-                heroIntroComplete || shouldReduceMotion
-                  ? { opacity: 1, y: 0 }
-                  : { opacity: 0, y: 14 }
-              }
-              transition={{ duration: 0.62, delay: 0.28, ease: NAKULA_EASE }}
-              className="max-w-[470px]"
-            >
+            <div className="max-w-[470px]">
               <p className="text-[24px] md:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] indent-8 md:indent-12">
-                <span className="text-[#cacaca]">
+                <motion.span
+                  initial={
+                    shouldReduceMotion
+                      ? false
+                      : { opacity: 0, y: 14, filter: 'blur(14px)' }
+                  }
+                  animate={
+                    heroIntroComplete || shouldReduceMotion
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(14px)' }
+                  }
+                  transition={{ duration: 0.86, delay: 0.26, ease: NAKULA_EASE }}
+                  className="text-[#cacaca] inline"
+                >
                   {isEn
                     ? 'I build web apps, interfaces, and digital systems '
                     : 'Saya membangun aplikasi web, antarmuka, dan sistem digital '}
-                </span>
-                <span className="text-[#555555]">
+                </motion.span>
+                <motion.span
+                  initial={
+                    shouldReduceMotion
+                      ? false
+                      : { opacity: 0, y: 14, filter: 'blur(14px)' }
+                  }
+                  animate={
+                    heroIntroComplete || shouldReduceMotion
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(14px)' }
+                  }
+                  transition={{ duration: 0.9, delay: 0.4, ease: NAKULA_EASE }}
+                  className="text-[#555555] inline"
+                >
                   {isEn
                     ? 'with intention, clarity and care.'
                     : 'dengan ketelitian, kejelasan, dan arsitektur terukur.'}
-                </span>
+                </motion.span>
               </p>
-            </motion.div>
+            </div>
 
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+              initial={
+                shouldReduceMotion
+                  ? false
+                  : { opacity: 0, y: 14, filter: 'blur(10px)' }
+              }
               animate={
                 heroIntroComplete || shouldReduceMotion
-                  ? { opacity: 1, y: 0 }
-                  : { opacity: 0, y: 12 }
+                  ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                  : { opacity: 0, y: 14, filter: 'blur(10px)' }
               }
-              transition={{ duration: 0.62, delay: 0.36, ease: NAKULA_EASE }}
+              transition={{ duration: 0.84, delay: 0.38, ease: NAKULA_EASE }}
               className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
             >
-              <div className="flex flex-wrap items-center gap-x-7 gap-y-2">
-                <span className="text-[12px] font-medium uppercase tracking-[-0.02em] text-[#666666]">
-                  {isEn ? 'VERIFIED TRACK:' : 'REKAM JEJAK:'}
+              <div className="flex w-full lg:w-auto items-center gap-5 min-w-0">
+                <span className="shrink-0 text-[12px] font-medium uppercase tracking-[-0.02em] text-[#666666]">
+                  {isEn ? 'TRUSTED TRACK:' : 'REKAM JEJAK:'}
                 </span>
-                {[
-                  'PT. AMA Salam',
-                  'Universitas Gunadarma',
-                  'SMKN 1 Cibinong',
-                  '@ghifari29/id-kit',
-                ].map((brand) => (
-                  <span
-                    key={brand}
-                    className="text-[14px] sm:text-[15px] font-semibold tracking-[-0.03em] text-[#858585]"
-                  >
-                    {brand}
-                  </span>
-                ))}
+                <div className="v2-hero-marquee-mask w-full max-w-[500px]">
+                  <div className="v2-hero-marquee-track">
+                    {[0, 1].map((dupIdx) => (
+                      <div
+                        key={dupIdx}
+                        aria-hidden={dupIdx === 1 ? 'true' : undefined}
+                        className="flex items-center gap-10 pr-10"
+                      >
+                        {[
+                          'PT. AMA Salam Indonesia',
+                          'Universitas Gunadarma',
+                          'SMKN 1 Cibinong',
+                          '@ghifari29/id-kit',
+                          '509+ Vitest Suite',
+                        ].map((brand) => (
+                          <span
+                            key={`${dupIdx}-${brand}`}
+                            className="inline-flex items-center gap-2 whitespace-nowrap text-[14px] sm:text-[15px] font-semibold tracking-[-0.03em] text-[#858585]"
+                          >
+                            <span
+                              className="inline-block h-1.5 w-1.5 rounded-full bg-[#3b82f6]/75"
+                              aria-hidden="true"
+                            />
+                            <span>{brand}</span>
+                          </span>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <a
@@ -1527,7 +1635,7 @@ export default function PortfolioV2() {
                             <button
                               type="button"
                               onClick={() => scrollToSection(`v2-work-item-${proj.id}`)}
-                              className={`inline-flex items-center gap-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm ${
+                              className={`inline-flex items-center gap-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-sm ${
                                 isCurrent
                                   ? 'text-white font-semibold'
                                   : 'text-[#555555] hover:text-[#cacaca]'
@@ -1572,10 +1680,10 @@ export default function PortfolioV2() {
                       <div className="flex flex-wrap items-center gap-4 pt-2 text-[12px] font-semibold uppercase tracking-[-0.02em]">
                         <RouterLink
                           to={`/study-case/${activeWork.id}`}
-                          className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
+                          className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#3b82f6] transition-colors"
                         >
                           <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-                          <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                          <FiArrowUpRight size={13} className="text-[#3b82f6]" />
                         </RouterLink>
                         {activeWork.live && (
                           <a
@@ -1585,7 +1693,7 @@ export default function PortfolioV2() {
                             className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
                           >
                             <span>Live</span>
-                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
                           </a>
                         )}
                         {activeWork.npm && (
@@ -1596,7 +1704,7 @@ export default function PortfolioV2() {
                             className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
                           >
                             <span>npm</span>
-                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
                           </a>
                         )}
                         {activeWork.github && (
@@ -1607,7 +1715,7 @@ export default function PortfolioV2() {
                             className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
                           >
                             <span>GitHub</span>
-                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
                           </a>
                         )}
                       </div>
@@ -1632,81 +1740,15 @@ export default function PortfolioV2() {
               </div>
             </div>
 
-            {/* Centered "MORE PROJECTS ↗" */}
-            <div className="mt-24 lg:mt-32 flex flex-col items-center">
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAllWorks((prev) => !prev)}
-                  aria-expanded={showAllWorks}
-                  className="v2-pill-btn !px-8 !py-4 !text-[15px]"
-                >
-                  <RolloverLabel
-                    text={
-                      showAllWorks
-                        ? isEn
-                          ? 'HIDE MORE PROJECTS'
-                          : 'TUTUP PROYEK LAINNYA'
-                        : isEn
-                        ? `MORE PROJECTS (+${otherProjects.length})`
-                        : `PROYEK LAINNYA (+${otherProjects.length})`
-                    }
-                  />
-                  <FiArrowUpRight size={16} className="text-[#ff4925]" />
-                </button>
-
-                <RouterLink
-                  to="/study-case"
-                  className="v2-pill-btn v2-pill-btn--accent !px-8 !py-4 !text-[15px]"
-                >
-                  <RolloverLabel text={isEn ? 'ALL CASE STUDIES' : 'SEMUA STUDI KASUS'} />
-                  <FiArrowUpRight size={16} />
-                </RouterLink>
-              </div>
-
-              <AnimatePresence initial={false}>
-                {showAllWorks && (
-                  <motion.div
-                    key="v2-more-projects"
-                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                    transition={{ duration: 0.36, ease: NAKULA_EASE }}
-                    className="w-full overflow-hidden"
-                  >
-                    <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {otherProjects.map((proj, index) => (
-                        <article key={proj.id} className="group space-y-4">
-                          <RouterLink
-                            to={`/study-case/${proj.id}`}
-                            className="block overflow-hidden rounded-[12px] border border-[#222222] bg-[#141414] aspect-[16/10]"
-                          >
-                            <img
-                              src={proj.image}
-                              alt={proj.title}
-                              loading="lazy"
-                              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                            />
-                          </RouterLink>
-                          <div className="flex items-baseline justify-between gap-4">
-                            <div>
-                              <h3 className="text-[24px] font-semibold tracking-[-0.04em] text-[#cacaca] group-hover:text-white transition-colors">
-                                <RouterLink to={`/study-case/${proj.id}`}>{proj.title}</RouterLink>
-                              </h3>
-                              <p className="text-[15px] text-[#858585] line-clamp-2 mt-1">
-                                {isEn ? proj.description.en : proj.description.id}
-                              </p>
-                            </div>
-                            <span className="shrink-0 text-[13px] font-semibold text-[#555555]">
-                              {String(selectedProjects.length + index + 1).padStart(2, '0')}.
-                            </span>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Centered "MORE PROJECTS ↗" — navigates directly to V2 Selected Works (/study-case) */}
+            <div className="mt-24 lg:mt-32 flex justify-center">
+              <RouterLink
+                to="/study-case"
+                className="v2-pill-btn !px-8 !py-4 !text-[15px]"
+              >
+                <RolloverLabel text={isEn ? 'MORE PROJECTS' : 'SEMUA PROYEK'} />
+                <FiArrowUpRight size={16} className="text-[#3b82f6]" />
+              </RouterLink>
             </div>
           </div>
         </section>
@@ -1770,7 +1812,7 @@ export default function PortfolioV2() {
                 <div className="relative">
                   <span
                     aria-hidden="true"
-                    className="absolute -top-2 left-0 text-[64px] sm:text-[80px] font-semibold leading-none text-[#ff4925] select-none"
+                    className="absolute -top-2 left-0 text-[64px] sm:text-[80px] font-semibold leading-none text-[#3b82f6] select-none"
                   >
                     “
                   </span>
@@ -1801,12 +1843,14 @@ export default function PortfolioV2() {
                 </div>
 
                 <div className="flex items-center gap-5">
-                  <img
-                    src={profileData.avatarImage}
-                    alt={siteConfig.name}
-                    loading="lazy"
-                    className="h-[84px] w-[84px] rounded-[16px] object-cover border border-[#2a2a2a]"
-                  />
+                  <div className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[16px] border border-[#2a2a2a] bg-[#141414]">
+                    <img
+                      src={profileData.avatarImage}
+                      alt={siteConfig.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover object-[51%_60%] scale-[2.4]"
+                    />
+                  </div>
                   <div>
                     <p className="text-[24px] font-semibold tracking-[-0.04em] leading-tight text-[#cacaca]">
                       {siteConfig.name}
@@ -1840,13 +1884,13 @@ export default function PortfolioV2() {
         </section>
 
         {/* ------------------------------------------------------------------
-            6. SERVICES / HOW I CAN HELP (Smooth Height Accordion `160px -> ~440px`)
+            6. SERVICES / HOW I CAN HELP (Exact Nakula Hover-Triggered 3-Column Morph Row)
             ------------------------------------------------------------------ */}
         <section
           id="v2-capabilities"
           className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
         >
-          <div className="v2-container mb-16 flex justify-center">
+          <div className="v2-container mb-16 sm:mb-24 flex justify-center">
             <div className="inline-flex items-start">
               <MaskedDisplayHeading
                 lines={isEn ? ['HOW I CAN HELP'] : ['KEAHLIAN & LAYANAN']}
@@ -1859,107 +1903,234 @@ export default function PortfolioV2() {
             </div>
           </div>
 
-          <div className="border-t border-b border-[#333333] divide-y divide-[#333333]">
+          <div
+            onMouseEnter={() => {
+              if (capabilityLeaveTimerRef.current) {
+                clearTimeout(capabilityLeaveTimerRef.current);
+                capabilityLeaveTimerRef.current = null;
+              }
+            }}
+            onMouseLeave={handleCapabilityLeave}
+            className="border-t border-b border-[#262626] divide-y divide-[#262626]"
+          >
             {capabilities.map((cap, idx) => {
               const isOpen = openCapabilityIdx === idx;
+              const rowDuration = isOpen ? 0.7 : 0.78;
+
               return (
-                <div
-                  key={cap.number}
-                  className={`transition-colors duration-300 ${
-                    isOpen ? 'bg-[#181818]' : 'bg-[#0a0a0a] hover:bg-[#131313]'
-                  }`}
-                >
-                  <div className="v2-container">
-                    <button
-                      type="button"
-                      onClick={() => setOpenCapabilityIdx(isOpen ? -1 : idx)}
-                      aria-expanded={isOpen}
-                      className="grid w-full grid-cols-12 items-center min-h-[112px] sm:min-h-[150px] py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-                    >
-                      <span
-                        className={`col-span-3 md:col-span-6 font-semibold tracking-[-0.05em] transition-all duration-300 ${
-                          isOpen
-                            ? 'text-[44px] sm:text-[64px] leading-none text-[#555555]'
-                            : 'text-[22px] sm:text-[28px] text-[#555555]'
-                        }`}
-                      >
-                        {cap.number}
-                        <span className="text-[#ff4925]">.</span>
-                      </span>
-                      <span className="col-span-9 md:col-span-6 flex items-center justify-between gap-4">
-                        <span
-                          className={`font-semibold tracking-[-0.05em] leading-[1.06] transition-all duration-300 ${
-                            isOpen
-                              ? 'text-[28px] sm:text-[40px] text-[#cacaca]'
-                              : 'text-[24px] sm:text-[34px] text-[#cacaca]'
+                <div key={cap.number}>
+                  {/* Desktop (`>= 1024px`): Pure Hover-Expand 3-Column Row (`156px -> 436px`, zero click needed) */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: isOpen ? 436 : 156,
+                      backgroundColor: isOpen ? '#161616' : '#0a0a0a',
+                    }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { duration: rowDuration, ease: SERVICES_EASE }
+                    }
+                    onMouseEnter={() => handleCapabilityEnter(idx)}
+                    onFocus={() => handleCapabilityEnter(idx)}
+                    onBlur={handleCapabilityLeave}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/study-case/${cap.featuredSlug}`);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="link"
+                    aria-label={`${cap.number} ${cap.title}`}
+                    className="hidden lg:block overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3b82f6] will-change-[height,background-color]"
+                    onClick={() => navigate(`/study-case/${cap.featuredSlug}`)}
+                  >
+                    <div className="v2-container h-full grid grid-cols-12 gap-8 relative">
+                      {/* Col 1 (`col-span-3`): `01.` scales smoothly from `32px` centered -> `82px` top-left */}
+                      <div className="col-span-3 relative h-full">
+                        <motion.span
+                          initial={false}
+                          animate={{
+                            scale: isOpen ? 1 : 0.39,
+                            y: isOpen ? 54 : 60,
+                          }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : { duration: rowDuration, ease: SERVICES_EASE }
+                          }
+                          style={{ transformOrigin: 'left top' }}
+                          className="inline-block text-[82px] font-semibold tracking-[-0.055em] leading-[0.88] text-[#555555] select-none will-change-transform"
+                        >
+                          {cap.number}
+                          <span className="text-[#3b82f6]">.</span>
+                        </motion.span>
+                      </div>
+
+                      {/* Col 2 (`col-span-4`): Center Preview Image scales `0.45 -> 1.0` & fades `0 -> 1` */}
+                      <div className="col-span-4 flex items-center justify-center h-full">
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            scale: isOpen ? 1 : 0.45,
+                            opacity: isOpen ? 1 : 0,
+                          }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : { duration: isOpen ? 0.68 : 0.62, ease: SERVICES_EASE }
+                          }
+                          className={`w-full max-w-[395px] aspect-[1.24] overflow-hidden rounded-[12px] border border-[#262626] bg-[#0e0e0e] will-change-[transform,opacity] ${
+                            isOpen ? 'pointer-events-auto' : 'pointer-events-none'
                           }`}
                         >
+                          <img
+                            src={cap.image}
+                            alt={cap.featuredProject}
+                            loading="lazy"
+                            className="h-full w-full object-cover object-top"
+                          />
+                        </motion.div>
+                      </div>
+
+                      {/* Col 3 (`col-start-8 col-span-5`): Collapsed `32px` Title morphs into `52px` Title + Summary + Bottom Pill Tags */}
+                      <div className="col-start-8 col-span-5 relative h-full">
+                        {/* Collapsed State (`32px` title vertically centered) */}
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            opacity: isOpen ? 0 : 1,
+                            y: isOpen ? -18 : 0,
+                          }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : {
+                                  duration: isOpen ? 0.42 : 0.58,
+                                  delay: isOpen ? 0 : 0.14,
+                                  ease: SERVICES_EASE,
+                                }
+                          }
+                          aria-hidden={isOpen}
+                          className="absolute inset-x-0 top-0 h-[156px] flex items-center pointer-events-none"
+                        >
+                          <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                            {cap.title}
+                          </h3>
+                        </motion.div>
+
+                        {/* Hovered/Expanded State (`52px` Title + Description + Bottom Pill Tags) */}
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            opacity: isOpen ? 1 : 0,
+                            y: isOpen ? 0 : 20,
+                          }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : {
+                                  duration: isOpen ? 0.64 : 0.48,
+                                  delay: isOpen ? 0.1 : 0,
+                                  ease: SERVICES_EASE,
+                                }
+                          }
+                          aria-hidden={!isOpen}
+                          className={`h-full py-[56px] flex flex-col justify-between ${
+                            isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+                          }`}
+                        >
+                          <div className="space-y-3.5">
+                            <h3 className="text-[44px] xl:text-[52px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                              {cap.title}
+                            </h3>
+                            <p className="text-[18px] xl:text-[20px] font-normal tracking-[-0.03em] leading-[1.3] text-[#858585] max-w-[490px]">
+                              {cap.summary}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2.5 pt-4">
+                            {cap.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="rounded-full border border-[#2d2d2d] px-4 py-2 text-[13px] font-normal tracking-[-0.01em] text-[#9a9a9a]"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Mobile / Tablet (`< 1024px`): Clean Touch Fallback (no `+`/`-` clutter) */}
+                  <div
+                    className={`lg:hidden transition-colors duration-300 ${
+                      isOpen ? 'bg-[#161616]' : 'bg-[#0a0a0a]'
+                    }`}
+                  >
+                    <div className="v2-container">
+                      <button
+                        type="button"
+                        onClick={() => setOpenCapabilityIdx(isOpen ? -1 : idx)}
+                        aria-expanded={isOpen}
+                        className="flex w-full items-baseline justify-between gap-4 py-8 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                      >
+                        <span
+                          className={`font-semibold tracking-[-0.05em] text-[#555555] transition-all duration-300 ${
+                            isOpen ? 'text-[44px] leading-none' : 'text-[24px]'
+                          }`}
+                        >
+                          {cap.number}
+                          <span className="text-[#3b82f6]">.</span>
+                        </span>
+                        <span className="flex-1 text-right sm:text-left sm:pl-6 text-[24px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
                           {cap.title}
                         </span>
-                        <span className="text-[#ff4925] shrink-0" aria-hidden="true">
-                          {isOpen ? <FiMinus size={20} /> : <FiPlus size={20} />}
-                        </span>
-                      </span>
-                    </button>
+                      </button>
 
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          key={`service-panel-${cap.number}`}
-                          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                          transition={{ duration: 0.36, ease: NAKULA_EASE }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pb-12 pt-2 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-                            <div className="hidden lg:block lg:col-span-2" />
-
-                            <div className="lg:col-span-4">
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key={`mobile-service-${cap.number}`}
+                            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                            transition={{ duration: 0.36, ease: NAKULA_EASE }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-10 space-y-5">
                               <RouterLink
                                 to={`/study-case/${cap.featuredSlug}`}
-                                className="block overflow-hidden rounded-[12px] border border-[#2a2a2a] bg-[#0a0a0a] aspect-[16/11] group"
+                                className="block overflow-hidden rounded-[12px] border border-[#262626] bg-[#0e0e0e] aspect-[16/11]"
                               >
                                 <img
                                   src={cap.image}
                                   alt={cap.featuredProject}
                                   loading="lazy"
-                                  className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+                                  className="h-full w-full object-cover object-top"
                                 />
                               </RouterLink>
-                            </div>
-
-                            <div className="lg:col-span-6 space-y-5">
-                              <p className="text-[18px] sm:text-[22px] font-medium tracking-[-0.04em] leading-[1.2] text-[#858585] max-w-xl">
+                              <p className="text-[17px] leading-[1.35] tracking-[-0.02em] text-[#858585]">
                                 {cap.summary}
                               </p>
-                              <div className="flex flex-wrap gap-2.5 pt-1">
+                              <div className="flex flex-wrap gap-2">
                                 {cap.tags.map((tag) => (
                                   <span
                                     key={tag}
-                                    className="rounded-full border border-[#333333] px-4 py-2 text-[13px] font-medium text-[#9a9a9a]"
+                                    className="rounded-full border border-[#2d2d2d] px-3.5 py-1.5 text-[12px] text-[#9a9a9a]"
                                   >
                                     {tag}
                                   </span>
                                 ))}
                               </div>
-                              <div>
-                                <RouterLink
-                                  to={`/study-case/${cap.featuredSlug}`}
-                                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[-0.01em] text-[#ff4925] hover:underline"
-                                >
-                                  <span>
-                                    {isEn ? 'Inspect Case Study:' : 'Studi Kasus:'}{' '}
-                                    {cap.featuredProject}
-                                  </span>
-                                  <FiArrowUpRight size={14} />
-                                </RouterLink>
-                              </div>
                             </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
               );
@@ -1998,7 +2169,7 @@ export default function PortfolioV2() {
                   </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="font-medium text-[#ff4925] hover:underline"
+                    className="font-medium text-[#3b82f6] hover:underline"
                   >
                     {isEn ? 'Contact Me' : 'Hubungi Saya'}
                   </a>
@@ -2017,12 +2188,12 @@ export default function PortfolioV2() {
                         type="button"
                         onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded"
+                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded"
                       >
                         <span className="text-[22px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] text-[#cacaca]">
                           {item.q}
                         </span>
-                        <span className="text-[#ff4925] shrink-0" aria-hidden="true">
+                        <span className="text-[#3b82f6] shrink-0" aria-hidden="true">
                           {isOpen ? <FiMinus size={24} /> : <FiPlus size={24} />}
                         </span>
                       </button>
@@ -2073,7 +2244,7 @@ export default function PortfolioV2() {
 
               <RouterLink
                 to="/study-case"
-                className="v2-pill-btn !min-w-[180px] !py-3.5 justify-between !text-[#ff4925] hover:!border-[#ff4925]"
+                className="v2-pill-btn !min-w-[180px] !py-3.5 justify-between !text-[#3b82f6] hover:!border-[#3b82f6]"
               >
                 <RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
                 <FiArrowUpRight size={16} />
@@ -2085,7 +2256,7 @@ export default function PortfolioV2() {
                 {/* Left Featured Card (50%) */}
                 <RouterLink
                   to={`/study-case/${featuredCaseStudies[0].id}`}
-                  className="group relative lg:col-span-6 min-h-[420px] lg:min-h-[540px] overflow-hidden rounded-[12px] border border-[#262626] bg-[#121212] flex flex-col justify-between p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                  className="group relative lg:col-span-6 min-h-[420px] lg:min-h-[540px] overflow-hidden rounded-[12px] border border-[#262626] bg-[#121212] flex flex-col justify-between p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                 >
                   <img
                     src={featuredCaseStudies[0].image}
@@ -2110,7 +2281,7 @@ export default function PortfolioV2() {
                     <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#a4a4a4]">
                       CASE STUDY · {featuredCaseStudies[0].number}
                     </p>
-                    <h3 className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.045em] leading-[1.08] text-white group-hover:text-[#ff4925] transition-colors">
+                    <h3 className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.045em] leading-[1.08] text-white group-hover:text-[#3b82f6] transition-colors">
                       {featuredCaseStudies[0].title} —{' '}
                       {isEn
                         ? featuredCaseStudies[0].subtitle.en
@@ -2125,7 +2296,7 @@ export default function PortfolioV2() {
                     <RouterLink
                       key={study.id}
                       to={`/study-case/${study.id}`}
-                      className="group rounded-[12px] border border-[#262626] bg-[#0e0e0e] p-3 flex flex-col justify-between gap-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                      className="group rounded-[12px] border border-[#262626] bg-[#0e0e0e] p-3 flex flex-col justify-between gap-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
                     >
                       <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[8px] bg-[#161616]">
                         <img
@@ -2144,7 +2315,7 @@ export default function PortfolioV2() {
                           CASE STUDY · {study.number}
                         </p>
                         <div className="space-y-2">
-                          <h3 className="text-[22px] font-semibold tracking-[-0.04em] leading-[1.12] text-[#cacaca] group-hover:text-[#ff4925] transition-colors">
+                          <h3 className="text-[22px] font-semibold tracking-[-0.04em] leading-[1.12] text-[#cacaca] group-hover:text-[#3b82f6] transition-colors">
                             {study.title} — {isEn ? study.subtitle.en : study.subtitle.id}
                           </h3>
                           <p className="text-[14px] leading-[1.4] text-[#777777] line-clamp-2">
@@ -2224,7 +2395,7 @@ export default function PortfolioV2() {
         </section>
 
         {/* ====================================================================
-            11. FOOTER (`z-3` Dark Upper Footer + `z-0` Curtain-Sliding `#FF4925` Bottom Banner)
+            11. FOOTER (`z-3` Dark Upper Footer + `z-0` Curtain-Sliding `#3B82F6` Bottom Banner)
             ==================================================================== */}
         <footer ref={footerRef} className="relative bg-[#0a0a0a]">
           {/* Upper Dark Footer (`z-index: 3`, exact Nakula `.framer-11myxzf`) */}
@@ -2238,7 +2409,7 @@ export default function PortfolioV2() {
                     </span>
                     <a
                       href={`mailto:${directEmail}`}
-                      className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#ff4925] hover:underline break-all"
+                      className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#3b82f6] hover:underline break-all"
                     >
                       {directEmail}
                     </a>
@@ -2263,7 +2434,7 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-top')}
-                          className="hover:text-[#ff4925] transition-colors"
+                          className="hover:text-[#3b82f6] transition-colors"
                         >
                           Home
                         </button>
@@ -2272,7 +2443,7 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-about')}
-                          className="hover:text-[#ff4925] transition-colors"
+                          className="hover:text-[#3b82f6] transition-colors"
                         >
                           About
                         </button>
@@ -2281,7 +2452,7 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-work')}
-                          className="hover:text-[#ff4925] transition-colors"
+                          className="hover:text-[#3b82f6] transition-colors"
                         >
                           Works
                         </button>
@@ -2290,23 +2461,23 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-contact')}
-                          className="hover:text-[#ff4925] transition-colors"
+                          className="hover:text-[#3b82f6] transition-colors"
                         >
                           Contact
                         </button>
                       </li>
                       <li>
-                        <RouterLink to="/study-case" className="hover:text-[#ff4925] transition-colors">
+                        <RouterLink to="/study-case" className="hover:text-[#3b82f6] transition-colors">
                           Case Studies
                         </RouterLink>
                       </li>
                       <li>
-                        <RouterLink to="/recruiter" className="hover:text-[#ff4925] transition-colors">
+                        <RouterLink to="/recruiter" className="hover:text-[#3b82f6] transition-colors">
                           Recruiter
                         </RouterLink>
                       </li>
                       <li>
-                        <RouterLink to="/play" className="hover:text-[#ff4925] transition-colors">
+                        <RouterLink to="/play" className="hover:text-[#3b82f6] transition-colors">
                           3D World
                         </RouterLink>
                       </li>
@@ -2324,7 +2495,7 @@ export default function PortfolioV2() {
                             href={channel.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
+                            className="inline-flex items-center gap-1.5 hover:text-[#3b82f6] transition-colors"
                           >
                             <span>{channel.name}</span>
                             <FiArrowUpRight size={15} className="text-[#777777]" />
@@ -2336,7 +2507,7 @@ export default function PortfolioV2() {
                           href="https://www.npmjs.com/package/@ghifari29/id-kit"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
+                          className="inline-flex items-center gap-1.5 hover:text-[#3b82f6] transition-colors"
                         >
                           <span>npm</span>
                           <FiArrowUpRight size={15} className="text-[#777777]" />
@@ -2355,7 +2526,7 @@ export default function PortfolioV2() {
 
                   <div className="border-b border-[#333333] pb-3 flex items-center justify-between text-[16px] text-[#777777]">
                     <span className="truncate pr-3">{RESUME_FILENAME}</span>
-                    <span className="text-[12px] font-semibold uppercase text-[#ff4925]">PDF</span>
+                    <span className="text-[12px] font-semibold uppercase text-[#3b82f6]">PDF</span>
                   </div>
 
                   {RESUME_AVAILABLE && (
@@ -2383,11 +2554,11 @@ export default function PortfolioV2() {
             </div>
           </div>
 
-          {/* Bottom Orange Banner (`z-index: 0`, slides out `-340px -> 0px` from behind `z-3` Dark Footer!) */}
-          <div className="relative z-[0] overflow-hidden bg-[#ff4925]">
+          {/* Bottom Blue Banner (`z-index: 0`, slides out `-340px -> 0px` from behind `z-3` Dark Footer!) */}
+          <div className="relative z-[0] overflow-hidden bg-[#3b82f6]">
             <motion.div
-              style={isTabletUp && !shouldReduceMotion ? { y: orangeBannerY } : undefined}
-              className="bg-[#ff4925] text-[#0a0a0a] pt-24 pb-10 sm:pt-[100px] sm:pb-12 will-change-transform"
+              style={isTabletUp && !shouldReduceMotion ? { y: accentBannerY } : undefined}
+              className="bg-[#3b82f6] text-[#0a0a0a] pt-24 pb-10 sm:pt-[100px] sm:pb-12 will-change-transform"
             >
               <div className="v2-container flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
                 <p className="v2-display-heading !text-[#0a0a0a] text-[clamp(4.75rem,15.5vw,13rem)] leading-[0.80]">

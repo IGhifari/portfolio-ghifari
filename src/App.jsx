@@ -32,6 +32,8 @@ const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const WorksListV2 = lazy(() => import('./v2/WorksListV2'));
+const WorkDetailV2 = lazy(() => import('./v2/WorkDetailV2'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
 const GameHub = lazy(() => import('./game/hub/GameHub'));
 const GamePage = lazy(() => import('./game/GamePage'));
@@ -101,7 +103,11 @@ const AppContent = () => {
     const { route, langPrefix, portfolioVersion, switchPortfolioVersion } = useRouter();
     const { language, t } = useLanguage();
     const isPlayMode = isPlayRouteType(route.type);
-    const isV2Active = route.type === 'home' && portfolioVersion !== '1';
+    const isV2Route =
+        route.type === 'home' ||
+        route.type === 'study-case-list' ||
+        route.type === 'study-case-detail';
+    const isV2Active = isV2Route && portfolioVersion !== '1';
 
     // Restore localized home page document metadata on returning to home or toggling language
     useEffect(() => {
@@ -141,7 +147,17 @@ const AppContent = () => {
     if (isV2Active) {
         return (
             <>
-                <PortfolioV2 />
+                {route.type === 'home' && <PortfolioV2 />}
+                {route.type === 'study-case-list' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+                        <WorksListV2 />
+                    </Suspense>
+                )}
+                {route.type === 'study-case-detail' && (
+                    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+                        <WorkDetailV2 slug={route.slug} />
+                    </Suspense>
+                )}
                 <PortfolioSwitcher
                     version={portfolioVersion}
                     onChange={switchPortfolioVersion}
