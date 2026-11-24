@@ -30,16 +30,27 @@ html.v2-scroll-root body {
 
 .v2-portfolio-root {
   --v2-bg: #0a0a0a;
+  --v2-bg-elevated: #0e0e0e;
   --v2-surface: #141414;
-  --v2-surface-elevated: #181818;
-  --v2-border: #2a2a2a;
+  --v2-surface-elevated: #161616;
+  --v2-border: #262626;
   --v2-border-strong: #333333;
   --v2-text: #cacaca;
   --v2-text-bright: #ffffff;
   --v2-text-muted: #858585;
   --v2-text-dim: #555555;
+  --v2-about-unlit: #2a2a2a;
+  --v2-big-num: #2b2b2b;
   --v2-accent: #3b82f6;
   --v2-accent-hover: #2563eb;
+  --v2-accent-ink: #0a0a0a;
+  --v2-glow-rgb: 59, 130, 246;
+  --v2-nav-scrim: linear-gradient(
+    180deg,
+    #0a0a0a 0%,
+    rgba(10, 10, 10, 0.7) 57.22%,
+    rgba(10, 10, 10, 0) 100%
+  );
   --v2-online: #47c554;
   --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
   --v2-font-sans: 'Geist Variable', 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
@@ -53,6 +64,9 @@ html.v2-scroll-root body {
   font-family: var(--v2-font-sans);
   position: relative;
   isolation: isolate;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -82,32 +96,27 @@ html.v2-scroll-root body {
 
 /* Exact Nakula Fixed Header Top Gradient Backdrop */
 .v2-nav-scrim {
-  background: linear-gradient(
-    180deg,
-    #0a0a0a 0%,
-    rgba(10, 10, 10, 0.7) 57.22%,
-    rgba(10, 10, 10, 0) 100%
-  );
+  background: var(--v2-nav-scrim);
 }
 
 /* Nakula Display Typography (Anton 140px desktop / 80px mobile, 100% line-height, 0em tracking) */
 .v2-display-heading {
-  font-family: var(--v2-font-display);
+  font-family: var(--v2-font-display, 'Anton', 'Space Grotesk', sans-serif);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0em;
+  letter-spacing: -0.015em;
   line-height: 1;
-  color: var(--v2-text);
+  color: var(--v2-text, #cacaca);
 }
 
 .v2-section-heading {
-  font-family: var(--v2-font-display);
+  font-family: var(--v2-font-display, 'Anton', 'Space Grotesk', sans-serif);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0em;
   line-height: 0.98;
   font-size: clamp(4.5rem, 9.72vw, 8.75rem); /* 72px -> 140px exact Nakula scale */
-  color: var(--v2-text);
+  color: var(--v2-text, #cacaca);
 }
 
 /* Nakula Section Tag ((ABOUT), (WHY US), (SERVICES), (PROCESS), (BLOG)) */
@@ -157,7 +166,7 @@ html.v2-scroll-root body {
 }
 
 .v2-pill-btn:hover {
-  border-color: #666666;
+  border-color: var(--v2-accent);
   color: var(--v2-text-bright);
 }
 
@@ -170,7 +179,7 @@ html.v2-scroll-root body {
 .v2-pill-btn--accent:hover {
   background-color: var(--v2-accent);
   border-color: var(--v2-accent);
-  color: #0a0a0a;
+  color: var(--v2-accent-ink);
 }
 
 .v2-rollover-wrap {
@@ -268,18 +277,7 @@ html.v2-scroll-root body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 58%;
-  filter: grayscale(0.45) contrast(1.22) brightness(0.84);
-  transform: scale(1.06);
-}
-
-.v2-hero-diagonal-glow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 48% 52%, rgba(59, 130, 246, 0.36) 0%, rgba(10, 10, 10, 0.78) 70%),
-    linear-gradient(155deg, rgba(10, 10, 10, 0.85) 8%, transparent 45%, rgba(10, 10, 10, 0.92) 90%);
-  mix-blend-mode: screen;
+  object-position: center 78%;
 }
 
 /* Nakula Hero Bottom "TRUSTED BY / VERIFIED TRACK" Edge-Faded Infinite Marquee */
@@ -329,8 +327,8 @@ html.v2-scroll-root body {
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
-  background: #141414;
-  border: 1px solid #1e1e1e;
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
 }
 
 @media (min-width: 1024px) {
@@ -407,8 +405,8 @@ html.v2-scroll-root body {
   height: 8px;
   background-image: repeating-linear-gradient(
     to right,
-    #333333 0px,
-    #333333 1px,
+    var(--v2-border-strong) 0px,
+    var(--v2-border-strong) 1px,
     transparent 1px,
     transparent 24px
   );
@@ -416,12 +414,15 @@ html.v2-scroll-root body {
 }
 
 /* ==========================================================================
-   Pre-Footer Contact Spotlight Atmospheric Layer (Electric Cobalt Blue)
+   Pre-Footer Contact Spotlight Atmospheric Layer (Season-Aware)
    ========================================================================== */
 .v2-cta-spotlight {
-  background:
-    radial-gradient(ellipse 38% 58% at 54% 44%, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.11) 42%, rgba(10, 10, 10, 0) 72%),
-    linear-gradient(125deg, rgba(10, 10, 10, 0.96) 28%, rgba(147, 197, 253, 0.05) 50%, rgba(10, 10, 10, 0.98) 74%);
+  background: radial-gradient(
+    ellipse 40% 58% at 54% 44%,
+    rgba(var(--v2-glow-rgb), 0.24) 0%,
+    rgba(var(--v2-glow-rgb), 0.08) 44%,
+    transparent 74%
+  );
 }
 
 /* ==========================================================================
@@ -433,8 +434,8 @@ html.v2-scroll-root body {
   aspect-ratio: 1.3518;
   border-radius: 12px;
   overflow: hidden;
-  background: #141414;
-  border: 1px solid #1e1e1e;
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
   transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }

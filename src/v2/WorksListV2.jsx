@@ -48,7 +48,7 @@ export default function WorksListV2() {
 
   return (
     <V2SubpageShell scrollKey="works-list">
-      <section className="relative z-[2] bg-[#0a0a0a] pt-[130px] pb-[100px] md:pt-[150px] md:pb-[150px]">
+      <section className="relative z-[2] bg-[var(--v2-bg)] pt-[130px] pb-[100px] md:pt-[150px] md:pb-[150px]">
         <div className="v2-container flex flex-col gap-[56px] md:gap-[72px]">
           <V2MaskedHeading
             as="h1"

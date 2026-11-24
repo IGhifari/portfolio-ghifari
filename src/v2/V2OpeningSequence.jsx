@@ -179,9 +179,9 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    // Calm, cinematic ~8.6s 000%->100% progression + ~0.55s radial light bloom + ~1.25s silk dissolve
-    const PROGRESS_DURATION_MS = 8600;
-    const BLOOM_DURATION_MS = 560;
+    // Smooth ~6.5s total sequence: 5.2s 000%->100% + 0.42s radial bloom + 0.9s silk dissolve
+    const PROGRESS_DURATION_MS = 5200;
+    const BLOOM_DURATION_MS = 420;
     const startTime = performance.now();
 
     let rafId = null;
@@ -283,7 +283,7 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
         }, BLOOM_DURATION_MS);
         setTimeout(() => {
           finishSequence();
-        }, BLOOM_DURATION_MS + 1280);
+        }, BLOOM_DURATION_MS + 920);
       }
 
       ctx.save();
@@ -646,7 +646,7 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
       data-v2-opening="active"
       initial={{ opacity: 1 }}
       animate={{ opacity: isDissolving ? 0 : 1 }}
-      transition={{ duration: isDissolving ? 1.25 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: isDissolving ? 0.9 : 0.25, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-0 z-[180] select-none overflow-hidden bg-[#0b0c0f] ${
         isDissolving ? 'pointer-events-none' : 'pointer-events-auto'
       }`}

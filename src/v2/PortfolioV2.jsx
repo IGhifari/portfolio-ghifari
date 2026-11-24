@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   AnimatePresence,
@@ -15,7 +15,7 @@ import {
 import Lenis from 'lenis';
 import { FiArrowUpRight, FiCheck, FiCopy, FiMinus, FiPlus, FiX } from 'react-icons/fi';
 
-import { siteConfig } from '../config/site';
+import { siteConfig, ENABLE_SEASONAL_THEMES } from '../config/site';
 import { profileData } from '../data/profile';
 import { selectedProjects, allProjects } from '../data/projects';
 import { experiences } from '../data/experience';
@@ -24,10 +24,16 @@ import { techCategoriesData } from '../data/skills';
 import { directEmail, contactChannelsData } from '../data/contact';
 import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { RouterLink, useRouter } from '../context/RouterContext';
 import V2OpeningSequence from './V2OpeningSequence';
+import V2SeasonDrawerPicker, { V2SeasonHeaderBadge } from './V2SeasonSelector';
+import { buildV2SeasonTokens } from './v2SeasonPalette';
 import { hasCompletedV2Opening } from './v2OpeningState';
 import './v2.css';
+
+const SeasonalEffects = lazy(() => import('../components/SeasonalEffects'));
+const DeveloperTerminal = lazy(() => import('../components/DeveloperTerminal'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 const SERVICES_EASE = [0.4, 0, 0.2, 1];
@@ -97,14 +103,14 @@ function CountUpMetricCell({ numeral, suffix, label, index, isTriggered, shouldR
     >
       <div className="v2-metric-ticks" aria-hidden="true" />
       <div className="flex items-baseline" aria-label={`${target}${suffix}`}>
-        <span className="text-[52px] sm:text-[76px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[#cacaca]">
+        <span className="text-[52px] sm:text-[76px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[var(--v2-text)]">
           {count}
         </span>
-        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[#3b82f6]">
+        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-accent)]">
           {suffix}
         </span>
       </div>
-      <p className="mt-12 max-w-[185px] text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.3] text-[#858585]">
+      <p className="mt-12 max-w-[185px] text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.3] text-[var(--v2-text-muted)]">
         {label}
       </p>
     </motion.div>
@@ -219,7 +225,7 @@ function AboutThresholdWord({ word, progress, threshold }) {
   return (
     <span
       className="v2-about-word"
-      style={{ color: isLit ? '#cacaca' : '#555555' }}
+      style={{ color: isLit ? 'var(--v2-text)' : 'var(--v2-about-unlit)' }}
     >
       {word}
     </span>
@@ -251,14 +257,14 @@ function NakulaAboutSection({ text }) {
     <section
       id="v2-about"
       ref={trackRef}
-      className="relative z-[2] h-[200vh] w-full bg-[#0a0a0a]"
+      className="relative z-[2] h-[200vh] w-full bg-[var(--v2-bg)]"
     >
       <div className="sticky top-0 flex h-screen w-full items-center px-4 sm:px-12 lg:px-[150px]">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col lg:flex-row items-start gap-6 lg:gap-[56px]">
           <div className="shrink-0 lg:pt-3">
             <span className="v2-section-tag">(ABOUT)</span>
           </div>
-          <p className="text-[clamp(2rem,3.88vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.1] text-[#555555]">
+          <p className="text-[clamp(2rem,3.88vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.1] text-[var(--v2-text-dim)]">
             {words.map((word, index) => {
               const threshold = (index / words.length) * 0.78;
               return (
@@ -358,7 +364,7 @@ function WorkShowcaseCard({
         <RouterLink
           to={`/study-case/${project.id}`}
           aria-label={`${project.title} — ${subtitleText}`}
-          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-[12px]"
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-[12px]"
         >
           <div
             className="v2-work-card-frame aspect-[16/11] lg:aspect-auto"
@@ -399,35 +405,35 @@ function WorkShowcaseCard({
 
       {/* Mobile & Tablet Project Metadata */}
       <div className="lg:hidden mt-4 space-y-2">
-        <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.05] text-[#cacaca]">
+        <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.05] text-[var(--v2-text)]">
           <RouterLink
             to={`/study-case/${project.id}`}
-            className="hover:text-[#3b82f6] transition-colors"
+            className="hover:text-[var(--v2-accent)] transition-colors"
           >
             {project.title}
           </RouterLink>
         </h3>
-        <p className="text-[18px] font-medium tracking-[-0.035em] leading-[1.2] text-[#858585]">
+        <p className="text-[18px] font-medium tracking-[-0.035em] leading-[1.2] text-[var(--v2-text-muted)]">
           {subtitleText}
         </p>
-        <p className="text-sm text-[#666666] leading-relaxed line-clamp-2">{descriptionText}</p>
+        <p className="text-sm text-[var(--v2-text-dim)] leading-relaxed line-clamp-2">{descriptionText}</p>
         <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-semibold uppercase tracking-[-0.02em]">
           <RouterLink
             to={`/study-case/${project.id}`}
-            className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#3b82f6]"
+            className="inline-flex items-center gap-1 text-[var(--v2-text)] hover:text-[var(--v2-accent)]"
           >
             <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+            <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
           </RouterLink>
           {project.live && (
             <a
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
+              className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)]"
             >
               <span>Live</span>
-              <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+              <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
             </a>
           )}
           {project.github && (
@@ -435,10 +441,10 @@ function WorkShowcaseCard({
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
+              className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)]"
             >
               <span>GitHub</span>
-              <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+              <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
             </a>
           )}
         </div>
@@ -490,7 +496,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
 
   if (!isDesktop || shouldReduceMotion) {
     return (
-      <section id="v2-experience" className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-32">
+      <section id="v2-experience" className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-32">
         <div className="v2-container mb-12">
           <div className="flex items-start justify-between gap-4">
             <MaskedDisplayHeading
@@ -503,29 +509,29 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
             </span>
           </div>
         </div>
-        <div className="border-t border-b border-[#333333]">
+        <div className="border-t border-b border-[var(--v2-border-strong)]">
           <div className="v2-container !px-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#333333]">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--v2-border-strong)]">
               {steps.map((item) => (
                 <article
                   key={item.step}
-                  className="flex flex-col justify-between min-h-[360px] p-7 bg-[#0a0a0a]"
+                  className="flex flex-col justify-between min-h-[360px] p-7 bg-[var(--v2-bg)]"
                 >
                   <div className="space-y-1">
-                    <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
+                    <p className="text-[22px] font-semibold tracking-[-0.04em] text-[var(--v2-text-muted)]">
                       {item.step}
-                      <span className="text-[#3b82f6]">.</span>
+                      <span className="text-[var(--v2-accent)]">.</span>
                     </p>
-                    <p className="text-[12px] font-medium uppercase text-[#555555]">
+                    <p className="text-[12px] font-medium uppercase text-[var(--v2-text-dim)]">
                       {item.period}
                     </p>
                   </div>
                   <div className="space-y-3 pt-14">
-                    <h3 className="text-[34px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                    <h3 className="text-[34px] font-semibold tracking-[-0.055em] leading-[1.02] text-[var(--v2-text)]">
                       {item.title}
                     </h3>
-                    <p className="text-[14px] font-semibold text-[#3b82f6]">{item.subtitle}</p>
-                    <p className="text-[15px] leading-[1.4] text-[#858585]">{item.body}</p>
+                    <p className="text-[14px] font-semibold text-[var(--v2-accent)]">{item.subtitle}</p>
+                    <p className="text-[15px] leading-[1.4] text-[var(--v2-text-muted)]">{item.body}</p>
                   </div>
                 </article>
               ))}
@@ -540,7 +546,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
     <section
       id="v2-experience"
       ref={trackRef}
-      className="relative z-[2] h-[285vh] w-full bg-[#0a0a0a] overflow-x-clip"
+      className="relative z-[2] h-[285vh] w-full bg-[var(--v2-bg)] overflow-x-clip"
     >
       <div className="sticky top-0 flex h-screen w-full items-center overflow-hidden">
         <motion.div
@@ -560,7 +566,7 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
                 ({isEn ? 'PROCESS' : 'PENGALAMAN'})
               </span>
             </div>
-            <p className="max-w-[360px] text-[20px] font-medium tracking-[-0.04em] leading-[1.2] text-[#858585]">
+            <p className="max-w-[360px] text-[20px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)]">
               {isEn
                 ? 'Verified track record across industry internship, open-source engineering, and computer science education.'
                 : 'Rekam jejak terverifikasi mulai dari magang industri, library open-source, hingga pendidikan informatika.'}
@@ -568,30 +574,30 @@ function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
           </div>
 
           {/* Right 4 Horizontal Step Cards (`360 x 560px` each) */}
-          <div className="flex shrink-0 border-t border-b border-l border-[#333333]">
+          <div className="flex shrink-0 border-t border-b border-l border-[var(--v2-border-strong)]">
             {steps.map((item) => (
               <article
                 key={item.step}
-                className="w-[360px] h-[560px] shrink-0 border-r border-[#333333] p-8 flex flex-col justify-between bg-[#0a0a0a]"
+                className="w-[360px] h-[560px] shrink-0 border-r border-[var(--v2-border-strong)] p-8 flex flex-col justify-between bg-[var(--v2-bg)]"
               >
                 <div className="space-y-1.5">
-                  <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
+                  <p className="text-[22px] font-semibold tracking-[-0.04em] text-[var(--v2-text-muted)]">
                     {item.step}
-                    <span className="text-[#3b82f6]">.</span>
+                    <span className="text-[var(--v2-accent)]">.</span>
                   </p>
-                  <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#555555]">
+                  <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[var(--v2-text-dim)]">
                     {item.period}
                   </p>
                 </div>
 
                 <div className="space-y-3.5">
-                  <h3 className="text-[40px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                  <h3 className="text-[40px] font-semibold tracking-[-0.055em] leading-[1.02] text-[var(--v2-text)]">
                     {item.title}
                   </h3>
-                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[#3b82f6]">
+                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--v2-accent)]">
                     {item.subtitle}
                   </p>
-                  <p className="text-[16px] leading-[1.35] tracking-[-0.02em] text-[#858585]">
+                  <p className="text-[16px] leading-[1.35] tracking-[-0.02em] text-[var(--v2-text-muted)]">
                     {item.body}
                   </p>
                 </div>
@@ -618,8 +624,13 @@ NakulaProcessSection.propTypes = {
 export default function PortfolioV2() {
   const shouldReduceMotion = useReducedMotion();
   const { language } = useLanguage();
+  const { isDark, season, seasonalEnabled } = useTheme();
   const { navigate, switchLanguage } = useRouter();
   const isEn = language === 'en';
+  const v2SeasonVars = useMemo(
+    () => buildV2SeasonTokens(season, seasonalEnabled),
+    [season, seasonalEnabled]
+  );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showOpening, setShowOpening] = useState(
@@ -1063,7 +1074,18 @@ export default function PortfolioV2() {
   const useHeroScrollExit = isTabletUp && !shouldReduceMotion;
 
   return (
-    <div className="v2-portfolio-root" data-portfolio-version="2">
+    <div
+      className="v2-portfolio-root"
+      data-portfolio-version="2"
+      data-v2-season={season?.isSeasonalActive ? season.id : 'default'}
+      style={v2SeasonVars}
+    >
+      {ENABLE_SEASONAL_THEMES && (
+        <Suspense fallback={null}>
+          <SeasonalEffects />
+        </Suspense>
+      )}
+
       {/* ====================================================================
           0. INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
           ==================================================================== */}
@@ -1105,10 +1127,10 @@ export default function PortfolioV2() {
             }}
             transition={{ duration: 0.48, ease: NAKULA_EASE }}
             style={{ transformOrigin: 'top left' }}
-            className="hidden md:inline-block pointer-events-auto v2-display-heading text-[clamp(5.5rem,14.8vw,13.5rem)] leading-[0.80] text-[#cacaca] hover:text-white transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-sm will-change-transform"
+            className="hidden md:inline-block pointer-events-auto v2-display-heading text-[clamp(5.5rem,14.8vw,13.5rem)] leading-[0.80] text-[var(--v2-text)] hover:text-[var(--v2-text-bright)] transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-sm will-change-transform"
           >
             {siteConfig.brandName}
-            <span className="text-[0.26em] align-top ml-1.5 font-sans font-normal text-[#cacaca]">
+            <span className="text-[0.26em] align-top ml-1.5 font-sans font-normal text-[var(--v2-text)]">
               ®
             </span>
           </motion.a>
@@ -1120,45 +1142,51 @@ export default function PortfolioV2() {
               e.preventDefault();
               scrollToSection('v2-top');
             }}
-            className="md:hidden pointer-events-auto v2-display-heading text-[36px] leading-[0.88] text-[#cacaca] select-none focus-visible:outline-none"
+            className="md:hidden pointer-events-auto v2-display-heading text-[36px] leading-[0.88] text-[var(--v2-text)] select-none focus-visible:outline-none"
           >
             {siteConfig.brandName}
-            <span className="text-[0.34em] align-top ml-0.5 font-sans font-normal text-[#cacaca]">
+            <span className="text-[0.34em] align-top ml-0.5 font-sans font-normal text-[var(--v2-text)]">
               ®
             </span>
           </a>
 
-          {/* Right Cluster with Nakula `mix-blend-difference` */}
-          <div className="pointer-events-auto flex items-center gap-5 lg:gap-10 mix-blend-difference">
+          {/* Right Cluster (`mix-blend-difference` in dark mode; direct contrast in Light Winter) */}
+          <div
+            className={`pointer-events-auto flex items-center gap-5 lg:gap-10 ${
+              isDark ? 'mix-blend-difference' : ''
+            }`}
+          >
             <div className="hidden md:flex flex-col text-left leading-[1.22]">
-              <div className="flex items-center gap-2 text-[15px] font-bold tracking-[-0.04em] text-[#cacaca]">
+              <div className="flex items-center gap-2 text-[15px] font-bold tracking-[-0.04em] text-[var(--v2-text)]">
                 <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
                 <span>{isEn ? 'Available for project' : 'Tersedia untuk proyek'}</span>
               </div>
-              <span className="pl-4 text-[13px] font-normal uppercase tracking-[-0.03em] text-[#858585]">
+              <span className="pl-4 text-[13px] font-normal uppercase tracking-[-0.03em] text-[var(--v2-text-muted)]">
                 {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
               </span>
             </div>
 
             <div className="hidden lg:flex flex-col text-left leading-[1.22]">
-              <span className="text-[15px] font-bold tracking-[-0.04em] text-[#cacaca]">
+              <span className="text-[15px] font-bold tracking-[-0.04em] text-[var(--v2-text)]">
                 {jakartaTime}
               </span>
-              <span className="text-[13px] font-normal tracking-[-0.03em] text-[#858585]">
+              <span className="text-[13px] font-normal tracking-[-0.03em] text-[var(--v2-text-muted)]">
                 (GMT+7)
               </span>
             </div>
 
             <div className="flex items-center gap-2">
+              <V2SeasonHeaderBadge isEn={isEn} onOpenDrawer={() => setIsMenuOpen(true)} />
+
               <button
                 type="button"
                 onClick={() => switchLanguage(isEn ? 'id' : 'en')}
                 aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
-                className="inline-flex h-[43px] items-center rounded-full border border-[#333333] bg-[#0a0a0a] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[#cacaca] hover:border-[#3b82f6] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                className="inline-flex h-[43px] items-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
               >
-                <span className={!isEn ? 'text-[#3b82f6]' : 'text-[#777777]'}>ID</span>
+                <span className={!isEn ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>ID</span>
                 <span className="mx-1 text-[#444444]">/</span>
-                <span className={isEn ? 'text-[#3b82f6]' : 'text-[#777777]'}>EN</span>
+                <span className={isEn ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>EN</span>
               </button>
 
               <a
@@ -1177,7 +1205,7 @@ export default function PortfolioV2() {
                 onClick={() => setIsMenuOpen(true)}
                 aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
                 aria-expanded={isMenuOpen}
-                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[#333333] bg-[#0a0a0a] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
               >
                 <span className="flex flex-col gap-1.5" aria-hidden="true">
                   <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
@@ -1212,19 +1240,19 @@ export default function PortfolioV2() {
               animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
               exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
               transition={{ duration: 0.48, ease: NAKULA_EASE }}
-              className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[#333333] bg-[#0a0a0a] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
+              className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between border-b border-[#333333] pb-5">
-                <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[#858585]">
-                  <span className="inline-block h-1.5 w-1.5 bg-[#3b82f6]" aria-hidden="true" />
+              <div className="flex items-center justify-between border-b border-[var(--v2-border-strong)] pb-5">
+                <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[var(--v2-text-muted)]">
+                  <span className="inline-block h-1.5 w-1.5 bg-[var(--v2-accent)]" aria-hidden="true" />
                   <span>MENU</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
                   aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
-                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#333333] bg-[#141414] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                 >
                   <FiX
                     size={17}
@@ -1234,7 +1262,7 @@ export default function PortfolioV2() {
               </div>
 
               <nav className="my-auto py-4" aria-label="Portfolio V2 Navigation">
-                <ul className="divide-y divide-[#262626]">
+                <ul className="divide-y divide-[var(--v2-border)]">
                   {drawerLinks.map((item, idx) => {
                     const isCurrent = activeSection === item.id;
                     return (
@@ -1249,15 +1277,15 @@ export default function PortfolioV2() {
                             ease: NAKULA_EASE,
                           }}
                           onClick={item.action}
-                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                         >
                           <span className="v2-drawer-nav-item">
-                            <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[#cacaca] group-hover:text-white transition-colors duration-300">
+                            <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[var(--v2-text)] group-hover:text-[var(--v2-text-bright)] transition-colors duration-300">
                               {item.label}
                             </span>
                             {isCurrent && (
                               <span
-                                className="inline-block h-2 w-2 bg-[#3b82f6] self-center"
+                                className="inline-block h-2 w-2 bg-[var(--v2-accent)] self-center"
                                 aria-hidden="true"
                               />
                             )}
@@ -1273,47 +1301,49 @@ export default function PortfolioV2() {
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.42, delay: 0.24, ease: NAKULA_EASE }}
-                className="space-y-6 pt-4"
+                className="space-y-5 pt-4"
               >
+                <V2SeasonDrawerPicker isEn={isEn} />
+
                 <div>
-                  <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[#777777]">
+                  <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
                     (EMAIL)
                   </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[#3b82f6] hover:opacity-85 transition-opacity break-all"
+                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-accent)] hover:opacity-85 transition-opacity break-all"
                   >
                     {directEmail}
                   </a>
                 </div>
                 <div>
-                  <p className="mb-2.5 text-[12px] uppercase tracking-[-0.02em] text-[#777777]">
+                  <p className="mb-2.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
                     (SOCIALS)
                   </p>
-                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-6 text-[17px] font-medium tracking-[-0.03em] text-[#cacaca]">
+                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-6 text-[17px] font-medium tracking-[-0.03em] text-[var(--v2-text)]">
                     {contactChannelsData.map((ch) => (
                       <a
                         key={ch.key}
                         href={ch.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-1.5 hover:text-white transition-colors"
+                        className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
                       >
                         <span>{ch.name}</span>
                         <FiArrowUpRight
                           size={14}
-                          className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#3b82f6]"
+                          className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
                         />
                       </a>
                     ))}
                     <RouterLink
                       to="/recruiter"
-                      className="group inline-flex items-center gap-1.5 hover:text-white transition-colors"
+                      className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
                     >
                       <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
                       <FiArrowUpRight
                         size={14}
-                        className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#3b82f6]"
+                        className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
                       />
                     </RouterLink>
                   </div>
@@ -1343,7 +1373,7 @@ export default function PortfolioV2() {
                 }
               : undefined
           }
-          className="v2-hero-sticky z-[1] min-h-[680px] md:h-screen md:min-h-[700px] w-full flex flex-col justify-between pt-[84px] pb-16 md:pt-28 md:pb-14 overflow-hidden bg-[#0a0a0a] origin-center will-change-transform"
+          className="v2-hero-sticky z-[1] min-h-[680px] md:h-screen md:min-h-[700px] w-full flex flex-col justify-between pt-[84px] pb-16 md:pt-28 md:pb-14 overflow-hidden bg-[var(--v2-bg)] origin-center will-change-transform"
         >
           {/* Center Diagonal Cobalt-Blue Spotlight Slit Portrait (Original Profile Photo) */}
           <motion.div
@@ -1368,26 +1398,25 @@ export default function PortfolioV2() {
                 className="v2-hero-diagonal-img"
                 loading="eager"
               />
-              <div className="v2-hero-diagonal-glow" />
             </div>
           </motion.div>
 
           {/* Mobile Availability & Clock Row directly below fixed navbar */}
           <div className="v2-container relative z-10 flex md:hidden items-start justify-between gap-4 pb-4">
             <div className="flex flex-col leading-[1.3]">
-              <div className="flex items-center gap-2 text-[14px] font-bold tracking-[-0.03em] text-[#cacaca]">
+              <div className="flex items-center gap-2 text-[14px] font-bold tracking-[-0.03em] text-[var(--v2-text)]">
                 <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
                 <span>{isEn ? 'Available for project' : 'Tersedia untuk proyek'}</span>
               </div>
-              <span className="pl-4 text-[12px] uppercase text-[#858585]">
+              <span className="pl-4 text-[12px] uppercase text-[var(--v2-text-muted)]">
                 {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
               </span>
             </div>
             <div className="flex flex-col text-right leading-[1.3]">
-              <span className="text-[14px] font-bold tracking-[-0.03em] text-[#cacaca]">
+              <span className="text-[14px] font-bold tracking-[-0.03em] text-[var(--v2-text)]">
                 {jakartaTime}
               </span>
-              <span className="text-[12px] text-[#858585]">(GMT+7)</span>
+              <span className="text-[12px] text-[var(--v2-text-muted)]">(GMT+7)</span>
             </div>
           </div>
 
@@ -1414,7 +1443,7 @@ export default function PortfolioV2() {
                     }
                     transition={{ duration: 0.78, delay: line.delay, ease: NAKULA_EASE }}
                     className={`block will-change-transform ${
-                      line.highlight ? 'text-[#cacaca]' : 'text-[#858585]'
+                      line.highlight ? 'text-[var(--v2-text)]' : 'text-[var(--v2-text-muted)]'
                     }`}
                   >
                     {line.text}
@@ -1440,7 +1469,7 @@ export default function PortfolioV2() {
                       : { opacity: 0, y: 14, filter: 'blur(14px)' }
                   }
                   transition={{ duration: 0.86, delay: 0.26, ease: NAKULA_EASE }}
-                  className="text-[#cacaca] inline"
+                  className="text-[var(--v2-text)] inline"
                 >
                   {isEn
                     ? 'I build web apps, interfaces, and digital systems '
@@ -1458,7 +1487,7 @@ export default function PortfolioV2() {
                       : { opacity: 0, y: 14, filter: 'blur(14px)' }
                   }
                   transition={{ duration: 0.9, delay: 0.4, ease: NAKULA_EASE }}
-                  className="text-[#555555] inline"
+                  className="text-[var(--v2-text-dim)] inline"
                 >
                   {isEn
                     ? 'with intention, clarity and care.'
@@ -1482,7 +1511,7 @@ export default function PortfolioV2() {
               className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
             >
               <div className="flex w-full lg:w-auto items-center gap-5 min-w-0">
-                <span className="shrink-0 text-[12px] font-medium uppercase tracking-[-0.02em] text-[#666666]">
+                <span className="shrink-0 text-[12px] font-medium uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
                   {isEn ? 'TRUSTED TRACK:' : 'REKAM JEJAK:'}
                 </span>
                 <div className="v2-hero-marquee-mask w-full max-w-[500px]">
@@ -1502,10 +1531,10 @@ export default function PortfolioV2() {
                         ].map((brand) => (
                           <span
                             key={`${dupIdx}-${brand}`}
-                            className="inline-flex items-center gap-2 whitespace-nowrap text-[14px] sm:text-[15px] font-semibold tracking-[-0.03em] text-[#858585]"
+                            className="inline-flex items-center gap-2 whitespace-nowrap text-[14px] sm:text-[15px] font-semibold tracking-[-0.03em] text-[var(--v2-text-muted)]"
                           >
                             <span
-                              className="inline-block h-1.5 w-1.5 rounded-full bg-[#3b82f6]/75"
+                              className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--v2-accent)]/75"
                               aria-hidden="true"
                             />
                             <span>{brand}</span>
@@ -1542,12 +1571,12 @@ export default function PortfolioV2() {
             ------------------------------------------------------------------ */}
         <section
           id="v2-work"
-          className="relative z-[2] bg-[#0a0a0a] pt-12 pb-28 sm:pt-20 sm:pb-36"
+          className="relative z-[2] bg-[var(--v2-bg)] pt-12 pb-28 sm:pt-20 sm:pb-36"
         >
           <div className="v2-container">
             {/* Section Heading */}
             <div className="flex flex-col items-start lg:items-center text-left lg:text-center mb-16 lg:mb-[140px]">
-              <span className="lg:hidden mb-3 text-[16px] font-medium tracking-[-0.02em] text-[#cacaca]">
+              <span className="lg:hidden mb-3 text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text)]">
                 ({String(selectedProjects.length).padStart(2, '0')})
               </span>
               <div className="inline-flex items-start">
@@ -1556,7 +1585,7 @@ export default function PortfolioV2() {
                   className="v2-section-heading"
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
                 />
-                <span className="hidden lg:inline-block ml-3 mt-1 text-[16px] font-medium tracking-[-0.02em] text-[#cacaca]">
+                <span className="hidden lg:inline-block ml-3 mt-1 text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text)]">
                   ({String(selectedProjects.length).padStart(2, '0')})
                 </span>
               </div>
@@ -1575,7 +1604,7 @@ export default function PortfolioV2() {
                         exit={shouldReduceMotion ? undefined : { y: -20, opacity: 0 }}
                         transition={{ duration: 0.22, ease: NAKULA_EASE }}
                         aria-live="polite"
-                        className="v2-display-heading text-[116px] leading-[0.88] !text-[#2b2b2b] select-none"
+                        className="v2-display-heading text-[116px] leading-[0.88] !text-[var(--v2-big-num)] select-none"
                       >
                         {activeWork.number}.
                       </motion.div>
@@ -1591,15 +1620,15 @@ export default function PortfolioV2() {
                             <button
                               type="button"
                               onClick={() => scrollToSection(`v2-work-item-${proj.id}`)}
-                              className={`inline-flex items-center gap-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded-sm ${
+                              className={`inline-flex items-center gap-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-sm ${
                                 isCurrent
-                                  ? 'text-white font-semibold'
-                                  : 'text-[#555555] hover:text-[#cacaca]'
+                                  ? 'text-[var(--v2-text-bright)] font-semibold'
+                                  : 'text-[var(--v2-text-dim)] hover:text-[var(--v2-text)]'
                               }`}
                             >
                               <span
                                 className={`inline-block h-[1px] transition-all duration-200 ${
-                                  isCurrent ? 'w-3.5 bg-[#cacaca]' : 'w-2 bg-[#333333]'
+                                  isCurrent ? 'w-3.5 bg-[var(--v2-text)]' : 'w-2 bg-[var(--v2-border-strong)]'
                                 }`}
                                 aria-hidden="true"
                               />
@@ -1622,34 +1651,34 @@ export default function PortfolioV2() {
                       transition={{ duration: 0.22, ease: NAKULA_EASE }}
                       className="space-y-2.5"
                     >
-                      <h3 className="text-[44px] xl:text-[48px] font-semibold tracking-[-0.055em] leading-[1.0] text-[#cacaca]">
+                      <h3 className="text-[44px] xl:text-[48px] font-semibold tracking-[-0.055em] leading-[1.0] text-[var(--v2-text)]">
                         <RouterLink
                           to={`/study-case/${activeWork.id}`}
-                          className="hover:text-white transition-colors"
+                          className="hover:text-[var(--v2-text-bright)] transition-colors"
                         >
                           {activeWork.title}
                         </RouterLink>
                       </h3>
-                      <p className="text-[20px] xl:text-[22px] font-medium tracking-[-0.045em] leading-[1.1] text-[#858585]">
+                      <p className="text-[20px] xl:text-[22px] font-medium tracking-[-0.045em] leading-[1.1] text-[var(--v2-text-muted)]">
                         {isEn ? activeWork.subtitle.en : activeWork.subtitle.id}
                       </p>
                       <div className="flex flex-wrap items-center gap-4 pt-2 text-[12px] font-semibold uppercase tracking-[-0.02em]">
                         <RouterLink
                           to={`/study-case/${activeWork.id}`}
-                          className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#3b82f6] transition-colors"
+                          className="inline-flex items-center gap-1 text-[var(--v2-text)] hover:text-[var(--v2-accent)] transition-colors"
                         >
                           <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-                          <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+                          <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
                         </RouterLink>
                         {activeWork.live && (
                           <a
                             href={activeWork.live}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                            className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)] transition-colors"
                           >
                             <span>Live</span>
-                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+                            <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
                           </a>
                         )}
                         {activeWork.npm && (
@@ -1657,10 +1686,10 @@ export default function PortfolioV2() {
                             href={activeWork.npm}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                            className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)] transition-colors"
                           >
                             <span>npm</span>
-                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+                            <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
                           </a>
                         )}
                         {activeWork.github && (
@@ -1668,10 +1697,10 @@ export default function PortfolioV2() {
                             href={activeWork.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                            className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)] transition-colors"
                           >
                             <span>GitHub</span>
-                            <FiArrowUpRight size={13} className="text-[#3b82f6]" />
+                            <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
                           </a>
                         )}
                       </div>
@@ -1703,7 +1732,7 @@ export default function PortfolioV2() {
                 className="v2-pill-btn !px-8 !py-4 !text-[15px]"
               >
                 <RolloverLabel text={isEn ? 'MORE PROJECTS' : 'SEMUA PROYEK'} />
-                <FiArrowUpRight size={16} className="text-[#3b82f6]" />
+                <FiArrowUpRight size={16} className="text-[var(--v2-accent)]" />
               </RouterLink>
             </div>
           </div>
@@ -1714,7 +1743,7 @@ export default function PortfolioV2() {
             ------------------------------------------------------------------ */}
         <section
           id="v2-metrics"
-          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
+          className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px]"
         >
           <div className="v2-container space-y-16 sm:space-y-24">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
@@ -1730,7 +1759,7 @@ export default function PortfolioV2() {
                 />
               </div>
 
-              <p className="max-w-[360px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[#858585] lg:pb-2">
+              <p className="max-w-[360px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[var(--v2-text-muted)] lg:pb-2">
                 {isEn
                   ? 'Grounded in hands-on engineering, I craft accessible interfaces and reliable web systems that deliver results.'
                   : 'Berlandaskan rekayasa terukur, saya merancang antarmuka aksesibel dan sistem web andal yang berdampak nyata.'}
@@ -1760,7 +1789,7 @@ export default function PortfolioV2() {
         {/* ------------------------------------------------------------------
             5. HIGHLIGHT QUOTE (Animated 1px Divider + Scroll Zoom-Out `1.15 -> 1.0` Right Image)
             ------------------------------------------------------------------ */}
-        <section className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-[150px]">
+        <section className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-[150px]">
           <div className="v2-container">
             <div className="flex flex-col lg:flex-row items-center gap-14 lg:gap-[120px]">
               {/* Left Quote Column (`min-width: 55%`) */}
@@ -1768,17 +1797,17 @@ export default function PortfolioV2() {
                 <div className="relative">
                   <span
                     aria-hidden="true"
-                    className="absolute -top-2 left-0 text-[64px] sm:text-[80px] font-semibold leading-none text-[#3b82f6] select-none"
+                    className="absolute -top-2 left-0 text-[64px] sm:text-[80px] font-semibold leading-none text-[var(--v2-accent)] select-none"
                   >
                     “
                   </span>
                   <blockquote className="text-[32px] sm:text-[48px] xl:text-[56px] font-semibold tracking-[-0.06em] leading-[1.02] indent-12 sm:indent-20">
-                    <span className="text-[#cacaca]">
+                    <span className="text-[var(--v2-text)]">
                       {isEn
                         ? 'Building software feels personal. '
                         : 'Membangun perangkat lunak itu personal. '}
                     </span>
-                    <span className="text-[#555555]">
+                    <span className="text-[var(--v2-text-dim)]">
                       {isEn
                         ? 'Every interface is engineered with type safety, WCAG 2.1 AA accessibility, and clean backend meaning.'
                         : 'Setiap antarmuka dirancang dengan tipe statis ketat, aksesibilitas WCAG 2.1 AA, dan backend yang bersih.'}
@@ -1794,12 +1823,12 @@ export default function PortfolioV2() {
                     viewport={{ once: true, amount: 0.5 }}
                     transition={{ duration: 1.0, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     style={{ transformOrigin: 'left center' }}
-                    className="h-[1px] w-full bg-[#333333]"
+                    className="h-[1px] w-full bg-[var(--v2-border-strong)]"
                   />
                 </div>
 
                 <div className="flex items-center gap-5">
-                  <div className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[16px] border border-[#2a2a2a] bg-[#141414]">
+                  <div className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[16px] border border-[var(--v2-border-strong)] bg-[var(--v2-surface)]">
                     <img
                       src={profileData.avatarImage}
                       alt={siteConfig.name}
@@ -1808,10 +1837,10 @@ export default function PortfolioV2() {
                     />
                   </div>
                   <div>
-                    <p className="text-[24px] font-semibold tracking-[-0.04em] leading-tight text-[#cacaca]">
+                    <p className="text-[24px] font-semibold tracking-[-0.04em] leading-tight text-[var(--v2-text)]">
                       {siteConfig.name}
                     </p>
-                    <p className="text-[16px] text-[#777777] mt-0.5">
+                    <p className="text-[16px] text-[var(--v2-text-dim)] mt-0.5">
                       {isEn
                         ? 'Frontend Intern Alumni at PT. AMA Salam'
                         : 'Alumni Frontend Intern di PT. AMA Salam'}
@@ -1824,7 +1853,7 @@ export default function PortfolioV2() {
               <div ref={highlightImgRef} className="w-full lg:flex-1">
                 <RouterLink
                   to="/study-case/project-management"
-                  className="block overflow-hidden rounded-[14px] border border-[#222222] bg-[#141414] aspect-[4/4.4]"
+                  className="block overflow-hidden rounded-[14px] border border-[var(--v2-border)] bg-[var(--v2-surface)] aspect-[4/4.4]"
                 >
                   <motion.img
                     src="/images/projects/project_management.webp"
@@ -1844,7 +1873,7 @@ export default function PortfolioV2() {
             ------------------------------------------------------------------ */}
         <section
           id="v2-capabilities"
-          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
+          className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px]"
         >
           <div className="v2-container mb-16 sm:mb-24 flex justify-center">
             <div className="inline-flex items-start">
@@ -1867,7 +1896,7 @@ export default function PortfolioV2() {
               }
             }}
             onMouseLeave={handleCapabilityLeave}
-            className="border-t border-b border-[#262626] divide-y divide-[#262626]"
+            className="border-t border-b border-[var(--v2-border)] divide-y divide-[var(--v2-border)]"
           >
             {capabilities.map((cap, idx) => {
               const isOpen = openCapabilityIdx === idx;
@@ -1880,7 +1909,9 @@ export default function PortfolioV2() {
                     initial={false}
                     animate={{
                       height: isOpen ? 436 : 156,
-                      backgroundColor: isOpen ? '#161616' : '#0a0a0a',
+                      backgroundColor: isOpen
+                        ? v2SeasonVars['--v2-surface-elevated']
+                        : v2SeasonVars['--v2-bg'],
                     }}
                     transition={
                       shouldReduceMotion
@@ -1899,7 +1930,7 @@ export default function PortfolioV2() {
                     tabIndex={0}
                     role="link"
                     aria-label={`${cap.number} ${cap.title}`}
-                    className="hidden lg:block overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3b82f6] will-change-[height,background-color]"
+                    className="hidden lg:block overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--v2-accent)] will-change-[height,background-color]"
                     onClick={() => navigate(`/study-case/${cap.featuredSlug}`)}
                   >
                     <div className="v2-container h-full grid grid-cols-12 gap-8 relative">
@@ -1917,10 +1948,10 @@ export default function PortfolioV2() {
                               : { duration: rowDuration, ease: SERVICES_EASE }
                           }
                           style={{ transformOrigin: 'left top' }}
-                          className="inline-block text-[82px] font-semibold tracking-[-0.055em] leading-[0.88] text-[#555555] select-none will-change-transform"
+                          className="inline-block text-[82px] font-semibold tracking-[-0.055em] leading-[0.88] text-[var(--v2-text-dim)] select-none will-change-transform"
                         >
                           {cap.number}
-                          <span className="text-[#3b82f6]">.</span>
+                          <span className="text-[var(--v2-accent)]">.</span>
                         </motion.span>
                       </div>
 
@@ -1937,7 +1968,7 @@ export default function PortfolioV2() {
                               ? { duration: 0 }
                               : { duration: isOpen ? 0.68 : 0.62, ease: SERVICES_EASE }
                           }
-                          className={`w-full max-w-[395px] aspect-[1.24] overflow-hidden rounded-[12px] border border-[#262626] bg-[#0e0e0e] will-change-[transform,opacity] ${
+                          className={`w-full max-w-[395px] aspect-[1.24] overflow-hidden rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] will-change-[transform,opacity] ${
                             isOpen ? 'pointer-events-auto' : 'pointer-events-none'
                           }`}
                         >
@@ -1971,7 +2002,7 @@ export default function PortfolioV2() {
                           aria-hidden={isOpen}
                           className="absolute inset-x-0 top-0 h-[156px] flex items-center pointer-events-none"
                         >
-                          <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                          <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                             {cap.title}
                           </h3>
                         </motion.div>
@@ -1998,10 +2029,10 @@ export default function PortfolioV2() {
                           }`}
                         >
                           <div className="space-y-3.5">
-                            <h3 className="text-[44px] xl:text-[52px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                            <h3 className="text-[44px] xl:text-[52px] font-semibold tracking-[-0.055em] leading-[1.02] text-[var(--v2-text)]">
                               {cap.title}
                             </h3>
-                            <p className="text-[18px] xl:text-[20px] font-normal tracking-[-0.03em] leading-[1.3] text-[#858585] max-w-[490px]">
+                            <p className="text-[18px] xl:text-[20px] font-normal tracking-[-0.03em] leading-[1.3] text-[var(--v2-text-muted)] max-w-[490px]">
                               {cap.summary}
                             </p>
                           </div>
@@ -2010,7 +2041,7 @@ export default function PortfolioV2() {
                             {cap.tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="rounded-full border border-[#2d2d2d] px-4 py-2 text-[13px] font-normal tracking-[-0.01em] text-[#9a9a9a]"
+                                className="rounded-full border border-[var(--v2-border-strong)] px-4 py-2 text-[13px] font-normal tracking-[-0.01em] text-[var(--v2-text-muted)]"
                               >
                                 {tag}
                               </span>
@@ -2024,7 +2055,7 @@ export default function PortfolioV2() {
                   {/* Mobile / Tablet (`< 1024px`): Clean Touch Fallback (no `+`/`-` clutter) */}
                   <div
                     className={`lg:hidden transition-colors duration-300 ${
-                      isOpen ? 'bg-[#161616]' : 'bg-[#0a0a0a]'
+                      isOpen ? 'bg-[var(--v2-surface-elevated)]' : 'bg-[var(--v2-bg)]'
                     }`}
                   >
                     <div className="v2-container">
@@ -2032,17 +2063,17 @@ export default function PortfolioV2() {
                         type="button"
                         onClick={() => setOpenCapabilityIdx(isOpen ? -1 : idx)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-baseline justify-between gap-4 py-8 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                        className="flex w-full items-baseline justify-between gap-4 py-8 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                       >
                         <span
-                          className={`font-semibold tracking-[-0.05em] text-[#555555] transition-all duration-300 ${
+                          className={`font-semibold tracking-[-0.05em] text-[var(--v2-text-dim)] transition-all duration-300 ${
                             isOpen ? 'text-[44px] leading-none' : 'text-[24px]'
                           }`}
                         >
                           {cap.number}
-                          <span className="text-[#3b82f6]">.</span>
+                          <span className="text-[var(--v2-accent)]">.</span>
                         </span>
-                        <span className="flex-1 text-right sm:text-left sm:pl-6 text-[24px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                        <span className="flex-1 text-right sm:text-left sm:pl-6 text-[24px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                           {cap.title}
                         </span>
                       </button>
@@ -2060,7 +2091,7 @@ export default function PortfolioV2() {
                             <div className="pb-10 space-y-5">
                               <RouterLink
                                 to={`/study-case/${cap.featuredSlug}`}
-                                className="block overflow-hidden rounded-[12px] border border-[#262626] bg-[#0e0e0e] aspect-[16/11]"
+                                className="block overflow-hidden rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] aspect-[16/11]"
                               >
                                 <img
                                   src={cap.image}
@@ -2069,14 +2100,14 @@ export default function PortfolioV2() {
                                   className="h-full w-full object-cover object-top"
                                 />
                               </RouterLink>
-                              <p className="text-[17px] leading-[1.35] tracking-[-0.02em] text-[#858585]">
+                              <p className="text-[17px] leading-[1.35] tracking-[-0.02em] text-[var(--v2-text-muted)]">
                                 {cap.summary}
                               </p>
                               <div className="flex flex-wrap gap-2">
                                 {cap.tags.map((tag) => (
                                   <span
                                     key={tag}
-                                    className="rounded-full border border-[#2d2d2d] px-3.5 py-1.5 text-[12px] text-[#9a9a9a]"
+                                    className="rounded-full border border-[var(--v2-border-strong)] px-3.5 py-1.5 text-[12px] text-[var(--v2-text-muted)]"
                                   >
                                     {tag}
                                   </span>
@@ -2109,7 +2140,7 @@ export default function PortfolioV2() {
             ------------------------------------------------------------------ */}
         <section
           id="v2-faq"
-          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
+          className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px]"
         >
           <div className="v2-container">
             <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
@@ -2120,12 +2151,12 @@ export default function PortfolioV2() {
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
                 />
                 <div className="text-[16px] leading-[1.35] tracking-[-0.02em]">
-                  <p className="text-[#cacaca]">
+                  <p className="text-[var(--v2-text)]">
                     {isEn ? 'Got specific questions?' : 'Punya pertanyaan spesifik?'}
                   </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="font-medium text-[#3b82f6] hover:underline"
+                    className="font-medium text-[var(--v2-accent)] hover:underline"
                   >
                     {isEn ? 'Contact Me' : 'Hubungi Saya'}
                   </a>
@@ -2138,18 +2169,18 @@ export default function PortfolioV2() {
                   return (
                     <div
                       key={item.q}
-                      className="rounded-[12px] border border-[#333333] bg-[#0a0a0a] p-6 sm:p-8"
+                      className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] p-6 sm:p-8"
                     >
                       <button
                         type="button"
                         onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] rounded"
+                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded"
                       >
-                        <span className="text-[22px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] text-[#cacaca]">
+                        <span className="text-[22px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] text-[var(--v2-text)]">
                           {item.q}
                         </span>
-                        <span className="text-[#3b82f6] shrink-0" aria-hidden="true">
+                        <span className="text-[var(--v2-accent)] shrink-0" aria-hidden="true">
                           {isOpen ? <FiMinus size={24} /> : <FiPlus size={24} />}
                         </span>
                       </button>
@@ -2164,7 +2195,7 @@ export default function PortfolioV2() {
                             transition={{ duration: 0.28, ease: NAKULA_EASE }}
                             className="overflow-hidden"
                           >
-                            <p className="pt-5 text-[16px] leading-[1.45] tracking-[-0.02em] text-[#777777]">
+                            <p className="pt-5 text-[16px] leading-[1.45] tracking-[-0.02em] text-[var(--v2-text-dim)]">
                               {item.a}
                             </p>
                           </motion.div>
@@ -2183,7 +2214,7 @@ export default function PortfolioV2() {
             ------------------------------------------------------------------ */}
         <section
           id="v2-insights"
-          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
+          className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px]"
         >
           <div className="v2-container space-y-12">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -2200,7 +2231,7 @@ export default function PortfolioV2() {
 
               <RouterLink
                 to="/study-case"
-                className="v2-pill-btn !min-w-[180px] !py-3.5 justify-between !text-[#3b82f6] hover:!border-[#3b82f6]"
+                className="v2-pill-btn !min-w-[180px] !py-3.5 justify-between !text-[var(--v2-accent)] hover:!border-[var(--v2-accent)]"
               >
                 <RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
                 <FiArrowUpRight size={16} />
@@ -2212,7 +2243,7 @@ export default function PortfolioV2() {
                 {/* Left Featured Card (50%) */}
                 <RouterLink
                   to={`/study-case/${featuredCaseStudies[0].id}`}
-                  className="group relative lg:col-span-6 min-h-[420px] lg:min-h-[540px] overflow-hidden rounded-[12px] border border-[#262626] bg-[#121212] flex flex-col justify-between p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                  className="group relative lg:col-span-6 min-h-[420px] lg:min-h-[540px] overflow-hidden rounded-[12px] border border-[var(--v2-border)] bg-[#121212] flex flex-col justify-between p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                 >
                   <img
                     src={featuredCaseStudies[0].image}
@@ -2226,7 +2257,7 @@ export default function PortfolioV2() {
                   />
 
                   <div className="relative z-10">
-                    <span className="inline-block rounded-full bg-[#e6e6e6]/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.02em] text-[#0a0a0a]">
+                    <span className="inline-block rounded-full bg-[#e6e6e6]/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.02em] text-[var(--v2-bg)]">
                       {isEn
                         ? featuredCaseStudies[0].category.en
                         : featuredCaseStudies[0].category.id}
@@ -2237,7 +2268,7 @@ export default function PortfolioV2() {
                     <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#a4a4a4]">
                       CASE STUDY · {featuredCaseStudies[0].number}
                     </p>
-                    <h3 className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.045em] leading-[1.08] text-white group-hover:text-[#3b82f6] transition-colors">
+                    <h3 className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.045em] leading-[1.08] text-white group-hover:text-[var(--v2-accent)] transition-colors">
                       {featuredCaseStudies[0].title} —{' '}
                       {isEn
                         ? featuredCaseStudies[0].subtitle.en
@@ -2252,29 +2283,29 @@ export default function PortfolioV2() {
                     <RouterLink
                       key={study.id}
                       to={`/study-case/${study.id}`}
-                      className="group rounded-[12px] border border-[#262626] bg-[#0e0e0e] p-3 flex flex-col justify-between gap-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]"
+                      className="group rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] p-3 flex flex-col justify-between gap-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                     >
-                      <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[8px] bg-[#161616]">
+                      <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[8px] bg-[var(--v2-surface-elevated)]">
                         <img
                           src={study.image}
                           alt={study.title}
                           loading="lazy"
                           className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
                         />
-                        <span className="absolute top-3 left-3 inline-block rounded-full bg-[#e6e6e6]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.02em] text-[#0a0a0a]">
+                        <span className="absolute top-3 left-3 inline-block rounded-full bg-[#e6e6e6]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.02em] text-[var(--v2-bg)]">
                           {isEn ? study.category.en : study.category.id}
                         </span>
                       </div>
 
                       <div className="px-2 pb-3 space-y-3 flex-1 flex flex-col justify-between">
-                        <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#777777]">
+                        <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[var(--v2-text-dim)]">
                           CASE STUDY · {study.number}
                         </p>
                         <div className="space-y-2">
-                          <h3 className="text-[22px] font-semibold tracking-[-0.04em] leading-[1.12] text-[#cacaca] group-hover:text-[#3b82f6] transition-colors">
+                          <h3 className="text-[22px] font-semibold tracking-[-0.04em] leading-[1.12] text-[var(--v2-text)] group-hover:text-[var(--v2-accent)] transition-colors">
                             {study.title} — {isEn ? study.subtitle.en : study.subtitle.id}
                           </h3>
-                          <p className="text-[14px] leading-[1.4] text-[#777777] line-clamp-2">
+                          <p className="text-[14px] leading-[1.4] text-[var(--v2-text-dim)] line-clamp-2">
                             {isEn ? study.details?.architecture?.en : study.details?.architecture?.id}
                           </p>
                         </div>
@@ -2293,7 +2324,7 @@ export default function PortfolioV2() {
         <section
           id="v2-contact"
           ref={ctaSectionRef}
-          className="relative z-[2] min-h-[580px] sm:min-h-[700px] flex items-center overflow-hidden bg-[#0a0a0a] py-24"
+          className="relative z-[2] min-h-[580px] sm:min-h-[700px] flex items-center overflow-hidden bg-[var(--v2-bg)] py-24"
         >
           {/* Downward Parallax Spotlight Layer (`translateY 0 -> 72px`, exact Nakula `.framer-1t4kn25`) */}
           <motion.div
@@ -2312,7 +2343,7 @@ export default function PortfolioV2() {
             </div>
 
             <div className="lg:col-span-5 space-y-6 lg:pb-2">
-              <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[#9a9a9a] max-w-md">
+              <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)] max-w-md">
                 {isEn
                   ? 'Have a frontend role, web application, or collaborative project in mind? Let’s build it with clarity.'
                   : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Mari bangun bersama dengan jelas dan terukur.'}
@@ -2353,28 +2384,28 @@ export default function PortfolioV2() {
         {/* ====================================================================
             11. FOOTER (`z-3` Dark Upper Footer + `z-0` Curtain-Sliding `#3B82F6` Bottom Banner)
             ==================================================================== */}
-        <footer ref={footerRef} className="relative bg-[#0a0a0a]">
+        <footer ref={footerRef} className="relative bg-[var(--v2-bg)]">
           {/* Upper Dark Footer (`z-index: 3`, exact Nakula `.framer-11myxzf`) */}
-          <div className="relative z-[3] bg-[#0a0a0a] border-t border-[#1c1c1c]">
+          <div className="relative z-[3] bg-[var(--v2-bg)] border-t border-[var(--v2-border)]">
             <div className="v2-container pt-14 pb-8 space-y-16">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 <div className="lg:col-span-4 space-y-5">
                   <div className="flex flex-wrap items-baseline gap-4">
-                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
                       (EMAIL)
                     </span>
                     <a
                       href={`mailto:${directEmail}`}
-                      className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#3b82f6] hover:underline break-all"
+                      className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-accent)] hover:underline break-all"
                     >
                       {directEmail}
                     </a>
                   </div>
                   <div className="flex flex-wrap items-baseline gap-4">
-                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
                       (LOCATION)
                     </span>
-                    <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.04em] leading-none text-[#cacaca]">
+                    <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.04em] leading-none text-[var(--v2-text)]">
                       Bogor / Jakarta, ID
                     </p>
                   </div>
@@ -2382,15 +2413,15 @@ export default function PortfolioV2() {
 
                 <div className="lg:col-span-4 grid grid-cols-2 gap-8">
                   <div>
-                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
                       (LINKS)
                     </p>
-                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[#cacaca]">
+                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[var(--v2-text)]">
                       <li>
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-top')}
-                          className="hover:text-[#3b82f6] transition-colors"
+                          className="hover:text-[var(--v2-accent)] transition-colors"
                         >
                           Home
                         </button>
@@ -2399,7 +2430,7 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-about')}
-                          className="hover:text-[#3b82f6] transition-colors"
+                          className="hover:text-[var(--v2-accent)] transition-colors"
                         >
                           About
                         </button>
@@ -2408,7 +2439,7 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-work')}
-                          className="hover:text-[#3b82f6] transition-colors"
+                          className="hover:text-[var(--v2-accent)] transition-colors"
                         >
                           Works
                         </button>
@@ -2417,23 +2448,23 @@ export default function PortfolioV2() {
                         <button
                           type="button"
                           onClick={() => scrollToSection('v2-contact')}
-                          className="hover:text-[#3b82f6] transition-colors"
+                          className="hover:text-[var(--v2-accent)] transition-colors"
                         >
                           Contact
                         </button>
                       </li>
                       <li>
-                        <RouterLink to="/study-case" className="hover:text-[#3b82f6] transition-colors">
+                        <RouterLink to="/study-case" className="hover:text-[var(--v2-accent)] transition-colors">
                           Case Studies
                         </RouterLink>
                       </li>
                       <li>
-                        <RouterLink to="/recruiter" className="hover:text-[#3b82f6] transition-colors">
+                        <RouterLink to="/recruiter" className="hover:text-[var(--v2-accent)] transition-colors">
                           Recruiter
                         </RouterLink>
                       </li>
                       <li>
-                        <RouterLink to="/play" className="hover:text-[#3b82f6] transition-colors">
+                        <RouterLink to="/play" className="hover:text-[var(--v2-accent)] transition-colors">
                           3D World
                         </RouterLink>
                       </li>
@@ -2441,20 +2472,20 @@ export default function PortfolioV2() {
                   </div>
 
                   <div>
-                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
                       (SOCIALS)
                     </p>
-                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[#cacaca]">
+                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[var(--v2-text)]">
                       {contactChannelsData.map((channel) => (
                         <li key={channel.key}>
                           <a
                             href={channel.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 hover:text-[#3b82f6] transition-colors"
+                            className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
                           >
                             <span>{channel.name}</span>
-                            <FiArrowUpRight size={15} className="text-[#777777]" />
+                            <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
                           </a>
                         </li>
                       ))}
@@ -2463,10 +2494,10 @@ export default function PortfolioV2() {
                           href="https://www.npmjs.com/package/@ghifari29/id-kit"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 hover:text-[#3b82f6] transition-colors"
+                          className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
                         >
                           <span>npm</span>
-                          <FiArrowUpRight size={15} className="text-[#777777]" />
+                          <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
                         </a>
                       </li>
                     </ul>
@@ -2474,15 +2505,15 @@ export default function PortfolioV2() {
                 </div>
 
                 <div className="lg:col-span-4 space-y-6">
-                  <p className="text-[15px] leading-[1.35] tracking-[-0.02em] text-[#cacaca] max-w-[280px]">
+                  <p className="text-[15px] leading-[1.35] tracking-[-0.02em] text-[var(--v2-text)] max-w-[280px]">
                     {isEn
                       ? 'Download my official CV to review full experience, projects, and engineering credentials.'
                       : 'Unduh CV resmi saya untuk meninjau pengalaman lengkap, proyek, dan kredensial rekayasa.'}
                   </p>
 
-                  <div className="border-b border-[#333333] pb-3 flex items-center justify-between text-[16px] text-[#777777]">
+                  <div className="border-b border-[var(--v2-border-strong)] pb-3 flex items-center justify-between text-[16px] text-[var(--v2-text-dim)]">
                     <span className="truncate pr-3">{RESUME_FILENAME}</span>
-                    <span className="text-[12px] font-semibold uppercase text-[#3b82f6]">PDF</span>
+                    <span className="text-[12px] font-semibold uppercase text-[var(--v2-accent)]">PDF</span>
                   </div>
 
                   {RESUME_AVAILABLE && (
@@ -2499,29 +2530,29 @@ export default function PortfolioV2() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-6 text-[12px] tracking-[-0.01em] text-[#777777]">
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-6 text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
                 <p className="uppercase">
                   @{new Date().getFullYear()} {siteConfig.brandName}. ALL RIGHTS RESERVED
                 </p>
-                <p className="uppercase font-medium text-[#cacaca]">
+                <p className="uppercase font-medium text-[var(--v2-text)]">
                   ENGINEERED BY {siteConfig.brandName}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Bottom Blue Banner (`z-index: 0`, slides out `-340px -> 0px` from behind `z-3` Dark Footer!) */}
-          <div className="relative z-[0] overflow-hidden bg-[#3b82f6]">
+          {/* Bottom Accent Banner (`z-index: 0`, slides out `-340px -> 0px` from behind `z-3` Footer!) */}
+          <div className="relative z-[0] overflow-hidden bg-[var(--v2-accent)]">
             <motion.div
               style={isTabletUp && !shouldReduceMotion ? { y: accentBannerY } : undefined}
-              className="bg-[#3b82f6] text-[#0a0a0a] pt-24 pb-10 sm:pt-[100px] sm:pb-12 will-change-transform"
+              className="bg-[var(--v2-accent)] text-[var(--v2-accent-ink)] pt-24 pb-10 sm:pt-[100px] sm:pb-12 will-change-transform"
             >
               <div className="v2-container flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
-                <p className="v2-display-heading !text-[#0a0a0a] text-[clamp(4.75rem,15.5vw,13rem)] leading-[0.80]">
+                <p className="v2-display-heading !text-[var(--v2-accent-ink)] text-[clamp(4.75rem,15.5vw,13rem)] leading-[0.80]">
                   {siteConfig.brandName}
                   <span className="text-[0.28em] align-top ml-1 font-sans font-normal">®</span>
                 </p>
-                <p className="text-left sm:text-right text-[clamp(2.1rem,3.8vw,3.35rem)] font-semibold tracking-[-0.055em] leading-[0.96] text-[#0a0a0a] max-w-[260px]">
+                <p className="text-left sm:text-right text-[clamp(2.1rem,3.8vw,3.35rem)] font-semibold tracking-[-0.055em] leading-[0.96] text-[var(--v2-accent-ink)] max-w-[260px]">
                   {isEn
                     ? 'Beyond Visuals. Built with Vision.'
                     : 'Melampaui Visual. Dibangun dengan Visi.'}
@@ -2531,6 +2562,10 @@ export default function PortfolioV2() {
           </div>
         </footer>
       </main>
+
+      <Suspense fallback={null}>
+        <DeveloperTerminal />
+      </Suspense>
     </div>
   );
 }

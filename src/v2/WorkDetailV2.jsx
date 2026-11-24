@@ -34,7 +34,7 @@ function ParallaxImageBox({ src, alt, className = '', rangePx = 84, eager = fals
   return (
     <div
       ref={boxRef}
-      className={`relative overflow-hidden rounded-[12px] bg-[#141414] border border-[#1f1f1f] ${className}`}
+      className={`relative overflow-hidden rounded-[12px] bg-[var(--v2-surface)] border border-[var(--v2-border)] ${className}`}
     >
       <motion.div
         style={
@@ -132,13 +132,13 @@ export default function WorkDetailV2({ slug }) {
   if (!project) {
     return (
       <V2SubpageShell scrollKey={`not-found-${slug}`}>
-        <section className="relative z-[2] min-h-[75vh] flex items-center bg-[#0a0a0a] pt-[140px] pb-[100px]">
+        <section className="relative z-[2] min-h-[75vh] flex items-center bg-[var(--v2-bg)] pt-[140px] pb-[100px]">
           <div className="v2-container max-w-[900px] space-y-8">
-            <p className="v2-section-tag !text-[#3b82f6]">(404 · NOT FOUND)</p>
+            <p className="v2-section-tag !text-[var(--v2-accent)]">(404 · NOT FOUND)</p>
             <h1 className="v2-section-heading">
               {isEn ? 'WORK NOT FOUND' : 'PROYEK TIDAK DITEMUKAN'}
             </h1>
-            <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] text-[#858585] max-w-xl">
+            <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] text-[var(--v2-text-muted)] max-w-xl">
               {isEn
                 ? `We could not find a case study matching "${slug}".`
                 : `Studi kasus dengan kode "${slug}" tidak ditemukan.`}
@@ -224,7 +224,7 @@ export default function WorkDetailV2({ slug }) {
       {/* ====================================================================
           SECTION 1 — CASE STUDY CONTENT (`max-width: 1200px`, `gap: 200px` desktop)
           ==================================================================== */}
-      <section className="relative z-[2] bg-[#0a0a0a] pt-[130px] pb-[100px] md:pt-[150px] md:pb-[150px] px-4 md:px-6">
+      <section className="relative z-[2] bg-[var(--v2-bg)] pt-[130px] pb-[100px] md:pt-[150px] md:pb-[150px] px-4 md:px-6">
         <div className="mx-auto w-full max-w-[1200px] flex flex-col gap-[120px] md:gap-[200px]">
           {/* 1. HERO + IMAGES BLOCK */}
           <div className="flex flex-col gap-[48px] md:gap-[64px]">
@@ -235,7 +235,7 @@ export default function WorkDetailV2({ slug }) {
                 <V2MaskedHeading
                   as="h1"
                   lines={[project.title]}
-                  className="v2-display-heading text-[clamp(3.5rem,8.4vw,8.75rem)] leading-[0.96] text-[#cacaca] break-words"
+                  className="v2-display-heading text-[clamp(3.5rem,8.4vw,8.75rem)] leading-[0.96] text-[var(--v2-text)] break-words"
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
                   reveal={isHeroReady}
                 />
@@ -251,7 +251,7 @@ export default function WorkDetailV2({ slug }) {
                       : { opacity: 0, y: 18, filter: 'blur(8px)' }
                   }
                   transition={{ duration: 0.65, delay: 0.12, ease: DETAIL_EASE }}
-                  className="max-w-[780px] text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.12] text-[#858585] will-change-transform"
+                  className="max-w-[780px] text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.12] text-[var(--v2-text-muted)] will-change-transform"
                 >
                   {descriptionText}
                 </motion.p>
@@ -269,13 +269,13 @@ export default function WorkDetailV2({ slug }) {
                   transition={{ duration: 0.58, delay: 0.08, ease: DETAIL_EASE }}
                   className="flex items-baseline gap-6 will-change-transform"
                 >
-                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
+                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text-dim)] uppercase">
                     ({isEn ? 'CATEGORY' : 'KATEGORI'})
                   </span>
-                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                     {categoryParts.map((part, idx) => (
                       <Fragment key={part}>
-                        {idx > 0 && <span className="mx-2 text-[#3b82f6]">•</span>}
+                        {idx > 0 && <span className="mx-2 text-[var(--v2-accent)]">•</span>}
                         <span>{part}</span>
                       </Fragment>
                     ))}
@@ -292,10 +292,10 @@ export default function WorkDetailV2({ slug }) {
                   transition={{ duration: 0.58, delay: 0.15, ease: DETAIL_EASE }}
                   className="flex items-baseline gap-6 will-change-transform"
                 >
-                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
+                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text-dim)] uppercase">
                     ({isEn ? 'ROLE' : 'PERAN'})
                   </span>
-                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                     {roleShort}
                   </span>
                 </motion.div>
@@ -310,13 +310,13 @@ export default function WorkDetailV2({ slug }) {
                   transition={{ duration: 0.58, delay: 0.22, ease: DETAIL_EASE }}
                   className="flex items-baseline gap-6 will-change-transform"
                 >
-                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
+                  <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text-dim)] uppercase">
                     (STACK)
                   </span>
-                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
+                  <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                     {(project.tags || []).slice(0, 3).map((tag, idx) => (
                       <Fragment key={tag}>
-                        {idx > 0 && <span className="mx-2 text-[#3b82f6]">•</span>}
+                        {idx > 0 && <span className="mx-2 text-[var(--v2-accent)]">•</span>}
                         <span>{tag}</span>
                       </Fragment>
                     ))}
@@ -343,7 +343,7 @@ export default function WorkDetailV2({ slug }) {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[#3b82f6] hover:opacity-85 transition-opacity"
+                          className="inline-flex items-center gap-1.5 text-[var(--v2-accent)] hover:opacity-85 transition-opacity"
                         >
                           <span>{isEn ? 'Live Website' : 'Lihat Website'}</span>
                           <FiArrowUpRight size={20} />
@@ -354,7 +354,7 @@ export default function WorkDetailV2({ slug }) {
                           href={project.npm}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[#3b82f6] hover:opacity-85 transition-opacity"
+                          className="inline-flex items-center gap-1.5 text-[var(--v2-accent)] hover:opacity-85 transition-opacity"
                         >
                           <span>npm Package</span>
                           <FiArrowUpRight size={20} />
@@ -366,11 +366,11 @@ export default function WorkDetailV2({ slug }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`inline-flex items-center gap-1.5 transition-opacity hover:opacity-85 ${
-                            project.live || project.npm ? 'text-[#cacaca]' : 'text-[#3b82f6]'
+                            project.live || project.npm ? 'text-[var(--v2-text)]' : 'text-[var(--v2-accent)]'
                           }`}
                         >
                           <span>GitHub</span>
-                          <FiArrowUpRight size={20} className="text-[#3b82f6]" />
+                          <FiArrowUpRight size={20} className="text-[var(--v2-accent)]" />
                         </a>
                       )}
                     </div>
@@ -399,17 +399,17 @@ export default function WorkDetailV2({ slug }) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left 1:1 Square Card — System Architecture & Full Tech Stack */}
-                <div className="aspect-square rounded-[12px] border border-[#222222] bg-[#111111] p-7 sm:p-10 flex flex-col justify-between">
+                <div className="aspect-square rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] p-7 sm:p-10 flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-[14px] uppercase tracking-[-0.02em] text-[#777777]">
+                    <span className="text-[14px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
                       ({isEn ? 'ARCHITECTURE' : 'ARSITEKTUR'})
                     </span>
-                    <span className="font-mono text-[13px] text-[#3b82f6]">
+                    <span className="font-mono text-[13px] text-[var(--v2-accent)]">
                       {project.number || '01'}.
                     </span>
                   </div>
 
-                  <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.045em] leading-[1.2] text-[#cacaca]">
+                  <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.045em] leading-[1.2] text-[var(--v2-text)]">
                     {architectureText}
                   </p>
 
@@ -417,7 +417,7 @@ export default function WorkDetailV2({ slug }) {
                     {(project.tags || []).map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-[#333333] px-3.5 py-1.5 text-[13px] font-medium text-[#9a9a9a]"
+                        className="rounded-full border border-[var(--v2-border-strong)] px-3.5 py-1.5 text-[13px] font-medium text-[var(--v2-text-muted)]"
                       >
                         {tag}
                       </span>
@@ -439,16 +439,16 @@ export default function WorkDetailV2({ slug }) {
 
           {/* 2. CHALLENGES BLOCK (`330px` Left Label + `680px` Indented Right Copy) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
-            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#555555]">
+            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
               {isEn ? 'Challenges' : 'Tantangan'}
-              <span className="text-[#3b82f6]">.</span>
+              <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-8">
-              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[#cacaca] indent-[calc(8%+16px)]">
+              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[var(--v2-text)] indent-[calc(8%+16px)]">
                 {problemText}
               </p>
               {goalsText && (
-                <p className="text-[18px] sm:text-[22px] font-medium tracking-[-0.04em] leading-[1.28] text-[#858585]">
+                <p className="text-[18px] sm:text-[22px] font-medium tracking-[-0.04em] leading-[1.28] text-[var(--v2-text-muted)]">
                   {goalsText}
                 </p>
               )}
@@ -457,23 +457,23 @@ export default function WorkDetailV2({ slug }) {
 
           {/* 3. SOLUTIONS BLOCK (`330px` Left Label + `680px` Indented Right Copy + Features) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
-            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#555555]">
+            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
               {isEn ? 'Solutions' : 'Solusi'}
-              <span className="text-[#3b82f6]">.</span>
+              <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-10">
-              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[#cacaca] indent-[calc(8%+16px)]">
+              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[var(--v2-text)] indent-[calc(8%+16px)]">
                 {solutionText}
               </p>
 
               {featuresList.length > 0 && (
-                <ul className="border-t border-[#222222] divide-y divide-[#222222]">
+                <ul className="border-t border-[var(--v2-border)] divide-y divide-[var(--v2-border)]">
                   {featuresList.map((feat, idx) => (
                     <li
                       key={feat}
-                      className="py-4 flex items-baseline gap-4 text-[16px] sm:text-[18px] font-medium tracking-[-0.025em] leading-[1.35] text-[#9a9a9a]"
+                      className="py-4 flex items-baseline gap-4 text-[16px] sm:text-[18px] font-medium tracking-[-0.025em] leading-[1.35] text-[var(--v2-text-muted)]"
                     >
-                      <span className="font-mono text-[12px] text-[#3b82f6] shrink-0">
+                      <span className="font-mono text-[12px] text-[var(--v2-accent)] shrink-0">
                         {String(idx + 1).padStart(2, '0')}.
                       </span>
                       <span>{feat}</span>
@@ -486,8 +486,8 @@ export default function WorkDetailV2({ slug }) {
 
           {/* 4. FULL-WIDTH SHOWCASE BLOCK (+ Interactive Playground for `@ghifari29/id-kit`) */}
           <div className="space-y-12">
-            <div className="rounded-[12px] border border-[#222222] bg-[#111111] p-5 sm:p-12 space-y-10">
-              <div className="overflow-hidden rounded-[10px] border border-[#242424] bg-[#0a0a0a]">
+            <div className="rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] p-5 sm:p-12 space-y-10">
+              <div className="overflow-hidden rounded-[10px] border border-[var(--v2-border)] bg-[var(--v2-bg)]">
                 <img
                   src={project.image}
                   alt={`${project.title} full showcase`}
@@ -501,12 +501,12 @@ export default function WorkDetailV2({ slug }) {
                   {processList.map((stepText, idx) => (
                     <div
                       key={stepText}
-                      className="border-t border-[#262626] pt-4 space-y-2"
+                      className="border-t border-[var(--v2-border)] pt-4 space-y-2"
                     >
-                      <p className="text-[13px] font-semibold uppercase tracking-[-0.02em] text-[#3b82f6]">
+                      <p className="text-[13px] font-semibold uppercase tracking-[-0.02em] text-[var(--v2-accent)]">
                         STEP {idx + 1}.
                       </p>
-                      <p className="text-[15px] sm:text-[16px] leading-[1.4] text-[#9a9a9a]">
+                      <p className="text-[15px] sm:text-[16px] leading-[1.4] text-[var(--v2-text-muted)]">
                         {stepText}
                       </p>
                     </div>
@@ -519,7 +519,7 @@ export default function WorkDetailV2({ slug }) {
               <div id="playground" className="pt-4">
                 <Suspense
                   fallback={
-                    <div className="h-64 rounded-[12px] border border-[#222222] bg-[#111111]" />
+                    <div className="h-64 rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)]" />
                   }
                 >
                   <IdKitPlayground />
@@ -530,22 +530,22 @@ export default function WorkDetailV2({ slug }) {
 
           {/* 5. RESULTS BLOCK (`330px` Left Label + `680px` Summary & 3-Col `72px` Metrics) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
-            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#555555]">
+            <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
               {isEn ? 'Results' : 'Hasil'}
-              <span className="text-[#3b82f6]">.</span>
+              <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-12">
-              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[#cacaca] indent-[calc(8%+16px)]">
+              <p className="text-[20px] sm:text-[28px] xl:text-[32px] font-semibold tracking-[-0.055em] leading-[1.12] text-[var(--v2-text)] indent-[calc(8%+16px)]">
                 {contributionFull}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-2">
                 {resultMetrics.map((m) => (
                   <div key={m.label} className="space-y-2">
-                    <p className="text-[44px] sm:text-[60px] xl:text-[68px] font-semibold tracking-[-0.055em] leading-none text-[#cacaca]">
+                    <p className="text-[44px] sm:text-[60px] xl:text-[68px] font-semibold tracking-[-0.055em] leading-none text-[var(--v2-text)]">
                       {m.value}
                     </p>
-                    <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#cacaca]">
+                    <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text)]">
                       {m.label}
                     </p>
                   </div>
@@ -559,18 +559,18 @@ export default function WorkDetailV2({ slug }) {
       {/* ====================================================================
           SECTION 2 — CENTERED ENGINEERING REFLECTION QUOTE (`max-w-[920px]`)
           ==================================================================== */}
-      <section className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-[150px] px-4 md:px-6">
+      <section className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-[150px] px-4 md:px-6">
         <div className="mx-auto w-full max-w-[920px] space-y-12">
           <div className="relative">
             <span
               aria-hidden="true"
-              className="absolute -top-2 left-0 text-[56px] sm:text-[80px] font-semibold leading-none text-[#3b82f6] select-none"
+              className="absolute -top-2 left-0 text-[56px] sm:text-[80px] font-semibold leading-none text-[var(--v2-accent)] select-none"
             >
               “
             </span>
             <blockquote className="text-[28px] sm:text-[44px] xl:text-[52px] font-semibold tracking-[-0.06em] leading-[1.04] indent-12 sm:indent-20">
-              <span className="text-[#cacaca]">{quoteLead} </span>
-              {quoteRest && <span className="text-[#555555]">{quoteRest}</span>}
+              <span className="text-[var(--v2-text)]">{quoteLead} </span>
+              {quoteRest && <span className="text-[var(--v2-text-dim)]">{quoteRest}</span>}
             </blockquote>
           </div>
 
@@ -586,7 +586,7 @@ export default function WorkDetailV2({ slug }) {
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="h-[76px] w-[76px] sm:h-[88px] sm:w-[88px] shrink-0 overflow-hidden rounded-[16px] border border-[#2a2a2a] bg-[#141414]">
+            <div className="h-[76px] w-[76px] sm:h-[88px] sm:w-[88px] shrink-0 overflow-hidden rounded-[16px] border border-[var(--v2-border-strong)] bg-[var(--v2-surface)]">
               <img
                 src={profileData.avatarImage}
                 alt={siteConfig.name}
@@ -595,10 +595,10 @@ export default function WorkDetailV2({ slug }) {
               />
             </div>
             <div>
-              <p className="text-[22px] sm:text-[24px] font-medium tracking-[-0.04em] text-[#cacaca]">
+              <p className="text-[22px] sm:text-[24px] font-medium tracking-[-0.04em] text-[var(--v2-text)]">
                 {siteConfig.name}
               </p>
-              <p className="text-[15px] sm:text-[16px] text-[#888888] mt-0.5">{roleShort}</p>
+              <p className="text-[15px] sm:text-[16px] text-[var(--v2-text-muted)] mt-0.5">{roleShort}</p>
             </div>
           </div>
         </div>
@@ -607,7 +607,7 @@ export default function WorkDetailV2({ slug }) {
       {/* ====================================================================
           SECTION 3 — MORE WORKS (`max-width: 1400px`, 2-Column Project Cards)
           ==================================================================== */}
-      <section className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-[150px]">
+      <section className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-[150px]">
         <div className="v2-container flex flex-col gap-[56px] md:gap-[72px]">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <V2MaskedHeading
@@ -619,7 +619,7 @@ export default function WorkDetailV2({ slug }) {
 
             <RouterLink
               to="/study-case"
-              className="v2-pill-btn !min-w-[190px] !h-[52px] justify-between !text-[#3b82f6] hover:!border-[#3b82f6]"
+              className="v2-pill-btn !min-w-[190px] !h-[52px] justify-between !text-[var(--v2-accent)] hover:!border-[var(--v2-accent)]"
             >
               <V2RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
               <FiArrowUpRight size={16} />
