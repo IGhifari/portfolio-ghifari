@@ -18,7 +18,7 @@ import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
 import { useLanguage } from '../context/LanguageContext';
 import { RouterLink, useRouter } from '../context/RouterContext';
 import V2OpeningSequence from './V2OpeningSequence';
-import { hasCompletedV2Opening } from './v2OpeningState';
+import { hasCompletedV2Opening, useV2TransitionState } from './v2OpeningState';
 import './v2.css';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -48,6 +48,7 @@ export function V2MaskedHeading({
   as: Tag = 'h1',
   className = '',
   shouldReduceMotion = false,
+  reveal,
 }) {
   if (shouldReduceMotion) {
     return (
@@ -62,12 +63,14 @@ export function V2MaskedHeading({
   }
 
   let charCursor = 0;
+  const isControlled = typeof reveal === 'boolean';
 
   return (
     <motion.div
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
+      animate={isControlled ? (reveal ? 'visible' : 'hidden') : undefined}
+      whileInView={isControlled ? undefined : 'visible'}
+      viewport={isControlled ? undefined : { once: true, amount: 0.2 }}
     >
       <Tag className={className}>
         {lines.map((line) => {
@@ -117,6 +120,7 @@ V2MaskedHeading.propTypes = {
   as: PropTypes.elementType,
   className: PropTypes.string,
   shouldReduceMotion: PropTypes.bool,
+  reveal: PropTypes.bool,
 };
 
 /**
@@ -126,7 +130,13 @@ V2MaskedHeading.propTypes = {
  * - Title: Geist `56px` desktop (`40px` mobile), `600`, `-0.06em`, `#cacaca`
  * - Subtitle: Geist `24px` desktop (`19px` mobile), `500`, `-0.05em`, `#858585`
  */
-export function V2WorkGridCard({ project, index = 0, isEn, shouldReduceMotion = false }) {
+export function V2WorkGridCard({
+  project,
+  index = 0,
+  isEn,
+  shouldReduceMotion = false,
+  reveal,
+}) {
   const [isHovered, setIsHovered] = useState(false);
 
   const mouseX = useMotionValue(0);
@@ -155,14 +165,23 @@ export function V2WorkGridCard({ project, index = 0, isEn, shouldReduceMotion = 
     ? project.description.en
     : project.description.id;
 
+  const isControlled = typeof reveal === 'boolean';
+
   return (
     <motion.article
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 32 }}
-      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.14 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 36 }}
+      animate={
+        shouldReduceMotion || !isControlled
+          ? undefined
+          : reveal
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 36 }
+      }
+      whileInView={shouldReduceMotion || isControlled ? undefined : { opacity: 1, y: 0 }}
+      viewport={isControlled ? undefined : { once: true, amount: 0.14 }}
       transition={{
-        duration: 0.62,
-        delay: (index % 2) * 0.08,
+        duration: 0.66,
+        delay: (isControlled ? 0.14 : 0) + (index % 2) * 0.08,
         ease: NAKULA_EASE,
       }}
       className="v2-works-grid-card group flex flex-col gap-6 sm:gap-8"
@@ -228,6 +247,7 @@ V2WorkGridCard.propTypes = {
   index: PropTypes.number,
   isEn: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
+  reveal: PropTypes.bool,
 };
 
 /**
@@ -246,20 +266,11 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [jakartaTime, setJakartaTime] = useState('');
-  const [activeScrollKey, setActiveScrollKey] = useState(scrollKey);
   const [showOpening, setShowOpening] = useState(
     () => !shouldReduceMotion && !hasCompletedV2Opening()
   );
-  const [showPageCurtain, setShowPageCurtain] = useState(
-    () => !shouldReduceMotion && hasCompletedV2Opening()
-  );
-
-  if (activeScrollKey !== scrollKey) {
-    setActiveScrollKey(scrollKey);
-    if (!shouldReduceMotion && hasCompletedV2Opening()) {
-      setShowPageCurtain(true);
-    }
-  }
+  const { subpageRevealReady } = useV2TransitionState();
+  const isNavbarReady = Boolean(shouldReduceMotion || (!showOpening && subpageRevealReady));
 
   const lenisRef = useRef(null);
   const ctaSectionRef = useRef(null);
@@ -306,7 +317,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
     };
   }, [shouldReduceMotion]);
 
-  // Reset scroll to top cleanly when switching between projects + run blue page curtain
+  // Reset scroll to top cleanly when switching between projects
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     if (lenisRef.current) {
@@ -316,22 +327,13 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
     if (shouldReduceMotion) {
       setShowOpening(false);
-      setShowPageCurtain(false);
       return undefined;
     }
 
     if (!hasCompletedV2Opening()) {
       setShowOpening(true);
-      setShowPageCurtain(false);
-      return undefined;
     }
-
-    setShowPageCurtain(true);
-    const curtainTimer = setTimeout(() => {
-      setShowPageCurtain(false);
-    }, 1250);
-
-    return () => clearTimeout(curtainTimer);
+    return undefined;
   }, [scrollKey, shouldReduceMotion]);
 
   // Live GMT+7 clock
@@ -407,50 +409,14 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
       )}
 
       {/* ====================================================================
-          ELECTRIC BLUE (#3B82F6) PAGE TRANSITION CURTAIN
-          ==================================================================== */}
-      <AnimatePresence>
-        {showPageCurtain && (
-          <motion.div
-            key={`v2-subpage-curtain-${scrollKey}`}
-            data-v2-splash="active"
-            initial={{ y: '0%' }}
-            exit={{
-              y: '-100%',
-              transition: {
-                duration: 1.12,
-                ease: [0.65, 0, 0.35, 1],
-              },
-            }}
-            className="fixed inset-0 z-[150] flex items-center justify-center bg-[#3b82f6] select-none pointer-events-none will-change-transform"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98, filter: 'blur(6px)' }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                filter: 'blur(0px)',
-                transition: {
-                  duration: 0.65,
-                  delay: 0.14,
-                  ease: NAKULA_EASE,
-                },
-              }}
-              className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,5.8vw,5.25rem)] leading-none px-4 py-2 will-change-transform"
-            >
-              {siteConfig.brandName}
-              <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
-                ®
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ====================================================================
           FIXED COMPACT NAKULA NAVBAR (Wordmark starts Small on `/works` & `/works/:slug`)
           ==================================================================== */}
-      <header className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none">
+      <motion.header
+        initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
+        animate={isNavbarReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+        transition={{ duration: 0.55, ease: NAKULA_EASE }}
+        className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none"
+      >
         <div className="v2-container flex items-center justify-between pt-4 md:pt-5">
           {/* Small Compact Wordmark (`~36px` tall, exact Nakula subpage navbar) */}
           <RouterLink
@@ -522,7 +488,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* ====================================================================
           SLIDE-OVER RIGHT MENU DRAWER

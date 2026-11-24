@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   parseLocation,
@@ -8,12 +8,52 @@ import {
   DEFAULT_PORTFOLIO_VERSION,
 } from '../utils/router';
 import { useLanguage, DEFAULT_LANGUAGE } from './LanguageContext';
+import { runV2PageTransition } from '../v2/v2OpeningState';
 
 const RouterContext = createContext(null);
+
+function isV2PageRouteType(type) {
+  return (
+    type === 'home' ||
+    type === 'study-case-list' ||
+    type === 'study-case-detail'
+  );
+}
+
+function shouldAnimateV2PageSwap(fromLoc, toLoc) {
+  if (typeof window === 'undefined' || !fromLoc || !toLoc) return false;
+  if (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return false;
+  }
+  const fromVer = fromLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+  const toVer = toLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+  if (fromVer === '1' || toVer === '1') return false;
+  if (!isV2PageRouteType(fromLoc.route?.type) || !isV2PageRouteType(toLoc.route?.type)) {
+    return false;
+  }
+  return fromLoc.cleanPath !== toLoc.cleanPath;
+}
+
+function preloadV2RouteChunk(routeType) {
+  if (routeType === 'study-case-list') {
+    import('../v2/WorksListV2');
+  } else if (routeType === 'study-case-detail') {
+    import('../v2/WorkDetailV2');
+  }
+}
 
 export const RouterProvider = ({ children }) => {
   const [currentLocation, setCurrentLocation] = useState(() => parseLocation());
   const { language, setLanguage } = useLanguage();
+  const currentLocationRef = useRef(currentLocation);
+  const scrollHistoryRef = useRef(new Map());
+
+  useEffect(() => {
+    currentLocationRef.current = currentLocation;
+  }, [currentLocation]);
 
   const activeLang =
     currentLocation.langPrefix === 'en' || language === 'en' ? 'en' : 'id';
@@ -21,8 +61,8 @@ export const RouterProvider = ({ children }) => {
 
   useEffect(() => {
     const handlePopState = () => {
+      const prevLoc = currentLocationRef.current;
       const nextLoc = parseLocation(window.location);
-      setCurrentLocation(nextLoc);
       const queryLang = new URLSearchParams(nextLoc.search || '').get('lang');
       const nextLang =
         nextLoc.langPrefix === 'en'
@@ -30,6 +70,23 @@ export const RouterProvider = ({ children }) => {
           : queryLang === 'en' || queryLang === 'id'
           ? queryLang
           : DEFAULT_LANGUAGE;
+
+      if (shouldAnimateV2PageSwap(prevLoc, nextLoc)) {
+        preloadV2RouteChunk(nextLoc.route?.type);
+        const savedScrollY = scrollHistoryRef.current.get(nextLoc.cleanPath) ?? 0;
+        runV2PageTransition(() => {
+          currentLocationRef.current = nextLoc;
+          setCurrentLocation(nextLoc);
+          setLanguage(nextLang);
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+          });
+        });
+        return;
+      }
+
+      currentLocationRef.current = nextLoc;
+      setCurrentLocation(nextLoc);
       setLanguage(nextLang);
     };
 
@@ -97,6 +154,24 @@ export const RouterProvider = ({ children }) => {
           ? buildLocalizedPath(to, 'en')
           : to;
       const targetUrl = withVersionParam(localizedUrl, portfolioVersion);
+
+      const parsedUrl = new URL(targetUrl, window.location.origin);
+      const nextParsed = parseLocation(parsedUrl);
+      const prevLoc = currentLocationRef.current;
+
+      if (shouldAnimateV2PageSwap(prevLoc, nextParsed)) {
+        if (prevLoc?.cleanPath) {
+          scrollHistoryRef.current.set(prevLoc.cleanPath, window.scrollY || 0);
+        }
+        preloadV2RouteChunk(nextParsed.route?.type);
+        runV2PageTransition(() => {
+          if (explicitEn && language !== 'en') {
+            setLanguage('en');
+          }
+          commitNavigation(targetUrl, { replace, scrollToTop, handleHashScroll: true });
+        });
+        return;
+      }
 
       if (explicitEn && language !== 'en') {
         setLanguage('en');

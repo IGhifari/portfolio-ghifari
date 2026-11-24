@@ -625,11 +625,8 @@ export default function PortfolioV2() {
   const [showOpening, setShowOpening] = useState(
     () => !shouldReduceMotion && !hasCompletedV2Opening()
   );
-  const [showSplash, setShowSplash] = useState(
-    () => !shouldReduceMotion && hasCompletedV2Opening()
-  );
   const [heroIntroComplete, setHeroIntroComplete] = useState(() =>
-    Boolean(shouldReduceMotion)
+    Boolean(shouldReduceMotion || hasCompletedV2Opening())
   );
   const [isWordmarkCompact, setIsWordmarkCompact] = useState(false);
   const [isHeroExited, setIsHeroExited] = useState(false);
@@ -705,60 +702,35 @@ export default function PortfolioV2() {
   }, []);
 
   // Initial site entry plays Orbital Telemetry Opening (`showOpening`);
-  // Returning to Home from another V2 page plays the `#3b82f6` Blue Curtain (`showSplash`).
+  // Subsequent returns to Home are wiped seamlessly by persistent `<V2PageTransition />` in App.jsx.
   useEffect(() => {
-    if (shouldReduceMotion) {
+    if (shouldReduceMotion || hasCompletedV2Opening()) {
       setShowOpening(false);
-      setShowSplash(false);
       setHeroIntroComplete(true);
       return undefined;
     }
 
-    if (!hasCompletedV2Opening()) {
-      setShowOpening(true);
-      setShowSplash(false);
-      setHeroIntroComplete(false);
-      return undefined;
-    }
-
-    setShowOpening(false);
-    setShowSplash(true);
+    setShowOpening(true);
     setHeroIntroComplete(false);
-
-    const splashTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 1850);
-
-    const readyTimer = setTimeout(() => {
-      setHeroIntroComplete(true);
-    }, 2920);
-
-    return () => {
-      clearTimeout(splashTimer);
-      clearTimeout(readyTimer);
-    };
-  }, [shouldReduceMotion]);
-
-  // Scroll to target anchor underneath blue curtain on hash arrival (e.g. `/#v2-about`) or reset to top
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    if (window.location.hash) {
-      const id = window.location.hash.replace(/^#/, '');
-      const timer = setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          if (lenisRef.current) {
-            lenisRef.current.scrollTo(el, { offset: -72, immediate: true });
-          } else {
-            el.scrollIntoView({ behavior: 'auto' });
-          }
-        }
-      }, 60);
-      return () => clearTimeout(timer);
-    }
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     return undefined;
   }, [shouldReduceMotion]);
+
+  // Scroll to target anchor on hash arrival (e.g. `/#v2-about`); leave normal & popstate scroll to RouterContext
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.location.hash) return undefined;
+    const id = window.location.hash.replace(/^#/, '');
+    const timer = setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(el, { offset: -72, immediate: true });
+        } else {
+          el.scrollIntoView({ behavior: 'auto' });
+        }
+      }
+    }, 40);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Enable viewport-level position:sticky strictly inside Portfolio V2
   useEffect(() => {
@@ -1093,7 +1065,7 @@ export default function PortfolioV2() {
   return (
     <div className="v2-portfolio-root" data-portfolio-version="2">
       {/* ====================================================================
-          0A. INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
+          0. INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
           ==================================================================== */}
       {showOpening && (
         <V2OpeningSequence
@@ -1105,47 +1077,6 @@ export default function PortfolioV2() {
           }}
         />
       )}
-
-      {/* ====================================================================
-          0B. PAGE TRANSITION — ELECTRIC BLUE (#3B82F6) CURTAIN
-          ==================================================================== */}
-      <AnimatePresence>
-        {showSplash && (
-          <motion.div
-            key="v2-nakula-splash"
-            data-v2-splash="active"
-            initial={{ y: '0%' }}
-            exit={{
-              y: '-100%',
-              transition: {
-                duration: 1.12,
-                ease: [0.65, 0, 0.35, 1],
-              },
-            }}
-            className="fixed inset-0 z-[150] flex items-center justify-center bg-[#3b82f6] select-none pointer-events-none will-change-transform"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98, filter: 'blur(6px)' }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                filter: 'blur(0px)',
-                transition: {
-                  duration: 0.72,
-                  delay: 0.22,
-                  ease: NAKULA_EASE,
-                },
-              }}
-              className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,5.8vw,5.25rem)] leading-none px-4 py-2 will-change-transform"
-            >
-              {siteConfig.brandName}
-              <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
-                ®
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ====================================================================
           FIXED NAKULA TOP HEADER (Variant-Switching Wordmark + Blend-Difference Right Nav)

@@ -14,6 +14,9 @@ import V2SubpageShell, {
   V2RolloverLabel,
   V2WorkGridCard,
 } from './V2Chrome';
+import { useV2TransitionState } from './v2OpeningState';
+
+const DETAIL_EASE = [0.22, 1, 0.36, 1];
 
 const IdKitPlayground = lazy(() => import('../components/IdKitPlayground'));
 
@@ -83,7 +86,11 @@ ParallaxImageBox.propTypes = {
 export default function WorkDetailV2({ slug }) {
   const { language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+  const { subpageRevealReady, openingCompleted } = useV2TransitionState();
   const isEn = language === 'en';
+  const isHeroReady = Boolean(
+    shouldReduceMotion || (openingCompleted && subpageRevealReady)
+  );
 
   const project = getProjectBySlug(slug);
 
@@ -230,15 +237,38 @@ export default function WorkDetailV2({ slug }) {
                   lines={[project.title]}
                   className="v2-display-heading text-[clamp(3.5rem,8.4vw,8.75rem)] leading-[0.96] text-[#cacaca] break-words"
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
+                  reveal={isHeroReady}
                 />
-                <p className="max-w-[780px] text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.12] text-[#858585]">
+                <motion.p
+                  initial={
+                    shouldReduceMotion
+                      ? false
+                      : { opacity: 0, y: 18, filter: 'blur(8px)' }
+                  }
+                  animate={
+                    isHeroReady
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 18, filter: 'blur(8px)' }
+                  }
+                  transition={{ duration: 0.65, delay: 0.12, ease: DETAIL_EASE }}
+                  className="max-w-[780px] text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.12] text-[#858585] will-change-transform"
+                >
                   {descriptionText}
-                </p>
+                </motion.p>
               </div>
 
               {/* Right Column: 4-Row Metadata Table (`width: 400px` desktop) */}
               <div className="w-full lg:w-[400px] shrink-0 flex flex-col gap-5 lg:pt-2">
-                <div className="flex items-baseline gap-6">
+                <motion.div
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 14, filter: 'blur(6px)' }}
+                  animate={
+                    isHeroReady
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                  }
+                  transition={{ duration: 0.58, delay: 0.08, ease: DETAIL_EASE }}
+                  className="flex items-baseline gap-6 will-change-transform"
+                >
                   <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
                     ({isEn ? 'CATEGORY' : 'KATEGORI'})
                   </span>
@@ -250,18 +280,36 @@ export default function WorkDetailV2({ slug }) {
                       </Fragment>
                     ))}
                   </span>
-                </div>
+                </motion.div>
 
-                <div className="flex items-baseline gap-6">
+                <motion.div
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 14, filter: 'blur(6px)' }}
+                  animate={
+                    isHeroReady
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                  }
+                  transition={{ duration: 0.58, delay: 0.15, ease: DETAIL_EASE }}
+                  className="flex items-baseline gap-6 will-change-transform"
+                >
                   <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
                     ({isEn ? 'ROLE' : 'PERAN'})
                   </span>
                   <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[#cacaca]">
                     {roleShort}
                   </span>
-                </div>
+                </motion.div>
 
-                <div className="flex items-baseline gap-6">
+                <motion.div
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 14, filter: 'blur(6px)' }}
+                  animate={
+                    isHeroReady
+                      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                  }
+                  transition={{ duration: 0.58, delay: 0.22, ease: DETAIL_EASE }}
+                  className="flex items-baseline gap-6 will-change-transform"
+                >
                   <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[#777777] uppercase">
                     (STACK)
                   </span>
@@ -273,10 +321,21 @@ export default function WorkDetailV2({ slug }) {
                       </Fragment>
                     ))}
                   </span>
-                </div>
+                </motion.div>
 
                 {(project.live || project.npm || project.github) && (
-                  <div className="flex items-baseline gap-6 pt-1">
+                  <motion.div
+                    initial={
+                      shouldReduceMotion ? false : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                    }
+                    animate={
+                      isHeroReady
+                        ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                        : { opacity: 0, y: 14, filter: 'blur(6px)' }
+                    }
+                    transition={{ duration: 0.58, delay: 0.29, ease: DETAIL_EASE }}
+                    className="flex items-baseline gap-6 pt-1 will-change-transform"
+                  >
                     <span className="w-[100px] shrink-0" aria-hidden="true" />
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08]">
                       {project.live && (
@@ -315,21 +374,28 @@ export default function WorkDetailV2({ slug }) {
                         </a>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </div>
 
             {/* Hero Cover Image + 2-Column Square Gallery (`gap: 24px`) */}
             <div className="flex flex-col gap-6">
-              <ParallaxImageBox
-                src={project.image}
-                alt={project.title}
-                eager={true}
-                rangePx={86}
-                shouldReduceMotion={Boolean(shouldReduceMotion)}
-                className="aspect-[1.446] w-full"
-              />
+              <motion.div
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 48 }}
+                animate={isHeroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 48 }}
+                transition={{ duration: 0.78, delay: 0.18, ease: DETAIL_EASE }}
+                className="will-change-transform"
+              >
+                <ParallaxImageBox
+                  src={project.image}
+                  alt={project.title}
+                  eager={true}
+                  rangePx={86}
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                  className="aspect-[1.446] w-full"
+                />
+              </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left 1:1 Square Card — System Architecture & Full Tech Stack */}

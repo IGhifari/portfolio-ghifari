@@ -6,6 +6,7 @@ import { siteConfig } from '../config/site';
 import { useLanguage } from '../context/LanguageContext';
 import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
 import V2SubpageShell, { V2MaskedHeading, V2WorkGridCard } from './V2Chrome';
+import { useV2TransitionState } from './v2OpeningState';
 
 /**
  * Portfolio V2 — All Works Page (`/study-case` when `portfolioVersion !== '1'`)
@@ -19,7 +20,11 @@ import V2SubpageShell, { V2MaskedHeading, V2WorkGridCard } from './V2Chrome';
 export default function WorksListV2() {
   const { language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+  const { subpageRevealReady, openingCompleted } = useV2TransitionState();
   const isEn = language === 'en';
+  const isHeroReady = Boolean(
+    shouldReduceMotion || (openingCompleted && subpageRevealReady)
+  );
 
   useEffect(() => {
     const title = isEn
@@ -50,6 +55,7 @@ export default function WorksListV2() {
             lines={isEn ? ['SELECTED WORKS'] : ['SEMUA KARYA']}
             className="v2-section-heading"
             shouldReduceMotion={Boolean(shouldReduceMotion)}
+            reveal={isHeroReady}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-[56px] gap-x-[24px]">
@@ -60,6 +66,7 @@ export default function WorksListV2() {
                 index={idx}
                 isEn={isEn}
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
+                reveal={idx < 2 ? isHeroReady : undefined}
               />
             ))}
           </div>
