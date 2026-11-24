@@ -2,8 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   AnimatePresence,
+  animate,
   motion,
+  useInView,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -24,10 +27,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { RouterLink, useRouter } from '../context/RouterContext';
 import './v2.css';
 
-const EDITORIAL_EASE = [0.22, 1, 0.36, 1];
+const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
 /* ==========================================================================
-   Helper Components
+   Scroll & Typography Primitives (1:1 Nakula Mechanics)
    ========================================================================== */
 
 function RolloverLabel({ text }) {
@@ -47,261 +50,246 @@ RolloverLabel.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
-function EditorialReveal({ children, className = '', delay = 0, shouldReduceMotion = false }) {
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
+/**
+ * Animated Count-Up Metric Cell (Exact Nakula video 00:03–00:05:
+ * staggered upward rise into a level 4-column horizontal strip + ease-out integer count-up)
+ */
+function CountUpMetricCell({ numeral, suffix, label, index, isTriggered, shouldReduceMotion }) {
+  const target = Number(numeral) || 0;
+  const [count, setCount] = useState(() => (shouldReduceMotion ? target : 0));
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setCount(target);
+      return undefined;
+    }
+    if (!isTriggered) return undefined;
+
+    const controls = animate(0, target, {
+      duration: 1.75,
+      delay: index * 0.12,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (latest) => {
+        setCount(Math.round(latest));
+      },
+    });
+
+    return () => controls.stop();
+  }, [index, isTriggered, shouldReduceMotion, target]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.16 }}
-      transition={{ duration: 0.56, delay, ease: EDITORIAL_EASE }}
-      className={className}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 52 }}
+      animate={
+        shouldReduceMotion || isTriggered
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 52 }
+      }
+      transition={{
+        duration: 0.72,
+        delay: index * 0.12,
+        ease: NAKULA_EASE,
+      }}
+      className="v2-metric-cell will-change-transform"
     >
-      {children}
+      <div className="v2-metric-ticks" aria-hidden="true" />
+      <div className="flex items-baseline" aria-label={`${target}${suffix}`}>
+        <span className="text-[52px] sm:text-[76px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[#cacaca]">
+          {count}
+        </span>
+        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[#ff4925]">
+          {suffix}
+        </span>
+      </div>
+      <p className="mt-12 max-w-[185px] text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.3] text-[#858585]">
+        {label}
+      </p>
     </motion.div>
   );
 }
 
-EditorialReveal.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  delay: PropTypes.number,
+CountUpMetricCell.propTypes = {
+  numeral: PropTypes.string.isRequired,
+  suffix: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  isTriggered: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
 };
 
-function ScrollWord({ word, progress, range }) {
-  const color = useTransform(progress, range, ['#323232', '#f5f5f5']);
+/**
+ * Masked Character-by-Character Display Heading Rise (Exact Nakula h2 viewport-entry reveal)
+ */
+function MaskedDisplayHeading({
+  lines,
+  as: Tag = 'h2',
+  className = '',
+  lineClassNames = [],
+  shouldReduceMotion = false,
+}) {
+  if (shouldReduceMotion) {
+    return (
+      <Tag className={className}>
+        {lines.map((line, lineIdx) => (
+          <span key={line} className={`block ${lineClassNames[lineIdx] || ''}`}>
+            {line}
+          </span>
+        ))}
+      </Tag>
+    );
+  }
+
+  let charCursor = 0;
 
   return (
-    <motion.span style={{ color }} className="inline-block mr-[0.25em]">
-      {word}
-    </motion.span>
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.22 }}
+    >
+      <Tag className={className}>
+        {lines.map((line, lineIdx) => {
+          const words = line.split(' ');
+          return (
+            <span
+              key={line}
+              className={`block overflow-hidden py-[0.02em] ${lineClassNames[lineIdx] || ''}`}
+            >
+              {words.map((word, wIdx) => (
+                <span
+                  key={`${word}-${wIdx}`}
+                  className="inline-block whitespace-nowrap mr-[0.22em] last:mr-0"
+                >
+                  {Array.from(word).map((ch, cIdx) => {
+                    const delay = charCursor * 0.018;
+                    charCursor += 1;
+                    return (
+                      <motion.span
+                        key={`${ch}-${cIdx}`}
+                        variants={{
+                          hidden: { y: '106%' },
+                          visible: {
+                            y: '0%',
+                            transition: {
+                              duration: 0.58,
+                              delay,
+                              ease: NAKULA_EASE,
+                            },
+                          },
+                        }}
+                        className="inline-block will-change-transform"
+                      >
+                        {ch}
+                      </motion.span>
+                    );
+                  })}
+                </span>
+              ))}
+            </span>
+          );
+        })}
+      </Tag>
+    </motion.div>
   );
 }
 
-ScrollWord.propTypes = {
+MaskedDisplayHeading.propTypes = {
+  lines: PropTypes.arrayOf(PropTypes.string).isRequired,
+  as: PropTypes.elementType,
+  className: PropTypes.string,
+  lineClassNames: PropTypes.arrayOf(PropTypes.string),
+  shouldReduceMotion: PropTypes.bool,
+};
+
+/**
+ * Threshold-switched About word with exact Nakula `transition: color 0.22s ease-out`
+ * Only updates React state when crossing its threshold (2 renders total, zero scroll jank).
+ */
+function AboutThresholdWord({ word, progress, threshold }) {
+  const [isLit, setIsLit] = useState(false);
+
+  useMotionValueEvent(progress, 'change', (latest) => {
+    const nextLit = latest >= threshold;
+    setIsLit((prev) => (prev !== nextLit ? nextLit : prev));
+  });
+
+  return (
+    <span
+      className="v2-about-word"
+      style={{ color: isLit ? '#cacaca' : '#555555' }}
+    >
+      {word}
+    </span>
+  );
+}
+
+AboutThresholdWord.propTypes = {
   word: PropTypes.string.isRequired,
   progress: PropTypes.object.isRequired,
-  range: PropTypes.arrayOf(PropTypes.number).isRequired,
+  threshold: PropTypes.number.isRequired,
 };
 
 /**
- * Sticky Full-Viewport Scroll-Scrubbed Editorial Statement.
- * Bounded `245vh` track with `-100vh` bottom overlap margin on desktop/tablet so:
- * 1) `(ABOUT)` enters naturally after Hero and locks at `top: 0`.
- * 2) Words reveal deliberately from `#323232` to `#f5f5f5`, paired with a hairline progress rail.
- * 3) Completed text dwells clearly before `SELECTED WORK` rises progressively over the final `100vh`.
+ * Exact Nakula About Section (`height: 200vh`, `z-index: 2`)
+ * - Slides cleanly over sticky Hero (`z-index: 1`) while Hero scales/fades out.
+ * - Words switch `#555555 -> #cacaca` across `y = 550..1550px`.
+ * - Unsticks cleanly at `200vh` and scrolls upward 1:1 with Latest Work following naturally.
  */
-function StickyAboutSection({ text, shouldReduceMotion = false, zIndex = 20 }) {
+function NakulaAboutSection({ text }) {
   const trackRef = useRef(null);
-  const [isMobileViewport, setIsMobileViewport] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth < 768 : false
-  );
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const onResize = () => setIsMobileViewport(window.innerWidth < 768);
-    window.addEventListener('resize', onResize, { passive: true });
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
   const { scrollYProgress } = useScroll({
     target: trackRef,
-    offset: ['start 70%', 'end end'],
+    offset: ['start 40%', 'end end'],
   });
 
-  const progressScaleY = useTransform(scrollYProgress, [0, 0.82], [0, 1]);
   const words = text.split(' ');
-  const useOverlapLayer = !shouldReduceMotion && !isMobileViewport;
 
   return (
-    <div
+    <section
       id="v2-about"
       ref={trackRef}
-      style={{
-        zIndex,
-        height: useOverlapLayer ? '245vh' : '175vh',
-        marginBottom: useOverlapLayer ? '-100vh' : undefined,
-      }}
-      className="relative w-full border-t border-[#161618]"
+      className="relative z-[2] h-[200vh] w-full bg-[#0a0a0a]"
     >
-      <section
-        style={{ position: 'sticky', top: 0 }}
-        className="v2-stack-layer flex h-screen w-full items-center bg-[#0a0a0a]"
-      >
-        <div className="v2-container w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            <div className="lg:col-span-2 lg:col-start-2 flex lg:flex-col items-center lg:items-start gap-4 lg:pt-3">
-              <span className="v2-section-tag text-[#d4d4d4]">(ABOUT)</span>
-              <div
-                className="relative h-px w-16 lg:h-16 lg:w-px bg-[#222226] overflow-hidden"
-                aria-hidden="true"
-              >
-                <motion.div
-                  style={{
-                    scaleY: progressScaleY,
-                    transformOrigin: 'top center',
-                  }}
-                  className="hidden lg:block h-full w-full bg-[#ff4925]"
-                />
-                <motion.div
-                  style={{
-                    scaleX: progressScaleY,
-                    transformOrigin: 'left center',
-                  }}
-                  className="lg:hidden h-full w-full bg-[#ff4925]"
-                />
-              </div>
-            </div>
-
-            <div className="lg:col-span-8">
-              <p className="max-w-[22ch] text-[clamp(2rem,4.1vw,3.75rem)] font-semibold tracking-[-0.045em] leading-[1.08] text-[#323232]">
-                {words.map((word, index) => {
-                  const total = words.length;
-                  const start = (index / total) * 0.72;
-                  const end = Math.min(0.82, start + 1.15 / total);
-                  return (
-                    <ScrollWord
-                      key={`${word}-${index}`}
-                      word={word}
-                      progress={scrollYProgress}
-                      range={[start, end]}
-                    />
-                  );
-                })}
-              </p>
-            </div>
+      <div className="sticky top-0 flex h-screen w-full items-center px-4 sm:px-12 lg:px-[150px]">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col lg:flex-row items-start gap-6 lg:gap-[56px]">
+          <div className="shrink-0 lg:pt-3">
+            <span className="v2-section-tag">(ABOUT)</span>
           </div>
+          <p className="text-[clamp(2rem,3.88vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.1] text-[#555555]">
+            {words.map((word, index) => {
+              const threshold = (index / words.length) * 0.78;
+              return (
+                <AboutThresholdWord
+                  key={`${word}-${index}`}
+                  word={word}
+                  progress={scrollYProgress}
+                  threshold={threshold}
+                />
+              );
+            })}
+          </p>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
 
-StickyAboutSection.propTypes = {
+NakulaAboutSection.propTypes = {
   text: PropTypes.string.isRequired,
-  shouldReduceMotion: PropTypes.bool,
-  zIndex: PropTypes.number,
 };
 
 /**
- * Controlled Sticky Overlap Curtain (used intentionally for closing CTA -> Footer reveal).
- * Bounded outer track ensures the section never remains permanently fixed once covered.
- */
-function OverlappingSection({
-  id,
-  zIndex,
-  dwellRatio = 0.22,
-  className = '',
-  shouldReduceMotion = false,
-  children,
-}) {
-  const sectionRef = useRef(null);
-  const [layoutMetrics, setLayoutMetrics] = useState({
-    stickyTop: 0,
-    wrapperHeight: null,
-    overlapMargin: 0,
-    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
-  });
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || shouldReduceMotion) return undefined;
-    const el = sectionRef.current;
-    if (!el) return undefined;
-
-    const updateStickyOffset = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      if (vw < 768) {
-        setLayoutMetrics({
-          stickyTop: 0,
-          wrapperHeight: null,
-          overlapMargin: 0,
-          isMobile: true,
-        });
-        return;
-      }
-      const height = Math.max(vh, el.offsetHeight);
-      const nextTop = height > vh ? vh - height : 0;
-      const dwellPx = Math.round(vh * dwellRatio);
-      const overlapPx = vh;
-      setLayoutMetrics({
-        stickyTop: nextTop,
-        wrapperHeight: height + dwellPx + overlapPx,
-        overlapMargin: -overlapPx,
-        isMobile: false,
-      });
-    };
-
-    updateStickyOffset();
-
-    let resizeObserver;
-    if ('ResizeObserver' in window) {
-      resizeObserver = new ResizeObserver(updateStickyOffset);
-      resizeObserver.observe(el);
-    }
-    window.addEventListener('resize', updateStickyOffset, { passive: true });
-
-    return () => {
-      if (resizeObserver) resizeObserver.disconnect();
-      window.removeEventListener('resize', updateStickyOffset);
-    };
-  }, [dwellRatio, shouldReduceMotion]);
-
-  const useStickyLayer = !shouldReduceMotion && !layoutMetrics.isMobile;
-
-  return (
-    <div
-      id={id}
-      style={{
-        zIndex,
-        height:
-          useStickyLayer && layoutMetrics.wrapperHeight
-            ? `${layoutMetrics.wrapperHeight}px`
-            : undefined,
-        marginBottom:
-          useStickyLayer && layoutMetrics.overlapMargin
-            ? `${layoutMetrics.overlapMargin}px`
-            : undefined,
-      }}
-      className="relative w-full"
-    >
-      <section
-        ref={sectionRef}
-        style={{
-          position: useStickyLayer ? 'sticky' : 'relative',
-          top: useStickyLayer ? `${layoutMetrics.stickyTop}px` : undefined,
-        }}
-        className={`v2-stack-layer min-h-screen flex flex-col justify-center ${
-          useStickyLayer ? 'v2-stack-layer--sticky-bottom' : ''
-        } ${className}`}
-      >
-        {children}
-      </section>
-    </div>
-  );
-}
-
-OverlappingSection.propTypes = {
-  id: PropTypes.string,
-  zIndex: PropTypes.number.isRequired,
-  dwellRatio: PropTypes.number,
-  className: PropTypes.string,
-  shouldReduceMotion: PropTypes.bool,
-  children: PropTypes.node.isRequired,
-};
-
-/**
- * Curated Editorial Project Showcase Card with Spring-Driven Cursor Orb (Zero React re-renders on hover move)
+ * Exact Nakula Work Showcase Card:
+ * - Normal-flow stacked card (NOT sticky).
+ * - Outer frame scales `0.62 -> 1.0 -> 0.62` with a flat `1.0` centered plateau.
+ * - Inner image wrapper applies the inverse counter-scale `1.55 -> 1.0 -> 1.55` inside `overflow-hidden`,
+ *   keeping the screenshot optically anchored while the frame expands and contracts!
  */
 function WorkShowcaseCard({
   project,
   index,
-  totalCount,
   onVisible,
+  isDesktop,
   isEn,
   shouldReduceMotion,
 }) {
@@ -310,8 +298,17 @@ function WorkShowcaseCard({
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const orbX = useSpring(mouseX, { stiffness: 320, damping: 28, mass: 0.45 });
-  const orbY = useSpring(mouseY, { stiffness: 320, damping: 28, mass: 0.45 });
+  const pillX = useSpring(mouseX, { stiffness: 340, damping: 28, mass: 0.4 });
+  const pillY = useSpring(mouseY, { stiffness: 340, damping: 28, mass: 0.4 });
+
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ['start end', 'end start'],
+  });
+
+  // Exact Nakula 3-phase outer scale (0.62 -> 1.0 plateau -> 0.62) + inverse inner counter-scale
+  const outerScale = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [0.62, 1, 1, 0.62]);
+  const innerCounterScale = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [1.55, 1, 1, 1.55]);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -325,7 +322,7 @@ function WorkShowcaseCard({
           }
         });
       },
-      { rootMargin: '-28% 0px -36% 0px', threshold: 0.15 }
+      { rootMargin: '-36% 0px -38% 0px', threshold: 0.05 }
     );
 
     observer.observe(el);
@@ -346,142 +343,101 @@ function WorkShowcaseCard({
   };
 
   const subtitleText = isEn ? project.subtitle.en : project.subtitle.id;
-  const categoryText = isEn ? project.category.en : project.category.id;
   const descriptionText = isEn ? project.description.en : project.description.id;
+  const useScaleChoreography = isDesktop && !shouldReduceMotion;
 
   return (
-    <article
-      id={`v2-work-item-${project.id}`}
-      ref={cardRef}
-      style={{ zIndex: index + 1 }}
-      className={`${
-        shouldReduceMotion ? 'relative' : 'v2-work-sticky-card'
-      } group bg-[#0a0a0a] border-t border-[#1b1b1d] pt-5 pb-10 sm:pb-14 ${
-        index > 0 ? 'lg:shadow-[0_-28px_60px_rgba(0,0,0,0.94)]' : ''
-      }`}
-    >
-      <div className="space-y-4">
-        {/* Prominent Editorial Header Strip */}
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <div className="flex items-baseline gap-3">
-            <span className="font-mono text-xs font-semibold text-[#ff4925]">
-              {project.number}
-            </span>
-            <h3 className="text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.04em] text-[#f5f5f5]">
-              <RouterLink
-                to={`/study-case/${project.id}`}
-                className="hover:text-[#ff4925] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-              >
-                {project.title}
-              </RouterLink>
-            </h3>
-            {project.version && (
-              <span className="font-mono text-[11px] text-[#8a8a8e]">{project.version}</span>
-            )}
-          </div>
-          <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-[#8a8a8e]">
-            {categoryText}
-          </span>
-        </div>
-
-        {/* Architectural Visual Stage */}
+    <article id={`v2-work-item-${project.id}`} ref={cardRef} className="group w-full">
+      <motion.div
+        style={useScaleChoreography ? { scale: outerScale } : undefined}
+        className="origin-center will-change-transform"
+      >
         <RouterLink
           to={`/study-case/${project.id}`}
           aria-label={`${project.title} — ${subtitleText}`}
-          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[10px]"
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[12px]"
         >
           <div
-            className="v2-work-mockup-stage"
+            className="v2-work-card-frame aspect-[16/11] lg:aspect-auto"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={() => setIsHovered(false)}
             onMouseMove={handleMouseMove}
           >
-            {/* Spring-Driven Cursor-Following "VIEW" Badge (Desktop pointer devices) */}
             {!shouldReduceMotion && (
               <motion.div
-                className="v2-view-project-orb hidden lg:flex"
-                style={{ x: orbX, y: orbY }}
+                className="v2-view-project-pill hidden lg:inline-flex"
+                style={{ left: pillX, top: pillY }}
                 animate={{
                   opacity: isHovered ? 1 : 0,
-                  scale: isHovered ? 1 : 0.72,
+                  scale: isHovered ? 1 : 0.78,
                 }}
-                transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
+                transition={{ duration: 0.18, ease: NAKULA_EASE }}
                 aria-hidden="true"
               >
-                {isEn ? 'VIEW' : 'LIHAT'}
+                <span>{isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}</span>
+                <FiArrowUpRight size={14} />
               </motion.div>
             )}
 
-            <div className="v2-work-device-frame">
+            <motion.div
+              style={useScaleChoreography ? { scale: innerCounterScale } : undefined}
+              className="v2-work-card-img-wrap origin-center"
+            >
               <img
                 src={project.image}
                 alt={project.title}
                 loading={index < 2 ? 'eager' : 'lazy'}
-                className="v2-work-device-img"
+                className="v2-work-card-img"
               />
-            </div>
+            </motion.div>
           </div>
         </RouterLink>
+      </motion.div>
 
-        {/* Mobile & Tablet Subtitle/Description (Desktop shows full editorial narrative in sticky left rail) */}
-        <div className="lg:hidden space-y-1.5 pt-1">
-          <p className="text-sm font-medium text-[#d4d4d4]">
-            {subtitleText}
-            <span className="ml-2 font-mono text-[11px] text-[#66666b]">
-              ({project.number}/{String(totalCount).padStart(2, '0')})
-            </span>
-          </p>
-          <p className="text-sm text-[#8a8a8e] leading-relaxed">{descriptionText}</p>
-        </div>
-
-        {/* Clean Metadata Footer: Restrained Stack List + Direct Action Links */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-          <p className="font-mono text-[11px] tracking-[0.02em] text-[#7a7a80]">
-            {project.tags.slice(0, 4).join('  ·  ')}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-5 text-[11px] font-mono font-semibold uppercase tracking-[0.06em]">
-            <RouterLink
-              to={`/study-case/${project.id}`}
-              className="inline-flex items-center gap-1 text-[#d4d4d4] hover:text-[#ff4925] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
+      {/* Mobile & Tablet Project Metadata */}
+      <div className="lg:hidden mt-4 space-y-2">
+        <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.05] text-[#cacaca]">
+          <RouterLink
+            to={`/study-case/${project.id}`}
+            className="hover:text-[#ff4925] transition-colors"
+          >
+            {project.title}
+          </RouterLink>
+        </h3>
+        <p className="text-[18px] font-medium tracking-[-0.035em] leading-[1.2] text-[#858585]">
+          {subtitleText}
+        </p>
+        <p className="text-sm text-[#666666] leading-relaxed line-clamp-2">{descriptionText}</p>
+        <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-semibold uppercase tracking-[-0.02em]">
+          <RouterLink
+            to={`/study-case/${project.id}`}
+            className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925]"
+          >
+            <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
+            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+          </RouterLink>
+          {project.live && (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
             >
-              <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
+              <span>Live</span>
               <FiArrowUpRight size={13} className="text-[#ff4925]" />
-            </RouterLink>
-            {project.live && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[#a4a4aa] hover:text-[#f5f5f5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-              >
-                <span>{isEn ? 'Live' : 'Demo'}</span>
-                <FiArrowUpRight size={13} className="text-[#ff4925]" />
-              </a>
-            )}
-            {project.npm && (
-              <a
-                href={project.npm}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[#a4a4aa] hover:text-[#f5f5f5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-              >
-                <span>npm</span>
-                <FiArrowUpRight size={13} className="text-[#ff4925]" />
-              </a>
-            )}
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[#7a7a80] hover:text-[#f5f5f5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-              >
-                <span>GitHub</span>
-                <FiArrowUpRight size={13} className="text-[#ff4925]" />
-              </a>
-            )}
-          </div>
+            </a>
+          )}
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[#858585] hover:text-white"
+            >
+              <span>GitHub</span>
+              <FiArrowUpRight size={13} className="text-[#ff4925]" />
+            </a>
+          )}
         </div>
       </div>
     </article>
@@ -491,14 +447,169 @@ function WorkShowcaseCard({
 WorkShowcaseCard.propTypes = {
   project: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
-  totalCount: PropTypes.number.isRequired,
   onVisible: PropTypes.func.isRequired,
+  isDesktop: PropTypes.bool.isRequired,
   isEn: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
 };
 
+/**
+ * Exact Nakula Sticky Horizontal Process Track (`285vh` outer track, `sticky top-0 h-screen` inner frame):
+ * Linearly translates `"HOW I WORK (PROCESS)"` + all 4 `360x560` `STEP 1..4` cards horizontally on desktop,
+ * then unsticks cleanly into the next section. Falls back to clean responsive grid on tablet/mobile.
+ */
+function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
+  const trackRef = useRef(null);
+  const rowRef = useRef(null);
+  const [maxPan, setMaxPan] = useState(640);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isDesktop || shouldReduceMotion) return undefined;
+
+    const measurePan = () => {
+      if (!rowRef.current) return;
+      const rowWidth = rowRef.current.scrollWidth;
+      const vw = window.innerWidth;
+      setMaxPan(Math.max(0, rowWidth - vw + 48));
+    };
+
+    measurePan();
+    window.addEventListener('resize', measurePan, { passive: true });
+    return () => window.removeEventListener('resize', measurePan);
+  }, [isDesktop, shouldReduceMotion, steps]);
+
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ['start start', 'end end'],
+  });
+
+  const horizontalX = useTransform(scrollYProgress, [0, 1], [0, -maxPan]);
+
+  if (!isDesktop || shouldReduceMotion) {
+    return (
+      <section id="v2-experience" className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-32">
+        <div className="v2-container mb-12">
+          <div className="flex items-start justify-between gap-4">
+            <MaskedDisplayHeading
+              lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
+              className="v2-section-heading"
+              shouldReduceMotion={shouldReduceMotion}
+            />
+            <span className="v2-section-tag pt-1">
+              ({isEn ? 'PROCESS' : 'PENGALAMAN'})
+            </span>
+          </div>
+        </div>
+        <div className="border-t border-b border-[#333333]">
+          <div className="v2-container !px-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#333333]">
+              {steps.map((item) => (
+                <article
+                  key={item.step}
+                  className="flex flex-col justify-between min-h-[360px] p-7 bg-[#0a0a0a]"
+                >
+                  <div className="space-y-1">
+                    <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
+                      {item.step}
+                      <span className="text-[#ff4925]">.</span>
+                    </p>
+                    <p className="text-[12px] font-medium uppercase text-[#555555]">
+                      {item.period}
+                    </p>
+                  </div>
+                  <div className="space-y-3 pt-14">
+                    <h3 className="text-[34px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                      {item.title}
+                    </h3>
+                    <p className="text-[14px] font-semibold text-[#ff4925]">{item.subtitle}</p>
+                    <p className="text-[15px] leading-[1.4] text-[#858585]">{item.body}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      id="v2-experience"
+      ref={trackRef}
+      className="relative z-[2] h-[285vh] w-full bg-[#0a0a0a] overflow-x-clip"
+    >
+      <div className="sticky top-0 flex h-screen w-full items-center overflow-hidden">
+        <motion.div
+          ref={rowRef}
+          style={{ x: horizontalX }}
+          className="flex items-center gap-14 px-6 will-change-transform"
+        >
+          {/* Left Intro Block (`530px` wide — exact Nakula `.framer-1efur92` first child) */}
+          <div className="relative w-[530px] shrink-0 h-[560px] flex flex-col justify-between py-2">
+            <div className="flex items-start justify-between">
+              <MaskedDisplayHeading
+                lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
+                className="v2-section-heading"
+                shouldReduceMotion={shouldReduceMotion}
+              />
+              <span className="v2-section-tag pt-2">
+                ({isEn ? 'PROCESS' : 'PENGALAMAN'})
+              </span>
+            </div>
+            <p className="max-w-[360px] text-[20px] font-medium tracking-[-0.04em] leading-[1.2] text-[#858585]">
+              {isEn
+                ? 'Verified track record across industry internship, open-source engineering, and computer science education.'
+                : 'Rekam jejak terverifikasi mulai dari magang industri, library open-source, hingga pendidikan informatika.'}
+            </p>
+          </div>
+
+          {/* Right 4 Horizontal Step Cards (`360 x 560px` each) */}
+          <div className="flex shrink-0 border-t border-b border-l border-[#333333]">
+            {steps.map((item) => (
+              <article
+                key={item.step}
+                className="w-[360px] h-[560px] shrink-0 border-r border-[#333333] p-8 flex flex-col justify-between bg-[#0a0a0a]"
+              >
+                <div className="space-y-1.5">
+                  <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#858585]">
+                    {item.step}
+                    <span className="text-[#ff4925]">.</span>
+                  </p>
+                  <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#555555]">
+                    {item.period}
+                  </p>
+                </div>
+
+                <div className="space-y-3.5">
+                  <h3 className="text-[40px] font-semibold tracking-[-0.055em] leading-[1.02] text-[#cacaca]">
+                    {item.title}
+                  </h3>
+                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[#ff4925]">
+                    {item.subtitle}
+                  </p>
+                  <p className="text-[16px] leading-[1.35] tracking-[-0.02em] text-[#858585]">
+                    {item.body}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+NakulaProcessSection.propTypes = {
+  steps: PropTypes.arrayOf(PropTypes.object).isRequired,
+  isEn: PropTypes.bool.isRequired,
+  isDesktop: PropTypes.bool.isRequired,
+  shouldReduceMotion: PropTypes.bool,
+};
+
 /* ==========================================================================
-   Main Portfolio V2 Component
+   Main Portfolio V2 Component — Exact 1:1 Nakula Scroll & Visual Reconstruction
    ========================================================================== */
 
 export default function PortfolioV2() {
@@ -510,7 +621,14 @@ export default function PortfolioV2() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSplash, setShowSplash] = useState(() => !shouldReduceMotion);
   const [heroIntroComplete, setHeroIntroComplete] = useState(() => Boolean(shouldReduceMotion));
-  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  const [isWordmarkCompact, setIsWordmarkCompact] = useState(false);
+  const [isHeroExited, setIsHeroExited] = useState(false);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
+  const [isTabletUp, setIsTabletUp] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  );
   const [activeSection, setActiveSection] = useState('v2-top');
   const [activeWorkIdx, setActiveWorkIdx] = useState(0);
   const [openCapabilityIdx, setOpenCapabilityIdx] = useState(0);
@@ -520,16 +638,63 @@ export default function PortfolioV2() {
   const [jakartaTime, setJakartaTime] = useState('');
 
   const lenisRef = useRef(null);
-  const heroRef = useRef(null);
+  const metricsGridRef = useRef(null);
+  const highlightImgRef = useRef(null);
+  const ctaSectionRef = useRef(null);
+  const footerRef = useRef(null);
 
-  // Subtle GPU parallax on the Hero diagonal portrait only (Hero itself scrolls 100% naturally)
-  const { scrollYProgress: heroScrollProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
+  const isMetricsInView = useInView(metricsGridRef, { once: true, amount: 0.25 });
+
+  const { scrollY } = useScroll();
+
+  // 1) Exact Nakula Hero Exit Transform (`y = 49 -> 500px`):
+  // Scales `1 -> 0.9`, lifts `0 -> -100px`, fades `1 -> 0` while sticky as About rises over it!
+  const heroOpacity = useTransform(scrollY, [49, 500], [1, 0]);
+  const heroTranslateY = useTransform(scrollY, [49, 500], [0, -100]);
+  const heroScale = useTransform(scrollY, [49, 500], [1, 0.9]);
+
+  // 2) Exact Nakula Wordmark Variant Switch (`Big -> Small` at `y > 48px`) + Hero pointer lock release
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const compact = latest > 48;
+    setIsWordmarkCompact((prev) => (prev !== compact ? compact : prev));
+    const exited = latest > 490;
+    setIsHeroExited((prev) => (prev !== exited ? exited : prev));
   });
-  const heroPortraitY = useTransform(heroScrollProgress, [0, 1], [0, -44]);
 
-  // Prompt editorial splash preloader (finishes cleanly so interaction is never sluggish)
+  // 3) Highlight Right Studio Frame Zoom-Out (`scale 1.15 -> 1.0` on scroll entry)
+  const { scrollYProgress: highlightProgress } = useScroll({
+    target: highlightImgRef,
+    offset: ['start end', 'center center'],
+  });
+  const highlightImgScale = useTransform(highlightProgress, [0, 1], [1.15, 1]);
+
+  // 4) Pre-Footer CTA Spotlight Downward Parallax (`translateY 0 -> 72px`)
+  const { scrollYProgress: ctaProgress } = useScroll({
+    target: ctaSectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const ctaSpotlightY = useTransform(ctaProgress, [0, 1], [0, 72]);
+
+  // 5) Footer Bottom Orange Banner Curtain-Slide (`translateY -340px -> 0px` from behind `z-3` Dark Footer)
+  const { scrollYProgress: footerProgress } = useScroll({
+    target: footerRef,
+    offset: ['start end', 'end end'],
+  });
+  const orangeBannerY = useTransform(footerProgress, [0, 1], [-340, 0]);
+
+  // Viewport responsive breakpoint tracking
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const onResize = () => {
+      setIsDesktopViewport(window.innerWidth >= 1024);
+      setIsTabletUp(window.innerWidth >= 768);
+    };
+    onResize();
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Nakula Splash Preloader
   useEffect(() => {
     if (shouldReduceMotion) {
       setShowSplash(false);
@@ -551,7 +716,7 @@ export default function PortfolioV2() {
     };
   }, [shouldReduceMotion]);
 
-  // Enable viewport-level position:sticky inside Portfolio V2 (scoped so Portfolio V1 is untouched)
+  // Enable viewport-level position:sticky strictly inside Portfolio V2
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
     const htmlEl = document.documentElement;
@@ -561,14 +726,13 @@ export default function PortfolioV2() {
     };
   }, []);
 
-  // Scoped single Lenis smooth scroll instance exclusively inside Portfolio V2
+  // Exact Nakula Lenis Smooth Scroll Curve (~1.2s exponential settle matching live measurement)
   useEffect(() => {
     if (typeof window === 'undefined' || shouldReduceMotion) return undefined;
 
     const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => 1 - Math.pow(1 - t, 3.2),
-      wheelMultiplier: 0.88,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       syncTouch: false,
     });
@@ -588,24 +752,12 @@ export default function PortfolioV2() {
     };
   }, [shouldReduceMotion]);
 
-  // Show minimal floating menu trigger only after scrolling past Hero (zero Hero elements pinned)
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const onScroll = () => {
-      const threshold = window.innerHeight * 0.82;
-      setShowFloatingMenu(window.scrollY > threshold);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   // Track active section for drawer indicator
   useEffect(() => {
     if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
       return undefined;
     }
-    const sectionIds = ['v2-top', 'v2-about', 'v2-work', 'v2-experience', 'v2-contact'];
+    const sectionIds = ['v2-top', 'v2-work', 'v2-about', 'v2-contact'];
     const elements = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
     if (!elements.length) return undefined;
 
@@ -624,7 +776,7 @@ export default function PortfolioV2() {
     return () => observer.disconnect();
   }, []);
 
-  // Live GMT+7 clock in Hero top bar
+  // Live GMT+7 clock
   useEffect(() => {
     const updateClock = () => {
       try {
@@ -636,7 +788,7 @@ export default function PortfolioV2() {
         }).format(new Date());
         setJakartaTime(formatted);
       } catch {
-        setJakartaTime('6:50 PM');
+        setJakartaTime('4:33 PM');
       }
     };
     updateClock();
@@ -657,10 +809,18 @@ export default function PortfolioV2() {
   const scrollToSection = useCallback(
     (sectionId) => {
       setIsMenuOpen(false);
+      if (sectionId === 'v2-top') {
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(0);
+        } else {
+          window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
+        }
+        return;
+      }
       const el = document.getElementById(sectionId);
       if (!el) return;
       if (lenisRef.current) {
-        lenisRef.current.scrollTo(el, { offset: 0 });
+        lenisRef.current.scrollTo(el, { offset: -72 });
       } else {
         el.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
       }
@@ -676,114 +836,98 @@ export default function PortfolioV2() {
         setTimeout(() => setCopiedEmail(false), 2200);
       }
     } catch {
-      // Fallback gracefully if clipboard API is restricted
+      // Ignore restricted clipboard environments
     }
   }, []);
 
   const activeWork = selectedProjects[activeWorkIdx] || selectedProjects[0];
   const internship = experiences[0];
 
-  // Authentic Capabilities mapped from repository data
   const capabilities = [
     {
       number: '01',
-      title: isEn ? 'Frontend Engineering & Architecture' : 'Rekayasa & Arsitektur Frontend',
+      title: isEn ? 'Frontend Engineering & UI' : 'Rekayasa Frontend & UI',
       summary: isEn
-        ? 'Fast, accessible (WCAG 2.1 AA), and modular web interfaces built with React, Next.js 15, TypeScript, and Tailwind CSS.'
-        : 'Antarmuka web cepat, aksesibel (WCAG 2.1 AA), dan modular dengan React, Next.js 15, TypeScript, serta Tailwind CSS.',
-      stack: ['React 18', 'Next.js 15', 'TypeScript', 'Tailwind CSS', 'WCAG 2.1 AA'],
+        ? 'Fast, accessible (WCAG 2.1 AA), and modular interfaces built with React, Next.js 15, TypeScript, and Tailwind CSS.'
+        : 'Antarmuka cepat, aksesibel (WCAG 2.1 AA), dan modular dengan React, Next.js 15, TypeScript, dan Tailwind CSS.',
+      tags: ['React 18', 'Next.js 15', 'TypeScript', 'WCAG 2.1 AA'],
       image: '/images/projects/akseskita.webp',
       featuredProject: 'AksesKita',
       featuredSlug: 'akseskita',
     },
     {
       number: '02',
-      title: isEn ? 'Full-Stack Systems & REST APIs' : 'Sistem Full-Stack & REST API',
+      title: isEn ? 'Full-Stack Web Systems' : 'Sistem Web Full-Stack',
       summary: isEn
-        ? 'End-to-end web platforms pairing reactive frontends with Node.js, Express, Laravel, RBAC authentication, and Zod validation.'
-        : 'Aplikasi web end-to-end memadukan frontend reaktif dengan Node.js, Express, Laravel, autentikasi RBAC, dan validasi Zod.',
-      stack: ['Node.js', 'Express.js', 'Laravel', 'REST API', 'Zod Validation'],
+        ? 'End-to-end web platforms pairing reactive frontends with Node.js, Express, Laravel, RBAC auth, and Zod validation.'
+        : 'Platform web end-to-end memadukan frontend reaktif dengan Node.js, Express, Laravel, autentikasi RBAC, dan Zod.',
+      tags: ['Node.js & Express', 'Laravel', 'REST API', 'Auth & RBAC'],
       image: '/images/projects/project_management.webp',
       featuredProject: 'Project Management System',
       featuredSlug: 'project-management',
     },
     {
       number: '03',
-      title: isEn ? 'Database Modeling & Open-Source Tooling' : 'Pemodelan Database & Open-Source',
+      title: isEn ? 'Databases & Open-Source' : 'Database & Open-Source',
       summary: isEn
-        ? 'Relational schemas in PostgreSQL and MySQL with Prisma ORM, plus zero-dependency TypeScript packages published to npm.'
-        : 'Perancangan skema relasional PostgreSQL dan MySQL dengan Prisma ORM, serta library TypeScript zero-dependency di npm.',
-      stack: ['PostgreSQL', 'Prisma ORM', 'MySQL', 'tsup (ESM/CJS)', 'Vitest CI'],
+        ? 'Relational schemas in PostgreSQL/MySQL with Prisma ORM, plus zero-dependency TypeScript tooling published to npm.'
+        : 'Skema relasional PostgreSQL/MySQL dengan Prisma ORM serta paket utilitas TypeScript zero-dependency di npm.',
+      tags: ['PostgreSQL', 'Prisma ORM', 'tsup (ESM/CJS)', 'Vitest CI'],
       image: '/images/projects/id-kit.webp',
       featuredProject: '@ghifari29/id-kit',
       featuredSlug: 'id-kit',
     },
     {
       number: '04',
-      title: isEn ? 'AI Pipelines & Interactive Web' : 'Alur Kerja AI & Web Interaktif',
+      title: isEn ? 'AI Pipelines & WebGL' : 'Alur AI & WebGL Interaktif',
       summary: isEn
-        ? 'Gemini AI document workflows backed by asynchronous BullMQ + Redis queues alongside interactive Three.js / WebGL scenes.'
-        : 'Pemrosesan dokumen Gemini AI dengan antrean latar belakang BullMQ + Redis serta antarmuka interaktif Three.js / WebGL.',
-      stack: ['Gemini API', 'BullMQ + Redis', 'Three.js / WebGL', 'Framer Motion'],
+        ? 'Gemini AI document workflows backed by BullMQ + Redis worker queues alongside interactive Three.js browser worlds.'
+        : 'Pemrosesan dokumen Gemini AI dengan antrean BullMQ + Redis serta pengalaman browser interaktif Three.js.',
+      tags: ['Gemini API', 'BullMQ + Redis', 'Three.js / WebGL', 'Framer Motion'],
       image: '/images/projects/studyflow.webp',
       featuredProject: 'StudyFlow',
       featuredSlug: 'studyflow',
     },
   ];
 
-  // Authentic Chronological Experience, Open Source & Education Timeline
-  const timelineEntries = [
+  const processTrackSteps = [
     {
-      id: 'exp-ama-salam',
+      step: 'STEP 1',
       period: isEn ? internship.period.en : internship.period.id,
-      meta: isEn
-        ? `${internship.type.en} · ${internship.location.en}`
-        : `${internship.type.id} · ${internship.location.id}`,
-      role: isEn ? internship.role.en : internship.role.id,
-      org: internship.company,
+      title: 'PT. AMA Salam',
+      subtitle: isEn ? internship.role.en : internship.role.id,
       body: isEn ? internship.description.en : internship.description.id,
-      stack: internship.technologies.slice(0, 4).join('  ·  '),
-      caseStudySlug: internship.projectRef,
     },
     {
-      id: 'oss-id-kit',
+      step: 'STEP 2',
       period: '2025 — Present',
-      meta: isEn ? 'Open-Source Package · npm' : 'Paket Open-Source · npm',
-      role: isEn ? 'Author & Maintainer' : 'Penulis & Maintainer',
-      org: '@ghifari29/id-kit',
+      title: '@ghifari29/id-kit',
+      subtitle: isEn ? 'Open-Source Author · npm' : 'Penulis Open-Source · npm',
       body: isEn
-        ? 'Engineered a zero-dependency offline TypeScript utility library for Indonesian data formats (9 modules, 10 subpath exports, 509 Vitest unit tests verified across 3 timezones).'
-        : 'Merancang library utilitas TypeScript offline zero-dependency untuk data Indonesia (9 modul, 10 subpath exports, 509 unit test Vitest di 3 zona waktu).',
-      stack: 'TypeScript  ·  tsup  ·  Vitest  ·  npm',
-      caseStudySlug: 'id-kit',
+        ? 'Engineered a zero-dependency offline TypeScript utility library for Indonesian data formats (9 modules, 10 subpath exports, 509 Vitest tests).'
+        : 'Merancang library TypeScript offline zero-dependency untuk data Indonesia (9 modul, 10 subpath exports, 509 unit test Vitest).',
     },
     {
-      id: 'edu-gunadarma',
+      step: 'STEP 3',
       period: isEn ? 'Ongoing' : 'Sedang Berjalan',
-      meta: isEn ? 'Undergraduate · Informatics' : 'Sarjana · S1 Informatika',
-      role: isEn ? 'Bachelor of Informatics' : 'S1 Informatika',
-      org: educationMetadata.gunadarma.institution,
+      title: educationMetadata.gunadarma.institution,
+      subtitle: isEn ? 'Bachelor of Informatics' : 'S1 Informatika',
       body: isEn
-        ? 'Studying software engineering, algorithms, data structures, relational database systems, and distributed web architecture.'
-        : 'Mendalami rekayasa perangkat lunak, algoritma, struktur data, sistem basis data relasional, dan arsitektur web.',
-      stack: isEn
-        ? 'Software Engineering  ·  Algorithms  ·  Web Systems'
-        : 'Rekayasa Perangkat Lunak  ·  Algoritma  ·  Sistem Web',
+        ? 'Focusing on software engineering, algorithms, data structures, relational database design, and distributed web systems.'
+        : 'Berfokus pada rekayasa perangkat lunak, algoritma, struktur data, perancangan basis data relasional, dan sistem web.',
     },
     {
-      id: 'edu-smkn1',
+      step: 'STEP 4',
       period: educationMetadata.smkn1Cibinong.period,
-      meta: isEn ? 'Vocational · Software Engineering' : 'SMK · Rekayasa Perangkat Lunak',
-      role: isEn ? 'Software Engineering (RPL)' : 'Rekayasa Perangkat Lunak (RPL)',
-      org: educationMetadata.smkn1Cibinong.institution,
+      title: educationMetadata.smkn1Cibinong.institution,
+      subtitle: isEn ? 'Software Engineering (RPL)' : 'Rekayasa Perangkat Lunak',
       body: isEn
-        ? 'Vocational software engineering foundation covering full-stack web applications, relational database design, and national educational game competitions.'
-        : 'Fondasi kejuruan Rekayasa Perangkat Lunak mencakup pengembangan aplikasi web full-stack, basis data relasional, dan kompetisi game edukasi nasional.',
-      stack: 'Full-Stack Web  ·  MySQL  ·  Laravel  ·  React',
+        ? 'Vocational software engineering foundation covering full-stack web applications, relational databases, and national educational game competitions.'
+        : 'Fondasi kejuruan Rekayasa Perangkat Lunak mencakup pengembangan aplikasi web full-stack, basis data relasional, dan kompetisi game nasional.',
     },
   ];
 
-  // Authentic Metrics derived from repository data
+  // Authentic 4-column desktop metrics matching Nakula's 4 desktop metric columns
   const totalSkillsCount = techCategoriesData.reduce(
     (acc, category) => acc + category.skills.length,
     0
@@ -791,34 +935,27 @@ export default function PortfolioV2() {
 
   const metricsData = [
     {
-      index: '01',
-      numeral: String(allProjects.length).padStart(2, '0'),
+      numeral: String(allProjects.length),
       suffix: '+',
-      label: isEn ? 'Shipped web & software projects' : 'Proyek web & perangkat lunak selesai',
+      label: isEn ? 'Completed web & software projects' : 'Proyek web & perangkat lunak selesai',
     },
     {
-      index: '02',
       numeral: '509',
-      suffix: '',
-      label: isEn ? 'Unit tests in @ghifari29/id-kit' : 'Unit test di @ghifari29/id-kit',
+      suffix: '+',
+      label: isEn ? 'Automated unit tests in @ghifari29/id-kit' : 'Unit test otomatis di @ghifari29/id-kit',
     },
     {
-      index: '03',
-      numeral: '05',
-      suffix: isEn ? 'mo' : 'bln',
-      label: isEn
-        ? 'Frontend internship at PT. AMA Salam'
-        : 'Magang frontend di PT. AMA Salam',
+      numeral: '100',
+      suffix: '%',
+      label: isEn ? 'WCAG 2.1 AA accessibility focus' : 'Fokus aksesibilitas WCAG 2.1 AA',
     },
     {
-      index: '04',
       numeral: String(totalSkillsCount),
       suffix: '+',
-      label: isEn ? 'Core languages & engineering tools' : 'Bahasa & perangkat rekayasa inti',
+      label: isEn ? 'Core technologies & engineering tools' : 'Teknologi inti & perangkat rekayasa',
     },
   ];
 
-  // Authentic FAQ items
   const faqItems = [
     {
       q: isEn
@@ -866,16 +1003,17 @@ export default function PortfolioV2() {
 
   const drawerLinks = [
     { id: 'v2-top', label: 'HOME' },
-    { id: 'v2-about', label: 'ABOUT' },
     { id: 'v2-work', label: 'WORKS' },
-    { id: 'v2-experience', label: isEn ? 'EXPERIENCE' : 'PENGALAMAN' },
+    { id: 'v2-about', label: 'ABOUT' },
     { id: 'v2-contact', label: 'CONTACT' },
   ];
+
+  const useHeroScrollExit = isTabletUp && !shouldReduceMotion;
 
   return (
     <div className="v2-portfolio-root" data-portfolio-version="2">
       {/* ====================================================================
-          0. PROMPT EDITORIAL SPLASH PRELOADER (#FF4925 Curtain)
+          0. NAKULA #FF4925 SPLASH PRELOADER
           ==================================================================== */}
       <AnimatePresence>
         {showSplash && (
@@ -900,17 +1038,17 @@ export default function PortfolioV2() {
                   transition: {
                     duration: 0.48,
                     delay: 0.06,
-                    ease: EDITORIAL_EASE,
+                    ease: NAKULA_EASE,
                   },
                 }}
                 exit={{
                   y: '-30%',
                   transition: {
-                    duration: 0.52,
+                    duration: 0.5,
                     ease: [0.76, 0, 0.24, 1],
                   },
                 }}
-                className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,6.5vw,5.75rem)] leading-none tracking-[-0.01em] will-change-transform"
+                className="v2-display-heading !text-[#0a0a0a] text-[clamp(3.25rem,6.5vw,5.75rem)] leading-none will-change-transform"
               >
                 {siteConfig.brandName}
                 <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#0a0a0a]">
@@ -923,46 +1061,118 @@ export default function PortfolioV2() {
       </AnimatePresence>
 
       {/* ====================================================================
-          Minimal Floating Menu Trigger (Appears ONLY after scrolling past Hero)
+          FIXED NAKULA TOP HEADER (Variant-Switching Wordmark + Blend-Difference Right Nav)
           ==================================================================== */}
-      <AnimatePresence>
-        {showFloatingMenu && !isMenuOpen && (
-          <motion.div
-            key="v2-floating-nav"
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-            transition={{ duration: 0.28, ease: EDITORIAL_EASE }}
-            className="fixed top-5 right-5 sm:top-6 sm:right-8 z-[110] flex items-center gap-2"
+      <motion.header
+        initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
+        animate={
+          heroIntroComplete || shouldReduceMotion
+            ? { opacity: 1, y: 0 }
+            : { opacity: 0, y: -12 }
+        }
+        transition={{ duration: 0.6, ease: NAKULA_EASE }}
+        className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none"
+      >
+        <div className="v2-container flex items-start justify-between pt-4 md:pt-6">
+          {/* Desktop Wordmark: Exact Nakula Big -> Small variant switch at scrollY > 48px */}
+          <motion.a
+            href="#v2-top"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('v2-top');
+            }}
+            initial={false}
+            animate={{
+              scale: shouldReduceMotion || isWordmarkCompact ? 0.2 : 1,
+            }}
+            transition={{ duration: 0.48, ease: NAKULA_EASE }}
+            style={{ transformOrigin: 'top left' }}
+            className="hidden md:inline-block pointer-events-auto v2-display-heading text-[clamp(5.5rem,13.4vw,12rem)] leading-[0.80] text-[#cacaca] hover:text-white transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm will-change-transform"
           >
-            <button
-              type="button"
-              onClick={() => switchLanguage(isEn ? 'id' : 'en')}
-              aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
-              className="inline-flex h-10 items-center rounded-full border border-[#2a2a2e] bg-[#0a0a0a]/90 backdrop-blur-md px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-[#d4d4d4] hover:border-[#ff4925] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-            >
-              <span className={!isEn ? 'text-[#ff4925]' : 'text-[#7a7a80]'}>ID</span>
-              <span className="mx-1 text-[#3a3a40]">/</span>
-              <span className={isEn ? 'text-[#ff4925]' : 'text-[#7a7a80]'}>EN</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen(true)}
-              aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
-              aria-expanded={isMenuOpen}
-              className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2a2a2e] bg-[#0a0a0a]/90 backdrop-blur-md text-[#d4d4d4] hover:border-[#55555c] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-            >
-              <span className="flex flex-col gap-1.5" aria-hidden="true">
-                <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
-                <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:-translate-x-[1.5px]" />
+            {siteConfig.brandName}
+            <span className="text-[0.26em] align-top ml-1.5 font-sans font-normal text-[#cacaca]">
+              ®
+            </span>
+          </motion.a>
+
+          {/* Mobile Compact Wordmark */}
+          <a
+            href="#v2-top"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('v2-top');
+            }}
+            className="md:hidden pointer-events-auto v2-display-heading text-[36px] leading-[0.88] text-[#cacaca] select-none focus-visible:outline-none"
+          >
+            {siteConfig.brandName}
+            <span className="text-[0.34em] align-top ml-0.5 font-sans font-normal text-[#cacaca]">
+              ®
+            </span>
+          </a>
+
+          {/* Right Cluster with Nakula `mix-blend-difference` */}
+          <div className="pointer-events-auto flex items-center gap-5 lg:gap-10 mix-blend-difference">
+            <div className="hidden md:flex flex-col text-left leading-[1.22]">
+              <div className="flex items-center gap-2 text-[15px] font-bold tracking-[-0.04em] text-[#cacaca]">
+                <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
+                <span>{isEn ? 'Available for project' : 'Tersedia untuk proyek'}</span>
+              </div>
+              <span className="pl-4 text-[13px] font-normal uppercase tracking-[-0.03em] text-[#858585]">
+                {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
               </span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+
+            <div className="hidden lg:flex flex-col text-left leading-[1.22]">
+              <span className="text-[15px] font-bold tracking-[-0.04em] text-[#cacaca]">
+                {jakartaTime}
+              </span>
+              <span className="text-[13px] font-normal tracking-[-0.03em] text-[#858585]">
+                (GMT+7)
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => switchLanguage(isEn ? 'id' : 'en')}
+                aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
+                className="inline-flex h-[43px] items-center rounded-full border border-[#333333] bg-[#0a0a0a] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[#cacaca] hover:border-[#ff4925] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+              >
+                <span className={!isEn ? 'text-[#ff4925]' : 'text-[#777777]'}>ID</span>
+                <span className="mx-1 text-[#444444]">/</span>
+                <span className={isEn ? 'text-[#ff4925]' : 'text-[#777777]'}>EN</span>
+              </button>
+
+              <a
+                href="#v2-contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('v2-contact');
+                }}
+                className="v2-pill-btn !h-[43px] !py-0 !px-5 !text-[14px]"
+              >
+                <RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(true)}
+                aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
+                aria-expanded={isMenuOpen}
+                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[#333333] bg-[#0a0a0a] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+              >
+                <span className="flex flex-col gap-1.5" aria-hidden="true">
+                  <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
+                  <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:-translate-x-[1.5px]" />
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.header>
 
       {/* ====================================================================
-          Slide-Over Editorial Menu Drawer
+          NAKULA SLIDE-OVER RIGHT MENU DRAWER
           ==================================================================== */}
       <AnimatePresence>
         {isMenuOpen && (
@@ -971,7 +1181,7 @@ export default function PortfolioV2() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.34, ease: EDITORIAL_EASE }}
+            transition={{ duration: 0.34, ease: NAKULA_EASE }}
             className="fixed inset-0 z-[130] flex justify-end bg-black/75 backdrop-blur-[2px]"
             role="dialog"
             aria-modal="true"
@@ -983,13 +1193,12 @@ export default function PortfolioV2() {
               initial={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
               animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
               exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              transition={{ duration: 0.46, ease: EDITORIAL_EASE }}
-              className="flex h-full w-full max-w-[440px] flex-col justify-between border-l border-[#1f1f22] bg-[#0a0a0a] px-7 py-7 sm:px-10 sm:py-8 will-change-transform"
+              transition={{ duration: 0.48, ease: NAKULA_EASE }}
+              className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[#333333] bg-[#0a0a0a] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Top Row */}
-              <div className="flex items-center justify-between border-b border-[#1b1b1d] pb-5">
-                <div className="flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-[#8a8a8e]">
+              <div className="flex items-center justify-between border-b border-[#333333] pb-5">
+                <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[#858585]">
                   <span className="inline-block h-1.5 w-1.5 bg-[#ff4925]" aria-hidden="true" />
                   <span>MENU</span>
                 </div>
@@ -997,7 +1206,7 @@ export default function PortfolioV2() {
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
                   aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
-                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2a2a2e] text-[#d4d4d4] hover:border-[#55555c] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#333333] bg-[#141414] text-[#cacaca] hover:border-[#666666] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
                 >
                   <FiX
                     size={17}
@@ -1006,9 +1215,8 @@ export default function PortfolioV2() {
                 </button>
               </div>
 
-              {/* Center Links */}
               <nav className="my-auto py-4" aria-label="Portfolio V2 Navigation">
-                <ul className="divide-y divide-[#18181a]">
+                <ul className="divide-y divide-[#262626]">
                   {drawerLinks.map((item, idx) => {
                     const isCurrent = activeSection === item.id;
                     return (
@@ -1018,21 +1226,15 @@ export default function PortfolioV2() {
                           initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
                           transition={{
-                            duration: 0.4,
-                            delay: 0.06 + idx * 0.045,
-                            ease: EDITORIAL_EASE,
+                            duration: 0.42,
+                            delay: 0.06 + idx * 0.05,
+                            ease: NAKULA_EASE,
                           }}
                           onClick={() => scrollToSection(item.id)}
-                          className="v2-drawer-nav-btn group flex w-full items-center py-3.5 sm:py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
                         >
                           <span className="v2-drawer-nav-item">
-                            <span
-                              className={`v2-drawer-nav-label v2-display-heading text-[40px] sm:text-[48px] transition-colors duration-300 ${
-                                isCurrent
-                                  ? '!text-white'
-                                  : '!text-[#a4a4aa] group-hover:!text-white'
-                              }`}
-                            >
+                            <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[#cacaca] group-hover:text-white transition-colors duration-300">
                               {item.label}
                             </span>
                             {isCurrent && (
@@ -1049,25 +1251,28 @@ export default function PortfolioV2() {
                 </ul>
               </nav>
 
-              {/* Bottom Contact & Socials */}
               <motion.div
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.24, ease: EDITORIAL_EASE }}
-                className="space-y-5 border-t border-[#1b1b1d] pt-5"
+                transition={{ duration: 0.42, delay: 0.24, ease: NAKULA_EASE }}
+                className="space-y-6 pt-4"
               >
                 <div>
-                  <p className="v2-section-tag mb-1.5 !text-[10px]">(EMAIL)</p>
+                  <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[#777777]">
+                    (EMAIL)
+                  </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="inline-block text-lg sm:text-xl font-semibold tracking-[-0.03em] text-[#ff4925] hover:opacity-85 transition-opacity"
+                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[#ff4925] hover:opacity-85 transition-opacity break-all"
                   >
                     {directEmail}
                   </a>
                 </div>
                 <div>
-                  <p className="v2-section-tag mb-2.5 !text-[10px]">(SOCIALS)</p>
-                  <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-sm font-medium text-[#d4d4d4]">
+                  <p className="mb-2.5 text-[12px] uppercase tracking-[-0.02em] text-[#777777]">
+                    (SOCIALS)
+                  </p>
+                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-6 text-[17px] font-medium tracking-[-0.03em] text-[#cacaca]">
                     {contactChannelsData.map((ch) => (
                       <a
                         key={ch.key}
@@ -1078,8 +1283,8 @@ export default function PortfolioV2() {
                       >
                         <span>{ch.name}</span>
                         <FiArrowUpRight
-                          size={13}
-                          className="text-[#66666b] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
+                          size={14}
+                          className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
                         />
                       </a>
                     ))}
@@ -1089,8 +1294,8 @@ export default function PortfolioV2() {
                     >
                       <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
                       <FiArrowUpRight
-                        size={13}
-                        className="text-[#66666b] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
+                        size={14}
+                        className="text-[#777777] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#ff4925]"
                       />
                     </RouterLink>
                   </div>
@@ -1102,27 +1307,35 @@ export default function PortfolioV2() {
       </AnimatePresence>
 
       {/* ====================================================================
-          Main Content
+          MAIN CONTENT
           ==================================================================== */}
       <main id="main-content" tabIndex={-1} className="v2-portfolio-main focus:outline-none">
         {/* ------------------------------------------------------------------
-            1. HERO SECTION (Normal document flow — scrolls upward cleanly)
+            1. HERO SECTION (Sticky `z-1` with exact Nakula scale(0.9) + translateY(-100px) + fade exit)
             ------------------------------------------------------------------ */}
-        <section
+        <motion.section
           id="v2-top"
-          ref={heroRef}
-          className="relative min-h-screen w-full flex flex-col justify-between pt-5 pb-9 sm:pt-7 sm:pb-12 overflow-hidden bg-[#0a0a0a]"
+          style={
+            useHeroScrollExit
+              ? {
+                  opacity: heroOpacity,
+                  y: heroTranslateY,
+                  scale: heroScale,
+                  pointerEvents: isHeroExited ? 'none' : 'auto',
+                }
+              : undefined
+          }
+          className="v2-hero-sticky z-[1] min-h-[680px] md:h-screen md:min-h-[700px] w-full flex flex-col justify-between pt-[84px] pb-6 md:pt-28 md:pb-6 overflow-hidden bg-[#0a0a0a] origin-center will-change-transform"
         >
-          {/* Center Diagonal Spotlight Portrait Slash with subtle scroll parallax */}
+          {/* Center Diagonal Spotlight Slit Portrait */}
           <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.04 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.05 }}
             animate={
               heroIntroComplete || shouldReduceMotion
                 ? { opacity: 1, scale: 1 }
-                : { opacity: 0, scale: 1.04 }
+                : { opacity: 0, scale: 1.05 }
             }
-            transition={{ duration: 0.9, delay: 0.04, ease: EDITORIAL_EASE }}
-            style={shouldReduceMotion ? undefined : { y: heroPortraitY }}
+            transition={{ duration: 0.9, delay: 0.05, ease: NAKULA_EASE }}
             className="v2-hero-diagonal-wrap"
             aria-hidden="true"
           >
@@ -1137,108 +1350,35 @@ export default function PortfolioV2() {
             </div>
           </motion.div>
 
-          {/* Hero Top Bar: Giant Wordmark + Borderless Status & Navigation Controls */}
-          <motion.header
-            initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
-            animate={
-              heroIntroComplete || shouldReduceMotion
-                ? { opacity: 1, y: 0 }
-                : { opacity: 0, y: -12 }
-            }
-            transition={{ duration: 0.62, ease: EDITORIAL_EASE }}
-            className="relative z-20 w-full"
-          >
-            <div className="v2-container flex items-start justify-between gap-4">
-              <a
-                href="#v2-top"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('v2-top');
-                }}
-                className="v2-display-heading text-[clamp(3.75rem,11.8vw,10.2rem)] leading-[0.82] tracking-[-0.01em] text-[#dcdcdc] hover:text-white transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-              >
-                {siteConfig.brandName}
-                <span className="text-[0.34em] align-top ml-1 font-sans font-normal text-[#a4a4aa]">
-                  ®
-                </span>
-              </a>
-
-              <div className="flex items-center gap-6 lg:gap-10 pt-1">
-                {/* Availability Metadata */}
-                <div className="hidden md:flex flex-col text-left leading-[1.3]">
-                  <div className="flex items-center gap-2 text-[12px] font-medium tracking-[-0.01em] text-[#d4d4d4]">
-                    <span
-                      className="h-1.5 w-1.5 rounded-full bg-emerald-400"
-                      aria-hidden="true"
-                    />
-                    <span>{isEn ? 'Available for work' : 'Tersedia untuk proyek'}</span>
-                  </div>
-                  <span className="pl-3.5 font-mono text-[10px] uppercase tracking-[0.06em] text-[#7a7a80]">
-                    {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
-                  </span>
-                </div>
-
-                {/* Live Jakarta Time */}
-                <div className="hidden lg:flex flex-col text-left leading-[1.3]">
-                  <span className="font-mono text-[12px] font-medium text-[#d4d4d4]">
-                    {jakartaTime}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-[#7a7a80]">
-                    BOGOR / GMT+7
-                  </span>
-                </div>
-
-                {/* Minimal Action Controls */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => switchLanguage(isEn ? 'id' : 'en')}
-                    aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
-                    className="inline-flex h-10 items-center rounded-full border border-[#2c2c30] bg-[#0a0a0a]/80 px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-[#d4d4d4] hover:border-[#ff4925] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-                  >
-                    <span className={!isEn ? 'text-[#ff4925]' : 'text-[#7a7a80]'}>ID</span>
-                    <span className="mx-1 text-[#3a3a40]">/</span>
-                    <span className={isEn ? 'text-[#ff4925]' : 'text-[#7a7a80]'}>EN</span>
-                  </button>
-
-                  <a
-                    href="#v2-contact"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection('v2-contact');
-                    }}
-                    className="v2-pill-btn hidden sm:inline-flex !py-2.5 !px-5 !text-[11px]"
-                  >
-                    <RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsMenuOpen(true)}
-                    aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
-                    aria-expanded={isMenuOpen}
-                    className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#2c2c30] bg-[#0a0a0a]/80 text-[#d4d4d4] hover:border-[#55555c] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-                  >
-                    <span className="flex flex-col gap-1.5" aria-hidden="true">
-                      <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
-                      <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:-translate-x-[1.5px]" />
-                    </span>
-                  </button>
-                </div>
+          {/* Mobile Availability & Clock Row directly below fixed navbar */}
+          <div className="v2-container relative z-10 flex md:hidden items-start justify-between gap-4 pb-4">
+            <div className="flex flex-col leading-[1.3]">
+              <div className="flex items-center gap-2 text-[14px] font-bold tracking-[-0.03em] text-[#cacaca]">
+                <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
+                <span>{isEn ? 'Available for project' : 'Tersedia untuk proyek'}</span>
               </div>
+              <span className="pl-4 text-[12px] uppercase text-[#858585]">
+                {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
+              </span>
             </div>
-          </motion.header>
+            <div className="flex flex-col text-right leading-[1.3]">
+              <span className="text-[14px] font-bold tracking-[-0.03em] text-[#cacaca]">
+                {jakartaTime}
+              </span>
+              <span className="text-[12px] text-[#858585]">(GMT+7)</span>
+            </div>
+          </div>
 
-          {/* Middle Row: Right-Aligned Masked Editorial Headline */}
-          <div className="v2-container relative z-10 my-auto flex justify-end py-10 sm:py-6">
-            <h1 className="text-right text-[clamp(2.4rem,5vw,4.35rem)] font-semibold tracking-[-0.05em] leading-[1.0]">
+          {/* Right-Aligned Stacked Display Headline ("Beyond / Visuals. / Built with / Vision.") */}
+          <div className="v2-container relative z-10 my-auto flex justify-end pt-4 md:pt-8">
+            <h1 className="text-right text-[clamp(2.65rem,3.9vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.0] max-w-[300px] sm:max-w-[340px]">
               {[
                 { text: isEn ? 'Beyond' : 'Melampaui', highlight: false, delay: 0.08 },
                 { text: isEn ? 'Visuals.' : 'Visual.', highlight: false, delay: 0.15 },
                 { text: isEn ? 'Built with' : 'Dibangun dengan', highlight: true, delay: 0.22 },
                 { text: isEn ? 'Vision.' : 'Visi Rekayasa.', highlight: true, delay: 0.29 },
               ].map((line) => (
-                <span key={line.text} className="block overflow-hidden py-[0.04em]">
+                <span key={line.text} className="block overflow-hidden py-[0.03em]">
                   <motion.span
                     initial={shouldReduceMotion ? false : { y: '108%', opacity: 0 }}
                     animate={
@@ -1246,9 +1386,9 @@ export default function PortfolioV2() {
                         ? { y: '0%', opacity: 1 }
                         : { y: '108%', opacity: 0 }
                     }
-                    transition={{ duration: 0.64, delay: line.delay, ease: EDITORIAL_EASE }}
+                    transition={{ duration: 0.62, delay: line.delay, ease: NAKULA_EASE }}
                     className={`block will-change-transform ${
-                      line.highlight ? 'font-semibold text-[#f0f0f0]' : 'text-[#84848a]'
+                      line.highlight ? 'text-[#cacaca]' : 'text-[#8f8f8f]'
                     }`}
                   >
                     {line.text}
@@ -1258,8 +1398,8 @@ export default function PortfolioV2() {
             </h1>
           </div>
 
-          {/* Bottom Row: Editorial Lead + Verified Track Bar & Accent CTA */}
-          <div className="v2-container relative z-10 space-y-8">
+          {/* Bottom Section: Indented Two-Tone Statement + Verified Track & Oversized Pill CTA */}
+          <div className="v2-container relative z-10 space-y-8 md:space-y-12 pt-16 md:pt-0">
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
               animate={
@@ -1267,19 +1407,19 @@ export default function PortfolioV2() {
                   ? { opacity: 1, y: 0 }
                   : { opacity: 0, y: 14 }
               }
-              transition={{ duration: 0.64, delay: 0.28, ease: EDITORIAL_EASE }}
-              className="max-w-md"
+              transition={{ duration: 0.62, delay: 0.28, ease: NAKULA_EASE }}
+              className="max-w-[470px]"
             >
-              <p className="text-[clamp(1.15rem,1.75vw,1.5rem)] font-medium tracking-[-0.035em] leading-[1.24]">
-                <span className="text-[#ededed]">
+              <p className="text-[24px] md:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] indent-8 md:indent-12">
+                <span className="text-[#cacaca]">
                   {isEn
-                    ? 'I engineer web applications, interfaces, and digital systems '
+                    ? 'I build web apps, interfaces, and digital systems '
                     : 'Saya membangun aplikasi web, antarmuka, dan sistem digital '}
                 </span>
-                <span className="text-[#78787e]">
+                <span className="text-[#555555]">
                   {isEn
-                    ? 'with clarity, accessibility, and full-stack care.'
-                    : 'dengan kejelasan, aksesibilitas, dan ketelitian full-stack.'}
+                    ? 'with intention, clarity and care.'
+                    : 'dengan ketelitian, kejelasan, dan arsitektur terukur.'}
                 </span>
               </p>
             </motion.div>
@@ -1291,94 +1431,77 @@ export default function PortfolioV2() {
                   ? { opacity: 1, y: 0 }
                   : { opacity: 0, y: 12 }
               }
-              transition={{ duration: 0.64, delay: 0.36, ease: EDITORIAL_EASE }}
-              className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 border-t border-[#1b1b1d] pt-5"
+              transition={{ duration: 0.62, delay: 0.36, ease: NAKULA_EASE }}
+              className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
             >
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                <span className="font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-[#6a6a70]">
-                  {isEn ? 'VERIFIED TRACK' : 'REKAM JEJAK'}
+              <div className="flex flex-wrap items-center gap-x-7 gap-y-2">
+                <span className="text-[12px] font-medium uppercase tracking-[-0.02em] text-[#666666]">
+                  {isEn ? 'VERIFIED TRACK:' : 'REKAM JEJAK:'}
                 </span>
                 {[
                   'PT. AMA Salam',
                   'Universitas Gunadarma',
                   'SMKN 1 Cibinong',
                   '@ghifari29/id-kit',
-                ].map((item) => (
+                ].map((brand) => (
                   <span
-                    key={item}
-                    className="text-xs sm:text-[13px] font-medium tracking-[-0.02em] text-[#96969c]"
+                    key={brand}
+                    className="text-[14px] sm:text-[15px] font-semibold tracking-[-0.03em] text-[#858585]"
                   >
-                    {item}
+                    {brand}
                   </span>
                 ))}
               </div>
 
-              <div className="w-full lg:w-auto flex justify-end">
-                <a
-                  href="#v2-work"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection('v2-work');
-                  }}
-                  className="v2-pill-btn v2-pill-btn--accent w-full sm:w-auto min-w-[230px] justify-between !px-7 !py-3.5"
-                >
-                  <RolloverLabel text={isEn ? 'SELECTED WORK' : 'LIHAT PROYEK'} />
-                  <FiArrowUpRight size={16} />
-                </a>
-              </div>
+              <a
+                href="#v2-work"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection('v2-work');
+                }}
+                className="v2-pill-btn v2-pill-btn--accent w-full lg:w-auto lg:min-w-[310px] !h-[60px] md:!h-[64px] justify-between !px-7 !text-[18px] md:!text-[22px] !font-semibold !tracking-[-0.04em]"
+              >
+                <RolloverLabel text={isEn ? 'START A PROJECT' : 'LIHAT PROYEK'} />
+                <FiArrowUpRight size={24} />
+              </a>
             </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* ------------------------------------------------------------------
-            2. STICKY (ABOUT) — Deliberate Word-by-Word Scroll Reveal
+            2. ABOUT SECTION (`200vh`, sticky `100vh` word reveal, unsticks cleanly at `1800px`)
             ------------------------------------------------------------------ */}
-        <StickyAboutSection
-          text={aboutStatement}
-          shouldReduceMotion={Boolean(shouldReduceMotion)}
-          zIndex={20}
-        />
+        <NakulaAboutSection text={aboutStatement} />
 
         {/* ------------------------------------------------------------------
-            3. SELECTED WORK — Curated Sticky Showcase (Rises over About cleanly)
+            3. LATEST WORK (Masked Char Rise + Sticky Left Index + Counter-Scaled Right Cards)
             ------------------------------------------------------------------ */}
         <section
           id="v2-work"
-          className="relative z-30 v2-stack-layer v2-stack-layer--overlap bg-[#0a0a0a] pt-20 pb-24 sm:pt-28 sm:pb-32"
+          className="relative z-[2] bg-[#0a0a0a] pt-12 pb-28 sm:pt-20 sm:pb-36"
         >
           <div className="v2-container">
-            {/* Editorial Asymmetrical Section Intro */}
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-16 sm:mb-24"
-            >
-              <div className="lg:col-span-8">
-                <p className="v2-section-tag mb-4">
-                  ({isEn ? 'CURATED PORTFOLIO' : 'PORTOFOLIO PILIHAN'})
-                </p>
-                <div className="inline-flex items-start">
-                  <h2 className="v2-display-heading text-[clamp(3.75rem,10.5vw,8.25rem)]">
-                    {isEn ? 'SELECTED WORK' : 'KARYA PILIHAN'}
-                  </h2>
-                  <span className="ml-2.5 mt-1 font-mono text-sm sm:text-lg font-medium text-[#ff4925]">
-                    ({String(selectedProjects.length).padStart(2, '0')})
-                  </span>
-                </div>
+            {/* Section Heading */}
+            <div className="flex flex-col items-start lg:items-center text-left lg:text-center mb-16 lg:mb-[140px]">
+              <span className="lg:hidden mb-3 text-[16px] font-medium tracking-[-0.02em] text-[#cacaca]">
+                ({String(selectedProjects.length).padStart(2, '0')})
+              </span>
+              <div className="inline-flex items-start">
+                <MaskedDisplayHeading
+                  lines={isEn ? ['LATEST WORK'] : ['KARYA PILIHAN']}
+                  className="v2-section-heading"
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                />
+                <span className="hidden lg:inline-block ml-3 mt-1 text-[16px] font-medium tracking-[-0.02em] text-[#cacaca]">
+                  ({String(selectedProjects.length).padStart(2, '0')})
+                </span>
               </div>
-              <div className="lg:col-span-4 lg:pb-3">
-                <p className="text-sm sm:text-base text-[#8a8a8e] leading-relaxed max-w-sm lg:ml-auto">
-                  {isEn
-                    ? 'Production applications, internal platforms, and open-source TypeScript tooling engineered from architecture to interface.'
-                    : 'Aplikasi produksi, platform internal, dan library TypeScript open-source yang dirancang dari arsitektur hingga antarmuka.'}
-                </p>
-              </div>
-            </EditorialReveal>
+            </div>
 
-            {/* Showcase Split: Sticky Left Editorial Index & Right Stacked Project Stages */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-              {/* Left Sticky Rail (Desktop) */}
-              <div className="hidden lg:flex lg:col-span-4 sticky top-24 flex-col justify-between h-[calc(100vh-7.5rem)] pr-6 pb-4">
-                <div className="space-y-7">
+            {/* 2-Column Showcase: Sticky Left Column (`top: 120px`, `80vh`) + Right Counter-Scaled Cards (`gap: 120px`) */}
+            <div className="flex flex-col lg:flex-row items-start gap-12">
+              <div className="hidden lg:flex lg:w-[33%] lg:max-w-[330px] shrink-0 sticky top-[120px] h-[80vh] max-h-[680px] flex-col justify-between">
+                <div className="space-y-8">
                   <div className="overflow-hidden">
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -1386,9 +1509,9 @@ export default function PortfolioV2() {
                         initial={shouldReduceMotion ? false : { y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={shouldReduceMotion ? undefined : { y: -20, opacity: 0 }}
-                        transition={{ duration: 0.24, ease: EDITORIAL_EASE }}
+                        transition={{ duration: 0.22, ease: NAKULA_EASE }}
                         aria-live="polite"
-                        className="v2-display-heading text-[clamp(4.75rem,7vw,6.75rem)] leading-none !text-[#26262a] select-none"
+                        className="v2-display-heading text-[116px] leading-[0.88] !text-[#2b2b2b] select-none"
                       >
                         {activeWork.number}.
                       </motion.div>
@@ -1396,7 +1519,7 @@ export default function PortfolioV2() {
                   </div>
 
                   <nav aria-label={isEn ? 'Selected projects index' : 'Indeks proyek pilihan'}>
-                    <ul className="space-y-2 text-[13px] font-medium">
+                    <ul className="space-y-2 text-[14px] font-medium tracking-[-0.02em]">
                       {selectedProjects.map((proj, idx) => {
                         const isCurrent = idx === activeWorkIdx;
                         return (
@@ -1407,12 +1530,12 @@ export default function PortfolioV2() {
                               className={`inline-flex items-center gap-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm ${
                                 isCurrent
                                   ? 'text-white font-semibold'
-                                  : 'text-[#66666b] hover:text-[#d4d4d4]'
+                                  : 'text-[#555555] hover:text-[#cacaca]'
                               }`}
                             >
                               <span
-                                className={`inline-block h-[1.5px] transition-all duration-200 ${
-                                  isCurrent ? 'w-4 bg-[#ff4925]' : 'w-0 bg-transparent'
+                                className={`inline-block h-[1px] transition-all duration-200 ${
+                                  isCurrent ? 'w-3.5 bg-[#cacaca]' : 'w-2 bg-[#333333]'
                                 }`}
                                 aria-hidden="true"
                               />
@@ -1425,43 +1548,83 @@ export default function PortfolioV2() {
                   </nav>
                 </div>
 
-                {/* Active Project Editorial Summary */}
-                <div className="border-t border-[#1b1b1d] pt-5">
+                <div className="space-y-4">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeWork.id}
-                      initial={shouldReduceMotion ? false : { y: 10, opacity: 0 }}
+                      initial={shouldReduceMotion ? false : { y: 12, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      exit={shouldReduceMotion ? undefined : { y: -10, opacity: 0 }}
-                      transition={{ duration: 0.24, ease: EDITORIAL_EASE }}
-                      className="space-y-2"
+                      exit={shouldReduceMotion ? undefined : { y: -12, opacity: 0 }}
+                      transition={{ duration: 0.22, ease: NAKULA_EASE }}
+                      className="space-y-2.5"
                     >
-                      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ff4925]">
-                        {isEn ? activeWork.category.en : activeWork.category.id}
-                      </p>
-                      <h3 className="text-2xl xl:text-3xl font-semibold tracking-[-0.045em] text-[#f0f0f0]">
-                        {activeWork.title}
+                      <h3 className="text-[44px] xl:text-[48px] font-semibold tracking-[-0.055em] leading-[1.0] text-[#cacaca]">
+                        <RouterLink
+                          to={`/study-case/${activeWork.id}`}
+                          className="hover:text-white transition-colors"
+                        >
+                          {activeWork.title}
+                        </RouterLink>
                       </h3>
-                      <p className="text-sm font-medium text-[#c4c4ca] leading-snug max-w-xs">
+                      <p className="text-[20px] xl:text-[22px] font-medium tracking-[-0.045em] leading-[1.1] text-[#858585]">
                         {isEn ? activeWork.subtitle.en : activeWork.subtitle.id}
                       </p>
-                      <p className="text-[13px] text-[#84848a] leading-relaxed max-w-xs line-clamp-3">
-                        {isEn ? activeWork.description.en : activeWork.description.id}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-4 pt-2 text-[12px] font-semibold uppercase tracking-[-0.02em]">
+                        <RouterLink
+                          to={`/study-case/${activeWork.id}`}
+                          className="inline-flex items-center gap-1 text-[#cacaca] hover:text-[#ff4925] transition-colors"
+                        >
+                          <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
+                          <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                        </RouterLink>
+                        {activeWork.live && (
+                          <a
+                            href={activeWork.live}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                          >
+                            <span>Live</span>
+                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                          </a>
+                        )}
+                        {activeWork.npm && (
+                          <a
+                            href={activeWork.npm}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                          >
+                            <span>npm</span>
+                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                          </a>
+                        )}
+                        {activeWork.github && (
+                          <a
+                            href={activeWork.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[#858585] hover:text-white transition-colors"
+                          >
+                            <span>GitHub</span>
+                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
+                          </a>
+                        )}
+                      </div>
                     </motion.div>
                   </AnimatePresence>
                 </div>
               </div>
 
-              {/* Right Column: Stacked Editorial Project Cards */}
-              <div className="lg:col-span-8 space-y-14 lg:space-y-[18vh] lg:pb-[10vh]">
+              {/* Right Scroll Column (`gap: 120px` desktop, exact Nakula card spacing) */}
+              <div className="w-full lg:flex-1 flex flex-col gap-16 lg:gap-[120px]">
                 {selectedProjects.map((project, idx) => (
                   <WorkShowcaseCard
                     key={project.id}
                     project={project}
                     index={idx}
-                    totalCount={selectedProjects.length}
                     onVisible={setActiveWorkIdx}
+                    isDesktop={isDesktopViewport}
                     isEn={isEn}
                     shouldReduceMotion={Boolean(shouldReduceMotion)}
                   />
@@ -1469,117 +1632,74 @@ export default function PortfolioV2() {
               </div>
             </div>
 
-            {/* Archive Strip — Clean Editorial Directory */}
-            <div className="relative z-20 mt-20 sm:mt-24 border-t border-[#1b1b1d] pt-12 sm:pt-14 bg-[#0a0a0a]">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-                <div className="space-y-2">
-                  <p className="v2-section-tag">
-                    ({isEn ? 'ARCHIVE' : 'ARSIP'} — 0{otherProjects.length})
-                  </p>
-                  <h3 className="text-2xl sm:text-3xl font-semibold tracking-[-0.04em] text-[#e8e8e8]">
-                    {isEn
-                      ? 'Additional Web Apps & Educational Games'
-                      : 'Aplikasi Web & Game Edukasi Tambahan'}
-                  </h3>
-                </div>
+            {/* Centered "MORE PROJECTS ↗" */}
+            <div className="mt-24 lg:mt-32 flex flex-col items-center">
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAllWorks((prev) => !prev)}
+                  aria-expanded={showAllWorks}
+                  className="v2-pill-btn !px-8 !py-4 !text-[15px]"
+                >
+                  <RolloverLabel
+                    text={
+                      showAllWorks
+                        ? isEn
+                          ? 'HIDE MORE PROJECTS'
+                          : 'TUTUP PROYEK LAINNYA'
+                        : isEn
+                        ? `MORE PROJECTS (+${otherProjects.length})`
+                        : `PROYEK LAINNYA (+${otherProjects.length})`
+                    }
+                  />
+                  <FiArrowUpRight size={16} className="text-[#ff4925]" />
+                </button>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowAllWorks((prev) => !prev)}
-                    aria-expanded={showAllWorks}
-                    className="v2-pill-btn"
-                  >
-                    <RolloverLabel
-                      text={
-                        showAllWorks
-                          ? isEn
-                            ? 'HIDE ARCHIVE'
-                            : 'TUTUP ARSIP'
-                          : isEn
-                          ? `VIEW ARCHIVE (+${otherProjects.length})`
-                          : `BUKA ARSIP (+${otherProjects.length})`
-                      }
-                    />
-                  </button>
-
-                  <RouterLink to="/study-case" className="v2-pill-btn v2-pill-btn--accent">
-                    <RolloverLabel text={isEn ? 'ALL CASE STUDIES' : 'SEMUA STUDI KASUS'} />
-                    <FiArrowUpRight size={15} />
-                  </RouterLink>
-                </div>
+                <RouterLink
+                  to="/study-case"
+                  className="v2-pill-btn v2-pill-btn--accent !px-8 !py-4 !text-[15px]"
+                >
+                  <RolloverLabel text={isEn ? 'ALL CASE STUDIES' : 'SEMUA STUDI KASUS'} />
+                  <FiArrowUpRight size={16} />
+                </RouterLink>
               </div>
 
               <AnimatePresence initial={false}>
                 {showAllWorks && (
                   <motion.div
-                    key="v2-archive-list"
+                    key="v2-more-projects"
                     initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                    transition={{ duration: 0.36, ease: EDITORIAL_EASE }}
-                    className="overflow-hidden"
+                    transition={{ duration: 0.36, ease: NAKULA_EASE }}
+                    className="w-full overflow-hidden"
                   >
-                    <div className="mt-10 divide-y divide-[#1b1b1d] border-t border-b border-[#1b1b1d]">
+                    <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-8">
                       {otherProjects.map((proj, index) => (
-                        <article
-                          key={proj.id}
-                          className="v2-editorial-row grid grid-cols-1 md:grid-cols-12 gap-5 items-center py-6"
-                        >
-                          <div className="md:col-span-2 aspect-[16/10] w-full overflow-hidden rounded-[6px] border border-[#1f1f22] bg-[#121214]">
+                        <article key={proj.id} className="group space-y-4">
+                          <RouterLink
+                            to={`/study-case/${proj.id}`}
+                            className="block overflow-hidden rounded-[12px] border border-[#222222] bg-[#141414] aspect-[16/10]"
+                          >
                             <img
                               src={proj.image}
                               alt={proj.title}
                               loading="lazy"
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                             />
-                          </div>
-                          <div className="md:col-span-6 space-y-1">
-                            <div className="flex items-center gap-3 font-mono text-[11px] text-[#7a7a80]">
-                              <span className="text-[#ff4925]">
-                                {String(selectedProjects.length + index + 1).padStart(2, '0')}
-                              </span>
-                              <span className="uppercase">
-                                {isEn ? proj.category.en : proj.category.id}
-                              </span>
+                          </RouterLink>
+                          <div className="flex items-baseline justify-between gap-4">
+                            <div>
+                              <h3 className="text-[24px] font-semibold tracking-[-0.04em] text-[#cacaca] group-hover:text-white transition-colors">
+                                <RouterLink to={`/study-case/${proj.id}`}>{proj.title}</RouterLink>
+                              </h3>
+                              <p className="text-[15px] text-[#858585] line-clamp-2 mt-1">
+                                {isEn ? proj.description.en : proj.description.id}
+                              </p>
                             </div>
-                            <h4 className="text-xl font-semibold tracking-[-0.035em] text-[#f0f0f0]">
-                              {proj.title}
-                            </h4>
-                            <p className="text-sm text-[#84848a] line-clamp-2">
-                              {isEn ? proj.description.en : proj.description.id}
-                            </p>
-                          </div>
-                          <div className="md:col-span-4 flex flex-wrap md:justify-end gap-4 font-mono text-[11px] font-semibold uppercase tracking-[0.06em]">
-                            <RouterLink
-                              to={`/study-case/${proj.id}`}
-                              className="inline-flex items-center gap-1 text-[#e8e8e8] hover:text-[#ff4925] transition-colors"
-                            >
-                              <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-                              <FiArrowUpRight size={13} className="text-[#ff4925]" />
-                            </RouterLink>
-                            {proj.live && (
-                              <a
-                                href={proj.live}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[#9a9aa0] hover:text-white transition-colors"
-                              >
-                                <span>Live</span>
-                                <FiArrowUpRight size={13} className="text-[#ff4925]" />
-                              </a>
-                            )}
-                            {proj.github && (
-                              <a
-                                href={proj.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[#7a7a80] hover:text-white transition-colors"
-                              >
-                                <span>GitHub</span>
-                                <FiArrowUpRight size={13} className="text-[#ff4925]" />
-                              </a>
-                            )}
+                            <span className="shrink-0 text-[13px] font-semibold text-[#555555]">
+                              {String(selectedProjects.length + index + 1).padStart(2, '0')}.
+                            </span>
                           </div>
                         </article>
                       ))}
@@ -1592,490 +1712,332 @@ export default function PortfolioV2() {
         </section>
 
         {/* ------------------------------------------------------------------
-            4. METRICS — Swiss Editorial Typographic Composition
+            4. WHY US / NUMBERS DON'T LIE (Masked Char Rise + Staggered Count-Up 4-Col Row)
             ------------------------------------------------------------------ */}
         <section
           id="v2-metrics"
-          className="relative z-30 bg-[#0a0a0a] border-t border-[#1b1b1d] py-24 sm:py-32"
+          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
         >
-          <div className="v2-container space-y-20">
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end"
-            >
-              <div className="lg:col-span-8">
-                <p className="v2-section-tag mb-4">
-                  ({isEn ? 'BY THE NUMBERS' : 'REKAM JEJAK TERUKUR'})
+          <div className="v2-container space-y-16 sm:space-y-24">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+              <div className="relative">
+                <p className="v2-section-tag mb-4 md:mb-0 md:absolute md:top-2 md:left-0">
+                  ({isEn ? 'WHY ME' : 'REKAM JEJAK'})
                 </p>
-                <h2 className="v2-display-heading text-[clamp(3.25rem,8.5vw,6.25rem)]">
-                  {isEn ? 'BEYOND THE CODE' : 'DI BALIK BARIS KODE'}
-                </h2>
-              </div>
-              <div className="lg:col-span-4 lg:pb-2">
-                <p className="text-sm text-[#8a8a8e] leading-relaxed max-w-xs lg:ml-auto">
-                  {isEn
-                    ? 'Verifiable figures drawn directly from shipped repositories, test suites, and industry internship delivery.'
-                    : 'Angka terverifikasi langsung dari repositori, rangkaian uji otomatis, dan pengalaman magang industri.'}
-                </p>
-              </div>
-            </EditorialReveal>
-
-            {/* 4-Column Architectural Stat Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-r border-[#1b1b1d]">
-              {metricsData.map((stat, idx) => (
-                <EditorialReveal
-                  key={stat.index}
-                  delay={idx * 0.06}
+                <MaskedDisplayHeading
+                  lines={isEn ? ['NUMBERS', "DON'T LIE"] : ['ANGKA YANG', 'TERBUKTI']}
+                  lineClassNames={['md:pl-28 lg:pl-36', '']}
+                  className="v2-section-heading"
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
-                  className="v2-metric-cell"
-                >
-                  <div className="v2-metric-ticks" aria-hidden="true" />
-                  <span className="font-mono text-[11px] text-[#5c5c62]">{stat.index}</span>
-                  <div className="my-8 flex items-baseline">
-                    <span className="text-[clamp(3.75rem,6vw,5.25rem)] font-semibold tracking-[-0.06em] leading-none text-[#ededed]">
-                      {stat.numeral}
-                    </span>
-                    {stat.suffix && (
-                      <span className="ml-0.5 text-[clamp(2rem,3.4vw,3rem)] font-semibold tracking-[-0.04em] leading-none text-[#ff4925]">
-                        {stat.suffix}
-                      </span>
-                    )}
-                  </div>
-                  <p className="max-w-[22ch] text-sm font-medium tracking-[-0.015em] leading-snug text-[#8a8a8e]">
-                    {stat.label}
-                  </p>
-                </EditorialReveal>
-              ))}
+                />
+              </div>
+
+              <p className="max-w-[360px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[#858585] lg:pb-2">
+                {isEn
+                  ? 'Grounded in hands-on engineering, I craft accessible interfaces and reliable web systems that deliver results.'
+                  : 'Berlandaskan rekayasa terukur, saya merancang antarmuka aksesibel dan sistem web andal yang berdampak nyata.'}
+              </p>
             </div>
 
-            {/* Asymmetrical Editorial Statement + Straight Architectural Frame */}
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pt-6"
+            {/* Level 4-Column Desktop / 2x2 Mobile Metric Strip with Staggered Rise & Count-Up */}
+            <div
+              ref={metricsGridRef}
+              className="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-6 items-stretch"
             >
-              <div className="lg:col-span-7 space-y-8">
-                <blockquote className="text-[clamp(1.6rem,3vw,2.65rem)] font-semibold tracking-[-0.045em] leading-[1.12]">
-                  <span className="text-[#ff4925] mr-2 font-serif text-[1.15em] leading-none">
-                    “
-                  </span>
-                  <span className="text-[#e8e8e8]">
-                    {isEn
-                      ? 'Every interface is engineered with strict type safety, WCAG 2.1 AA accessibility, '
-                      : 'Setiap antarmuka dirancang dengan tipe statis ketat, aksesibilitas WCAG 2.1 AA, '}
-                  </span>
-                  <span className="text-[#66666c]">
-                    {isEn
-                      ? 'and clean backend integration so products remain fast and maintainable.'
-                      : 'dan integrasi backend bersih agar produk tetap cepat serta mudah dirawat.'}
-                  </span>
-                </blockquote>
-
-                <div className="flex items-center gap-4 border-t border-[#1b1b1d] pt-6">
-                  <img
-                    src={profileData.avatarImage}
-                    alt={siteConfig.name}
-                    loading="lazy"
-                    className="h-12 w-12 rounded-[8px] object-cover border border-[#26262a]"
-                  />
-                  <div>
-                    <p className="text-base font-semibold tracking-[-0.02em] text-[#e8e8e8]">
-                      {siteConfig.name}
-                    </p>
-                    <p className="font-mono text-[11px] text-[#7a7a80]">
-                      {isEn
-                        ? 'Frontend Developer Intern Alumni · PT. AMA Salam Indonesia'
-                        : 'Alumni Frontend Developer Intern · PT. AMA Salam Indonesia'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-5">
-                <div className="v2-work-mockup-stage !aspect-[16/11]">
-                  <div className="v2-work-device-frame">
-                    <img
-                      src="/images/projects/project_management.webp"
-                      alt="Project Management System"
-                      loading="lazy"
-                      className="v2-work-device-img"
-                    />
-                  </div>
-                </div>
-              </div>
-            </EditorialReveal>
+              {metricsData.map((stat, idx) => (
+                <CountUpMetricCell
+                  key={stat.label}
+                  numeral={stat.numeral}
+                  suffix={stat.suffix}
+                  label={stat.label}
+                  index={idx}
+                  isTriggered={isMetricsInView}
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
         {/* ------------------------------------------------------------------
-            5. CAPABILITIES — Editorial Accordion with Smooth Reveal
+            5. HIGHLIGHT QUOTE (Animated 1px Divider + Scroll Zoom-Out `1.15 -> 1.0` Right Image)
+            ------------------------------------------------------------------ */}
+        <section className="relative z-[2] bg-[#0a0a0a] py-24 sm:py-[150px]">
+          <div className="v2-container">
+            <div className="flex flex-col lg:flex-row items-center gap-14 lg:gap-[120px]">
+              {/* Left Quote Column (`min-width: 55%`) */}
+              <div className="w-full lg:w-[55%] space-y-12">
+                <div className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-2 left-0 text-[64px] sm:text-[80px] font-semibold leading-none text-[#ff4925] select-none"
+                  >
+                    “
+                  </span>
+                  <blockquote className="text-[32px] sm:text-[48px] xl:text-[56px] font-semibold tracking-[-0.06em] leading-[1.02] indent-12 sm:indent-20">
+                    <span className="text-[#cacaca]">
+                      {isEn
+                        ? 'Building software feels personal. '
+                        : 'Membangun perangkat lunak itu personal. '}
+                    </span>
+                    <span className="text-[#555555]">
+                      {isEn
+                        ? 'Every interface is engineered with type safety, WCAG 2.1 AA accessibility, and clean backend meaning.'
+                        : 'Setiap antarmuka dirancang dengan tipe statis ketat, aksesibilitas WCAG 2.1 AA, dan backend yang bersih.'}
+                    </span>
+                  </blockquote>
+                </div>
+
+                {/* Animated 1px Divider Line (Exact Nakula 1s cubic-bezier(0.4, 0, 0.2, 1)) */}
+                <div className="w-full overflow-hidden">
+                  <motion.div
+                    initial={shouldReduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 1.0, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ transformOrigin: 'left center' }}
+                    className="h-[1px] w-full bg-[#333333]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-5">
+                  <img
+                    src={profileData.avatarImage}
+                    alt={siteConfig.name}
+                    loading="lazy"
+                    className="h-[84px] w-[84px] rounded-[16px] object-cover border border-[#2a2a2a]"
+                  />
+                  <div>
+                    <p className="text-[24px] font-semibold tracking-[-0.04em] leading-tight text-[#cacaca]">
+                      {siteConfig.name}
+                    </p>
+                    <p className="text-[16px] text-[#777777] mt-0.5">
+                      {isEn
+                        ? 'Frontend Intern Alumni at PT. AMA Salam'
+                        : 'Alumni Frontend Intern di PT. AMA Salam'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Studio Frame with Scroll Zoom-Out (`1.15 -> 1.0`) */}
+              <div ref={highlightImgRef} className="w-full lg:flex-1">
+                <RouterLink
+                  to="/study-case/project-management"
+                  className="block overflow-hidden rounded-[14px] border border-[#222222] bg-[#141414] aspect-[4/4.4]"
+                >
+                  <motion.img
+                    src="/images/projects/project_management.webp"
+                    alt="Project Management System"
+                    loading="lazy"
+                    style={shouldReduceMotion ? undefined : { scale: highlightImgScale }}
+                    className="h-full w-full object-cover object-top will-change-transform"
+                  />
+                </RouterLink>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------------
+            6. SERVICES / HOW I CAN HELP (Smooth Height Accordion `160px -> ~440px`)
             ------------------------------------------------------------------ */}
         <section
           id="v2-capabilities"
-          className="relative z-30 bg-[#0a0a0a] border-t border-[#1b1b1d] py-24 sm:py-32"
+          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
         >
-          <div className="v2-container">
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-14 sm:mb-20"
-            >
-              <div className="lg:col-span-8">
-                <p className="v2-section-tag mb-4">
-                  ({isEn ? 'CAPABILITIES' : 'KEAHLIAN'})
-                </p>
-                <h2 className="v2-display-heading text-[clamp(3.25rem,8.5vw,6.25rem)]">
-                  {isEn ? 'HOW I CAN HELP' : 'KEAHLIAN & LAYANAN'}
-                </h2>
-              </div>
-              <div className="lg:col-span-4 lg:pb-2">
-                <p className="text-sm text-[#8a8a8e] leading-relaxed max-w-xs lg:ml-auto">
-                  {isEn
-                    ? 'Core disciplines spanning interface architecture, full-stack web APIs, and tested open-source packages.'
-                    : 'Disiplin utama mencakup arsitektur antarmuka, API web full-stack, serta paket open-source teruji.'}
-                </p>
-              </div>
-            </EditorialReveal>
+          <div className="v2-container mb-16 flex justify-center">
+            <div className="inline-flex items-start">
+              <MaskedDisplayHeading
+                lines={isEn ? ['HOW I CAN HELP'] : ['KEAHLIAN & LAYANAN']}
+                className="v2-section-heading text-center"
+                shouldReduceMotion={Boolean(shouldReduceMotion)}
+              />
+              <span className="hidden sm:inline-block ml-3 mt-1 v2-section-tag">
+                ({isEn ? 'SERVICES' : 'LAYANAN'})
+              </span>
+            </div>
+          </div>
 
-            <div className="border-t border-b border-[#1b1b1d] divide-y divide-[#1b1b1d]">
-              {capabilities.map((cap, idx) => {
-                const isOpen = openCapabilityIdx === idx;
-                return (
-                  <div key={cap.number} className="py-6 sm:py-8">
+          <div className="border-t border-b border-[#333333] divide-y divide-[#333333]">
+            {capabilities.map((cap, idx) => {
+              const isOpen = openCapabilityIdx === idx;
+              return (
+                <div
+                  key={cap.number}
+                  className={`transition-colors duration-300 ${
+                    isOpen ? 'bg-[#181818]' : 'bg-[#0a0a0a] hover:bg-[#131313]'
+                  }`}
+                >
+                  <div className="v2-container">
                     <button
                       type="button"
                       onClick={() => setOpenCapabilityIdx(isOpen ? -1 : idx)}
                       aria-expanded={isOpen}
-                      className="flex w-full items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm group"
+                      className="grid w-full grid-cols-12 items-center min-h-[112px] sm:min-h-[150px] py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
                     >
-                      <div className="flex items-baseline gap-5 sm:gap-8">
-                        <span className="font-mono text-sm sm:text-base font-semibold text-[#5c5c62]">
-                          {cap.number}
-                          <span className="text-[#ff4925]">.</span>
-                        </span>
-                        <h3
-                          className={`text-2xl sm:text-4xl font-semibold tracking-[-0.045em] transition-colors ${
+                      <span
+                        className={`col-span-3 md:col-span-6 font-semibold tracking-[-0.05em] transition-all duration-300 ${
+                          isOpen
+                            ? 'text-[44px] sm:text-[64px] leading-none text-[#555555]'
+                            : 'text-[22px] sm:text-[28px] text-[#555555]'
+                        }`}
+                      >
+                        {cap.number}
+                        <span className="text-[#ff4925]">.</span>
+                      </span>
+                      <span className="col-span-9 md:col-span-6 flex items-center justify-between gap-4">
+                        <span
+                          className={`font-semibold tracking-[-0.05em] leading-[1.06] transition-all duration-300 ${
                             isOpen
-                              ? 'text-[#f2f2f2]'
-                              : 'text-[#84848a] group-hover:text-[#e8e8e8]'
+                              ? 'text-[28px] sm:text-[40px] text-[#cacaca]'
+                              : 'text-[24px] sm:text-[34px] text-[#cacaca]'
                           }`}
                         >
                           {cap.title}
-                        </h3>
-                      </div>
-                      <span
-                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#242428] text-[#ff4925] group-hover:border-[#ff4925] transition-colors"
-                        aria-hidden="true"
-                      >
-                        {isOpen ? <FiMinus size={16} /> : <FiPlus size={16} />}
+                        </span>
+                        <span className="text-[#ff4925] shrink-0" aria-hidden="true">
+                          {isOpen ? <FiMinus size={20} /> : <FiPlus size={20} />}
+                        </span>
                       </span>
                     </button>
 
                     <AnimatePresence initial={false}>
                       {isOpen && (
                         <motion.div
-                          key={`cap-body-${cap.number}`}
+                          key={`service-panel-${cap.number}`}
                           initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                          transition={{ duration: 0.34, ease: EDITORIAL_EASE }}
+                          transition={{ duration: 0.36, ease: NAKULA_EASE }}
                           className="overflow-hidden"
                         >
-                          <div className="pt-7 pb-2 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:pl-14 items-center">
-                            <div className="lg:col-span-7 space-y-5">
-                              <p className="text-base sm:text-lg text-[#9a9aa0] leading-relaxed max-w-xl">
-                                {cap.summary}
-                              </p>
-                              <p className="font-mono text-xs tracking-[0.03em] text-[#7a7a80]">
-                                {cap.stack.join('  ·  ')}
-                              </p>
-                              <div className="pt-1">
-                                <RouterLink
-                                  to={`/study-case/${cap.featuredSlug}`}
-                                  className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.06em] text-[#ff4925] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-                                >
-                                  <span>
-                                    {isEn ? 'Case Study:' : 'Studi Kasus:'} {cap.featuredProject}
-                                  </span>
-                                  <FiArrowUpRight size={14} />
-                                </RouterLink>
-                              </div>
-                            </div>
+                          <div className="pb-12 pt-2 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                            <div className="hidden lg:block lg:col-span-2" />
 
-                            <div className="lg:col-span-5">
+                            <div className="lg:col-span-4">
                               <RouterLink
                                 to={`/study-case/${cap.featuredSlug}`}
-                                className="block overflow-hidden rounded-[8px] border border-[#222226] bg-[#101012] aspect-[16/10] group/img focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                                className="block overflow-hidden rounded-[12px] border border-[#2a2a2a] bg-[#0a0a0a] aspect-[16/11] group"
                               >
                                 <img
                                   src={cap.image}
                                   alt={cap.featuredProject}
                                   loading="lazy"
-                                  className="h-full w-full object-cover transition-transform duration-700 group-hover/img:scale-[1.03]"
+                                  className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
                                 />
                               </RouterLink>
+                            </div>
+
+                            <div className="lg:col-span-6 space-y-5">
+                              <p className="text-[18px] sm:text-[22px] font-medium tracking-[-0.04em] leading-[1.2] text-[#858585] max-w-xl">
+                                {cap.summary}
+                              </p>
+                              <div className="flex flex-wrap gap-2.5 pt-1">
+                                {cap.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="rounded-full border border-[#333333] px-4 py-2 text-[13px] font-medium text-[#9a9a9a]"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                              <div>
+                                <RouterLink
+                                  to={`/study-case/${cap.featuredSlug}`}
+                                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[-0.01em] text-[#ff4925] hover:underline"
+                                >
+                                  <span>
+                                    {isEn ? 'Inspect Case Study:' : 'Studi Kasus:'}{' '}
+                                    {cap.featuredProject}
+                                  </span>
+                                  <FiArrowUpRight size={14} />
+                                </RouterLink>
+                              </div>
                             </div>
                           </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------------
-            6. EXPERIENCE & EDUCATION — Editorial Chronological Timeline
-            ------------------------------------------------------------------ */}
-        <section
-          id="v2-experience"
-          className="relative z-30 bg-[#0a0a0a] border-t border-[#1b1b1d] py-24 sm:py-32"
-        >
-          <div className="v2-container">
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-14 sm:mb-20"
-            >
-              <div className="lg:col-span-8">
-                <p className="v2-section-tag mb-4">
-                  ({isEn ? 'TRACK RECORD' : 'PENGALAMAN & PENDIDIKAN'})
-                </p>
-                <h2 className="v2-display-heading text-[clamp(3.25rem,8.5vw,6.25rem)]">
-                  {isEn ? 'EXPERIENCE & EDUCATION' : 'JEJAK & PENDIDIKAN'}
-                </h2>
-              </div>
-              <div className="lg:col-span-4 lg:pb-2">
-                <p className="text-sm text-[#8a8a8e] leading-relaxed max-w-xs lg:ml-auto">
-                  {isEn
-                    ? 'Industry internship, published open-source tooling, and formal computer science education.'
-                    : 'Magang industri, library open-source terpublikasi, serta pendidikan formal informatika.'}
-                </p>
-              </div>
-            </EditorialReveal>
-
-            <div className="border-b border-[#1b1b1d]">
-              {timelineEntries.map((item, idx) => (
-                <EditorialReveal
-                  key={item.id}
-                  delay={idx * 0.05}
-                  shouldReduceMotion={Boolean(shouldReduceMotion)}
-                >
-                  <article className="v2-editorial-row grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 py-8 sm:py-10 items-start">
-                    {/* Left Column: Period & Context Metadata */}
-                    <div className="lg:col-span-3 space-y-1.5">
-                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.06em] text-[#ff4925]">
-                        {item.period}
-                      </p>
-                      <p className="font-mono text-[11px] text-[#7a7a80] leading-snug">
-                        {item.meta}
-                      </p>
-                    </div>
-
-                    {/* Center Column: Role & Institution */}
-                    <div className="lg:col-span-4 space-y-1">
-                      <h3 className="text-2xl sm:text-[1.75rem] font-semibold tracking-[-0.04em] leading-tight text-[#f0f0f0]">
-                        {item.org}
-                      </h3>
-                      <p className="text-sm font-medium text-[#a4a4aa]">{item.role}</p>
-                    </div>
-
-                    {/* Right Column: Factual Description + Stack + Optional Case Study Link */}
-                    <div className="lg:col-span-5 space-y-3">
-                      <p className="text-sm sm:text-base text-[#8f8f96] leading-relaxed">
-                        {item.body}
-                      </p>
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                        <span className="font-mono text-[11px] text-[#66666c]">{item.stack}</span>
-                        {item.caseStudySlug && (
-                          <RouterLink
-                            to={`/study-case/${item.caseStudySlug}`}
-                            className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-[#d4d4d4] hover:text-[#ff4925] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm"
-                          >
-                            <span>{isEn ? 'Inspect Work' : 'Lihat Detail'}</span>
-                            <FiArrowUpRight size={13} className="text-[#ff4925]" />
-                          </RouterLink>
-                        )}
-                      </div>
-                    </div>
-                  </article>
-                </EditorialReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------------
-            7. ARCHITECTURE CASE STUDIES — Asymmetrical Editorial Feature
-            ------------------------------------------------------------------ */}
-        <section
-          id="v2-insights"
-          className="relative z-30 bg-[#0a0a0a] border-t border-[#1b1b1d] py-24 sm:py-32"
-        >
-          <div className="v2-container">
-            <EditorialReveal
-              shouldReduceMotion={Boolean(shouldReduceMotion)}
-              className="flex flex-wrap items-end justify-between gap-6 mb-14 sm:mb-20"
-            >
-              <div>
-                <p className="v2-section-tag mb-4">(CASE STUDIES)</p>
-                <h2 className="v2-display-heading text-[clamp(3.25rem,8.5vw,6.25rem)]">
-                  {isEn ? 'LATEST INSIGHTS' : 'STUDI KASUS TEKNIS'}
-                </h2>
-              </div>
-              <RouterLink to="/study-case" className="v2-pill-btn v2-pill-btn--accent">
-                <RolloverLabel text={isEn ? 'ALL CASE STUDIES' : 'LIHAT SEMUA'} />
-                <FiArrowUpRight size={15} />
-              </RouterLink>
-            </EditorialReveal>
-
-            {featuredCaseStudies.length > 0 && (
-              <div className="space-y-10">
-                {/* Lead Feature: Asymmetrical 12-Col Horizontal Split */}
-                <EditorialReveal shouldReduceMotion={Boolean(shouldReduceMotion)}>
-                  <RouterLink
-                    to={`/study-case/${featuredCaseStudies[0].id}`}
-                    className="group grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-b border-[#1b1b1d] py-8 sm:py-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
-                  >
-                    <div className="lg:col-span-7 overflow-hidden rounded-[8px] border border-[#1f1f22] bg-[#101012] aspect-[16/10]">
-                      <img
-                        src={featuredCaseStudies[0].image}
-                        alt={featuredCaseStudies[0].title}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="lg:col-span-5 space-y-4">
-                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-[#ff4925]">
-                        {isEn
-                          ? featuredCaseStudies[0].category.en
-                          : featuredCaseStudies[0].category.id}
-                      </p>
-                      <h3 className="text-2xl sm:text-4xl font-semibold tracking-[-0.045em] leading-[1.08] text-[#f2f2f2] group-hover:text-[#ff4925] transition-colors">
-                        {featuredCaseStudies[0].title} —{' '}
-                        {isEn
-                          ? featuredCaseStudies[0].subtitle.en
-                          : featuredCaseStudies[0].subtitle.id}
-                      </h3>
-                      <p className="text-sm sm:text-base text-[#8a8a8e] leading-relaxed line-clamp-4">
-                        {isEn
-                          ? featuredCaseStudies[0].details?.architecture?.en
-                          : featuredCaseStudies[0].details?.architecture?.id}
-                      </p>
-                      <span className="inline-flex items-center gap-1.5 pt-2 font-mono text-xs font-semibold uppercase tracking-[0.06em] text-[#d4d4d4] group-hover:text-[#ff4925] transition-colors">
-                        <span>{isEn ? 'Read Architecture Notes' : 'Baca Studi Kasus'}</span>
-                        <FiArrowUpRight size={14} className="text-[#ff4925]" />
-                      </span>
-                    </div>
-                  </RouterLink>
-                </EditorialReveal>
-
-                {/* Supporting 2-Column Editorial Features */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  {featuredCaseStudies.slice(1).map((study, idx) => (
-                    <EditorialReveal
-                      key={study.id}
-                      delay={idx * 0.08}
-                      shouldReduceMotion={Boolean(shouldReduceMotion)}
-                    >
-                      <RouterLink
-                        to={`/study-case/${study.id}`}
-                        className="group block space-y-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-[8px]"
-                      >
-                        <div className="aspect-[16/10] w-full overflow-hidden rounded-[8px] border border-[#1f1f22] bg-[#101012]">
-                          <img
-                            src={study.image}
-                            alt={study.title}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                          />
-                        </div>
-                        <div className="space-y-2 pt-1">
-                          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ff4925]">
-                            {isEn ? study.category.en : study.category.id}
-                          </p>
-                          <h3 className="text-xl sm:text-2xl font-semibold tracking-[-0.04em] text-[#f0f0f0] group-hover:text-[#ff4925] transition-colors">
-                            {study.title} — {isEn ? study.subtitle.en : study.subtitle.id}
-                          </h3>
-                          <p className="text-sm text-[#8a8a8e] leading-relaxed line-clamp-2">
-                            {isEn ? study.details?.architecture?.en : study.details?.architecture?.id}
-                          </p>
-                        </div>
-                      </RouterLink>
-                    </EditorialReveal>
-                  ))}
                 </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         </section>
 
         {/* ------------------------------------------------------------------
-            8. FAQ — Editorial 12-Column Split (Clean Hairline Accordion)
+            7. HOW I WORK / PROCESS (Exact Nakula Sticky Horizontal Pan Track!)
+            ------------------------------------------------------------------ */}
+        <NakulaProcessSection
+          steps={processTrackSteps}
+          isEn={isEn}
+          isDesktop={isDesktopViewport}
+          shouldReduceMotion={Boolean(shouldReduceMotion)}
+        />
+
+        {/* ------------------------------------------------------------------
+            8. FAQ SECTION (Exact Nakula 2-Col + `12px` Rounded `#333` Dark Cards)
             ------------------------------------------------------------------ */}
         <section
           id="v2-faq"
-          className="relative z-30 bg-[#0a0a0a] border-t border-[#1b1b1d] py-24 sm:py-32"
+          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
         >
           <div className="v2-container">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
-              <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-5">
-                <p className="v2-section-tag">(FAQ)</p>
-                <h2 className="v2-display-heading text-[clamp(3.5rem,7.5vw,5.75rem)]">
-                  {isEn ? 'QUESTIONS' : 'PERTANYAAN'}
-                </h2>
-                <div className="text-sm text-[#8a8a8e] space-y-1">
-                  <p>{isEn ? 'Have something specific in mind?' : 'Punya pertanyaan spesifik?'}</p>
+            <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
+              <div className="lg:w-[220px] shrink-0 space-y-4">
+                <MaskedDisplayHeading
+                  lines={['FAQ']}
+                  className="v2-section-heading"
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                />
+                <div className="text-[16px] leading-[1.35] tracking-[-0.02em]">
+                  <p className="text-[#cacaca]">
+                    {isEn ? 'Got specific questions?' : 'Punya pertanyaan spesifik?'}
+                  </p>
                   <a
                     href={`mailto:${directEmail}`}
-                    className="inline-flex items-center gap-1 font-mono text-xs font-semibold uppercase tracking-[0.06em] text-[#ff4925] hover:underline"
+                    className="font-medium text-[#ff4925] hover:underline"
                   >
-                    <span>{isEn ? 'Email Directly' : 'Kirim Email'}</span>
-                    <FiArrowUpRight size={13} />
+                    {isEn ? 'Contact Me' : 'Hubungi Saya'}
                   </a>
                 </div>
               </div>
 
-              <div className="lg:col-span-8 border-t border-b border-[#1b1b1d] divide-y divide-[#1b1b1d]">
+              <div className="w-full lg:max-w-[800px] space-y-3">
                 {faqItems.map((item, idx) => {
                   const isOpen = openFaqIdx === idx;
                   return (
-                    <div key={item.q} className="py-6 sm:py-7">
+                    <div
+                      key={item.q}
+                      className="rounded-[12px] border border-[#333333] bg-[#0a0a0a] p-6 sm:p-8"
+                    >
                       <button
                         type="button"
                         onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-start justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded-sm group"
+                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925] rounded"
                       >
-                        <div className="flex items-baseline gap-4">
-                          <span className="font-mono text-xs text-[#5c5c62]">
-                            {String(idx + 1).padStart(2, '0')}
-                          </span>
-                          <span
-                            className={`text-lg sm:text-xl font-semibold tracking-[-0.03em] transition-colors ${
-                              isOpen
-                                ? 'text-[#f2f2f2]'
-                                : 'text-[#96969c] group-hover:text-[#e8e8e8]'
-                            }`}
-                          >
-                            {item.q}
-                          </span>
-                        </div>
-                        <span className="text-[#ff4925] shrink-0 pt-1" aria-hidden="true">
-                          {isOpen ? <FiMinus size={18} /> : <FiPlus size={18} />}
+                        <span className="text-[22px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] text-[#cacaca]">
+                          {item.q}
+                        </span>
+                        <span className="text-[#ff4925] shrink-0" aria-hidden="true">
+                          {isOpen ? <FiMinus size={24} /> : <FiPlus size={24} />}
                         </span>
                       </button>
 
                       <AnimatePresence initial={false}>
                         {isOpen && (
                           <motion.div
-                            key={`faq-ans-${idx}`}
+                            key={`faq-body-${idx}`}
                             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3, ease: EDITORIAL_EASE }}
+                            transition={{ duration: 0.28, ease: NAKULA_EASE }}
                             className="overflow-hidden"
                           >
-                            <p className="pt-4 pl-8 text-sm sm:text-base text-[#8a8a8e] leading-relaxed max-w-2xl">
+                            <p className="pt-5 text-[16px] leading-[1.45] tracking-[-0.02em] text-[#777777]">
                               {item.a}
                             </p>
                           </motion.div>
@@ -2090,55 +2052,168 @@ export default function PortfolioV2() {
         </section>
 
         {/* ------------------------------------------------------------------
-            9. CLOSING CTA — Controlled Overlap Curtain into Footer
+            9. LATEST INSIGHTS / CASE STUDIES (Masked Char Rise + 3-Card Asymmetric Grid)
             ------------------------------------------------------------------ */}
-        <OverlappingSection
-          id="v2-contact"
-          zIndex={40}
-          dwellRatio={0.2}
-          shouldReduceMotion={Boolean(shouldReduceMotion)}
-          className="border-t border-[#1b1b1d] py-24 sm:py-32"
+        <section
+          id="v2-insights"
+          className="relative z-[2] bg-[#0a0a0a] py-28 sm:py-[150px]"
         >
-          <div className="v2-container grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-            <div className="lg:col-span-7 space-y-5">
-              <p className="v2-section-tag">({isEn ? 'NEXT STEP' : 'LANGKAH SELANJUTNYA'})</p>
-              <h2 className="v2-display-heading text-[clamp(4.25rem,10.5vw,8.25rem)] leading-[0.88] !text-[#ededed]">
-                <span className="block">{isEn ? "LET'S" : 'MARI'}</span>
-                <span className="block">{isEn ? 'BUILD' : 'BANGUN'}</span>
-                <span className="block !text-[#ff4925]">{isEn ? 'TOGETHER' : 'BERSAMA'}</span>
-              </h2>
+          <div className="v2-container space-y-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+              <div className="inline-flex items-start">
+                <MaskedDisplayHeading
+                  lines={isEn ? ['LATEST INSIGHTS'] : ['STUDI KASUS']}
+                  className="v2-section-heading"
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                />
+                <span className="hidden sm:inline-block ml-3 mt-1 v2-section-tag">
+                  ({isEn ? 'CASE STUDIES' : 'ARSITEKTUR'})
+                </span>
+              </div>
+
+              <RouterLink
+                to="/study-case"
+                className="v2-pill-btn !min-w-[180px] !py-3.5 justify-between !text-[#ff4925] hover:!border-[#ff4925]"
+              >
+                <RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
+                <FiArrowUpRight size={16} />
+              </RouterLink>
             </div>
 
-            <div className="lg:col-span-5 space-y-7 lg:pb-2">
-              <p className="text-lg sm:text-xl font-medium tracking-[-0.03em] text-[#9a9aa0] leading-[1.38] max-w-md">
+            {featuredCaseStudies.length > 0 && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                {/* Left Featured Card (50%) */}
+                <RouterLink
+                  to={`/study-case/${featuredCaseStudies[0].id}`}
+                  className="group relative lg:col-span-6 min-h-[420px] lg:min-h-[540px] overflow-hidden rounded-[12px] border border-[#262626] bg-[#121212] flex flex-col justify-between p-5 sm:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                >
+                  <img
+                    src={featuredCaseStudies[0].image}
+                    alt={featuredCaseStudies[0].title}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/95 via-[#0a0a0a]/45 to-[#0a0a0a]/20"
+                    aria-hidden="true"
+                  />
+
+                  <div className="relative z-10">
+                    <span className="inline-block rounded-full bg-[#e6e6e6]/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.02em] text-[#0a0a0a]">
+                      {isEn
+                        ? featuredCaseStudies[0].category.en
+                        : featuredCaseStudies[0].category.id}
+                    </span>
+                  </div>
+
+                  <div className="relative z-10 space-y-2">
+                    <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#a4a4a4]">
+                      CASE STUDY · {featuredCaseStudies[0].number}
+                    </p>
+                    <h3 className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.045em] leading-[1.08] text-white group-hover:text-[#ff4925] transition-colors">
+                      {featuredCaseStudies[0].title} —{' '}
+                      {isEn
+                        ? featuredCaseStudies[0].subtitle.en
+                        : featuredCaseStudies[0].subtitle.id}
+                    </h3>
+                  </div>
+                </RouterLink>
+
+                {/* Right 2 Secondary Cards (50%) */}
+                <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {featuredCaseStudies.slice(1).map((study) => (
+                    <RouterLink
+                      key={study.id}
+                      to={`/study-case/${study.id}`}
+                      className="group rounded-[12px] border border-[#262626] bg-[#0e0e0e] p-3 flex flex-col justify-between gap-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4925]"
+                    >
+                      <div className="relative aspect-[16/11] w-full overflow-hidden rounded-[8px] bg-[#161616]">
+                        <img
+                          src={study.image}
+                          alt={study.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                        />
+                        <span className="absolute top-3 left-3 inline-block rounded-full bg-[#e6e6e6]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.02em] text-[#0a0a0a]">
+                          {isEn ? study.category.en : study.category.id}
+                        </span>
+                      </div>
+
+                      <div className="px-2 pb-3 space-y-3 flex-1 flex flex-col justify-between">
+                        <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[#777777]">
+                          CASE STUDY · {study.number}
+                        </p>
+                        <div className="space-y-2">
+                          <h3 className="text-[22px] font-semibold tracking-[-0.04em] leading-[1.12] text-[#cacaca] group-hover:text-[#ff4925] transition-colors">
+                            {study.title} — {isEn ? study.subtitle.en : study.subtitle.id}
+                          </h3>
+                          <p className="text-[14px] leading-[1.4] text-[#777777] line-clamp-2">
+                            {isEn ? study.details?.architecture?.en : study.details?.architecture?.id}
+                          </p>
+                        </div>
+                      </div>
+                    </RouterLink>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------------
+            10. PRE-FOOTER CONTACT CTA (Downward Spotlight Parallax + Masked Heading)
+            ------------------------------------------------------------------ */}
+        <section
+          id="v2-contact"
+          ref={ctaSectionRef}
+          className="relative z-[2] min-h-[580px] sm:min-h-[700px] flex items-center overflow-hidden bg-[#0a0a0a] py-24"
+        >
+          {/* Downward Parallax Spotlight Layer (`translateY 0 -> 72px`, exact Nakula `.framer-1t4kn25`) */}
+          <motion.div
+            aria-hidden="true"
+            style={shouldReduceMotion ? undefined : { y: ctaSpotlightY }}
+            className="v2-cta-spotlight pointer-events-none absolute -inset-y-20 inset-x-0 will-change-transform"
+          />
+
+          <div className="v2-container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+            <div className="lg:col-span-7">
+              <MaskedDisplayHeading
+                lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
+                className="v2-section-heading"
+                shouldReduceMotion={Boolean(shouldReduceMotion)}
+              />
+            </div>
+
+            <div className="lg:col-span-5 space-y-6 lg:pb-2">
+              <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[#9a9a9a] max-w-md">
                 {isEn
-                  ? 'Have a frontend role, full-stack web product, or engineering collaboration in mind? Let’s talk directly.'
-                  : 'Punya peluang frontend, produk web full-stack, atau kolaborasi rekayasa perangkat lunak? Mari berdiskusi langsung.'}
+                  ? 'Have a frontend role, web application, or collaborative project in mind? Let’s build it with clarity.'
+                  : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Mari bangun bersama dengan jelas dan terukur.'}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={`mailto:${directEmail}`}
-                  className="v2-pill-btn v2-pill-btn--accent flex-1 !py-4 !text-xs sm:!text-sm justify-center"
+                  className="v2-pill-btn v2-pill-btn--accent flex-1 !h-[58px] !text-[16px] justify-between !px-7"
                 >
-                  <RolloverLabel text={isEn ? 'GET IN TOUCH' : 'HUBUNGI SEKARANG'} />
-                  <FiArrowUpRight size={16} />
+                  <RolloverLabel text={isEn ? 'START A PROJECT' : 'HUBUNGI SEKARANG'} />
+                  <FiArrowUpRight size={20} />
                 </a>
 
                 <button
                   type="button"
                   onClick={handleCopyEmail}
                   aria-label={isEn ? 'Copy email address' : 'Salin alamat email'}
-                  className="v2-pill-btn !py-4 !px-5 !text-xs justify-center"
+                  className="v2-pill-btn !h-[58px] !px-5 !text-[13px]"
                 >
                   {copiedEmail ? (
                     <>
-                      <FiCheck size={14} className="text-emerald-400" />
+                      <FiCheck size={15} className="text-[#47c554]" />
                       <span>{isEn ? 'COPIED' : 'TERSALIN'}</span>
                     </>
                   ) : (
                     <>
-                      <FiCopy size={14} />
+                      <FiCopy size={15} />
                       <span>{isEn ? 'COPY EMAIL' : 'SALIN EMAIL'}</span>
                     </>
                   )}
@@ -2146,175 +2221,186 @@ export default function PortfolioV2() {
               </div>
             </div>
           </div>
-        </OverlappingSection>
+        </section>
 
         {/* ====================================================================
-            10. FOOTER + FULL-BLEED #FF4925 BRAND BANNER
+            11. FOOTER (`z-3` Dark Upper Footer + `z-0` Curtain-Sliding `#FF4925` Bottom Banner)
             ==================================================================== */}
-        <footer
-          style={{ zIndex: 50 }}
-          className="v2-stack-layer v2-stack-layer--overlap min-h-screen flex flex-col justify-between bg-[#0a0a0a] pt-16 sm:pt-24"
-        >
-          <div className="v2-container space-y-14 pb-16">
-            {/* Top Contact Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-b border-[#1b1b1d] pb-12">
-              <div>
-                <p className="v2-section-tag mb-2">(EMAIL)</p>
-                <a
-                  href={`mailto:${directEmail}`}
-                  className="text-2xl sm:text-4xl font-semibold tracking-[-0.04em] text-[#ff4925] hover:underline break-all"
-                >
-                  {directEmail}
-                </a>
-              </div>
-              <div>
-                <p className="v2-section-tag mb-2">(LOCATION)</p>
-                <p className="text-2xl sm:text-4xl font-semibold tracking-[-0.04em] text-[#e0e0e0]">
-                  Bogor / Jakarta, Indonesia
-                </p>
-              </div>
-            </div>
-
-            {/* Middle 3-Column Navigation & CV */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10">
-              <div className="lg:col-span-3">
-                <p className="v2-section-tag mb-4">(NAVIGATION)</p>
-                <ul className="space-y-2.5 text-base font-medium tracking-[-0.02em] text-[#d4d4d4]">
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection('v2-top')}
-                      className="hover:text-[#ff4925] transition-colors"
-                    >
-                      Home
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection('v2-about')}
-                      className="hover:text-[#ff4925] transition-colors"
-                    >
-                      About
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection('v2-work')}
-                      className="hover:text-[#ff4925] transition-colors"
-                    >
-                      Works
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection('v2-experience')}
-                      className="hover:text-[#ff4925] transition-colors"
-                    >
-                      {isEn ? 'Experience' : 'Pengalaman'}
-                    </button>
-                  </li>
-                  <li>
-                    <RouterLink to="/study-case" className="hover:text-[#ff4925] transition-colors">
-                      Case Studies
-                    </RouterLink>
-                  </li>
-                  <li>
-                    <RouterLink to="/recruiter" className="hover:text-[#ff4925] transition-colors">
-                      Recruiter Mode
-                    </RouterLink>
-                  </li>
-                  <li>
-                    <RouterLink to="/play" className="hover:text-[#ff4925] transition-colors">
-                      3D World
-                    </RouterLink>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="lg:col-span-3">
-                <p className="v2-section-tag mb-4">(SOCIALS)</p>
-                <ul className="space-y-2.5 text-base font-medium tracking-[-0.02em] text-[#d4d4d4]">
-                  {contactChannelsData.map((channel) => (
-                    <li key={channel.key}>
-                      <a
-                        href={channel.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
-                      >
-                        <span>{channel.name}</span>
-                        <FiArrowUpRight size={14} className="text-[#7a7a80]" />
-                      </a>
-                    </li>
-                  ))}
-                  <li>
+        <footer ref={footerRef} className="relative bg-[#0a0a0a]">
+          {/* Upper Dark Footer (`z-index: 3`, exact Nakula `.framer-11myxzf`) */}
+          <div className="relative z-[3] bg-[#0a0a0a] border-t border-[#1c1c1c]">
+            <div className="v2-container pt-14 pb-8 space-y-16">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <div className="lg:col-span-4 space-y-5">
+                  <div className="flex flex-wrap items-baseline gap-4">
+                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                      (EMAIL)
+                    </span>
                     <a
-                      href="https://www.npmjs.com/package/@ghifari29/id-kit"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
+                      href={`mailto:${directEmail}`}
+                      className="text-[26px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[#ff4925] hover:underline break-all"
                     >
-                      <span>npm (@ghifari29/id-kit)</span>
-                      <FiArrowUpRight size={14} className="text-[#7a7a80]" />
+                      {directEmail}
                     </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="lg:col-span-6 space-y-5">
-                <p className="v2-section-tag">(CURRICULUM VITAE)</p>
-                <p className="text-sm sm:text-base text-[#8a8a8e] max-w-md leading-relaxed">
-                  {isEn
-                    ? 'Download my official curriculum vitae or explore verified engineering case studies.'
-                    : 'Unduh curriculum vitae resmi atau jelajahi studi kasus arsitektur perangkat lunak.'}
-                </p>
-
-                <div className="border-b border-[#242428] pb-3 flex items-center justify-between text-sm sm:text-base text-[#9a9aa0]">
-                  <span className="truncate pr-4">{RESUME_FILENAME}</span>
-                  <span className="font-mono text-[11px] uppercase text-[#ff4925]">PDF</span>
+                  </div>
+                  <div className="flex flex-wrap items-baseline gap-4">
+                    <span className="w-[82px] shrink-0 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                      (LOCATION)
+                    </span>
+                    <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.04em] leading-none text-[#cacaca]">
+                      Bogor / Jakarta, ID
+                    </p>
+                  </div>
                 </div>
 
-                {RESUME_AVAILABLE && (
-                  <a
-                    href={RESUME_URL}
-                    download={RESUME_FILENAME}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="v2-pill-btn w-full !py-3.5"
-                  >
-                    <RolloverLabel text={isEn ? 'DOWNLOAD CV' : 'UNDUH CV'} />
-                  </a>
-                )}
-              </div>
-            </div>
+                <div className="lg:col-span-4 grid grid-cols-2 gap-8">
+                  <div>
+                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                      (LINKS)
+                    </p>
+                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[#cacaca]">
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => scrollToSection('v2-top')}
+                          className="hover:text-[#ff4925] transition-colors"
+                        >
+                          Home
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => scrollToSection('v2-about')}
+                          className="hover:text-[#ff4925] transition-colors"
+                        >
+                          About
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => scrollToSection('v2-work')}
+                          className="hover:text-[#ff4925] transition-colors"
+                        >
+                          Works
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => scrollToSection('v2-contact')}
+                          className="hover:text-[#ff4925] transition-colors"
+                        >
+                          Contact
+                        </button>
+                      </li>
+                      <li>
+                        <RouterLink to="/study-case" className="hover:text-[#ff4925] transition-colors">
+                          Case Studies
+                        </RouterLink>
+                      </li>
+                      <li>
+                        <RouterLink to="/recruiter" className="hover:text-[#ff4925] transition-colors">
+                          Recruiter
+                        </RouterLink>
+                      </li>
+                      <li>
+                        <RouterLink to="/play" className="hover:text-[#ff4925] transition-colors">
+                          3D World
+                        </RouterLink>
+                      </li>
+                    </ul>
+                  </div>
 
-            {/* Legal Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#18181a] pt-6 font-mono text-[11px] text-[#7a7a80]">
-              <p className="uppercase tracking-[0.04em]">
-                © {new Date().getFullYear()} {siteConfig.brandName}. ALL RIGHTS RESERVED
-              </p>
-              <p className="uppercase tracking-[0.04em] text-[#a4a4aa]">
-                PORTFOLIO V2 · {siteConfig.name}
-              </p>
+                  <div>
+                    <p className="mb-4 text-[13px] uppercase tracking-[-0.03em] text-[#666666]">
+                      (SOCIALS)
+                    </p>
+                    <ul className="space-y-2 text-[19px] font-medium tracking-[-0.03em] text-[#cacaca]">
+                      {contactChannelsData.map((channel) => (
+                        <li key={channel.key}>
+                          <a
+                            href={channel.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
+                          >
+                            <span>{channel.name}</span>
+                            <FiArrowUpRight size={15} className="text-[#777777]" />
+                          </a>
+                        </li>
+                      ))}
+                      <li>
+                        <a
+                          href="https://www.npmjs.com/package/@ghifari29/id-kit"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 hover:text-[#ff4925] transition-colors"
+                        >
+                          <span>npm</span>
+                          <FiArrowUpRight size={15} className="text-[#777777]" />
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-4 space-y-6">
+                  <p className="text-[15px] leading-[1.35] tracking-[-0.02em] text-[#cacaca] max-w-[280px]">
+                    {isEn
+                      ? 'Download my official CV to review full experience, projects, and engineering credentials.'
+                      : 'Unduh CV resmi saya untuk meninjau pengalaman lengkap, proyek, dan kredensial rekayasa.'}
+                  </p>
+
+                  <div className="border-b border-[#333333] pb-3 flex items-center justify-between text-[16px] text-[#777777]">
+                    <span className="truncate pr-3">{RESUME_FILENAME}</span>
+                    <span className="text-[12px] font-semibold uppercase text-[#ff4925]">PDF</span>
+                  </div>
+
+                  {RESUME_AVAILABLE && (
+                    <a
+                      href={RESUME_URL}
+                      download={RESUME_FILENAME}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="v2-pill-btn w-full !h-[52px] !text-[14px]"
+                    >
+                      <RolloverLabel text={isEn ? 'DOWNLOAD CV' : 'UNDUH CV'} />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-6 text-[12px] tracking-[-0.01em] text-[#777777]">
+                <p className="uppercase">
+                  @{new Date().getFullYear()} {siteConfig.brandName}. ALL RIGHTS RESERVED
+                </p>
+                <p className="uppercase font-medium text-[#cacaca]">
+                  ENGINEERED BY {siteConfig.brandName}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Full-Width Vermilion #FF4925 Brand Banner */}
-          <div className="bg-[#ff4925] text-[#0a0a0a] py-8 sm:py-12 pb-20 sm:pb-14">
-            <div className="v2-container flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <p className="v2-display-heading !text-[#0a0a0a] text-[clamp(4.25rem,14.5vw,12rem)] leading-[0.82]">
-                {siteConfig.brandName}
-                <span className="text-[0.32em] align-top ml-1 font-sans font-normal">®</span>
-              </p>
-              <p className="text-xl sm:text-3xl font-semibold tracking-[-0.045em] leading-[1.06] text-[#0a0a0a] max-w-[230px]">
-                {isEn
-                  ? 'Beyond Visuals. Built with Vision.'
-                  : 'Melampaui Visual. Dibangun dengan Visi.'}
-              </p>
-            </div>
+          {/* Bottom Orange Banner (`z-index: 0`, slides out `-340px -> 0px` from behind `z-3` Dark Footer!) */}
+          <div className="relative z-[0] overflow-hidden bg-[#ff4925]">
+            <motion.div
+              style={isTabletUp && !shouldReduceMotion ? { y: orangeBannerY } : undefined}
+              className="bg-[#ff4925] text-[#0a0a0a] pt-24 pb-10 sm:pt-[100px] sm:pb-12 will-change-transform"
+            >
+              <div className="v2-container flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
+                <p className="v2-display-heading !text-[#0a0a0a] text-[clamp(4.75rem,15.5vw,13rem)] leading-[0.80]">
+                  {siteConfig.brandName}
+                  <span className="text-[0.28em] align-top ml-1 font-sans font-normal">®</span>
+                </p>
+                <p className="text-left sm:text-right text-[clamp(2.1rem,3.8vw,3.35rem)] font-semibold tracking-[-0.055em] leading-[0.96] text-[#0a0a0a] max-w-[260px]">
+                  {isEn
+                    ? 'Beyond Visuals. Built with Vision.'
+                    : 'Melampaui Visual. Dibangun dengan Visi.'}
+                </p>
+              </div>
+            </motion.div>
           </div>
         </footer>
       </main>

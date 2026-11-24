@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Portfolio V2 — Editorial Architecture, Typography & Motion Primitives
+   Portfolio V2 — Exact 1:1 Nakula Reference & Scroll Choreography Styles
    Strictly scoped to `.v2-portfolio-root` so Portfolio 1 remains untouched.
    ========================================================================== */
 
@@ -30,20 +30,19 @@ html.v2-scroll-root body {
 
 .v2-portfolio-root {
   --v2-bg: #0a0a0a;
-  --v2-surface: #0f0f10;
-  --v2-surface-elevated: #141416;
-  --v2-surface-accent: #1d0d0a;
-  --v2-hairline: #1b1b1d;
-  --v2-border: #252528;
-  --v2-border-strong: #36363a;
-  --v2-text: #d4d4d4;
-  --v2-text-bright: #f7f7f7;
-  --v2-text-muted: #8a8a8e;
-  --v2-text-dim: #4c4c50;
+  --v2-surface: #141414;
+  --v2-surface-elevated: #181818;
+  --v2-border: #2a2a2a;
+  --v2-border-strong: #333333;
+  --v2-text: #cacaca;
+  --v2-text-bright: #ffffff;
+  --v2-text-muted: #858585;
+  --v2-text-dim: #555555;
   --v2-accent: #ff4925;
-  --v2-accent-hover: #e03715;
+  --v2-accent-hover: #bd2608;
+  --v2-online: #47c554;
   --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
-  --v2-font-sans: 'Geist Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --v2-font-sans: 'Geist Variable', 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
   --v2-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
 
   min-height: 100vh;
@@ -64,50 +63,89 @@ html.v2-scroll-root body {
   width: 100%;
 }
 
+/* Nakula wide container (max-width 1400px, 24px desktop / 16px mobile side padding) */
 .v2-container {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: clamp(1.25rem, 3.6vw, 3.5rem);
-  padding-right: clamp(1.25rem, 3.6vw, 3.5rem);
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-/* Display Typography (Anton Condensed All-Caps) */
+@media (min-width: 768px) {
+  .v2-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Exact Nakula Fixed Header Top Gradient Backdrop */
+.v2-nav-scrim {
+  background: linear-gradient(
+    180deg,
+    #0a0a0a 0%,
+    rgba(10, 10, 10, 0.7) 57.22%,
+    rgba(10, 10, 10, 0) 100%
+  );
+}
+
+/* Nakula Display Typography (Anton 140px desktop / 80px mobile, 100% line-height, 0em tracking) */
 .v2-display-heading {
   font-family: var(--v2-font-display);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.008em;
-  line-height: 0.92;
+  letter-spacing: 0em;
+  line-height: 1;
   color: var(--v2-text);
 }
 
-.v2-section-tag {
-  font-family: var(--v2-font-mono);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+.v2-section-heading {
+  font-family: var(--v2-font-display);
+  font-weight: 400;
   text-transform: uppercase;
-  color: var(--v2-text-muted);
+  letter-spacing: 0em;
+  line-height: 0.98;
+  font-size: clamp(4.5rem, 9.72vw, 8.75rem); /* 72px -> 140px exact Nakula scale */
+  color: var(--v2-text);
 }
 
-/* Editorial Vertical Text-Rollover Action Button */
+/* Nakula Section Tag ((ABOUT), (WHY US), (SERVICES), (PROCESS), (BLOG)) */
+.v2-section-tag {
+  font-family: var(--v2-font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--v2-text);
+}
+
+/* Nakula About Word Smooth Threshold Transition (exact 0.2s ease-out from live DOM) */
+.v2-about-word {
+  display: inline-block;
+  margin-right: 0.25em;
+  transition:
+    color 0.22s ease-out,
+    filter 0.22s ease-out;
+}
+
+/* Nakula Vertical Text-Rollover Pill Button */
 .v2-pill-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   border-radius: 9999px;
-  padding: 0.85rem 1.7rem;
+  padding: 0.8rem 1.5rem;
   font-family: var(--v2-font-sans);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
   border: 1px solid var(--v2-border-strong);
   background-color: var(--v2-bg);
-  color: var(--v2-text-bright);
+  color: var(--v2-text);
   transition:
     border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
     background-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
@@ -119,13 +157,13 @@ html.v2-scroll-root body {
 }
 
 .v2-pill-btn:hover {
-  border-color: #5c5c62;
+  border-color: #666666;
   color: var(--v2-text-bright);
 }
 
 .v2-pill-btn--accent {
-  background-color: var(--v2-surface-accent);
-  border-color: rgba(255, 73, 37, 0.48);
+  background-color: var(--v2-bg);
+  border-color: var(--v2-accent);
   color: var(--v2-accent);
 }
 
@@ -139,8 +177,8 @@ html.v2-scroll-root body {
   position: relative;
   display: inline-grid;
   overflow: hidden;
-  height: 1.25em;
-  line-height: 1.25em;
+  height: 1.2em;
+  line-height: 1.2em;
 }
 
 .v2-rollover-track {
@@ -152,8 +190,8 @@ html.v2-scroll-root body {
 
 .v2-rollover-line {
   display: block;
-  height: 1.25em;
-  line-height: 1.25em;
+  height: 1.2em;
+  line-height: 1.2em;
 }
 
 .v2-pill-btn:hover .v2-rollover-track,
@@ -161,7 +199,7 @@ html.v2-scroll-root body {
   transform: translate3d(0, -50%, 0);
 }
 
-/* Menu Drawer Link Underline */
+/* Nakula Menu Drawer Link Underline */
 .v2-drawer-nav-item {
   position: relative;
   display: inline-flex;
@@ -193,8 +231,19 @@ html.v2-scroll-root body {
 }
 
 /* ==========================================================================
-   Hero Diagonal Spotlight Portrait Slash
+   Hero — Sticky Wrapper + Diagonal Spotlight Slit
    ========================================================================== */
+.v2-hero-sticky {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .v2-hero-sticky {
+    position: sticky;
+    top: 0;
+  }
+}
+
 .v2-hero-diagonal-wrap {
   position: absolute;
   inset: 0;
@@ -208,122 +257,103 @@ html.v2-scroll-root body {
 
 .v2-hero-diagonal-mask {
   position: relative;
-  width: min(740px, 86vw);
-  height: min(670px, 80vh);
-  clip-path: polygon(31% 0%, 96% 0%, 64% 100%, 2% 100%);
-  -webkit-mask-image: radial-gradient(ellipse 68% 70% at 50% 48%, #000 44%, transparent 94%);
-  mask-image: radial-gradient(ellipse 68% 70% at 50% 48%, #000 44%, transparent 94%);
+  width: min(680px, 84vw);
+  height: min(520px, 58vh);
+  clip-path: polygon(0% 56%, 100% 0%, 100% 44%, 0% 100%);
+  -webkit-mask-image: radial-gradient(ellipse 76% 80% at 50% 50%, #000 54%, transparent 98%);
+  mask-image: radial-gradient(ellipse 76% 80% at 50% 50%, #000 54%, transparent 98%);
 }
 
 .v2-hero-diagonal-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
-  filter: contrast(1.16) saturate(1.04) sepia(0.18) hue-rotate(-10deg) brightness(0.84);
-  transform: scale(1.05);
+  object-position: center 22%;
+  filter: contrast(1.24) saturate(1.18) sepia(0.28) hue-rotate(-14deg) brightness(0.84);
+  transform: scale(1.06);
 }
 
 .v2-hero-diagonal-glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 54% 42%, rgba(255, 73, 37, 0.22) 0%, rgba(10, 10, 10, 0.72) 66%),
-    linear-gradient(128deg, rgba(10, 10, 10, 0.88) 10%, transparent 46%, rgba(10, 10, 10, 0.94) 88%);
+    radial-gradient(circle at 48% 52%, rgba(255, 73, 37, 0.32) 0%, rgba(10, 10, 10, 0.78) 70%),
+    linear-gradient(155deg, rgba(10, 10, 10, 0.85) 8%, transparent 45%, rgba(10, 10, 10, 0.92) 90%);
   mix-blend-mode: screen;
 }
 
 /* ==========================================================================
-   Selected Work — Architectural Screenshot Stage & Spring Cursor Orb
+   Latest Work — Outer Card Scale + Inverse Counter-Scaled Inner Image
    ========================================================================== */
-.v2-work-mockup-stage {
+.v2-work-card-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(180deg, #131316 0%, #0d0d0f 100%);
-  border: 1px solid var(--v2-hairline);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(0.85rem, 2.2vw, 1.85rem);
-  transition: border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  background: #141414;
+  border: 1px solid #1e1e1e;
 }
 
-.v2-work-mockup-stage:hover {
-  border-color: var(--v2-border-strong);
+@media (min-width: 1024px) {
+  .v2-work-card-frame {
+    height: 80vh;
+    max-height: 680px;
+  }
 }
 
-.v2-work-device-frame {
-  position: relative;
+.v2-work-card-img-wrap {
   width: 100%;
   height: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #08080a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.72);
+  will-change: transform;
 }
 
-.v2-work-device-img {
+.v2-work-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.v2-work-mockup-stage:hover .v2-work-device-img {
+.v2-work-card-frame:hover .v2-work-card-img {
   transform: scale(1.03);
 }
 
-.v2-view-project-orb {
+/* Nakula Translucent Frosted Pill Cursor Badge ("VIEW PROJECT ↗") */
+.v2-view-project-pill {
   position: absolute;
   top: 0;
   left: 0;
-  width: 104px;
-  height: 104px;
-  margin-left: -52px;
-  margin-top: -52px;
+  padding: 11px 20px;
   border-radius: 9999px;
-  background: rgba(12, 12, 14, 0.86);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #ffffff;
-  font-family: var(--v2-font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-family: var(--v2-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  gap: 6px;
+  white-space: nowrap;
   pointer-events: none;
   z-index: 20;
+  transform: translate(-50%, -50%);
   will-change: transform, opacity;
 }
 
-/* Stacked Sticky Project Cards inside #v2-work (Desktop only) */
-@media (min-width: 1024px) {
-  .v2-work-sticky-card {
-    position: sticky;
-    top: 5.5rem;
-  }
-}
-
 /* ==========================================================================
-   Metrics — Swiss Editorial Typographic Grid
+   Why Us / Numbers Don't Lie — Metric Columns with Top Ticks
    ========================================================================== */
 .v2-metric-cell {
   position: relative;
-  padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1.25rem, 2.4vw, 2.25rem);
-  border-top: 1px solid var(--v2-hairline);
-  border-left: 1px solid var(--v2-hairline);
-  min-height: 230px;
+  padding: 40px 12px 12px 20px;
+  border-left: 1px solid var(--v2-border-strong);
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -334,88 +364,44 @@ html.v2-scroll-root body {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 6px;
+  width: 90%;
+  height: 8px;
   background-image: repeating-linear-gradient(
     to right,
-    #2e2e32 0px,
-    #2e2e32 1px,
+    #333333 0px,
+    #333333 1px,
     transparent 1px,
-    transparent 22px
+    transparent 24px
   );
-  opacity: 0.7;
+  opacity: 0.78;
 }
 
 /* ==========================================================================
-   Editorial Timeline & Row Interactions
+   Pre-Footer Contact Spotlight Atmospheric Layer
    ========================================================================== */
-.v2-editorial-row {
-  border-top: 1px solid var(--v2-hairline);
-  transition:
-    background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.v2-editorial-row:hover {
-  border-top-color: var(--v2-border-strong);
-}
-
-/* ==========================================================================
-   Controlled Overlapping Layer Architecture
-   ========================================================================== */
-.v2-stack-layer {
-  position: relative;
-  width: 100%;
-  background-color: var(--v2-bg);
-}
-
-.v2-stack-layer--overlap {
-  box-shadow:
-    0 -24px 56px rgba(0, 0, 0, 0.9),
-    0 -1px 0 rgba(255, 255, 255, 0.05);
-  border-top: 1px solid var(--v2-hairline);
-}
-
-/* Desktop & Tablet (>= 768px): Sticky layered overlap where explicitly enabled */
-@media (min-width: 768px) {
-  .v2-stack-layer--sticky-top {
-    position: sticky;
-    top: 0;
-  }
-
-  .v2-stack-layer--sticky-bottom {
-    position: sticky;
-  }
-}
-
-/* Mobile (< 768px): Natural vertical document scrolling */
-@media (max-width: 767px) {
-  .v2-stack-layer--sticky-top,
-  .v2-stack-layer--sticky-bottom {
-    position: relative;
-    top: auto !important;
-  }
+.v2-cta-spotlight {
+  background:
+    radial-gradient(ellipse 38% 58% at 54% 44%, rgba(255, 118, 64, 0.26) 0%, rgba(255, 73, 37, 0.09) 42%, rgba(10, 10, 10, 0) 72%),
+    linear-gradient(125deg, rgba(10, 10, 10, 0.96) 28%, rgba(255, 255, 255, 0.04) 50%, rgba(10, 10, 10, 0.98) 74%);
 }
 
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
-  .v2-stack-layer--sticky-top,
-  .v2-stack-layer--sticky-bottom {
+  .v2-hero-sticky {
     position: relative !important;
-    top: auto !important;
   }
 
+  .v2-about-word,
   .v2-rollover-track,
   .v2-drawer-nav-label::after,
-  .v2-work-device-img,
-  .v2-pill-btn,
-  .v2-editorial-row {
+  .v2-work-card-img,
+  .v2-pill-btn {
     transition: none !important;
   }
 
   .v2-pill-btn:hover .v2-rollover-track,
   .v2-pill-btn:focus-visible .v2-rollover-track,
-  .v2-work-mockup-stage:hover .v2-work-device-img {
+  .v2-work-card-frame:hover .v2-work-card-img {
     transform: none !important;
   }
 }
