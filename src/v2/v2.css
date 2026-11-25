@@ -511,6 +511,54 @@ html.v2-scroll-root body {
   scrollbar-color: var(--v2-border-strong) transparent;
 }
 
+/* ==========================================================================
+   Contact Form V2 — Season-Aware Editorial Inputs
+   ========================================================================== */
+.v2-form-field {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text-bright);
+  padding: 0.8rem 1rem;
+  font-family: var(--v2-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.v2-form-field::placeholder {
+  color: var(--v2-text-dim);
+}
+
+.v2-form-field:hover:not(:disabled) {
+  border-color: var(--v2-text-muted);
+}
+
+.v2-form-field:focus {
+  outline: none;
+  border-color: var(--v2-accent);
+  box-shadow: 0 0 0 3px rgba(var(--v2-glow-rgb), 0.18);
+}
+
+.v2-form-field:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.v2-form-field--error {
+  border-color: #f43f5e;
+}
+
+.v2-form-field--error:focus {
+  border-color: #f43f5e;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.2);
+}
+
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
   .v2-hero-sticky {
@@ -524,7 +572,8 @@ html.v2-scroll-root body {
   .v2-works-grid-mask,
   .v2-works-grid-img,
   .v2-pill-btn,
-  .v2-gh-cell {
+  .v2-gh-cell,
+  .v2-form-field {
     transition: none !important;
   }
 

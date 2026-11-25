@@ -35,6 +35,7 @@ import './v2.css';
 const SeasonalEffects = lazy(() => import('../components/SeasonalEffects'));
 const DeveloperTerminal = lazy(() => import('../components/DeveloperTerminal'));
 const GithubActivityV2 = lazy(() => import('./GithubActivityV2'));
+const ContactFormV2 = lazy(() => import('./ContactFormV2'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 const SERVICES_EASE = [0.4, 0, 0.2, 1];
@@ -2338,12 +2339,12 @@ export default function PortfolioV2() {
         </section>
 
         {/* ------------------------------------------------------------------
-            10. PRE-FOOTER CONTACT CTA (Downward Spotlight Parallax + Masked Heading)
+            10. PRE-FOOTER CONTACT CTA + SEND A MESSAGE FORM (Parallax Spotlight + Masked Heading)
             ------------------------------------------------------------------ */}
         <section
           id="v2-contact"
           ref={ctaSectionRef}
-          className="relative z-[2] min-h-[580px] sm:min-h-[700px] flex items-center overflow-hidden bg-[var(--v2-bg)] py-24"
+          className="relative z-[2] overflow-hidden bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
         >
           {/* Downward Parallax Spotlight Layer (`translateY 0 -> 72px`, exact Nakula `.framer-1t4kn25`) */}
           <motion.div
@@ -2352,36 +2353,39 @@ export default function PortfolioV2() {
             className="v2-cta-spotlight pointer-events-none absolute -inset-y-20 inset-x-0 will-change-transform"
           />
 
-          <div className="v2-container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-            <div className="lg:col-span-7">
-              <MaskedDisplayHeading
-                lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
-                className="v2-section-heading"
-                shouldReduceMotion={Boolean(shouldReduceMotion)}
-              />
-            </div>
+          <div className="v2-container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
+            {/* Left Editorial Intro & Direct Channels */}
+            <div className="lg:col-span-5 space-y-8">
+              <div className="space-y-4">
+                <p className="v2-section-tag">({isEn ? 'CONTACT' : 'KONTAK'})</p>
+                <MaskedDisplayHeading
+                  lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
+                  className="v2-section-heading"
+                  shouldReduceMotion={Boolean(shouldReduceMotion)}
+                />
+              </div>
 
-            <div className="lg:col-span-5 space-y-6 lg:pb-2">
-              <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)] max-w-md">
+              <p className="text-[19px] sm:text-[22px] font-medium tracking-[-0.035em] leading-[1.25] text-[var(--v2-text-muted)] max-w-md">
                 {isEn
-                  ? 'Have a frontend role, web application, or collaborative project in mind? Let’s build it with clarity.'
-                  : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Mari bangun bersama dengan jelas dan terukur.'}
+                  ? 'Have a frontend role, web application, or collaborative project in mind? Send a message directly or reach out via email.'
+                  : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Kirim pesan langsung atau hubungi lewat email.'}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3">
+              {/* Quick Direct Email & Copy Pills */}
+              <div className="flex flex-wrap gap-3">
                 <a
                   href={`mailto:${directEmail}`}
-                  className="v2-pill-btn v2-pill-btn--accent flex-1 !h-[58px] !text-[16px] justify-between !px-7"
+                  className="v2-pill-btn !h-[52px] !px-6 !text-[13px]"
                 >
-                  <RolloverLabel text={isEn ? 'START A PROJECT' : 'HUBUNGI SEKARANG'} />
-                  <FiArrowUpRight size={20} />
+                  <RolloverLabel text={isEn ? 'OPEN MAIL APP' : 'BUKA EMAIL'} />
+                  <FiArrowUpRight size={15} className="text-[var(--v2-accent)]" />
                 </a>
 
                 <button
                   type="button"
                   onClick={handleCopyEmail}
                   aria-label={isEn ? 'Copy email address' : 'Salin alamat email'}
-                  className="v2-pill-btn !h-[58px] !px-5 !text-[13px]"
+                  className="v2-pill-btn !h-[52px] !px-5 !text-[13px]"
                 >
                   {copiedEmail ? (
                     <>
@@ -2396,6 +2400,33 @@ export default function PortfolioV2() {
                   )}
                 </button>
               </div>
+
+              {/* Availability & Location Hairline Metadata */}
+              <div className="pt-6 border-t border-[var(--v2-border)] space-y-2.5 font-mono text-[12px] text-[var(--v2-text-muted)]">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="h-2 w-2 rounded-full bg-[#47c554] shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="uppercase tracking-[0.04em] text-[var(--v2-text)]">
+                    {isEn ? 'Available for roles & freelance' : 'Tersedia untuk kerja & freelance'}
+                  </span>
+                </div>
+                <p className="text-[var(--v2-text-dim)]">
+                  {directEmail} · Bogor / Jakarta, ID
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Editorial Send a Message Form */}
+            <div className="lg:col-span-7">
+              <Suspense
+                fallback={
+                  <div className="h-[480px] rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] motion-safe:animate-pulse" />
+                }
+              >
+                <ContactFormV2 isEn={isEn} />
+              </Suspense>
             </div>
           </div>
         </section>
