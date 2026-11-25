@@ -34,6 +34,7 @@ import './v2.css';
 
 const SeasonalEffects = lazy(() => import('../components/SeasonalEffects'));
 const DeveloperTerminal = lazy(() => import('../components/DeveloperTerminal'));
+const GithubActivityV2 = lazy(() => import('./GithubActivityV2'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 const SERVICES_EASE = [0.4, 0, 0.2, 1];
@@ -2134,6 +2135,24 @@ export default function PortfolioV2() {
           isDesktop={isDesktopViewport}
           shouldReduceMotion={Boolean(shouldReduceMotion)}
         />
+
+        {/* ------------------------------------------------------------------
+            7B. GITHUB ACTIVITY (Live Open-Source Telemetry + Seasonal Heatmap)
+            ------------------------------------------------------------------ */}
+        <Suspense
+          fallback={
+            <section
+              id="v2-github"
+              className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
+            >
+              <div className="v2-container">
+                <div className="h-[320px] rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] motion-safe:animate-pulse" />
+              </div>
+            </section>
+          }
+        >
+          <GithubActivityV2 isEn={isEn} />
+        </Suspense>
 
         {/* ------------------------------------------------------------------
             8. FAQ SECTION (Exact Nakula 2-Col + `12px` Rounded `#333` Dark Cards)

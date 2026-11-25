@@ -459,6 +459,58 @@ html.v2-scroll-root body {
   }
 }
 
+/* ==========================================================================
+   GitHub Activity V2 — Season-Adaptive Contribution Heatmap Cells
+   ========================================================================== */
+.v2-gh-cell {
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.16s ease,
+    background-color 0.25s ease;
+}
+
+.v2-gh-cell:hover {
+  transform: scale(1.22);
+  z-index: 15;
+  border-color: var(--v2-text-bright);
+}
+
+.v2-gh-cell-0 {
+  background-color: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+}
+
+.v2-gh-cell-1 {
+  background-color: rgba(var(--v2-glow-rgb), 0.24);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.22);
+}
+
+.v2-gh-cell-2 {
+  background-color: rgba(var(--v2-glow-rgb), 0.48);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.34);
+}
+
+.v2-gh-cell-3 {
+  background-color: rgba(var(--v2-glow-rgb), 0.76);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.5);
+}
+
+.v2-gh-cell-4 {
+  background-color: var(--v2-accent);
+  border: 1px solid var(--v2-accent);
+}
+
+/* December Light Winter contrast refinement */
+[data-theme='light'] .v2-portfolio-root .v2-gh-cell-0 {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.v2-gh-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-border-strong) transparent;
+}
+
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
   .v2-hero-sticky {
@@ -471,7 +523,8 @@ html.v2-scroll-root body {
   .v2-work-card-img,
   .v2-works-grid-mask,
   .v2-works-grid-img,
-  .v2-pill-btn {
+  .v2-pill-btn,
+  .v2-gh-cell {
     transition: none !important;
   }
 
@@ -483,7 +536,8 @@ html.v2-scroll-root body {
   .v2-pill-btn:focus-visible .v2-rollover-track,
   .v2-work-card-frame:hover .v2-work-card-img,
   .v2-works-grid-card:hover .v2-works-grid-mask,
-  .v2-works-grid-card:hover .v2-works-grid-img {
+  .v2-works-grid-card:hover .v2-works-grid-img,
+  .v2-gh-cell:hover {
     transform: none !important;
   }
 }
