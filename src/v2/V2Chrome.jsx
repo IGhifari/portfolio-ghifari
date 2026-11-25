@@ -490,29 +490,31 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                 <span className={isEn ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>EN</span>
               </button>
 
-              <a
-                href="#v2-subpage-contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToContact();
-                }}
-                className="v2-pill-btn !h-[43px] !py-0 !px-5 !text-[14px]"
-              >
-                <V2RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
-              </a>
+              <div className="flex items-center gap-1">
+                <a
+                  href="#v2-subpage-contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToContact();
+                  }}
+                  className="v2-pill-btn v2-nav-talk-btn"
+                >
+                  <V2RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
+                </a>
 
-              <button
-                type="button"
-                onClick={() => setIsMenuOpen(true)}
-                aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
-                aria-expanded={isMenuOpen}
-                className="group inline-flex h-[43px] w-[43px] md:h-[46px] md:w-[46px] items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
-              >
-                <span className="flex flex-col gap-1.5" aria-hidden="true">
-                  <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:translate-x-[1.5px]" />
-                  <span className="block h-[1.5px] w-4 bg-current transition-transform duration-300 group-hover:-translate-x-[1.5px]" />
-                </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsMenuOpen(true)}
+                  aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
+                  aria-expanded={isMenuOpen}
+                  className="v2-nav-menu-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
+                >
+                  <span className="v2-nav-menu-bars" aria-hidden="true">
+                    <span className="v2-nav-menu-bar v2-nav-menu-bar--top" />
+                    <span className="v2-nav-menu-bar v2-nav-menu-bar--bottom" />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -528,7 +530,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.34, ease: NAKULA_EASE }}
+            transition={{ duration: 0.56, ease: NAKULA_EASE }}
             className="fixed inset-0 z-[130] flex justify-end bg-black/75 backdrop-blur-[2px]"
             role="dialog"
             aria-modal="true"
@@ -540,7 +542,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
               initial={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
               animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
               exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              transition={{ duration: 0.48, ease: NAKULA_EASE }}
+              transition={{ duration: 0.78, ease: NAKULA_EASE }}
               className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
               onClick={(e) => e.stopPropagation()}
             >
@@ -568,11 +570,11 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                     <li key={item.key} className="overflow-hidden">
                       <motion.button
                         type="button"
-                        initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
+                        initial={shouldReduceMotion ? false : { y: 28, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{
-                          duration: 0.42,
-                          delay: 0.06 + idx * 0.05,
+                          duration: 0.62,
+                          delay: 0.16 + idx * 0.08,
                           ease: NAKULA_EASE,
                         }}
                         onClick={item.action}

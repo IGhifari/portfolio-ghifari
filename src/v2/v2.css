@@ -208,6 +208,97 @@ html.v2-scroll-root body {
   transform: translate3d(0, -50%, 0);
 }
 
+/* Nakula Navbar Paired Pill ("LET'S TALK") & Circular Menu Button (`=`) */
+.v2-nav-talk-btn {
+  height: 46px;
+  padding: 0 1.4rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  border-color: var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text);
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-talk-btn:hover,
+.v2-nav-talk-btn:focus-visible {
+  background-color: #282828;
+  border-color: #383838;
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text-bright);
+  cursor: pointer;
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-menu-btn:hover,
+.v2-nav-menu-btn:focus-visible {
+  background-color: #282828;
+  border-color: #383838;
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-menu-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 21px;
+}
+
+.v2-nav-menu-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  will-change: transform;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-menu-bar--top {
+  transform-origin: right center;
+}
+
+.v2-nav-menu-bar--bottom {
+  transform-origin: left center;
+}
+
+.v2-nav-menu-btn:hover .v2-nav-menu-bar--top,
+.v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--top {
+  transform: translate3d(1.5px, 0, 0) scaleX(0.68);
+}
+
+.v2-nav-menu-btn:hover .v2-nav-menu-bar--bottom,
+.v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--bottom {
+  transform: translate3d(-1.5px, 0, 0) scaleX(0.68);
+}
+
+[data-theme='light'] .v2-portfolio-root .v2-nav-talk-btn:hover,
+[data-theme='light'] .v2-portfolio-root .v2-nav-talk-btn:focus-visible,
+[data-theme='light'] .v2-portfolio-root .v2-nav-menu-btn:hover,
+[data-theme='light'] .v2-portfolio-root .v2-nav-menu-btn:focus-visible {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #020617;
+}
+
 /* Nakula Menu Drawer Link Underline */
 .v2-drawer-nav-item {
   position: relative;
@@ -572,6 +663,9 @@ html.v2-scroll-root body {
   .v2-works-grid-mask,
   .v2-works-grid-img,
   .v2-pill-btn,
+  .v2-nav-talk-btn,
+  .v2-nav-menu-btn,
+  .v2-nav-menu-bar,
   .v2-gh-cell,
   .v2-form-field {
     transition: none !important;
@@ -583,6 +677,10 @@ html.v2-scroll-root body {
 
   .v2-pill-btn:hover .v2-rollover-track,
   .v2-pill-btn:focus-visible .v2-rollover-track,
+  .v2-nav-menu-btn:hover .v2-nav-menu-bar--top,
+  .v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--top,
+  .v2-nav-menu-btn:hover .v2-nav-menu-bar--bottom,
+  .v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--bottom,
   .v2-work-card-frame:hover .v2-work-card-img,
   .v2-works-grid-card:hover .v2-works-grid-mask,
   .v2-works-grid-card:hover .v2-works-grid-img,

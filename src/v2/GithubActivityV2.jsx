@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { motion, useReducedMotion } from 'framer-motion';
+import { animate, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   FiAlertCircle,
   FiArrowUpRight,
@@ -43,6 +43,146 @@ const GITHUB_LEVEL_CLASSES = [
 function getCellClass(level) {
   return GITHUB_LEVEL_CLASSES[level] || GITHUB_LEVEL_CLASSES[0];
 }
+
+/**
+ * Staggered Rise + Ease-Out Count-Up Metric Cell
+ * Matches Portfolio V2's "NUMBERS DON'T LIE" (`CountUpMetricCell`) animation 1:1.
+ */
+function GithubCountUpCell({
+  target,
+  suffix,
+  label,
+  sub,
+  index,
+  isTriggered,
+  shouldReduceMotion,
+  locale,
+}) {
+  const numericTarget = Number(target) || 0;
+  const [count, setCount] = useState(() => (shouldReduceMotion ? numericTarget : 0));
+  const currentCountRef = useRef(shouldReduceMotion ? numericTarget : 0);
+  const hasAnimatedOnceRef = useRef(false);
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      currentCountRef.current = numericTarget;
+      setCount(numericTarget);
+      return undefined;
+    }
+    if (!isTriggered) return undefined;
+
+    const fromValue = hasAnimatedOnceRef.current ? currentCountRef.current : 0;
+    const delay = hasAnimatedOnceRef.current ? 0 : index * 0.12;
+    hasAnimatedOnceRef.current = true;
+
+    const controls = animate(fromValue, numericTarget, {
+      duration: 1.75,
+      delay,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (latest) => {
+        const rounded = Math.round(latest);
+        currentCountRef.current = rounded;
+        setCount(rounded);
+      },
+    });
+
+    return () => controls.stop();
+  }, [index, isTriggered, numericTarget, shouldReduceMotion]);
+
+  const formattedCount = locale ? count.toLocaleString(locale) : String(count);
+  const formattedTarget = locale ? numericTarget.toLocaleString(locale) : String(numericTarget);
+
+  return (
+    <motion.div
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 52 }}
+      animate={
+        shouldReduceMotion || isTriggered
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 52 }
+      }
+      transition={{
+        duration: 0.72,
+        delay: index * 0.12,
+        ease: NAKULA_EASE,
+      }}
+      className="v2-metric-cell !min-h-[200px] sm:!min-h-[232px] will-change-transform"
+    >
+      <div className="v2-metric-ticks" aria-hidden="true" />
+
+      <div className="flex items-baseline" aria-label={`${formattedTarget}${suffix}`}>
+        <span className="text-[48px] sm:text-[72px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[var(--v2-text)]">
+          {formattedCount}
+        </span>
+        <span className="text-[40px] sm:text-[60px] xl:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-accent)]">
+          {suffix}
+        </span>
+      </div>
+
+      <div className="mt-10 space-y-1">
+        <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.25] text-[var(--v2-text)]">
+          {label}
+        </p>
+        <p className="font-mono text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
+          {sub}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+GithubCountUpCell.propTypes = {
+  target: PropTypes.number.isRequired,
+  suffix: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  sub: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  isTriggered: PropTypes.bool.isRequired,
+  shouldReduceMotion: PropTypes.bool,
+  locale: PropTypes.string,
+};
+
+/**
+ * Dedicated wrapper so `useInView` always binds to a mounted DOM grid after initial load.
+ */
+function GithubMetricsStrip({ cards, shouldReduceMotion }) {
+  const gridRef = useRef(null);
+  const isInView = useInView(gridRef, { once: true, amount: 0.2 });
+
+  return (
+    <div
+      ref={gridRef}
+      className="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-6 items-stretch"
+    >
+      {cards.map((card, idx) => (
+        <GithubCountUpCell
+          key={card.id}
+          target={card.target}
+          suffix={card.suffix}
+          label={card.label}
+          sub={card.sub}
+          locale={card.locale}
+          index={idx}
+          isTriggered={isInView}
+          shouldReduceMotion={shouldReduceMotion}
+        />
+      ))}
+    </div>
+  );
+}
+
+GithubMetricsStrip.propTypes = {
+  cards: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      target: PropTypes.number.isRequired,
+      suffix: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      sub: PropTypes.string.isRequired,
+      locale: PropTypes.string,
+    })
+  ).isRequired,
+  shouldReduceMotion: PropTypes.bool,
+};
 
 /**
  * Portfolio V2 GitHub Activity Section
@@ -194,7 +334,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
     () => [
       {
         id: 'contributions',
-        value: totalContributions.toLocaleString(isEn ? 'en-US' : 'id-ID'),
+        target: Number(totalContributions) || 0,
+        locale: isEn ? 'en-US' : 'id-ID',
         suffix: '+',
         label: isEn ? 'Annual Contributions' : 'Kontribusi Tahunan',
         sub: isEn
@@ -203,7 +344,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
       },
       {
         id: 'streak',
-        value: String(stats.currentStreak),
+        target: Number(stats.currentStreak) || 0,
         suffix: isEn ? 'd' : 'h',
         label: isEn ? 'Current Streak' : 'Streak Saat Ini',
         sub: isEn
@@ -212,14 +353,14 @@ function GithubActivityV2({ isEn: isEnProp }) {
       },
       {
         id: 'repos',
-        value: String(profile?.publicRepos ?? 24),
+        target: Number(profile?.publicRepos ?? 24) || 0,
         suffix: '.',
         label: isEn ? 'Public Repositories' : 'Repositori Publik',
         sub: `@${username}`,
       },
       {
         id: 'followers',
-        value: String(profile?.followers ?? 11),
+        target: Number(profile?.followers ?? 11) || 0,
         suffix: '.',
         label: isEn ? 'GitHub Followers' : 'Pengikut GitHub',
         sub: isEn
@@ -395,50 +536,29 @@ function GithubActivityV2({ isEn: isEnProp }) {
             Live Content: 4-Column Hairline Telemetry + Editorial Heatmap
             ------------------------------------------------------------------ */}
         {(!loading || data) && (
-          <motion.div {...fadeInProps} className="space-y-12 sm:space-y-16">
-            {/* 1. 4-Column Metric Strip (Matches V2 `.v2-metric-cell` DNA) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6 items-stretch">
-              {metricCards.map((card) => (
-                <div
-                  key={card.id}
-                  className="v2-metric-cell !min-h-[184px] sm:!min-h-[210px]"
-                >
-                  <div className="v2-metric-ticks" aria-hidden="true" />
-
-                  <div className="flex items-baseline">
-                    <span className="text-[44px] sm:text-[62px] xl:text-[70px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-text)]">
-                      {card.value}
-                    </span>
-                    <span className="text-[34px] sm:text-[50px] xl:text-[56px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-accent)]">
-                      {card.suffix}
-                    </span>
-                  </div>
-
-                  <div className="mt-10 space-y-1">
-                    <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.25] text-[var(--v2-text)]">
-                      {card.label}
-                    </p>
-                    <p className="font-mono text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
-                      {card.sub}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="space-y-12 sm:space-y-16">
+            {/* 1. 4-Column Metric Strip (Exact "NUMBERS DON'T LIE" Staggered Rise + Count-Up) */}
+            <GithubMetricsStrip
+              cards={metricCards}
+              shouldReduceMotion={Boolean(shouldReduceMotion)}
+            />
 
             {/* 2. Contribution Heatmap Surface */}
-            <div className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] overflow-hidden">
+            <motion.div
+              {...fadeInProps}
+              className="mx-auto w-full max-w-[1000px] rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] overflow-hidden"
+            >
               {/* Top Identity & Cadence Bar */}
-              <div className="px-5 sm:px-7 py-4 border-b border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5 min-w-0">
+              <div className="px-4 sm:px-6 py-3.5 border-b border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <img
                     src={avatarSrc}
                     alt={`${profile?.name || siteConfig.author.name} GitHub avatar`}
-                    width={36}
-                    height={36}
+                    width={32}
+                    height={32}
                     loading="lazy"
                     decoding="async"
-                    className="h-9 w-9 rounded-full object-cover border border-[var(--v2-border-strong)] shrink-0 bg-[var(--v2-surface)]"
+                    className="h-8 w-8 rounded-full object-cover border border-[var(--v2-border-strong)] shrink-0 bg-[var(--v2-surface)]"
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -446,7 +566,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                         href={profile?.htmlUrl || GITHUB_PROFILE_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[14px] sm:text-[15px] font-semibold tracking-[-0.02em] text-[var(--v2-text)] hover:text-[var(--v2-accent)] transition-colors truncate"
+                        className="text-[13px] sm:text-[14px] font-semibold tracking-[-0.02em] text-[var(--v2-text)] hover:text-[var(--v2-accent)] transition-colors truncate"
                       >
                         {profile?.name || siteConfig.author.name}
                       </a>
@@ -454,7 +574,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                         @{username}
                       </span>
                     </div>
-                    <p className="text-[12px] sm:text-[13px] text-[var(--v2-text-muted)] truncate max-w-[520px]">
+                    <p className="text-[12px] text-[var(--v2-text-muted)] truncate max-w-[460px]">
                       {profile?.bio ||
                         (isEn
                           ? 'Frontend Engineer · React, Next.js & Scalable UI Systems'
@@ -463,7 +583,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.04em] text-[var(--v2-text)] shrink-0">
+                <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.04em] text-[var(--v2-text)] shrink-0">
                   <span
                     className="h-1.5 w-1.5 rounded-full bg-[var(--v2-accent)]"
                     aria-hidden="true"
@@ -476,14 +596,14 @@ function GithubActivityV2({ isEn: isEnProp }) {
               </div>
 
               {/* Responsive 53-Week Matrix */}
-              <div className="px-5 sm:px-7 py-6 sm:py-8">
-                <div className="overflow-x-auto pb-2 v2-gh-scroll">
-                  <div className="min-w-[740px] w-full">
+              <div className="px-4 sm:px-6 py-5 sm:py-6">
+                <div className="overflow-x-auto pb-1.5 v2-gh-scroll">
+                  <div className="min-w-[680px] w-full">
                     {/* Month Headers Aligned to Week Columns */}
-                    <div className="flex items-center gap-2.5 mb-2.5 select-none">
-                      <div className="w-7 shrink-0" aria-hidden="true" />
+                    <div className="flex items-center gap-2 mb-2 select-none">
+                      <div className="w-6 shrink-0" aria-hidden="true" />
                       <div
-                        className="grid flex-1 gap-[3px] xl:gap-[4px] font-mono text-[10px] uppercase tracking-[0.04em] text-[var(--v2-text-dim)]"
+                        className="grid flex-1 gap-[3px] font-mono text-[10px] uppercase tracking-[0.04em] text-[var(--v2-text-dim)]"
                         style={{
                           gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
                         }}
@@ -501,8 +621,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
                     </div>
 
                     {/* Weekday Labels + 7-Row Grid */}
-                    <div className="flex items-stretch gap-2.5">
-                      <div className="grid grid-rows-7 gap-[3px] xl:gap-[4px] w-7 shrink-0 font-mono text-[10px] text-[var(--v2-text-dim)] select-none">
+                    <div className="flex items-stretch gap-2">
+                      <div className="grid grid-rows-7 gap-[3px] w-6 shrink-0 font-mono text-[9px] text-[var(--v2-text-dim)] select-none">
                         {(DAY_LABELS[language] || DAY_LABELS.en).map((dayLabel, idx) => (
                           <span key={idx} className="flex items-center leading-none">
                             {dayLabel}
@@ -511,7 +631,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                       </div>
 
                       <div
-                        className="grid flex-1 grid-rows-7 grid-flow-col gap-[3px] xl:gap-[4px]"
+                        className="grid flex-1 grid-rows-7 grid-flow-col gap-[3px]"
                         style={{
                           gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
                         }}
@@ -544,7 +664,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                               }}
                               onBlur={() => setHoveredDay(null)}
                               onKeyDown={(e) => handleCellKeyDown(e, idx)}
-                              className={`v2-gh-cell aspect-square w-full rounded-[2px] sm:rounded-[3px] cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] focus-visible:z-10 ${getCellClass(
+                              className={`v2-gh-cell aspect-square w-full rounded-[2px] cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] focus-visible:z-10 ${getCellClass(
                                 day.level
                               )}`}
                             />
@@ -557,11 +677,11 @@ function GithubActivityV2({ isEn: isEnProp }) {
               </div>
 
               {/* Bottom Telemetry Readout + Seasonal Scale Legend */}
-              <div className="px-5 sm:px-7 py-4 border-t border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="px-4 sm:px-6 py-3.5 border-t border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div
                   role="status"
                   aria-live="polite"
-                  className="min-h-[1.75rem] flex items-center font-mono text-[12px]"
+                  className="min-h-[1.5rem] flex items-center font-mono text-[11px]"
                 >
                   {hoveredDay ? (
                     <span className="inline-flex items-center gap-2 text-[var(--v2-text-bright)] font-medium">
@@ -573,7 +693,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-2 text-[var(--v2-text-muted)]">
-                      <FiCalendar size={13} className="text-[var(--v2-text-dim)] shrink-0" aria-hidden="true" />
+                      <FiCalendar size={12} className="text-[var(--v2-text-dim)] shrink-0" aria-hidden="true" />
                       <span>
                         {isEn
                           ? 'Hover squares or use arrow keys to inspect daily commits.'
@@ -583,13 +703,13 @@ function GithubActivityV2({ isEn: isEnProp }) {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto font-mono text-[10px] uppercase tracking-[0.06em] text-[var(--v2-text-dim)]">
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto font-mono text-[10px] uppercase tracking-[0.06em] text-[var(--v2-text-dim)]">
                   <span>{t('github.legendLess')}</span>
                   <div className="flex items-center gap-1" aria-hidden="true">
                     {GITHUB_LEVEL_CLASSES.map((cls, levelIdx) => (
                       <span
                         key={cls}
-                        className={`block h-3 w-3 rounded-[2px] ${cls}`}
+                        className={`block h-2.5 w-2.5 rounded-[2px] ${cls}`}
                         title={`Level ${levelIdx}`}
                       />
                     ))}
@@ -597,8 +717,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
                   <span>{t('github.legendMore')}</span>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </div>
     </section>

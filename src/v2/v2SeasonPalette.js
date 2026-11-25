@@ -101,13 +101,35 @@ export const V2_DEFAULT_TOKENS = {
     'linear-gradient(180deg, #0a0a0a 0%, rgba(10, 10, 10, 0.7) 57.22%, rgba(10, 10, 10, 0) 100%)',
 };
 
+export const V2_DEFAULT_LIGHT_TOKENS = {
+  '--v2-bg': '#f8fafc',
+  '--v2-bg-elevated': '#ffffff',
+  '--v2-surface': '#f1f5f9',
+  '--v2-surface-elevated': '#e2e8f0',
+  '--v2-border': '#e2e8f0',
+  '--v2-border-strong': '#cbd5e1',
+  '--v2-text': '#0f172a',
+  '--v2-text-bright': '#020617',
+  '--v2-text-muted': '#475569',
+  '--v2-text-dim': '#64748b',
+  '--v2-about-unlit': '#cbd5e1',
+  '--v2-big-num': '#e2e8f0',
+  '--v2-accent': '#2563eb',
+  '--v2-accent-hover': '#1d4ed8',
+  '--v2-accent-ink': '#ffffff',
+  '--v2-glow-rgb': '37, 99, 235',
+  '--v2-nav-scrim':
+    'linear-gradient(180deg, #f8fafc 0%, rgba(248, 250, 252, 0.86) 57.22%, rgba(248, 250, 252, 0) 100%)',
+};
+
 /**
  * Computes Portfolio V2 CSS custom property map for a resolved `season` from `ThemeContext`.
- * Returns exact `V2_DEFAULT_TOKENS` during default/inactive months (3, 5, 7, 8, 9, 11).
+ * Returns exact `V2_DEFAULT_TOKENS` during default/inactive dark months (3, 5, 7, 8, 9, 11),
+ * and `V2_DEFAULT_LIGHT_TOKENS` when the user switches to Light mode during default months.
  */
 export function buildV2SeasonTokens(season, seasonalEnabled = ENABLE_SEASONAL_THEMES) {
   if (!seasonalEnabled || !season || !season.isSeasonalActive || !season.palette) {
-    return V2_DEFAULT_TOKENS;
+    return season?.mode === 'light' ? V2_DEFAULT_LIGHT_TOKENS : V2_DEFAULT_TOKENS;
   }
 
   const p = season.palette;
