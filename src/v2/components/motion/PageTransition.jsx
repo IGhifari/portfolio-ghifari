@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { siteConfig } from '../config/site';
-import { useTheme } from '../context/ThemeContext';
-import { useV2TransitionState } from './v2OpeningState';
-import { buildV2SeasonTokens } from './v2SeasonPalette';
+import { siteConfig } from '../../../config/site';
+import { useTheme } from '../../../context/ThemeContext';
+import { useV2TransitionState } from './openingState';
+import { buildV2SeasonTokens } from '../../theme/seasonPalette';
 
 const CURTAIN_WIPE_EASE = [0.76, 0, 0.24, 1];
 const LOGO_RISE_EASE = [0.22, 1, 0.36, 1];

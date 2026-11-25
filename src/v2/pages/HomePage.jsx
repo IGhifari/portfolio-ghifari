@@ -1,626 +1,52 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   AnimatePresence,
-  animate,
   motion,
   useInView,
-  useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from 'framer-motion';
-import Lenis from 'lenis';
-import { FiArrowUpRight, FiCheck, FiCopy, FiMinus, FiPlus, FiX } from 'react-icons/fi';
+import { FiArrowUpRight, FiCheck, FiCopy, FiMinus, FiPlus } from 'react-icons/fi';
 
-import { siteConfig, ENABLE_SEASONAL_THEMES } from '../config/site';
-import { profileData } from '../data/profile';
-import { selectedProjects, allProjects } from '../data/projects';
-import { experiences } from '../data/experience';
-import { educationMetadata } from '../data/education';
-import { techCategoriesData } from '../data/skills';
-import { directEmail, contactChannelsData } from '../data/contact';
-import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
-import { RouterLink, useRouter } from '../context/RouterContext';
-import V2OpeningSequence from './V2OpeningSequence';
-import V2SeasonDrawerPicker, { V2SeasonHeaderBadge } from './V2SeasonSelector';
-import { buildV2SeasonTokens } from './v2SeasonPalette';
-import { hasCompletedV2Opening } from './v2OpeningState';
-import './v2.css';
+import { siteConfig, ENABLE_SEASONAL_THEMES } from '../../config/site';
+import { profileData } from '../../data/profile';
+import { selectedProjects, allProjects } from '../../data/projects';
+import { experiences } from '../../data/experience';
+import { educationMetadata } from '../../data/education';
+import { techCategoriesData } from '../../data/skills';
+import { directEmail, contactChannelsData } from '../../data/contact';
+import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../../data/resume';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
+import { RouterLink, useRouter } from '../../context/RouterContext';
+import { useV2Lenis } from '../hooks/useV2Lenis';
+import { useJakartaClock } from '../hooks/useJakartaClock';
+import { useClipboardCopy } from '../hooks/useClipboardCopy';
+import { V2SeasonHeaderBadge } from '../theme/ThemeControls';
+import { buildV2SeasonTokens } from '../theme/seasonPalette';
+import OpeningSequence from '../components/motion/OpeningSequence';
+import { hasCompletedV2Opening } from '../components/motion/openingState';
+import RolloverLabel from '../components/ui/RolloverLabel';
+import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
+import CountUpMetricCell from '../components/ui/CountUpMetricCell';
+import V2MenuDrawer from '../components/layout/V2MenuDrawer';
+import AboutSection from '../sections/AboutSection';
+import WorkShowcaseCard from '../sections/WorkShowcaseCard';
+import ProcessSection from '../sections/ProcessSection';
+import '../styles/v2.css';
 
-const SeasonalEffects = lazy(() => import('../components/SeasonalEffects'));
-const DeveloperTerminal = lazy(() => import('../components/DeveloperTerminal'));
-const GithubActivityV2 = lazy(() => import('./GithubActivityV2'));
-const ContactFormV2 = lazy(() => import('./ContactFormV2'));
+const SeasonalEffects = lazy(() => import('../../components/SeasonalEffects'));
+const DeveloperTerminal = lazy(() => import('../../components/DeveloperTerminal'));
+const GithubActivityV2 = lazy(() => import('../sections/GithubActivitySection'));
+const ContactFormV2 = lazy(() => import('../sections/ContactFormSection'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 const SERVICES_EASE = [0.4, 0, 0.2, 1];
 
 /* ==========================================================================
-   Scroll & Typography Primitives (1:1 Nakula Mechanics)
-   ========================================================================== */
-
-function RolloverLabel({ text }) {
-  return (
-    <span className="v2-rollover-wrap">
-      <span className="v2-rollover-track">
-        <span className="v2-rollover-line">{text}</span>
-        <span className="v2-rollover-line" aria-hidden="true">
-          {text}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-RolloverLabel.propTypes = {
-  text: PropTypes.string.isRequired,
-};
-
-/**
- * Animated Count-Up Metric Cell (Exact Nakula video 00:03–00:05:
- * staggered upward rise into a level 4-column horizontal strip + ease-out integer count-up)
- */
-function CountUpMetricCell({ numeral, suffix, label, index, isTriggered, shouldReduceMotion }) {
-  const target = Number(numeral) || 0;
-  const [count, setCount] = useState(() => (shouldReduceMotion ? target : 0));
-
-  useEffect(() => {
-    if (shouldReduceMotion) {
-      setCount(target);
-      return undefined;
-    }
-    if (!isTriggered) return undefined;
-
-    const controls = animate(0, target, {
-      duration: 1.75,
-      delay: index * 0.12,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (latest) => {
-        setCount(Math.round(latest));
-      },
-    });
-
-    return () => controls.stop();
-  }, [index, isTriggered, shouldReduceMotion, target]);
-
-  return (
-    <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 52 }}
-      animate={
-        shouldReduceMotion || isTriggered
-          ? { opacity: 1, y: 0 }
-          : { opacity: 0, y: 52 }
-      }
-      transition={{
-        duration: 0.72,
-        delay: index * 0.12,
-        ease: NAKULA_EASE,
-      }}
-      className="v2-metric-cell will-change-transform"
-    >
-      <div className="v2-metric-ticks" aria-hidden="true" />
-      <div className="flex items-baseline" aria-label={`${target}${suffix}`}>
-        <span className="text-[52px] sm:text-[76px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[var(--v2-text)]">
-          {count}
-        </span>
-        <span className="text-[44px] sm:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-accent)]">
-          {suffix}
-        </span>
-      </div>
-      <p className="mt-12 max-w-[185px] text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.3] text-[var(--v2-text-muted)]">
-        {label}
-      </p>
-    </motion.div>
-  );
-}
-
-CountUpMetricCell.propTypes = {
-  numeral: PropTypes.string.isRequired,
-  suffix: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
-  isTriggered: PropTypes.bool.isRequired,
-  shouldReduceMotion: PropTypes.bool,
-};
-
-/**
- * Masked Character-by-Character Display Heading Rise (Exact Nakula h2 viewport-entry reveal)
- */
-function MaskedDisplayHeading({
-  lines,
-  as: Tag = 'h2',
-  className = '',
-  lineClassNames = [],
-  shouldReduceMotion = false,
-}) {
-  if (shouldReduceMotion) {
-    return (
-      <Tag className={className}>
-        {lines.map((line, lineIdx) => (
-          <span key={line} className={`block ${lineClassNames[lineIdx] || ''}`}>
-            {line}
-          </span>
-        ))}
-      </Tag>
-    );
-  }
-
-  let charCursor = 0;
-
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.22 }}
-    >
-      <Tag className={className}>
-        {lines.map((line, lineIdx) => {
-          const words = line.split(' ');
-          return (
-            <span
-              key={line}
-              className={`block overflow-hidden py-[0.02em] ${lineClassNames[lineIdx] || ''}`}
-            >
-              {words.map((word, wIdx) => (
-                <span
-                  key={`${word}-${wIdx}`}
-                  className="inline-block whitespace-nowrap mr-[0.22em] last:mr-0"
-                >
-                  {Array.from(word).map((ch, cIdx) => {
-                    const delay = charCursor * 0.018;
-                    charCursor += 1;
-                    return (
-                      <motion.span
-                        key={`${ch}-${cIdx}`}
-                        variants={{
-                          hidden: { y: '106%' },
-                          visible: {
-                            y: '0%',
-                            transition: {
-                              duration: 0.58,
-                              delay,
-                              ease: NAKULA_EASE,
-                            },
-                          },
-                        }}
-                        className="inline-block will-change-transform"
-                      >
-                        {ch}
-                      </motion.span>
-                    );
-                  })}
-                </span>
-              ))}
-            </span>
-          );
-        })}
-      </Tag>
-    </motion.div>
-  );
-}
-
-MaskedDisplayHeading.propTypes = {
-  lines: PropTypes.arrayOf(PropTypes.string).isRequired,
-  as: PropTypes.elementType,
-  className: PropTypes.string,
-  lineClassNames: PropTypes.arrayOf(PropTypes.string),
-  shouldReduceMotion: PropTypes.bool,
-};
-
-/**
- * Threshold-switched About word with exact Nakula `transition: color 0.22s ease-out`
- * Only updates React state when crossing its threshold (2 renders total, zero scroll jank).
- */
-function AboutThresholdWord({ word, progress, threshold }) {
-  const [isLit, setIsLit] = useState(false);
-
-  useMotionValueEvent(progress, 'change', (latest) => {
-    const nextLit = latest >= threshold;
-    setIsLit((prev) => (prev !== nextLit ? nextLit : prev));
-  });
-
-  return (
-    <span
-      className="v2-about-word"
-      style={{ color: isLit ? 'var(--v2-text)' : 'var(--v2-about-unlit)' }}
-    >
-      {word}
-    </span>
-  );
-}
-
-AboutThresholdWord.propTypes = {
-  word: PropTypes.string.isRequired,
-  progress: PropTypes.object.isRequired,
-  threshold: PropTypes.number.isRequired,
-};
-
-/**
- * Exact Nakula About Section (`height: 200vh`, `z-index: 2`)
- * - Slides cleanly over sticky Hero (`z-index: 1`) while Hero scales/fades out.
- * - Words switch `#555555 -> #cacaca` across `y = 550..1550px`.
- * - Unsticks cleanly at `200vh` and scrolls upward 1:1 with Latest Work following naturally.
- */
-function NakulaAboutSection({ text }) {
-  const trackRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ['start 40%', 'end end'],
-  });
-
-  const words = text.split(' ');
-
-  return (
-    <section
-      id="v2-about"
-      ref={trackRef}
-      className="relative z-[2] h-[200vh] w-full bg-[var(--v2-bg)]"
-    >
-      <div className="sticky top-0 flex h-screen w-full items-center px-4 sm:px-12 lg:px-[150px]">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col lg:flex-row items-start gap-6 lg:gap-[56px]">
-          <div className="shrink-0 lg:pt-3">
-            <span className="v2-section-tag">(ABOUT)</span>
-          </div>
-          <p className="text-[clamp(2rem,3.88vw,3.5rem)] font-semibold tracking-[-0.06em] leading-[1.1] text-[var(--v2-text-dim)]">
-            {words.map((word, index) => {
-              const threshold = (index / words.length) * 0.78;
-              return (
-                <AboutThresholdWord
-                  key={`${word}-${index}`}
-                  word={word}
-                  progress={scrollYProgress}
-                  threshold={threshold}
-                />
-              );
-            })}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-NakulaAboutSection.propTypes = {
-  text: PropTypes.string.isRequired,
-};
-
-/**
- * Exact Nakula Work Showcase Card:
- * - Normal-flow stacked card (NOT sticky).
- * - Outer frame scales `0.62 -> 1.0 -> 0.62` with a flat `1.0` centered plateau.
- * - Inner image wrapper applies the inverse counter-scale `1.55 -> 1.0 -> 1.55` inside `overflow-hidden`,
- *   keeping the screenshot optically anchored while the frame expands and contracts!
- */
-function WorkShowcaseCard({
-  project,
-  index,
-  onVisible,
-  isDesktop,
-  isEn,
-  shouldReduceMotion,
-}) {
-  const cardRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const pillX = useSpring(mouseX, { stiffness: 340, damping: 28, mass: 0.4 });
-  const pillY = useSpring(mouseY, { stiffness: 340, damping: 28, mass: 0.4 });
-
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start end', 'end start'],
-  });
-
-  // Exact Nakula 3-phase outer scale (0.62 -> 1.0 plateau -> 0.62) + inverse inner counter-scale
-  const outerScale = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [0.62, 1, 1, 0.62]);
-  const innerCounterScale = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [1.55, 1, 1, 1.55]);
-
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            onVisible(index);
-          }
-        });
-      },
-      { rootMargin: '-36% 0px -38% 0px', threshold: 0.05 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [index, onVisible]);
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left);
-    mouseY.set(e.clientY - rect.top);
-  };
-
-  const handleMouseEnter = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.jump(e.clientX - rect.left);
-    mouseY.jump(e.clientY - rect.top);
-    setIsHovered(true);
-  };
-
-  const subtitleText = isEn ? project.subtitle.en : project.subtitle.id;
-  const descriptionText = isEn ? project.description.en : project.description.id;
-  const useScaleChoreography = isDesktop && !shouldReduceMotion;
-
-  return (
-    <article id={`v2-work-item-${project.id}`} ref={cardRef} className="group w-full">
-      <motion.div
-        style={useScaleChoreography ? { scale: outerScale } : undefined}
-        className="origin-center will-change-transform"
-      >
-        <RouterLink
-          to={`/study-case/${project.id}`}
-          aria-label={`${project.title} — ${subtitleText}`}
-          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-[12px]"
-        >
-          <div
-            className="v2-work-card-frame aspect-[16/11] lg:aspect-auto"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={() => setIsHovered(false)}
-            onMouseMove={handleMouseMove}
-          >
-            {!shouldReduceMotion && (
-              <motion.div
-                className="v2-view-project-pill hidden lg:inline-flex"
-                style={{ left: pillX, top: pillY }}
-                animate={{
-                  opacity: isHovered ? 1 : 0,
-                  scale: isHovered ? 1 : 0.78,
-                }}
-                transition={{ duration: 0.18, ease: NAKULA_EASE }}
-                aria-hidden="true"
-              >
-                <span>{isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}</span>
-                <FiArrowUpRight size={14} />
-              </motion.div>
-            )}
-
-            <motion.div
-              style={useScaleChoreography ? { scale: innerCounterScale } : undefined}
-              className="v2-work-card-img-wrap origin-center"
-            >
-              <img
-                src={project.image}
-                alt={project.title}
-                loading={index < 2 ? 'eager' : 'lazy'}
-                className="v2-work-card-img"
-              />
-            </motion.div>
-          </div>
-        </RouterLink>
-      </motion.div>
-
-      {/* Mobile & Tablet Project Metadata */}
-      <div className="lg:hidden mt-4 space-y-2">
-        <h3 className="text-[32px] font-semibold tracking-[-0.05em] leading-[1.05] text-[var(--v2-text)]">
-          <RouterLink
-            to={`/study-case/${project.id}`}
-            className="hover:text-[var(--v2-accent)] transition-colors"
-          >
-            {project.title}
-          </RouterLink>
-        </h3>
-        <p className="text-[18px] font-medium tracking-[-0.035em] leading-[1.2] text-[var(--v2-text-muted)]">
-          {subtitleText}
-        </p>
-        <p className="text-sm text-[var(--v2-text-dim)] leading-relaxed line-clamp-2">{descriptionText}</p>
-        <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-semibold uppercase tracking-[-0.02em]">
-          <RouterLink
-            to={`/study-case/${project.id}`}
-            className="inline-flex items-center gap-1 text-[var(--v2-text)] hover:text-[var(--v2-accent)]"
-          >
-            <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
-            <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
-          </RouterLink>
-          {project.live && (
-            <a
-              href={project.live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)]"
-            >
-              <span>Live</span>
-              <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
-            </a>
-          )}
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[var(--v2-text-muted)] hover:text-[var(--v2-text-bright)]"
-            >
-              <span>GitHub</span>
-              <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
-            </a>
-          )}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-WorkShowcaseCard.propTypes = {
-  project: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-  onVisible: PropTypes.func.isRequired,
-  isDesktop: PropTypes.bool.isRequired,
-  isEn: PropTypes.bool.isRequired,
-  shouldReduceMotion: PropTypes.bool,
-};
-
-/**
- * Exact Nakula Sticky Horizontal Process Track (`285vh` outer track, `sticky top-0 h-screen` inner frame):
- * Linearly translates `"HOW I WORK (PROCESS)"` + all 4 `360x560` `STEP 1..4` cards horizontally on desktop,
- * then unsticks cleanly into the next section. Falls back to clean responsive grid on tablet/mobile.
- */
-function NakulaProcessSection({ steps, isEn, isDesktop, shouldReduceMotion }) {
-  const trackRef = useRef(null);
-  const rowRef = useRef(null);
-  const [maxPan, setMaxPan] = useState(640);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isDesktop || shouldReduceMotion) return undefined;
-
-    const measurePan = () => {
-      if (!rowRef.current) return;
-      const rowWidth = rowRef.current.scrollWidth;
-      const vw = window.innerWidth;
-      setMaxPan(Math.max(0, rowWidth - vw + 48));
-    };
-
-    measurePan();
-    window.addEventListener('resize', measurePan, { passive: true });
-    return () => window.removeEventListener('resize', measurePan);
-  }, [isDesktop, shouldReduceMotion, steps]);
-
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ['start start', 'end end'],
-  });
-
-  const horizontalX = useTransform(scrollYProgress, [0, 1], [0, -maxPan]);
-
-  if (!isDesktop || shouldReduceMotion) {
-    return (
-      <section id="v2-experience" className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-32">
-        <div className="v2-container mb-12">
-          <div className="flex items-start justify-between gap-4">
-            <MaskedDisplayHeading
-              lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
-              className="v2-section-heading"
-              shouldReduceMotion={shouldReduceMotion}
-            />
-            <span className="v2-section-tag pt-1">
-              ({isEn ? 'PROCESS' : 'PENGALAMAN'})
-            </span>
-          </div>
-        </div>
-        <div className="border-t border-b border-[var(--v2-border-strong)]">
-          <div className="v2-container !px-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--v2-border-strong)]">
-              {steps.map((item) => (
-                <article
-                  key={item.step}
-                  className="flex flex-col justify-between min-h-[360px] p-7 bg-[var(--v2-bg)]"
-                >
-                  <div className="space-y-1">
-                    <p className="text-[22px] font-semibold tracking-[-0.04em] text-[var(--v2-text-muted)]">
-                      {item.step}
-                      <span className="text-[var(--v2-accent)]">.</span>
-                    </p>
-                    <p className="text-[12px] font-medium uppercase text-[var(--v2-text-dim)]">
-                      {item.period}
-                    </p>
-                  </div>
-                  <div className="space-y-3 pt-14">
-                    <h3 className="text-[34px] font-semibold tracking-[-0.055em] leading-[1.02] text-[var(--v2-text)]">
-                      {item.title}
-                    </h3>
-                    <p className="text-[14px] font-semibold text-[var(--v2-accent)]">{item.subtitle}</p>
-                    <p className="text-[15px] leading-[1.4] text-[var(--v2-text-muted)]">{item.body}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section
-      id="v2-experience"
-      ref={trackRef}
-      className="relative z-[2] h-[285vh] w-full bg-[var(--v2-bg)] overflow-x-clip"
-    >
-      <div className="sticky top-0 flex h-screen w-full items-center overflow-hidden">
-        <motion.div
-          ref={rowRef}
-          style={{ x: horizontalX }}
-          className="flex items-center gap-14 px-6 will-change-transform"
-        >
-          {/* Left Intro Block (`530px` wide — exact Nakula `.framer-1efur92` first child) */}
-          <div className="relative w-[530px] shrink-0 h-[560px] flex flex-col justify-between py-2">
-            <div className="flex items-start justify-between">
-              <MaskedDisplayHeading
-                lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
-                className="v2-section-heading"
-                shouldReduceMotion={shouldReduceMotion}
-              />
-              <span className="v2-section-tag pt-2">
-                ({isEn ? 'PROCESS' : 'PENGALAMAN'})
-              </span>
-            </div>
-            <p className="max-w-[360px] text-[20px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)]">
-              {isEn
-                ? 'Verified track record across industry internship, open-source engineering, and computer science education.'
-                : 'Rekam jejak terverifikasi mulai dari magang industri, library open-source, hingga pendidikan informatika.'}
-            </p>
-          </div>
-
-          {/* Right 4 Horizontal Step Cards (`360 x 560px` each) */}
-          <div className="flex shrink-0 border-t border-b border-l border-[var(--v2-border-strong)]">
-            {steps.map((item) => (
-              <article
-                key={item.step}
-                className="w-[360px] h-[560px] shrink-0 border-r border-[var(--v2-border-strong)] p-8 flex flex-col justify-between bg-[var(--v2-bg)]"
-              >
-                <div className="space-y-1.5">
-                  <p className="text-[22px] font-semibold tracking-[-0.04em] text-[var(--v2-text-muted)]">
-                    {item.step}
-                    <span className="text-[var(--v2-accent)]">.</span>
-                  </p>
-                  <p className="text-[12px] font-medium uppercase tracking-[-0.01em] text-[var(--v2-text-dim)]">
-                    {item.period}
-                  </p>
-                </div>
-
-                <div className="space-y-3.5">
-                  <h3 className="text-[40px] font-semibold tracking-[-0.055em] leading-[1.02] text-[var(--v2-text)]">
-                    {item.title}
-                  </h3>
-                  <p className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--v2-accent)]">
-                    {item.subtitle}
-                  </p>
-                  <p className="text-[16px] leading-[1.35] tracking-[-0.02em] text-[var(--v2-text-muted)]">
-                    {item.body}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-NakulaProcessSection.propTypes = {
-  steps: PropTypes.arrayOf(PropTypes.object).isRequired,
-  isEn: PropTypes.bool.isRequired,
-  isDesktop: PropTypes.bool.isRequired,
-  shouldReduceMotion: PropTypes.bool,
-};
-
-/* ==========================================================================
-   Main Portfolio V2 Component — Exact 1:1 Nakula Scroll & Visual Reconstruction
+   Main Portfolio V2 Home Page — Orchestrates Reusable V2 Sections & Primitives
    ========================================================================== */
 
 export default function PortfolioV2() {
@@ -653,10 +79,10 @@ export default function PortfolioV2() {
   const [activeWorkIdx, setActiveWorkIdx] = useState(0);
   const [openCapabilityIdx, setOpenCapabilityIdx] = useState(-1);
   const [openFaqIdx, setOpenFaqIdx] = useState(0);
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [jakartaTime, setJakartaTime] = useState('');
 
-  const lenisRef = useRef(null);
+  const lenisRef = useV2Lenis(Boolean(shouldReduceMotion));
+  const jakartaTime = useJakartaClock();
+  const { copied: copiedEmail, copy: copyToClipboard } = useClipboardCopy(2200);
   const capabilityLeaveTimerRef = useRef(null);
   const metricsGridRef = useRef(null);
   const highlightImgRef = useRef(null);
@@ -743,43 +169,7 @@ export default function PortfolioV2() {
       }
     }, 40);
     return () => clearTimeout(timer);
-  }, []);
-
-  // Enable viewport-level position:sticky strictly inside Portfolio V2
-  useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-    const htmlEl = document.documentElement;
-    htmlEl.classList.add('v2-scroll-root');
-    return () => {
-      htmlEl.classList.remove('v2-scroll-root');
-    };
-  }, []);
-
-  // Exact Nakula Lenis Smooth Scroll Curve (~1.2s exponential settle matching live measurement)
-  useEffect(() => {
-    if (typeof window === 'undefined' || shouldReduceMotion) return undefined;
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      syncTouch: false,
-    });
-    lenisRef.current = lenis;
-
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, [shouldReduceMotion]);
+  }, [lenisRef]);
 
   // Track active section for drawer indicator
   useEffect(() => {
@@ -805,36 +195,6 @@ export default function PortfolioV2() {
     return () => observer.disconnect();
   }, []);
 
-  // Live GMT+7 clock
-  useEffect(() => {
-    const updateClock = () => {
-      try {
-        const formatted = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Jakarta',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        }).format(new Date());
-        setJakartaTime(formatted);
-      } catch {
-        setJakartaTime('4:33 PM');
-      }
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 30000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Close drawer on Escape
-  useEffect(() => {
-    if (!isMenuOpen) return undefined;
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isMenuOpen]);
-
   const scrollToSection = useCallback(
     (sectionId) => {
       setIsMenuOpen(false);
@@ -854,7 +214,7 @@ export default function PortfolioV2() {
         el.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
       }
     },
-    [shouldReduceMotion]
+    [lenisRef, shouldReduceMotion]
   );
 
   // Cleanup capability hover timer on unmount
@@ -886,17 +246,9 @@ export default function PortfolioV2() {
     }, 140);
   }, [isDesktopViewport]);
 
-  const handleCopyEmail = useCallback(async () => {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(directEmail);
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2200);
-      }
-    } catch {
-      // Ignore restricted clipboard environments
-    }
-  }, []);
+  const handleCopyEmail = useCallback(() => {
+    copyToClipboard(directEmail);
+  }, [copyToClipboard]);
 
   const activeWork = selectedProjects[activeWorkIdx] || selectedProjects[0];
   const internship = experiences[0];
@@ -1060,17 +412,33 @@ export default function PortfolioV2() {
     : 'Saya memadukan ketelitian rekayasa frontend dengan arsitektur full-stack untuk merancang pengalaman web yang bermakna, aksesibel, dan andal.';
 
   const drawerLinks = [
-    { id: 'v2-top', label: 'HOME', action: () => scrollToSection('v2-top') },
+    {
+      id: 'v2-top',
+      label: 'HOME',
+      active: activeSection === 'v2-top',
+      action: () => scrollToSection('v2-top'),
+    },
     {
       id: 'v2-work',
       label: 'WORKS',
+      active: activeSection === 'v2-work',
       action: () => {
         setIsMenuOpen(false);
         navigate('/study-case');
       },
     },
-    { id: 'v2-about', label: 'ABOUT', action: () => scrollToSection('v2-about') },
-    { id: 'v2-contact', label: 'CONTACT', action: () => scrollToSection('v2-contact') },
+    {
+      id: 'v2-about',
+      label: 'ABOUT',
+      active: activeSection === 'v2-about',
+      action: () => scrollToSection('v2-about'),
+    },
+    {
+      id: 'v2-contact',
+      label: 'CONTACT',
+      active: activeSection === 'v2-contact',
+      action: () => scrollToSection('v2-contact'),
+    },
   ];
 
   const useHeroScrollExit = isTabletUp && !shouldReduceMotion;
@@ -1092,7 +460,7 @@ export default function PortfolioV2() {
           0. INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
           ==================================================================== */}
       {showOpening && (
-        <V2OpeningSequence
+        <OpeningSequence
           isEn={isEn}
           onRevealStart={() => setHeroIntroComplete(true)}
           onComplete={() => {
@@ -1224,139 +592,13 @@ export default function PortfolioV2() {
       {/* ====================================================================
           NAKULA SLIDE-OVER RIGHT MENU DRAWER
           ==================================================================== */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            key="v2-menu-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.56, ease: NAKULA_EASE }}
-            className="fixed inset-0 z-[130] flex justify-end bg-black/75 backdrop-blur-[2px]"
-            role="dialog"
-            aria-modal="true"
-            aria-label={isEn ? 'Navigation Menu' : 'Menu Navigasi'}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            <motion.div
-              key="v2-menu-panel"
-              initial={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              transition={{ duration: 0.78, ease: NAKULA_EASE }}
-              className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between border-b border-[var(--v2-border-strong)] pb-5">
-                <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[var(--v2-text-muted)]">
-                  <span className="inline-block h-1.5 w-1.5 bg-[var(--v2-accent)]" aria-hidden="true" />
-                  <span>MENU</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMenuOpen(false)}
-                  aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
-                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
-                >
-                  <FiX
-                    size={17}
-                    className="transition-transform duration-300 group-hover:rotate-90"
-                  />
-                </button>
-              </div>
-
-              <nav className="my-auto py-4" aria-label="Portfolio V2 Navigation">
-                <ul className="divide-y divide-[var(--v2-border)]">
-                  {drawerLinks.map((item, idx) => {
-                    const isCurrent = activeSection === item.id;
-                    return (
-                      <li key={item.id} className="overflow-hidden">
-                        <motion.button
-                          type="button"
-                          initial={shouldReduceMotion ? false : { y: 28, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{
-                            duration: 0.62,
-                            delay: 0.16 + idx * 0.08,
-                            ease: NAKULA_EASE,
-                          }}
-                          onClick={item.action}
-                          className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
-                        >
-                          <span className="v2-drawer-nav-item">
-                            <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[var(--v2-text)] group-hover:text-[var(--v2-text-bright)] transition-colors duration-300">
-                              {item.label}
-                            </span>
-                            {isCurrent && (
-                              <span
-                                className="inline-block h-2 w-2 bg-[var(--v2-accent)] self-center"
-                                aria-hidden="true"
-                              />
-                            )}
-                          </span>
-                        </motion.button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-
-              <motion.div
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.62, delay: 0.4, ease: NAKULA_EASE }}
-                className="space-y-5 pt-4"
-              >
-                <V2SeasonDrawerPicker isEn={isEn} />
-
-                <div>
-                  <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                    (EMAIL)
-                  </p>
-                  <a
-                    href={`mailto:${directEmail}`}
-                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-accent)] hover:opacity-85 transition-opacity break-all"
-                  >
-                    {directEmail}
-                  </a>
-                </div>
-                <div>
-                  <p className="mb-2.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                    (SOCIALS)
-                  </p>
-                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-6 text-[17px] font-medium tracking-[-0.03em] text-[var(--v2-text)]">
-                    {contactChannelsData.map((ch) => (
-                      <a
-                        key={ch.key}
-                        href={ch.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
-                      >
-                        <span>{ch.name}</span>
-                        <FiArrowUpRight
-                          size={14}
-                          className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
-                        />
-                      </a>
-                    ))}
-                    <RouterLink
-                      to="/recruiter"
-                      className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
-                    >
-                      <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
-                      <FiArrowUpRight
-                        size={14}
-                        className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
-                      />
-                    </RouterLink>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <V2MenuDrawer
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        items={drawerLinks}
+        isEn={isEn}
+        shouldReduceMotion={Boolean(shouldReduceMotion)}
+      />
 
       {/* ====================================================================
           MAIN CONTENT
@@ -1568,7 +810,7 @@ export default function PortfolioV2() {
         {/* ------------------------------------------------------------------
             2. ABOUT SECTION (`200vh`, sticky `100vh` word reveal, unsticks cleanly at `1800px`)
             ------------------------------------------------------------------ */}
-        <NakulaAboutSection text={aboutStatement} />
+        <AboutSection text={aboutStatement} />
 
         {/* ------------------------------------------------------------------
             3. LATEST WORK (Masked Char Rise + Sticky Left Index + Counter-Scaled Right Cards)
@@ -1778,7 +1020,7 @@ export default function PortfolioV2() {
               {metricsData.map((stat, idx) => (
                 <CountUpMetricCell
                   key={stat.label}
-                  numeral={stat.numeral}
+                  target={stat.numeral}
                   suffix={stat.suffix}
                   label={stat.label}
                   index={idx}
@@ -2132,7 +1374,7 @@ export default function PortfolioV2() {
         {/* ------------------------------------------------------------------
             7. HOW I WORK / PROCESS (Exact Nakula Sticky Horizontal Pan Track!)
             ------------------------------------------------------------------ */}
-        <NakulaProcessSection
+        <ProcessSection
           steps={processTrackSteps}
           isEn={isEn}
           isDesktop={isDesktopViewport}

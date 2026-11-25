@@ -8,7 +8,7 @@ import {
   DEFAULT_PORTFOLIO_VERSION,
 } from '../utils/router';
 import { useLanguage, DEFAULT_LANGUAGE } from './LanguageContext';
-import { runV2PageTransition } from '../v2/v2OpeningState';
+import { runV2PageTransition } from '../v2/components/motion/openingState';
 
 const RouterContext = createContext(null);
 
@@ -39,9 +39,9 @@ function shouldAnimateV2PageSwap(fromLoc, toLoc) {
 
 function preloadV2RouteChunk(routeType) {
   if (routeType === 'study-case-list') {
-    import('../v2/WorksListV2');
+    import('../v2/pages/WorksPage');
   } else if (routeType === 'study-case-detail') {
-    import('../v2/WorkDetailV2');
+    import('../v2/pages/WorkDetailPage');
   }
 }
 

@@ -1,7 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  AnimatePresence,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -9,125 +8,30 @@ import {
   useSpring,
   useTransform,
 } from 'framer-motion';
-import Lenis from 'lenis';
-import { FiArrowUpRight, FiCheck, FiCopy, FiX } from 'react-icons/fi';
+import { FiArrowUpRight, FiCheck, FiCopy } from 'react-icons/fi';
 
-import { siteConfig, ENABLE_SEASONAL_THEMES } from '../config/site';
-import { directEmail, contactChannelsData } from '../data/contact';
-import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../data/resume';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
-import { RouterLink, useRouter } from '../context/RouterContext';
-import V2OpeningSequence from './V2OpeningSequence';
-import V2SeasonDrawerPicker, { V2SeasonHeaderBadge } from './V2SeasonSelector';
-import { buildV2SeasonTokens } from './v2SeasonPalette';
-import { hasCompletedV2Opening, useV2TransitionState } from './v2OpeningState';
-import './v2.css';
+import { siteConfig, ENABLE_SEASONAL_THEMES } from '../../../config/site';
+import { directEmail, contactChannelsData } from '../../../data/contact';
+import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../../../data/resume';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTheme } from '../../../context/ThemeContext';
+import { RouterLink, useRouter } from '../../../context/RouterContext';
+import { useV2Lenis } from '../../hooks/useV2Lenis';
+import { useJakartaClock } from '../../hooks/useJakartaClock';
+import { useClipboardCopy } from '../../hooks/useClipboardCopy';
+import { V2SeasonHeaderBadge } from '../../theme/ThemeControls';
+import { buildV2SeasonTokens } from '../../theme/seasonPalette';
+import OpeningSequence from '../motion/OpeningSequence';
+import { hasCompletedV2Opening, useV2TransitionState } from '../motion/openingState';
+import RolloverLabel from '../ui/RolloverLabel';
+import MaskedDisplayHeading from '../ui/MaskedDisplayHeading';
+import V2MenuDrawer from './V2MenuDrawer';
+import '../../styles/v2.css';
 
-const SeasonalEffects = lazy(() => import('../components/SeasonalEffects'));
-const DeveloperTerminal = lazy(() => import('../components/DeveloperTerminal'));
+const SeasonalEffects = lazy(() => import('../../../components/SeasonalEffects'));
+const DeveloperTerminal = lazy(() => import('../../../components/DeveloperTerminal'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
-
-export function V2RolloverLabel({ text }) {
-  return (
-    <span className="v2-rollover-wrap">
-      <span className="v2-rollover-track">
-        <span className="v2-rollover-line">{text}</span>
-        <span className="v2-rollover-line" aria-hidden="true">
-          {text}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-V2RolloverLabel.propTypes = {
-  text: PropTypes.string.isRequired,
-};
-
-/**
- * Masked Character-by-Character Display Heading Rise (Shared across V2 subpages)
- */
-export function V2MaskedHeading({
-  lines,
-  as: Tag = 'h1',
-  className = '',
-  shouldReduceMotion = false,
-  reveal,
-}) {
-  if (shouldReduceMotion) {
-    return (
-      <Tag className={className}>
-        {lines.map((line) => (
-          <span key={line} className="block">
-            {line}
-          </span>
-        ))}
-      </Tag>
-    );
-  }
-
-  let charCursor = 0;
-  const isControlled = typeof reveal === 'boolean';
-
-  return (
-    <motion.div
-      initial="hidden"
-      animate={isControlled ? (reveal ? 'visible' : 'hidden') : undefined}
-      whileInView={isControlled ? undefined : 'visible'}
-      viewport={isControlled ? undefined : { once: true, amount: 0.2 }}
-    >
-      <Tag className={className}>
-        {lines.map((line) => {
-          const words = line.split(' ');
-          return (
-            <span key={line} className="block overflow-hidden py-[0.02em]">
-              {words.map((word, wIdx) => (
-                <span
-                  key={`${word}-${wIdx}`}
-                  className="inline-block whitespace-nowrap mr-[0.22em] last:mr-0"
-                >
-                  {Array.from(word).map((ch, cIdx) => {
-                    const delay = charCursor * 0.018;
-                    charCursor += 1;
-                    return (
-                      <motion.span
-                        key={`${ch}-${cIdx}`}
-                        variants={{
-                          hidden: { y: '106%' },
-                          visible: {
-                            y: '0%',
-                            transition: {
-                              duration: 0.56,
-                              delay,
-                              ease: NAKULA_EASE,
-                            },
-                          },
-                        }}
-                        className="inline-block will-change-transform"
-                      >
-                        {ch}
-                      </motion.span>
-                    );
-                  })}
-                </span>
-              ))}
-            </span>
-          );
-        })}
-      </Tag>
-    </motion.div>
-  );
-}
-
-V2MaskedHeading.propTypes = {
-  lines: PropTypes.arrayOf(PropTypes.string).isRequired,
-  as: PropTypes.elementType,
-  className: PropTypes.string,
-  shouldReduceMotion: PropTypes.bool,
-  reveal: PropTypes.bool,
-};
 
 /**
  * Exact Nakula `/works` & `MORE WORKS` Project Grid Card:
@@ -275,15 +179,15 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [jakartaTime, setJakartaTime] = useState('');
   const [showOpening, setShowOpening] = useState(
     () => !shouldReduceMotion && !hasCompletedV2Opening()
   );
   const { subpageRevealReady } = useV2TransitionState();
   const isNavbarReady = Boolean(shouldReduceMotion || (!showOpening && subpageRevealReady));
 
-  const lenisRef = useRef(null);
+  const lenisRef = useV2Lenis(Boolean(shouldReduceMotion));
+  const jakartaTime = useJakartaClock();
+  const { copied: copiedEmail, copy: copyToClipboard } = useClipboardCopy(2200);
   const ctaSectionRef = useRef(null);
 
   const { scrollYProgress: ctaProgress } = useScroll({
@@ -291,42 +195,6 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
     offset: ['start end', 'end start'],
   });
   const ctaSpotlightY = useTransform(ctaProgress, [0, 1], [0, 72]);
-
-  // Enable viewport-level V2 scroll root
-  useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-    const htmlEl = document.documentElement;
-    htmlEl.classList.add('v2-scroll-root');
-    return () => {
-      htmlEl.classList.remove('v2-scroll-root');
-    };
-  }, []);
-
-  // Scoped single Lenis smooth scroll instance
-  useEffect(() => {
-    if (typeof window === 'undefined' || shouldReduceMotion) return undefined;
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      syncTouch: false,
-    });
-    lenisRef.current = lenis;
-
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, [shouldReduceMotion]);
 
   // Reset scroll to top cleanly when switching between projects
   useEffect(() => {
@@ -345,37 +213,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
       setShowOpening(true);
     }
     return undefined;
-  }, [scrollKey, shouldReduceMotion]);
-
-  // Live GMT+7 clock
-  useEffect(() => {
-    const updateClock = () => {
-      try {
-        const formatted = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Jakarta',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        }).format(new Date());
-        setJakartaTime(formatted);
-      } catch {
-        setJakartaTime('4:50 PM');
-      }
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 30000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Close drawer on Escape
-  useEffect(() => {
-    if (!isMenuOpen) return undefined;
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isMenuOpen]);
+  }, [lenisRef, scrollKey, shouldReduceMotion]);
 
   const scrollToContact = useCallback(() => {
     setIsMenuOpen(false);
@@ -386,25 +224,17 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
     } else {
       el.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
     }
-  }, [shouldReduceMotion]);
+  }, [lenisRef, shouldReduceMotion]);
 
-  const handleCopyEmail = useCallback(async () => {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(directEmail);
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2200);
-      }
-    } catch {
-      // Ignore restricted clipboard environments
-    }
-  }, []);
+  const handleCopyEmail = useCallback(() => {
+    copyToClipboard(directEmail);
+  }, [copyToClipboard]);
 
   const drawerItems = [
-    { key: 'home', label: 'HOME', action: () => { setIsMenuOpen(false); navigate('/'); } },
-    { key: 'works', label: 'WORKS', active: true, action: () => { setIsMenuOpen(false); navigate('/study-case'); } },
-    { key: 'about', label: 'ABOUT', action: () => { setIsMenuOpen(false); navigate('/#v2-about'); } },
-    { key: 'contact', label: 'CONTACT', action: scrollToContact },
+    { id: 'home', label: 'HOME', action: () => { setIsMenuOpen(false); navigate('/'); } },
+    { id: 'works', label: 'WORKS', active: true, action: () => { setIsMenuOpen(false); navigate('/study-case'); } },
+    { id: 'about', label: 'ABOUT', action: () => { setIsMenuOpen(false); navigate('/#v2-about'); } },
+    { id: 'contact', label: 'CONTACT', action: scrollToContact },
   ];
 
   return (
@@ -424,7 +254,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
           INITIAL SITE ENTRY — ORBITAL TELEMETRY OPENING (`000% -> 100%`)
           ==================================================================== */}
       {showOpening && (
-        <V2OpeningSequence
+        <OpeningSequence
           isEn={isEn}
           onComplete={() => setShowOpening(false)}
         />
@@ -499,7 +329,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                   }}
                   className="v2-pill-btn v2-nav-talk-btn"
                 >
-                  <V2RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
+                  <RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
                 </a>
 
                 <button
@@ -523,132 +353,13 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
       {/* ====================================================================
           SLIDE-OVER RIGHT MENU DRAWER
           ==================================================================== */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            key="v2-subpage-drawer-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.56, ease: NAKULA_EASE }}
-            className="fixed inset-0 z-[130] flex justify-end bg-black/75 backdrop-blur-[2px]"
-            role="dialog"
-            aria-modal="true"
-            aria-label={isEn ? 'Navigation Menu' : 'Menu Navigasi'}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            <motion.div
-              key="v2-subpage-drawer-panel"
-              initial={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
-              exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
-              transition={{ duration: 0.78, ease: NAKULA_EASE }}
-              className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between border-b border-[var(--v2-border-strong)] pb-5">
-                <div className="flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[-0.02em] text-[var(--v2-text-muted)]">
-                  <span className="inline-block h-1.5 w-1.5 bg-[var(--v2-accent)]" aria-hidden="true" />
-                  <span>MENU</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMenuOpen(false)}
-                  aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
-                  className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
-                >
-                  <FiX
-                    size={17}
-                    className="transition-transform duration-300 group-hover:rotate-90"
-                  />
-                </button>
-              </div>
-
-              <nav className="my-auto py-4" aria-label="Portfolio V2 Navigation">
-                <ul className="divide-y divide-[var(--v2-border)]">
-                  {drawerItems.map((item, idx) => (
-                    <li key={item.key} className="overflow-hidden">
-                      <motion.button
-                        type="button"
-                        initial={shouldReduceMotion ? false : { y: 28, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{
-                          duration: 0.62,
-                          delay: 0.16 + idx * 0.08,
-                          ease: NAKULA_EASE,
-                        }}
-                        onClick={item.action}
-                        className="v2-drawer-nav-btn group flex w-full items-center py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
-                      >
-                        <span className="v2-drawer-nav-item">
-                          <span className="v2-drawer-nav-label v2-display-heading text-[48px] sm:text-[54px] text-[var(--v2-text)] group-hover:text-[var(--v2-text-bright)] transition-colors duration-300">
-                            {item.label}
-                          </span>
-                          {item.active && (
-                            <span
-                              className="inline-block h-2 w-2 bg-[var(--v2-accent)] self-center"
-                              aria-hidden="true"
-                            />
-                          )}
-                        </span>
-                      </motion.button>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              <div className="space-y-5 pt-4">
-                <V2SeasonDrawerPicker isEn={isEn} />
-
-                <div>
-                  <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                    (EMAIL)
-                  </p>
-                  <a
-                    href={`mailto:${directEmail}`}
-                    className="inline-block text-[26px] sm:text-[30px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-accent)] hover:opacity-85 transition-opacity break-all"
-                  >
-                    {directEmail}
-                  </a>
-                </div>
-                <div>
-                  <p className="mb-2.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                    (SOCIALS)
-                  </p>
-                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-6 text-[17px] font-medium tracking-[-0.03em] text-[var(--v2-text)]">
-                    {contactChannelsData.map((ch) => (
-                      <a
-                        key={ch.key}
-                        href={ch.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
-                      >
-                        <span>{ch.name}</span>
-                        <FiArrowUpRight
-                          size={14}
-                          className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
-                        />
-                      </a>
-                    ))}
-                    <RouterLink
-                      to="/recruiter"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="group inline-flex items-center gap-1.5 hover:text-[var(--v2-text-bright)] transition-colors"
-                    >
-                      <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
-                      <FiArrowUpRight
-                        size={14}
-                        className="text-[var(--v2-text-dim)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--v2-accent)]"
-                      />
-                    </RouterLink>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <V2MenuDrawer
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        items={drawerItems}
+        isEn={isEn}
+        shouldReduceMotion={Boolean(shouldReduceMotion)}
+      />
 
       {/* ====================================================================
           PAGE CONTENT + PRE-FOOTER CTA + NAKULA FOOTER
@@ -670,7 +381,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
           <div className="v2-container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
             <div className="lg:col-span-7">
-              <V2MaskedHeading
+              <MaskedDisplayHeading
                 as="h2"
                 lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
                 className="v2-section-heading"
@@ -690,7 +401,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                   href={`mailto:${directEmail}`}
                   className="v2-pill-btn v2-pill-btn--accent flex-1 !h-[60px] !text-[16px] justify-between !px-7"
                 >
-                  <V2RolloverLabel text={isEn ? 'GET IN TOUCH' : 'HUBUNGI SEKARANG'} />
+                  <RolloverLabel text={isEn ? 'GET IN TOUCH' : 'HUBUNGI SEKARANG'} />
                   <FiArrowUpRight size={20} />
                 </a>
 
@@ -841,7 +552,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                     rel="noopener noreferrer"
                     className="v2-pill-btn w-full !h-[52px] !text-[14px]"
                   >
-                    <V2RolloverLabel text={isEn ? 'DOWNLOAD CV' : 'UNDUH CV'} />
+                    <RolloverLabel text={isEn ? 'DOWNLOAD CV' : 'UNDUH CV'} />
                   </a>
                 )}
               </div>

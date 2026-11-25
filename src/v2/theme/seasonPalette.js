@@ -5,7 +5,7 @@
  * 100% identical to V2's signature Obsidian + Electric Blue (#3b82f6) aesthetic.
  */
 
-import { ENABLE_SEASONAL_THEMES } from '../config/site.js';
+import { ENABLE_SEASONAL_THEMES } from '../../config/site.js';
 
 export const V2_SEASON_OPTIONS = [
   {

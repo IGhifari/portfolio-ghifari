@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
-import { allProjects } from '../data/projects';
-import { siteConfig } from '../config/site';
-import { useLanguage } from '../context/LanguageContext';
-import { updateDocumentMetadata, generateCaseStudyListSchema } from '../utils/seo';
-import V2SubpageShell, { V2MaskedHeading, V2WorkGridCard } from './V2Chrome';
-import { useV2TransitionState } from './v2OpeningState';
+import { allProjects } from '../../data/projects';
+import { siteConfig } from '../../config/site';
+import { useLanguage } from '../../context/LanguageContext';
+import { updateDocumentMetadata, generateCaseStudyListSchema } from '../../utils/seo';
+import V2SubpageShell, { V2WorkGridCard } from '../components/layout/V2Chrome';
+import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
+import { useV2TransitionState } from '../components/motion/openingState';
 
 /**
  * Portfolio V2 — All Works Page (`/study-case` when `portfolioVersion !== '1'`)
@@ -50,7 +51,7 @@ export default function WorksListV2() {
     <V2SubpageShell scrollKey="works-list">
       <section className="relative z-[2] bg-[var(--v2-bg)] pt-[130px] pb-[100px] md:pt-[150px] md:pb-[150px]">
         <div className="v2-container flex flex-col gap-[56px] md:gap-[72px]">
-          <V2MaskedHeading
+          <MaskedDisplayHeading
             as="h1"
             lines={isEn ? ['SELECTED WORKS'] : ['SEMUA KARYA']}
             className="v2-section-heading"

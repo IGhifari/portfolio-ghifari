@@ -23,7 +23,7 @@ import {
   V2_DEFAULT_TOKENS,
   V2_SEASON_OPTIONS,
   buildV2SeasonTokens,
-} from '../src/v2/v2SeasonPalette.js';
+} from '../src/v2/theme/seasonPalette.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

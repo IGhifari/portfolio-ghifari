@@ -14,9 +14,9 @@ import Navbar from './components/Navbar';
 import Profile from './components/Profile';
 import Project from './components/Project';
 import PortfolioSwitcher from './components/PortfolioSwitcher';
-import PortfolioV2 from './v2/PortfolioV2';
-import V2PageTransition from './v2/V2PageTransition';
-import { hasCompletedV2Opening } from './v2/v2OpeningState';
+import PortfolioV2 from './v2/pages/HomePage';
+import V2PageTransition from './v2/components/motion/PageTransition';
+import { hasCompletedV2Opening } from './v2/components/motion/openingState';
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -34,8 +34,8 @@ const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
-const WorksListV2 = lazy(() => import('./v2/WorksListV2'));
-const WorkDetailV2 = lazy(() => import('./v2/WorkDetailV2'));
+const WorksListV2 = lazy(() => import('./v2/pages/WorksPage'));
+const WorkDetailV2 = lazy(() => import('./v2/pages/WorkDetailPage'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
 const GameHub = lazy(() => import('./game/hub/GameHub'));
 const GamePage = lazy(() => import('./game/GamePage'));

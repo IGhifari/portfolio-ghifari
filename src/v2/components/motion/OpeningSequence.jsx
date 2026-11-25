@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { markV2OpeningCompleted } from './v2OpeningState';
+import { markV2OpeningCompleted } from './openingState';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 

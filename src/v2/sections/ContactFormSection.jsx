@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import emailjs from '@emailjs/browser';
 import { FiAlertCircle, FiCheckCircle, FiSend } from 'react-icons/fi';
 
-import { useLanguage } from '../context/LanguageContext';
-import { directEmail } from '../data/contact';
-import { siteConfig } from '../config/site';
-import { CONTACT_LIMITS, validateContactForm } from '../utils/contactValidation';
-import { V2RolloverLabel } from './V2Chrome';
+import { useLanguage } from '../../context/LanguageContext';
+import { directEmail } from '../../data/contact';
+import { siteConfig } from '../../config/site';
+import { CONTACT_LIMITS, validateContactForm } from '../../utils/contactValidation';
+import RolloverLabel from '../components/ui/RolloverLabel';
 
 const COOLDOWN_MS = 60000;
 
@@ -398,7 +398,7 @@ function ContactFormV2({ isEn: isEnProp }) {
               </>
             ) : (
               <>
-                <V2RolloverLabel text={isEn ? 'SEND MESSAGE' : 'KIRIM PESAN'} />
+                <RolloverLabel text={isEn ? 'SEND MESSAGE' : 'KIRIM PESAN'} />
                 <FiSend size={14} aria-hidden="true" />
               </>
             )}

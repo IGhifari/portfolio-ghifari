@@ -3,22 +3,20 @@ import PropTypes from 'prop-types';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { FiArrowUpRight } from 'react-icons/fi';
 
-import { allProjects, getProjectBySlug } from '../data/projects';
-import { profileData } from '../data/profile';
-import { siteConfig } from '../config/site';
-import { useLanguage } from '../context/LanguageContext';
-import { RouterLink } from '../context/RouterContext';
-import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../utils/seo';
-import V2SubpageShell, {
-  V2MaskedHeading,
-  V2RolloverLabel,
-  V2WorkGridCard,
-} from './V2Chrome';
-import { useV2TransitionState } from './v2OpeningState';
+import { allProjects, getProjectBySlug } from '../../data/projects';
+import { profileData } from '../../data/profile';
+import { siteConfig } from '../../config/site';
+import { useLanguage } from '../../context/LanguageContext';
+import { RouterLink } from '../../context/RouterContext';
+import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../../utils/seo';
+import V2SubpageShell, { V2WorkGridCard } from '../components/layout/V2Chrome';
+import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
+import RolloverLabel from '../components/ui/RolloverLabel';
+import { useV2TransitionState } from '../components/motion/openingState';
 
 const DETAIL_EASE = [0.22, 1, 0.36, 1];
 
-const IdKitPlayground = lazy(() => import('../components/IdKitPlayground'));
+const IdKitPlayground = lazy(() => import('../../components/IdKitPlayground'));
 
 /**
  * Downward Scroll Parallax Image Box (Exact `/works/arjuna` `inset: -90px 0 0` downward translate)
@@ -148,11 +146,11 @@ export default function WorkDetailV2({ slug }) {
                 to="/study-case"
                 className="v2-pill-btn v2-pill-btn--accent !h-[54px] !px-7"
               >
-                <V2RolloverLabel text={isEn ? 'ALL WORKS' : 'SEMUA KARYA'} />
+                <RolloverLabel text={isEn ? 'ALL WORKS' : 'SEMUA KARYA'} />
                 <FiArrowUpRight size={18} />
               </RouterLink>
               <RouterLink to="/" className="v2-pill-btn !h-[54px] !px-7">
-                <V2RolloverLabel text={isEn ? 'BACK HOME' : 'BERANDA'} />
+                <RolloverLabel text={isEn ? 'BACK HOME' : 'BERANDA'} />
               </RouterLink>
             </div>
           </div>
@@ -232,7 +230,7 @@ export default function WorkDetailV2({ slug }) {
             <div className="flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-[64px]">
               {/* Left Column: Title + 2-line Description */}
               <div className="flex-1 flex flex-col gap-4 min-w-0">
-                <V2MaskedHeading
+                <MaskedDisplayHeading
                   as="h1"
                   lines={[project.title]}
                   className="v2-display-heading text-[clamp(3.5rem,8.4vw,8.75rem)] leading-[0.96] text-[var(--v2-text)] break-words"
@@ -610,7 +608,7 @@ export default function WorkDetailV2({ slug }) {
       <section className="relative z-[2] bg-[var(--v2-bg)] py-24 sm:py-[150px]">
         <div className="v2-container flex flex-col gap-[56px] md:gap-[72px]">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-            <V2MaskedHeading
+            <MaskedDisplayHeading
               as="h2"
               lines={isEn ? ['MORE WORKS'] : ['KARYA LAINNYA']}
               className="v2-section-heading"
@@ -621,7 +619,7 @@ export default function WorkDetailV2({ slug }) {
               to="/study-case"
               className="v2-pill-btn !min-w-[190px] !h-[52px] justify-between !text-[var(--v2-accent)] hover:!border-[var(--v2-accent)]"
             >
-              <V2RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
+              <RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
               <FiArrowUpRight size={16} />
             </RouterLink>
           </div>

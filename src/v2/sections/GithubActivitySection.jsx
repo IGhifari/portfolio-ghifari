@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { animate, motion, useInView, useReducedMotion } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   FiAlertCircle,
   FiArrowUpRight,
@@ -14,11 +14,13 @@ import {
   clearGithubCache,
   fetchGithubData,
   formatRepoDate,
-} from '../services/githubService';
-import { initialContributionsData } from '../data/githubContributions';
-import { siteConfig } from '../config/site';
-import { useLanguage } from '../context/LanguageContext';
-import { V2MaskedHeading, V2RolloverLabel } from './V2Chrome';
+} from '../../services/githubService';
+import { initialContributionsData } from '../../data/githubContributions';
+import { siteConfig } from '../../config/site';
+import { useLanguage } from '../../context/LanguageContext';
+import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
+import RolloverLabel from '../components/ui/RolloverLabel';
+import CountUpMetricCell from '../components/ui/CountUpMetricCell';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
@@ -45,103 +47,6 @@ function getCellClass(level) {
 }
 
 /**
- * Staggered Rise + Ease-Out Count-Up Metric Cell
- * Matches Portfolio V2's "NUMBERS DON'T LIE" (`CountUpMetricCell`) animation 1:1.
- */
-function GithubCountUpCell({
-  target,
-  suffix,
-  label,
-  sub,
-  index,
-  isTriggered,
-  shouldReduceMotion,
-  locale,
-}) {
-  const numericTarget = Number(target) || 0;
-  const [count, setCount] = useState(() => (shouldReduceMotion ? numericTarget : 0));
-  const currentCountRef = useRef(shouldReduceMotion ? numericTarget : 0);
-  const hasAnimatedOnceRef = useRef(false);
-
-  useEffect(() => {
-    if (shouldReduceMotion) {
-      currentCountRef.current = numericTarget;
-      setCount(numericTarget);
-      return undefined;
-    }
-    if (!isTriggered) return undefined;
-
-    const fromValue = hasAnimatedOnceRef.current ? currentCountRef.current : 0;
-    const delay = hasAnimatedOnceRef.current ? 0 : index * 0.12;
-    hasAnimatedOnceRef.current = true;
-
-    const controls = animate(fromValue, numericTarget, {
-      duration: 1.75,
-      delay,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (latest) => {
-        const rounded = Math.round(latest);
-        currentCountRef.current = rounded;
-        setCount(rounded);
-      },
-    });
-
-    return () => controls.stop();
-  }, [index, isTriggered, numericTarget, shouldReduceMotion]);
-
-  const formattedCount = locale ? count.toLocaleString(locale) : String(count);
-  const formattedTarget = locale ? numericTarget.toLocaleString(locale) : String(numericTarget);
-
-  return (
-    <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 52 }}
-      animate={
-        shouldReduceMotion || isTriggered
-          ? { opacity: 1, y: 0 }
-          : { opacity: 0, y: 52 }
-      }
-      transition={{
-        duration: 0.72,
-        delay: index * 0.12,
-        ease: NAKULA_EASE,
-      }}
-      className="v2-metric-cell !min-h-[200px] sm:!min-h-[232px] will-change-transform"
-    >
-      <div className="v2-metric-ticks" aria-hidden="true" />
-
-      <div className="flex items-baseline" aria-label={`${formattedTarget}${suffix}`}>
-        <span className="text-[48px] sm:text-[72px] xl:text-[80px] font-semibold tracking-[-0.07em] leading-none text-[var(--v2-text)]">
-          {formattedCount}
-        </span>
-        <span className="text-[40px] sm:text-[60px] xl:text-[68px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-accent)]">
-          {suffix}
-        </span>
-      </div>
-
-      <div className="mt-10 space-y-1">
-        <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.25] text-[var(--v2-text)]">
-          {label}
-        </p>
-        <p className="font-mono text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
-          {sub}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-GithubCountUpCell.propTypes = {
-  target: PropTypes.number.isRequired,
-  suffix: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  sub: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
-  isTriggered: PropTypes.bool.isRequired,
-  shouldReduceMotion: PropTypes.bool,
-  locale: PropTypes.string,
-};
-
-/**
  * Dedicated wrapper so `useInView` always binds to a mounted DOM grid after initial load.
  */
 function GithubMetricsStrip({ cards, shouldReduceMotion }) {
@@ -154,7 +59,7 @@ function GithubMetricsStrip({ cards, shouldReduceMotion }) {
       className="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-6 items-stretch"
     >
       {cards.map((card, idx) => (
-        <GithubCountUpCell
+        <CountUpMetricCell
           key={card.id}
           target={card.target}
           suffix={card.suffix}
@@ -164,6 +69,7 @@ function GithubMetricsStrip({ cards, shouldReduceMotion }) {
           index={idx}
           isTriggered={isInView}
           shouldReduceMotion={shouldReduceMotion}
+          className="!min-h-[200px] sm:!min-h-[232px]"
         />
       ))}
     </div>
@@ -406,7 +312,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
               ({isEn ? 'OPEN SOURCE' : 'KODE TERBUKA'})
             </p>
             <div id="v2-github-heading">
-              <V2MaskedHeading
+              <MaskedDisplayHeading
                 as="h2"
                 lines={isEn ? ['GITHUB', 'ACTIVITY'] : ['AKTIVITAS', 'GITHUB']}
                 className="v2-section-heading md:[&>span:first-child]:pl-32 lg:[&>span:first-child]:pl-40"
@@ -464,7 +370,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                 rel="noopener noreferrer"
                 className="v2-pill-btn v2-pill-btn--accent !py-3 !px-6 !text-[13px]"
               >
-                <V2RolloverLabel text={isEn ? 'VIEW GITHUB' : 'LIHAT GITHUB'} />
+                <RolloverLabel text={isEn ? 'VIEW GITHUB' : 'LIHAT GITHUB'} />
                 <FiArrowUpRight size={15} aria-hidden="true" />
               </a>
             </div>
@@ -525,7 +431,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                 rel="noopener noreferrer"
                 className="v2-pill-btn v2-pill-btn--accent !py-3 !px-6 !text-[13px]"
               >
-                <V2RolloverLabel text={isEn ? 'OPEN GITHUB' : 'BUKA GITHUB'} />
+                <RolloverLabel text={isEn ? 'OPEN GITHUB' : 'BUKA GITHUB'} />
                 <FiArrowUpRight size={15} aria-hidden="true" />
               </a>
             </div>
