@@ -1597,80 +1597,94 @@ export default function PortfolioV2() {
             className="v2-cta-spotlight pointer-events-none absolute -inset-y-20 inset-x-0 will-change-transform"
           />
 
-          <div className="v2-container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
-            {/* Left Editorial Intro & Direct Channels */}
-            <div className="lg:col-span-5 space-y-8">
-              <div className="space-y-4">
-                <p className="v2-section-tag">({isEn ? 'CONTACT' : 'KONTAK'})</p>
+          <div className="v2-container relative z-10 space-y-16 sm:space-y-24">
+            {/* Top Nakula Editorial Header Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
+              <div className="lg:col-span-7 relative">
+                <p className="v2-section-tag mb-4 md:mb-0 md:absolute md:top-2 md:left-0">
+                  ({isEn ? 'CONTACT' : 'KONTAK'})
+                </p>
                 <MaskedDisplayHeading
                   lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
+                  lineClassNames={['md:pl-28 lg:pl-36', '']}
                   className="v2-section-heading"
                   shouldReduceMotion={Boolean(shouldReduceMotion)}
                 />
               </div>
 
-              <p className="text-[19px] sm:text-[22px] font-medium tracking-[-0.035em] leading-[1.25] text-[var(--v2-text-muted)] max-w-md">
-                {isEn
-                  ? 'Have a frontend role, web application, or collaborative project in mind? Send a message directly or reach out via email.'
-                  : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Kirim pesan langsung atau hubungi lewat email.'}
-              </p>
+              <div className="lg:col-span-5 space-y-6 lg:pb-2">
+                <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)] max-w-md">
+                  {isEn
+                    ? 'Have a frontend role, web application, or collaborative project in mind? Drop a note below or reach out directly.'
+                    : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Tulis pesan di bawah atau hubungi langsung.'}
+                </p>
 
-              {/* Quick Direct Email & Copy Pills */}
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href={`mailto:${directEmail}`}
-                  className="v2-pill-btn !h-[52px] !px-6 !text-[13px]"
-                >
-                  <RolloverLabel text={isEn ? 'OPEN MAIL APP' : 'BUKA EMAIL'} />
-                  <FiArrowUpRight size={15} className="text-[var(--v2-accent)]" />
-                </a>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    aria-label={isEn ? 'Copy email address' : 'Salin alamat email'}
+                    className="v2-pill-btn !h-[48px] !px-5 !text-[13px]"
+                  >
+                    {copiedEmail ? (
+                      <>
+                        <FiCheck size={14} className="text-[#47c554]" />
+                        <span>{isEn ? 'EMAIL COPIED' : 'EMAIL TERSALIN'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiCopy size={14} />
+                        <span>{isEn ? 'COPY EMAIL' : 'SALIN EMAIL'}</span>
+                      </>
+                    )}
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  aria-label={isEn ? 'Copy email address' : 'Salin alamat email'}
-                  className="v2-pill-btn !h-[52px] !px-5 !text-[13px]"
-                >
-                  {copiedEmail ? (
-                    <>
-                      <FiCheck size={15} className="text-[#47c554]" />
-                      <span>{isEn ? 'COPIED' : 'TERSALIN'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FiCopy size={15} />
-                      <span>{isEn ? 'COPY EMAIL' : 'SALIN EMAIL'}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Availability & Location Hairline Metadata */}
-              <div className="pt-6 border-t border-[var(--v2-border)] space-y-2.5 font-mono text-[12px] text-[var(--v2-text-muted)]">
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className="h-2 w-2 rounded-full bg-[#47c554] shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span className="uppercase tracking-[0.04em] text-[var(--v2-text)]">
-                    {isEn ? 'Available for roles & freelance' : 'Tersedia untuk kerja & freelance'}
+                  <span className="inline-flex items-center gap-2 text-[13px] font-medium tracking-[-0.02em] text-[var(--v2-text-muted)] pl-1">
+                    <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
+                    <span>{isEn ? 'Open for opportunities' : 'Terbuka untuk peluang'}</span>
                   </span>
                 </div>
-                <p className="text-[var(--v2-text-dim)]">
-                  {directEmail} · Bogor / Jakarta, ID
-                </p>
               </div>
             </div>
 
-            {/* Right Column: Editorial Send a Message Form */}
-            <div className="lg:col-span-7">
-              <Suspense
-                fallback={
-                  <div className="h-[480px] rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] motion-safe:animate-pulse" />
-                }
-              >
-                <ContactFormV2 isEn={isEn} />
-              </Suspense>
+            {/* Bottom Asymmetric 2-Column Editorial Inquiry Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+              <div className="lg:col-span-4 space-y-6 lg:pt-2">
+                <div className="space-y-2">
+                  <p className="text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
+                    ({isEn ? 'DIRECT EMAIL' : 'EMAIL LANGSUNG'})
+                  </p>
+                  <a
+                    href={`mailto:${directEmail}`}
+                    className="inline-block text-[22px] sm:text-[26px] font-semibold tracking-[-0.045em] leading-[1.1] text-[var(--v2-text)] hover:text-[var(--v2-accent)] transition-colors break-all"
+                  >
+                    {directEmail}
+                  </a>
+                </div>
+
+                <div className="space-y-1.5 text-[15px] tracking-[-0.02em] text-[var(--v2-text-muted)]">
+                  <p className="text-[13px] uppercase tracking-[-0.03em] text-[var(--v2-text-dim)]">
+                    ({isEn ? 'BASE' : 'LOKASI'})
+                  </p>
+                  <p>Bogor / Jakarta, Indonesia (GMT+7)</p>
+                </div>
+              </div>
+
+              <div className="lg:col-span-8">
+                <Suspense
+                  fallback={
+                    <div className="border-t border-[var(--v2-border-strong)] divide-y divide-[var(--v2-border-strong)]">
+                      {[0, 1, 2, 3].map((row) => (
+                        <div key={row} className="py-7">
+                          <div className="h-7 w-2/3 rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
+                        </div>
+                      ))}
+                    </div>
+                  }
+                >
+                  <ContactFormV2 isEn={isEn} />
+                </Suspense>
+              </div>
             </div>
           </div>
         </section>

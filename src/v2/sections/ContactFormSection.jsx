@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import emailjs from '@emailjs/browser';
-import { FiAlertCircle, FiCheckCircle, FiSend } from 'react-icons/fi';
+import { FiAlertCircle, FiArrowUpRight, FiCheck } from 'react-icons/fi';
 
 import { useLanguage } from '../../context/LanguageContext';
 import { directEmail } from '../../data/contact';
@@ -11,12 +11,18 @@ import RolloverLabel from '../components/ui/RolloverLabel';
 
 const COOLDOWN_MS = 60000;
 
+const SUBJECT_PRESETS = {
+  en: ['Frontend Role', 'Web Project', 'Collaboration'],
+  id: ['Peluang Kerja', 'Proyek Web', 'Kolaborasi'],
+};
+
 /**
- * Portfolio V2 Editorial Contact Form ("Send a Message")
- * Reuses the exact EmailJS + pure-JS validation + honeypot + 60s cooldown pipeline
- * from V1 Contact.jsx, styled to match Portfolio V2's Nakula & seasonal design tokens.
+ * Portfolio V2 Architectural Inquiry Form
+ * Open-canvas Nakula editorial layout: numbered `01.`–`04.` hairline rows,
+ * frameless large-scale typography, animated left-to-right accent focus rule,
+ * studio topic pills, and `SEND MESSAGE ↗` rollover CTA.
  */
-function ContactFormV2({ isEn: isEnProp }) {
+function ContactFormSection({ isEn: isEnProp }) {
   const { t, language } = useLanguage();
   const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
 
@@ -49,6 +55,19 @@ function ContactFormV2({ isEn: isEnProp }) {
     });
   }, []);
 
+  const handlePresetClick = useCallback((preset) => {
+    setFormData((prev) => ({
+      ...prev,
+      subject: prev.subject === preset ? '' : preset,
+    }));
+    setErrors((prev) => {
+      if (!prev.subject) return prev;
+      const next = { ...prev };
+      delete next.subject;
+      return next;
+    });
+  }, []);
+
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -63,7 +82,7 @@ function ContactFormV2({ isEn: isEnProp }) {
         return;
       }
 
-      // 60-second client-side cooldown to prevent duplicate spam submissions
+      // 60-second client-side cooldown
       const now = Date.now();
       if (now - lastSubmitTimeRef.current < COOLDOWN_MS) {
         setStatusNotice({
@@ -144,71 +163,58 @@ function ContactFormV2({ isEn: isEnProp }) {
     [formData, isEn, publicKey, serviceId, t, templateId]
   );
 
-  return (
-    <div className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)]/95 backdrop-blur-md p-6 sm:p-8 lg:p-10">
-      {/* Form Top Bar */}
-      <div className="flex flex-wrap items-end justify-between gap-4 pb-6 mb-7 border-b border-[var(--v2-border)]">
-        <div className="space-y-1.5">
-          <span className="block font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--v2-accent)]">
-            ({isEn ? 'SEND A MESSAGE' : 'KIRIM PESAN'})
-          </span>
-          <h3 className="text-[24px] sm:text-[28px] font-semibold tracking-[-0.045em] leading-[1.08] text-[var(--v2-text)]">
-            {t('contact.formTitle')}
-          </h3>
-        </div>
-        <span className="font-mono text-[11px] uppercase tracking-[0.04em] text-[var(--v2-text-dim)]">
-          {t('contact.requiredHint')}
-        </span>
-      </div>
+  const presets = isEn ? SUBJECT_PRESETS.en : SUBJECT_PRESETS.id;
 
-      {/* Inline Status Feedback Banner */}
+  return (
+    <div className="w-full">
+      {/* Minimal Editorial Status Strip */}
       {statusNotice && (
         <div
           role={statusNotice.type === 'success' ? 'status' : 'alert'}
           aria-live="polite"
-          className={`mb-7 rounded-[10px] border p-4 flex items-start gap-3 text-[13px] sm:text-[14px] leading-[1.45] ${
+          className={`mb-10 border-l-2 pl-5 py-2 space-y-1 ${
             statusNotice.type === 'success'
-              ? 'border-[#47c554]/40 bg-[#47c554]/10 text-[var(--v2-text)]'
+              ? 'border-[#47c554]'
               : statusNotice.type === 'warning'
-                ? 'border-[var(--v2-accent)]/45 bg-[var(--v2-accent)]/10 text-[var(--v2-text)]'
-                : 'border-rose-500/40 bg-rose-500/10 text-[var(--v2-text)]'
+                ? 'border-[var(--v2-accent)]'
+                : 'border-rose-500'
           }`}
         >
-          {statusNotice.type === 'success' ? (
-            <FiCheckCircle size={18} className="mt-0.5 shrink-0 text-[#47c554]" aria-hidden="true" />
-          ) : (
-            <FiAlertCircle
-              size={18}
-              className={`mt-0.5 shrink-0 ${
-                statusNotice.type === 'warning' ? 'text-[var(--v2-accent)]' : 'text-rose-400'
-              }`}
-              aria-hidden="true"
-            />
-          )}
-          <div className="space-y-1">
-            <strong className="block font-semibold text-[var(--v2-text-bright)]">
-              {statusNotice.title}
-            </strong>
-            <p className="text-[var(--v2-text-muted)]">
-              {statusNotice.body}
-              {statusNotice.showDirectFallback && (
-                <>
-                  {' '}
-                  <a
-                    href={`mailto:${directEmail}`}
-                    className="underline font-mono text-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors"
-                  >
-                    {directEmail}
-                  </a>
-                  .
-                </>
-              )}
-            </p>
+          <div className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.02em] text-[var(--v2-text-bright)]">
+            {statusNotice.type === 'success' ? (
+              <FiCheck size={16} className="text-[#47c554] shrink-0" aria-hidden="true" />
+            ) : (
+              <FiAlertCircle
+                size={16}
+                className={
+                  statusNotice.type === 'warning'
+                    ? 'text-[var(--v2-accent)] shrink-0'
+                    : 'text-rose-400 shrink-0'
+                }
+                aria-hidden="true"
+              />
+            )}
+            <span>{statusNotice.title}</span>
           </div>
+          <p className="text-[14px] leading-[1.45] tracking-[-0.01em] text-[var(--v2-text-muted)]">
+            {statusNotice.body}
+            {statusNotice.showDirectFallback && (
+              <>
+                {' '}
+                <a
+                  href={`mailto:${directEmail}`}
+                  className="font-medium text-[var(--v2-accent)] hover:underline"
+                >
+                  {directEmail}
+                </a>
+                .
+              </>
+            )}
+          </p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      <form onSubmit={handleSubmit} noValidate className="space-y-10 sm:space-y-12">
         {/* Honeypot anti-bot field */}
         <div className="hidden" aria-hidden="true">
           <label htmlFor="v2-bot-field">Leave this empty</label>
@@ -223,189 +229,243 @@ function ContactFormV2({ isEn: isEnProp }) {
           />
         </div>
 
-        {/* Name & Email */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-          <div>
-            <label
-              htmlFor="v2-contact-name"
-              className="block font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--v2-text-muted)] mb-2"
-            >
-              {t('contact.nameLabel')} <span className="text-[var(--v2-accent)]">*</span>
-            </label>
-            <input
-              type="text"
-              id="v2-contact-name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder={t('contact.namePlaceholder')}
-              disabled={isSubmitting}
-              maxLength={CONTACT_LIMITS.NAME_MAX}
-              className={`v2-form-field ${errors.name ? 'v2-form-field--error' : ''}`}
-              aria-invalid={errors.name ? 'true' : 'false'}
-              aria-describedby={errors.name ? 'v2-name-error' : undefined}
-            />
-            {errors.name && (
-              <p
-                id="v2-name-error"
-                role="alert"
-                className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] text-rose-400"
+        {/* Row 01 & 02: Name + Email (2-column architectural grid on desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-x-12 lg:gap-x-16">
+          <div className={`v2-editorial-field ${errors.name ? 'v2-editorial-field--error' : ''}`}>
+            <div className="flex items-start gap-4 sm:gap-6">
+              <span
+                className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
+                aria-hidden="true"
               >
-                <FiAlertCircle size={12} aria-hidden="true" />
-                <span>{errors.name}</span>
-              </p>
-            )}
+                01<span className="text-[var(--v2-accent)]">.</span>
+              </span>
+              <div className="flex-1 min-w-0 space-y-2">
+                <label
+                  htmlFor="v2-contact-name"
+                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                >
+                  {isEn ? "What's your name?" : 'Siapa nama Anda?'}
+                </label>
+                <input
+                  type="text"
+                  id="v2-contact-name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder={isEn ? 'John Doe *' : 'Nama lengkap Anda *'}
+                  disabled={isSubmitting}
+                  maxLength={CONTACT_LIMITS.NAME_MAX}
+                  className="v2-editorial-input"
+                  aria-invalid={errors.name ? 'true' : 'false'}
+                  aria-describedby={errors.name ? 'v2-name-error' : undefined}
+                />
+                {errors.name && (
+                  <p
+                    id="v2-name-error"
+                    role="alert"
+                    className="pt-1 text-[13px] font-medium tracking-[-0.01em] text-rose-400"
+                  >
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="v2-contact-email"
-              className="block font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--v2-text-muted)] mb-2"
-            >
-              {t('contact.emailLabel')} <span className="text-[var(--v2-accent)]">*</span>
-            </label>
-            <input
-              type="email"
-              id="v2-contact-email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder={t('contact.emailPlaceholder')}
-              disabled={isSubmitting}
-              maxLength={CONTACT_LIMITS.EMAIL_MAX}
-              className={`v2-form-field ${errors.email ? 'v2-form-field--error' : ''}`}
-              aria-invalid={errors.email ? 'true' : 'false'}
-              aria-describedby={errors.email ? 'v2-email-error' : undefined}
-            />
-            {errors.email && (
-              <p
-                id="v2-email-error"
-                role="alert"
-                className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] text-rose-400"
+          <div className={`v2-editorial-field ${errors.email ? 'v2-editorial-field--error' : ''}`}>
+            <div className="flex items-start gap-4 sm:gap-6">
+              <span
+                className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
+                aria-hidden="true"
               >
-                <FiAlertCircle size={12} aria-hidden="true" />
-                <span>{errors.email}</span>
-              </p>
-            )}
+                02<span className="text-[var(--v2-accent)]">.</span>
+              </span>
+              <div className="flex-1 min-w-0 space-y-2">
+                <label
+                  htmlFor="v2-contact-email"
+                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                >
+                  {isEn ? "What's your email?" : 'Apa alamat email Anda?'}
+                </label>
+                <input
+                  type="email"
+                  id="v2-contact-email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="name@company.com *"
+                  disabled={isSubmitting}
+                  maxLength={CONTACT_LIMITS.EMAIL_MAX}
+                  className="v2-editorial-input"
+                  aria-invalid={errors.email ? 'true' : 'false'}
+                  aria-describedby={errors.email ? 'v2-email-error' : undefined}
+                />
+                {errors.email && (
+                  <p
+                    id="v2-email-error"
+                    role="alert"
+                    className="pt-1 text-[13px] font-medium tracking-[-0.01em] text-rose-400"
+                  >
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Subject (Optional) */}
-        <div>
-          <label
-            htmlFor="v2-contact-subject"
-            className="block font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--v2-text-muted)] mb-2"
-          >
-            {t('contact.subjectLabel')}{' '}
-            <span className="text-[var(--v2-text-dim)] text-[10px] normal-case tracking-normal">
-              {t('contact.subjectOptional')}
-            </span>
-          </label>
-          <input
-            type="text"
-            id="v2-contact-subject"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            placeholder={t('contact.subjectPlaceholder')}
-            disabled={isSubmitting}
-            maxLength={CONTACT_LIMITS.SUBJECT_MAX}
-            className={`v2-form-field ${errors.subject ? 'v2-form-field--error' : ''}`}
-            aria-invalid={errors.subject ? 'true' : 'false'}
-            aria-describedby={errors.subject ? 'v2-subject-error' : undefined}
-          />
-          {errors.subject && (
-            <p
-              id="v2-subject-error"
-              role="alert"
-              className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] text-rose-400"
+        {/* Row 03: Topic / Subject (with V2 Studio Topic Pills) */}
+        <div className={`v2-editorial-field ${errors.subject ? 'v2-editorial-field--error' : ''}`}>
+          <div className="flex items-start gap-4 sm:gap-6">
+            <span
+              className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
+              aria-hidden="true"
             >
-              <FiAlertCircle size={12} aria-hidden="true" />
-              <span>{errors.subject}</span>
-            </p>
-          )}
-        </div>
+              03<span className="text-[var(--v2-accent)]">.</span>
+            </span>
+            <div className="flex-1 min-w-0 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <label
+                  htmlFor="v2-contact-subject"
+                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                >
+                  {isEn ? 'What are we discussing?' : 'Topik apa yang ingin dibahas?'}
+                </label>
 
-        {/* Message */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label
-              htmlFor="v2-contact-message"
-              className="block font-mono text-[11px] uppercase tracking-[0.06em] text-[var(--v2-text-muted)]"
-            >
-              {t('contact.messageLabel')} <span className="text-[var(--v2-accent)]">*</span>
-            </label>
-            <span className="font-mono text-[10px] text-[var(--v2-text-dim)] tabular-nums">
-              {formData.message.length}/{CONTACT_LIMITS.MESSAGE_MAX}
-            </span>
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label={isEn ? 'Quick topics' : 'Pilihan topik'}
+                >
+                  {presets.map((preset) => {
+                    const isSelected = formData.subject === preset;
+                    return (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => handlePresetClick(preset)}
+                        disabled={isSubmitting}
+                        aria-pressed={isSelected}
+                        className={`v2-topic-pill focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] ${
+                          isSelected ? 'v2-topic-pill--active' : ''
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <input
+                type="text"
+                id="v2-contact-subject"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                placeholder={
+                  isEn
+                    ? 'Frontend Engineer role, web platform, etc. (Optional)'
+                    : 'Posisi Frontend Engineer, proyek web, dll. (Opsional)'
+                }
+                disabled={isSubmitting}
+                maxLength={CONTACT_LIMITS.SUBJECT_MAX}
+                className="v2-editorial-input"
+                aria-invalid={errors.subject ? 'true' : 'false'}
+                aria-describedby={errors.subject ? 'v2-subject-error' : undefined}
+              />
+              {errors.subject && (
+                <p
+                  id="v2-subject-error"
+                  role="alert"
+                  className="pt-1 text-[13px] font-medium tracking-[-0.01em] text-rose-400"
+                >
+                  {errors.subject}
+                </p>
+              )}
+            </div>
           </div>
-          <textarea
-            id="v2-contact-message"
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            rows={4}
-            placeholder={t('contact.messagePlaceholder')}
-            disabled={isSubmitting}
-            maxLength={CONTACT_LIMITS.MESSAGE_MAX}
-            className={`v2-form-field resize-y min-h-[124px] ${errors.message ? 'v2-form-field--error' : ''}`}
-            aria-invalid={errors.message ? 'true' : 'false'}
-            aria-describedby={errors.message ? 'v2-message-error' : undefined}
-          />
-          {errors.message && (
-            <p
-              id="v2-message-error"
-              role="alert"
-              className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] text-rose-400"
-            >
-              <FiAlertCircle size={12} aria-hidden="true" />
-              <span>{errors.message}</span>
-            </p>
-          )}
         </div>
 
-        {/* Submit Row */}
-        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Row 04: Message */}
+        <div className={`v2-editorial-field ${errors.message ? 'v2-editorial-field--error' : ''}`}>
+          <div className="flex items-start gap-4 sm:gap-6">
+            <span
+              className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
+              aria-hidden="true"
+            >
+              04<span className="text-[var(--v2-accent)]">.</span>
+            </span>
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <label
+                  htmlFor="v2-contact-message"
+                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                >
+                  {isEn ? 'Tell me about your project or role' : 'Ceritakan detail proyek atau peran'}
+                </label>
+                {formData.message.length > 4000 && (
+                  <span className="text-[12px] tabular-nums text-[var(--v2-text-dim)]">
+                    {formData.message.length}/{CONTACT_LIMITS.MESSAGE_MAX}
+                  </span>
+                )}
+              </div>
+
+              <textarea
+                id="v2-contact-message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                rows={3}
+                placeholder={
+                  isEn
+                    ? 'Scope, timeline, goals, or team context... *'
+                    : 'Ruang lingkup, timeline, tujuan, atau konteks tim... *'
+                }
+                disabled={isSubmitting}
+                maxLength={CONTACT_LIMITS.MESSAGE_MAX}
+                className="v2-editorial-input resize-y min-h-[88px]"
+                aria-invalid={errors.message ? 'true' : 'false'}
+                aria-describedby={errors.message ? 'v2-message-error' : undefined}
+              />
+              {errors.message && (
+                <p
+                  id="v2-message-error"
+                  role="alert"
+                  className="pt-1 text-[13px] font-medium tracking-[-0.01em] text-rose-400"
+                >
+                  {errors.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Row */}
+        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="v2-pill-btn v2-pill-btn--accent !h-[54px] !px-8 !text-[14px] w-full sm:w-auto justify-between sm:justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="v2-pill-btn v2-pill-btn--accent !h-[60px] !px-8 !text-[15px] w-full sm:w-auto sm:min-w-[240px] justify-between disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
-                <svg
-                  className="animate-spin h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                <span>{isEn ? 'SENDING...' : 'MENGIRIM...'}</span>
+                <span
+                  className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin"
                   aria-hidden="true"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                <span>{t('contact.submittingBtn')}</span>
+                />
               </>
             ) : (
               <>
                 <RolloverLabel text={isEn ? 'SEND MESSAGE' : 'KIRIM PESAN'} />
-                <FiSend size={14} aria-hidden="true" />
+                <FiArrowUpRight size={20} aria-hidden="true" />
               </>
             )}
           </button>
 
-          <p className="font-mono text-[11px] text-[var(--v2-text-dim)]">
-            {isEn ? 'Direct delivery · Reply < 24h' : 'Kirim langsung · Respon < 24 jam'}
+          <p className="text-[14px] tracking-[-0.02em] text-[var(--v2-text-dim)]">
+            {isEn ? 'Usually responds within 24 hours.' : 'Biasanya membalas dalam 24 jam.'}
           </p>
         </div>
       </form>
@@ -413,8 +473,8 @@ function ContactFormV2({ isEn: isEnProp }) {
   );
 }
 
-ContactFormV2.propTypes = {
+ContactFormSection.propTypes = {
   isEn: PropTypes.bool,
 };
 
-export default ContactFormV2;
+export default ContactFormSection;
