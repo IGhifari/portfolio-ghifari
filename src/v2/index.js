@@ -31,3 +31,6 @@ export { default as ThemeControls, V2SeasonHeaderBadge } from './theme/ThemeCont
 export { useV2Lenis } from './hooks/useV2Lenis';
 export { useJakartaClock } from './hooks/useJakartaClock';
 export { useClipboardCopy } from './hooks/useClipboardCopy';
+
+export { default as TechStackSection } from './sections/TechStackSection';
+export { default as CertificatesSection } from './sections/CertificatesSection';

@@ -40,7 +40,9 @@ import '../styles/v2.css';
 const SeasonalEffects = lazy(() => import('../../components/SeasonalEffects'));
 const DeveloperTerminal = lazy(() => import('../../components/DeveloperTerminal'));
 const V2ChatAssistant = lazy(() => import('../components/layout/V2ChatAssistant'));
+const TechStackSection = lazy(() => import('../sections/TechStackSection'));
 const GithubActivityV2 = lazy(() => import('../sections/GithubActivitySection'));
+const CertificatesSection = lazy(() => import('../sections/CertificatesSection'));
 const ContactFormV2 = lazy(() => import('../sections/ContactFormSection'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -1373,6 +1375,24 @@ export default function PortfolioV2() {
         </section>
 
         {/* ------------------------------------------------------------------
+            6B. TECH STACK (7-Domain Architectural Index + Ecosystem Marquee)
+            ------------------------------------------------------------------ */}
+        <Suspense
+          fallback={
+            <section
+              id="v2-stack"
+              className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
+            >
+              <div className="v2-container border-t border-b border-[var(--v2-border-strong)] py-16">
+                <div className="h-[240px] rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
+              </div>
+            </section>
+          }
+        >
+          <TechStackSection isEn={isEn} />
+        </Suspense>
+
+        {/* ------------------------------------------------------------------
             7. HOW I WORK / PROCESS (Exact Nakula Sticky Horizontal Pan Track!)
             ------------------------------------------------------------------ */}
         <ProcessSection
@@ -1398,6 +1418,24 @@ export default function PortfolioV2() {
           }
         >
           <GithubActivityV2 isEn={isEn} />
+        </Suspense>
+
+        {/* ------------------------------------------------------------------
+            7C. CERTIFICATES & CREDENTIALS (Interactive Split-Stage Ledger + Lightbox)
+            ------------------------------------------------------------------ */}
+        <Suspense
+          fallback={
+            <section
+              id="v2-certificates"
+              className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
+            >
+              <div className="v2-container border-t border-b border-[var(--v2-border-strong)] py-16">
+                <div className="h-[260px] rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
+              </div>
+            </section>
+          }
+        >
+          <CertificatesSection isEn={isEn} />
         </Suspense>
 
         {/* ------------------------------------------------------------------
