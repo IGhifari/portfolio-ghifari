@@ -82,7 +82,7 @@ export default function CountUpMetricCell({
           <p className="text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] leading-[1.25] text-[var(--v2-text)]">
             {label}
           </p>
-          <p className="font-mono text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
+          <p className="text-[13px] tracking-[-0.015em] text-[var(--v2-text-dim)]">
             {sub}
           </p>
         </div>

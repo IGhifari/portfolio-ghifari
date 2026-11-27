@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
-import {
-  FiAlertCircle,
-  FiArrowUpRight,
-  FiCalendar,
-  FiRefreshCw,
-} from 'react-icons/fi';
+import { FiAlertCircle, FiArrowUpRight, FiRefreshCw } from 'react-icons/fi';
 
 import {
   GITHUB_PROFILE_URL,
@@ -69,7 +64,6 @@ function GithubMetricsStrip({ cards, shouldReduceMotion }) {
           index={idx}
           isTriggered={isInView}
           shouldReduceMotion={shouldReduceMotion}
-          className="!min-h-[200px] sm:!min-h-[232px]"
         />
       ))}
     </div>
@@ -91,11 +85,11 @@ GithubMetricsStrip.propTypes = {
 };
 
 /**
- * Portfolio V2 GitHub Activity Section
- * Reuses the live GitHub data/cache pipeline (`githubService.js`) with Nakula-inspired
- * editorial typography, hairline metric ticks, and season-adaptive heatmap cells.
+ * Portfolio V2 Architectural GitHub Activity Section
+ * Open-canvas Nakula editorial layout: zero Bento cards, hairline 12-column ledger,
+ * live interactive big-numeral inspection readout on the left, frameless 53-week matrix on the right.
  */
-function GithubActivityV2({ isEn: isEnProp }) {
+function GithubActivitySection({ isEn: isEnProp }) {
   const { language, t } = useLanguage();
   const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
   const shouldReduceMotion = useReducedMotion();
@@ -104,7 +98,6 @@ function GithubActivityV2({ isEn: isEnProp }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const [fromCache, setFromCache] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [focusedDayIndex, setFocusedDayIndex] = useState(0);
   const gridCellsRef = useRef([]);
@@ -121,7 +114,6 @@ function GithubActivityV2({ isEn: isEnProp }) {
 
       const result = await fetchGithubData({ force });
       setData(result.data);
-      setFromCache(result.fromCache);
     } catch (err) {
       setError({
         message: err.message,
@@ -143,7 +135,6 @@ function GithubActivityV2({ isEn: isEnProp }) {
   const days = useMemo(() => contributions?.days || [], [contributions?.days]);
 
   const stats = useMemo(() => calculateContributionStats(days), [days]);
-
   const numWeeks = useMemo(() => Math.max(1, Math.ceil(days.length / 7)), [days.length]);
 
   const monthHeaders = useMemo(() => {
@@ -245,8 +236,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
         suffix: '+',
         label: isEn ? 'Annual Contributions' : 'Kontribusi Tahunan',
         sub: isEn
-          ? `${stats.activeDays} active coding days`
-          : `${stats.activeDays} hari aktif berkode`,
+          ? `${stats.activeDays} active days`
+          : `${stats.activeDays} hari aktif`,
       },
       {
         id: 'streak',
@@ -254,8 +245,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
         suffix: isEn ? 'd' : 'h',
         label: isEn ? 'Current Streak' : 'Streak Saat Ini',
         sub: isEn
-          ? `Longest streak: ${stats.longestStreak} days`
-          : `Streak terpanjang: ${stats.longestStreak} hari`,
+          ? `Best: ${stats.longestStreak} days`
+          : `Terpanjang: ${stats.longestStreak} hari`,
       },
       {
         id: 'repos',
@@ -290,11 +281,15 @@ function GithubActivityV2({ isEn: isEnProp }) {
   const fadeInProps = shouldReduceMotion
     ? {}
     : {
-        initial: { opacity: 0, y: 24 },
+        initial: { opacity: 0, y: 28 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, amount: 0.15 },
-        transition: { duration: 0.65, ease: NAKULA_EASE },
+        transition: { duration: 0.7, ease: NAKULA_EASE },
       };
+
+  const inspectedDateLabel = hoveredDay
+    ? formatRepoDate(`${hoveredDay.date}T00:00:00`, language)
+    : '';
 
   return (
     <section
@@ -302,9 +297,9 @@ function GithubActivityV2({ isEn: isEnProp }) {
       aria-labelledby="v2-github-heading"
       className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
     >
-      <div className="v2-container space-y-14 sm:space-y-20">
+      <div className="v2-container space-y-16 sm:space-y-24">
         {/* ------------------------------------------------------------------
-            Editorial Header (Matches V2 Metrics / Insights Composition)
+            1. Nakula Editorial Header (1:1 Match with "NUMBERS DON'T LIE")
             ------------------------------------------------------------------ */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="relative">
@@ -315,103 +310,52 @@ function GithubActivityV2({ isEn: isEnProp }) {
               <MaskedDisplayHeading
                 as="h2"
                 lines={isEn ? ['GITHUB', 'ACTIVITY'] : ['AKTIVITAS', 'GITHUB']}
-                className="v2-section-heading md:[&>span:first-child]:pl-32 lg:[&>span:first-child]:pl-40"
+                lineClassNames={['md:pl-36 lg:pl-44', '']}
+                className="v2-section-heading"
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
               />
             </div>
           </div>
 
-          <div className="flex flex-col items-start lg:items-end gap-5 max-w-[440px]">
-            <div className="flex items-center gap-2.5 text-[12px] font-mono uppercase tracking-[0.08em] text-[var(--v2-text-muted)]">
-              <span
-                className="inline-block h-2 w-2 rounded-full bg-[var(--v2-accent)] motion-safe:animate-pulse"
-                aria-hidden="true"
-              />
-              <span>
-                {loading
-                  ? isEn
-                    ? 'SYNCING TELEMETRY...'
-                    : 'MENYINKRONKAN DATA...'
-                  : fromCache
-                    ? isEn
-                      ? `CACHED · @${username}`
-                      : `TERSINGGAH · @${username}`
-                    : isEn
-                      ? `LIVE API · @${username}`
-                      : `API LANGSUNG · @${username}`}
-              </span>
-            </div>
-
-            <p className="text-[17px] sm:text-[19px] font-medium tracking-[-0.03em] leading-[1.28] text-[var(--v2-text-muted)] lg:text-right">
-              {isEn
-                ? 'Real-time open-source cadence, commit consistency, and 53-week contribution telemetry.'
-                : 'Ritme open-source real-time, konsistensi komit, dan telemetri kontribusi 53 minggu terakhir.'}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => loadData({ force: true })}
-                disabled={loading || refreshing}
-                aria-label={t('github.refresh')}
-                className="v2-pill-btn !py-3 !px-5 !text-[13px] disabled:opacity-50"
-              >
-                <FiRefreshCw
-                  size={14}
-                  className={refreshing ? 'animate-spin text-[var(--v2-accent)]' : 'text-[var(--v2-accent)]'}
-                  aria-hidden="true"
-                />
-                <span>{refreshing ? (isEn ? 'SYNCING' : 'MEMUAT') : isEn ? 'REFRESH' : 'PERBARUI'}</span>
-              </button>
-
-              <a
-                href={GITHUB_PROFILE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="v2-pill-btn v2-pill-btn--accent !py-3 !px-6 !text-[13px]"
-              >
-                <RolloverLabel text={isEn ? 'VIEW GITHUB' : 'LIHAT GITHUB'} />
-                <FiArrowUpRight size={15} aria-hidden="true" />
-              </a>
-            </div>
-          </div>
+          <p className="max-w-[360px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[var(--v2-text-muted)] lg:pb-2">
+            {isEn
+              ? 'Consistent engineering output, public TypeScript tooling, and 53 weeks of verified commit history.'
+              : 'Konsistensi rekayasa perangkat lunak, paket TypeScript publik, dan riwayat komit 53 minggu terakhir.'}
+          </p>
         </div>
 
         {/* ------------------------------------------------------------------
-            Loading State
+            Loading State (Open Architectural Hairlines — Zero Boxed Cards)
             ------------------------------------------------------------------ */}
         {loading && !data && (
-          <div className="space-y-10" aria-busy="true" aria-live="polite">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
+          <div className="space-y-16" aria-busy="true" aria-live="polite">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-6">
               {[0, 1, 2, 3].map((item) => (
-                <div key={item} className="v2-metric-cell !min-h-[184px]">
+                <div key={item} className="v2-metric-cell">
                   <div className="v2-metric-ticks" aria-hidden="true" />
-                  <div className="h-14 w-28 rounded bg-[var(--v2-surface-elevated)] motion-safe:animate-pulse" />
-                  <div className="mt-8 space-y-2">
-                    <div className="h-4 w-32 rounded bg-[var(--v2-surface-elevated)] motion-safe:animate-pulse" />
-                    <div className="h-3 w-24 rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
-                  </div>
+                  <div className="h-16 w-28 rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
+                  <div className="mt-12 h-4 w-32 rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
                 </div>
               ))}
             </div>
 
-            <div className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] p-6 sm:p-8">
-              <div className="h-[150px] w-full rounded-[8px] bg-[var(--v2-surface)] motion-safe:animate-pulse" />
+            <div className="border-t border-b border-[var(--v2-border-strong)] py-12">
+              <div className="h-[140px] w-full rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
             </div>
           </div>
         )}
 
         {/* ------------------------------------------------------------------
-            Error State (only when no data is available)
+            Error State (Minimal Open Hairline Strip)
             ------------------------------------------------------------------ */}
         {error && !data && !loading && (
-          <div className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] p-8 sm:p-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="border-t border-b border-[var(--v2-border-strong)] py-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.06em] text-[var(--v2-accent)]">
-                <FiAlertCircle size={15} aria-hidden="true" />
+              <div className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[-0.02em] text-[var(--v2-accent)]">
+                <FiAlertCircle size={16} aria-hidden="true" />
                 <span>{error.isRateLimit ? t('github.rateLimitTitle') : t('github.errorTitle')}</span>
               </div>
-              <p className="text-[16px] leading-[1.45] text-[var(--v2-text-muted)]">
+              <p className="text-[17px] leading-[1.4] tracking-[-0.02em] text-[var(--v2-text-muted)]">
                 {error.isRateLimit ? t('github.rateLimitDesc') : t('github.errorDesc')}
               </p>
             </div>
@@ -420,7 +364,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
               <button
                 type="button"
                 onClick={() => loadData({ force: true })}
-                className="v2-pill-btn !py-3 !px-6 !text-[13px]"
+                className="v2-pill-btn !py-3.5 !px-6 !text-[13px]"
               >
                 <FiRefreshCw size={14} className="text-[var(--v2-accent)]" aria-hidden="true" />
                 <span>{t('github.retry')}</span>
@@ -429,7 +373,7 @@ function GithubActivityV2({ isEn: isEnProp }) {
                 href={GITHUB_PROFILE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="v2-pill-btn v2-pill-btn--accent !py-3 !px-6 !text-[13px]"
+                className="v2-pill-btn v2-pill-btn--accent !py-3.5 !px-6 !text-[13px]"
               >
                 <RolloverLabel text={isEn ? 'OPEN GITHUB' : 'BUKA GITHUB'} />
                 <FiArrowUpRight size={15} aria-hidden="true" />
@@ -439,188 +383,208 @@ function GithubActivityV2({ isEn: isEnProp }) {
         )}
 
         {/* ------------------------------------------------------------------
-            Live Content: 4-Column Hairline Telemetry + Editorial Heatmap
+            Live Content: 4-Column Metric Strip + Open Architectural Ledger
             ------------------------------------------------------------------ */}
         {(!loading || data) && (
-          <div className="space-y-12 sm:space-y-16">
-            {/* 1. 4-Column Metric Strip (Exact "NUMBERS DON'T LIE" Staggered Rise + Count-Up) */}
+          <div className="space-y-16 sm:space-y-24">
+            {/* 2. 4-Column Metric Strip */}
             <GithubMetricsStrip
               cards={metricCards}
               shouldReduceMotion={Boolean(shouldReduceMotion)}
             />
 
-            {/* 2. Contribution Heatmap Surface */}
+            {/* 3. Open-Canvas Architectural Contribution Ledger (Zero Bento Box!) */}
             <motion.div
               {...fadeInProps}
-              className="mx-auto w-full max-w-[1000px] rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg-elevated)] overflow-hidden"
+              className="border-t border-b border-[var(--v2-border-strong)] py-10 sm:py-14"
             >
-              {/* Top Identity & Cadence Bar */}
-              <div className="px-4 sm:px-6 py-3.5 border-b border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <img
-                    src={avatarSrc}
-                    alt={`${profile?.name || siteConfig.author.name} GitHub avatar`}
-                    width={32}
-                    height={32}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-8 w-8 rounded-full object-cover border border-[var(--v2-border-strong)] shrink-0 bg-[var(--v2-surface)]"
-                  />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={profile?.htmlUrl || GITHUB_PROFILE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[13px] sm:text-[14px] font-semibold tracking-[-0.02em] text-[var(--v2-text)] hover:text-[var(--v2-accent)] transition-colors truncate"
-                      >
-                        {profile?.name || siteConfig.author.name}
-                      </a>
-                      <span className="font-mono text-[11px] text-[var(--v2-text-dim)] shrink-0">
-                        @{username}
-                      </span>
-                    </div>
-                    <p className="text-[12px] text-[var(--v2-text-muted)] truncate max-w-[460px]">
-                      {profile?.bio ||
-                        (isEn
-                          ? 'Frontend Engineer · React, Next.js & Scalable UI Systems'
-                          : 'Frontend Engineer · React, Next.js & Sistem UI Skalabel')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.04em] text-[var(--v2-text)] shrink-0">
-                  <span
-                    className="h-1.5 w-1.5 rounded-full bg-[var(--v2-accent)]"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    {totalContributions.toLocaleString(isEn ? 'en-US' : 'id-ID')}{' '}
-                    {isEn ? 'CONTRIBUTIONS / 12M' : 'KONTRIBUSI / 12B'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Responsive 53-Week Matrix */}
-              <div className="px-4 sm:px-6 py-5 sm:py-6">
-                <div className="overflow-x-auto pb-1.5 v2-gh-scroll">
-                  <div className="min-w-[680px] w-full">
-                    {/* Month Headers Aligned to Week Columns */}
-                    <div className="flex items-center gap-2 mb-2 select-none">
-                      <div className="w-6 shrink-0" aria-hidden="true" />
-                      <div
-                        className="grid flex-1 gap-[3px] font-mono text-[10px] uppercase tracking-[0.04em] text-[var(--v2-text-dim)]"
-                        style={{
-                          gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
-                        }}
-                      >
-                        {monthHeaders.map((month, idx) => (
-                          <span
-                            key={`${month.label}-${idx}`}
-                            className="whitespace-nowrap overflow-visible"
-                            style={{ gridColumnStart: month.colIdx + 1 }}
-                          >
-                            {month.label}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+                {/* Left Column (4 cols): Live Inspection Readout / Studio Profile + Actions */}
+                <div className="lg:col-span-4 lg:border-r lg:border-[var(--v2-border-strong)] lg:pr-10 flex flex-col justify-between gap-8">
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="min-h-[108px] flex flex-col justify-between"
+                  >
+                    {hoveredDay ? (
+                      <div className="space-y-2">
+                        <p className="text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-accent)] font-medium">
+                          ({inspectedDateLabel})
+                        </p>
+                        <div className="flex items-baseline gap-2 tabular-nums">
+                          <span className="text-[44px] sm:text-[52px] font-semibold tracking-[-0.06em] leading-none text-[var(--v2-text-bright)]">
+                            {hoveredDay.count}
                           </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Weekday Labels + 7-Row Grid */}
-                    <div className="flex items-stretch gap-2">
-                      <div className="grid grid-rows-7 gap-[3px] w-6 shrink-0 font-mono text-[9px] text-[var(--v2-text-dim)] select-none">
-                        {(DAY_LABELS[language] || DAY_LABELS.en).map((dayLabel, idx) => (
-                          <span key={idx} className="flex items-center leading-none">
-                            {dayLabel}
+                          <span className="text-[18px] font-medium tracking-[-0.03em] text-[var(--v2-text-muted)]">
+                            {hoveredDay.count === 1
+                              ? isEn
+                                ? 'contribution'
+                                : 'kontribusi'
+                              : isEn
+                                ? 'contributions'
+                                : 'kontribusi'}
                           </span>
-                        ))}
+                        </div>
                       </div>
-
-                      <div
-                        className="grid flex-1 grid-rows-7 grid-flow-col gap-[3px]"
-                        style={{
-                          gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
-                        }}
-                        role="grid"
-                        aria-label={
-                          isEn
-                            ? `GitHub contribution heatmap for ${username} (${totalContributions} contributions). Use arrow keys to navigate days.`
-                            : `Kalender kontribusi GitHub untuk ${username} (${totalContributions} kontribusi). Gunakan tombol panah untuk berpindah hari.`
-                        }
-                      >
-                        {days.map((day, idx) => {
-                          const tooltipText = formatDayTooltip(day);
-                          const isFocused = idx === focusedDayIndex;
-                          return (
-                            <div
-                              key={day.date || idx}
-                              ref={(el) => {
-                                gridCellsRef.current[idx] = el;
-                              }}
-                              role="gridcell"
-                              tabIndex={isFocused ? 0 : -1}
-                              title={tooltipText}
-                              aria-label={tooltipText}
-                              aria-selected={isFocused}
-                              onMouseEnter={() => setHoveredDay(day)}
-                              onMouseLeave={() => setHoveredDay(null)}
-                              onFocus={() => {
-                                setFocusedDayIndex(idx);
-                                setHoveredDay(day);
-                              }}
-                              onBlur={() => setHoveredDay(null)}
-                              onKeyDown={(e) => handleCellKeyDown(e, idx)}
-                              className={`v2-gh-cell aspect-square w-full rounded-[2px] cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] focus-visible:z-10 ${getCellClass(
-                                day.level
-                              )}`}
-                            />
-                          );
-                        })}
+                    ) : (
+                      <div className="space-y-4">
+                        <p className="text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
+                          ({isEn ? 'DEVELOPER PROFILE' : 'PROFIL PENGEMBANG'})
+                        </p>
+                        <div className="flex items-center gap-3.5">
+                          <img
+                            src={avatarSrc}
+                            alt={`${profile?.name || siteConfig.author.name} GitHub avatar`}
+                            width={44}
+                            height={44}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-11 w-11 rounded-full object-cover border border-[var(--v2-border-strong)] shrink-0 bg-[var(--v2-surface)]"
+                          />
+                          <div className="min-w-0">
+                            <p className="text-[18px] font-semibold tracking-[-0.035em] leading-[1.15] text-[var(--v2-text)] truncate">
+                              {profile?.name || siteConfig.author.name}
+                            </p>
+                            <p className="text-[14px] tracking-[-0.02em] text-[var(--v2-text-dim)] truncate">
+                              @{username}
+                              {profile?.bio ? ` — ${profile.bio}` : ''}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
-                </div>
-              </div>
 
-              {/* Bottom Telemetry Readout + Seasonal Scale Legend */}
-              <div className="px-4 sm:px-6 py-3.5 border-t border-[var(--v2-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div
-                  role="status"
-                  aria-live="polite"
-                  className="min-h-[1.5rem] flex items-center font-mono text-[11px]"
-                >
-                  {hoveredDay ? (
-                    <span className="inline-flex items-center gap-2 text-[var(--v2-text-bright)] font-medium">
-                      <span
-                        className="h-2 w-2 rounded-full bg-[var(--v2-accent)] shrink-0"
+                  {/* Action Strip: Nakula Rollover Pill + Subtle Circular Sync */}
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={profile?.htmlUrl || GITHUB_PROFILE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="v2-pill-btn !h-[48px] !px-6 !text-[13px]"
+                    >
+                      <RolloverLabel text={isEn ? 'GITHUB PROFILE' : 'PROFIL GITHUB'} />
+                      <FiArrowUpRight size={15} className="text-[var(--v2-accent)]" aria-hidden="true" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => loadData({ force: true })}
+                      disabled={loading || refreshing}
+                      aria-label={t('github.refresh')}
+                      title={t('github.refresh')}
+                      className="inline-flex h-[48px] w-[48px] items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] text-[var(--v2-text-muted)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
+                    >
+                      <FiRefreshCw
+                        size={15}
+                        className={refreshing ? 'animate-spin text-[var(--v2-accent)]' : ''}
                         aria-hidden="true"
                       />
-                      <span>{formatDayTooltip(hoveredDay)}</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-2 text-[var(--v2-text-muted)]">
-                      <FiCalendar size={12} className="text-[var(--v2-text-dim)] shrink-0" aria-hidden="true" />
-                      <span>
-                        {isEn
-                          ? 'Hover squares or use arrow keys to inspect daily commits.'
-                          : 'Arahkan kursor atau tombol panah untuk inspeksi komit harian.'}
-                      </span>
-                    </span>
-                  )}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto font-mono text-[10px] uppercase tracking-[0.06em] text-[var(--v2-text-dim)]">
-                  <span>{t('github.legendLess')}</span>
-                  <div className="flex items-center gap-1" aria-hidden="true">
-                    {GITHUB_LEVEL_CLASSES.map((cls, levelIdx) => (
-                      <span
-                        key={cls}
-                        className={`block h-2.5 w-2.5 rounded-[2px] ${cls}`}
-                        title={`Level ${levelIdx}`}
-                      />
-                    ))}
+                {/* Right Column (8 cols): Frameless 53-Week Matrix Directly on Canvas */}
+                <div className="lg:col-span-8 flex flex-col justify-between gap-6 min-w-0">
+                  {/* Minimal Editorial Meta Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <p className="text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
+                      ({isEn ? '53-WEEK CADENCE' : 'RITME 53 MINGGU'})
+                    </p>
+
+                    <div className="flex items-center gap-2 text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
+                      <span>{t('github.legendLess')}</span>
+                      <div className="flex items-center gap-1" aria-hidden="true">
+                        {GITHUB_LEVEL_CLASSES.map((cls, levelIdx) => (
+                          <span
+                            key={cls}
+                            className={`block h-2.5 w-2.5 rounded-[2px] ${cls}`}
+                            title={`Level ${levelIdx}`}
+                          />
+                        ))}
+                      </div>
+                      <span>{t('github.legendMore')}</span>
+                    </div>
                   </div>
-                  <span>{t('github.legendMore')}</span>
+
+                  {/* Compact Frameless Heatmap Grid */}
+                  <div className="overflow-x-auto pb-1 v2-gh-scroll">
+                    <div className="min-w-[640px] max-w-[840px] w-full">
+                      {/* Month Headers */}
+                      <div className="flex items-center gap-2 mb-2 select-none">
+                        <div className="w-6 shrink-0" aria-hidden="true" />
+                        <div
+                          className="grid flex-1 gap-[3px] text-[11px] font-medium uppercase tracking-[-0.01em] text-[var(--v2-text-dim)]"
+                          style={{
+                            gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
+                          }}
+                        >
+                          {monthHeaders.map((month, idx) => (
+                            <span
+                              key={`${month.label}-${idx}`}
+                              className="whitespace-nowrap overflow-visible"
+                              style={{ gridColumnStart: month.colIdx + 1 }}
+                            >
+                              {month.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Weekday Labels + 7-Row Grid */}
+                      <div className="flex items-stretch gap-2">
+                        <div className="grid grid-rows-7 gap-[3px] w-6 shrink-0 text-[10px] font-medium text-[var(--v2-text-dim)] select-none">
+                          {(DAY_LABELS[language] || DAY_LABELS.en).map((dayLabel, idx) => (
+                            <span key={idx} className="flex items-center leading-none">
+                              {dayLabel}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div
+                          className="grid flex-1 grid-rows-7 grid-flow-col gap-[3px]"
+                          style={{
+                            gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
+                          }}
+                          role="grid"
+                          aria-label={
+                            isEn
+                              ? `GitHub contribution heatmap for ${username} (${totalContributions} contributions). Use arrow keys to navigate days.`
+                              : `Kalender kontribusi GitHub untuk ${username} (${totalContributions} kontribusi). Gunakan tombol panah untuk berpindah hari.`
+                          }
+                        >
+                          {days.map((day, idx) => {
+                            const tooltipText = formatDayTooltip(day);
+                            const isFocused = idx === focusedDayIndex;
+                            return (
+                              <div
+                                key={day.date || idx}
+                                ref={(el) => {
+                                  gridCellsRef.current[idx] = el;
+                                }}
+                                role="gridcell"
+                                tabIndex={isFocused ? 0 : -1}
+                                title={tooltipText}
+                                aria-label={tooltipText}
+                                aria-selected={isFocused}
+                                onMouseEnter={() => setHoveredDay(day)}
+                                onMouseLeave={() => setHoveredDay(null)}
+                                onFocus={() => {
+                                  setFocusedDayIndex(idx);
+                                  setHoveredDay(day);
+                                }}
+                                onBlur={() => setHoveredDay(null)}
+                                onKeyDown={(e) => handleCellKeyDown(e, idx)}
+                                className={`v2-gh-cell aspect-square w-full rounded-[2px] cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] focus-visible:z-10 ${getCellClass(
+                                  day.level
+                                )}`}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -631,8 +595,8 @@ function GithubActivityV2({ isEn: isEnProp }) {
   );
 }
 
-GithubActivityV2.propTypes = {
+GithubActivitySection.propTypes = {
   isEn: PropTypes.bool,
 };
 
-export default GithubActivityV2;
+export default GithubActivitySection;

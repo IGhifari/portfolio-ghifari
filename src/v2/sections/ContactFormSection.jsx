@@ -20,7 +20,7 @@ const SUBJECT_PRESETS = {
  * Portfolio V2 Architectural Inquiry Form
  * Open-canvas Nakula editorial layout: numbered `01.`–`04.` hairline rows,
  * frameless large-scale typography, animated left-to-right accent focus rule,
- * studio topic pills, and `SEND MESSAGE ↗` rollover CTA.
+ * bordered V2 topic pills, and `SEND MESSAGE ↗` rollover CTA.
  */
 function ContactFormSection({ isEn: isEnProp }) {
   const { t, language } = useLanguage();
@@ -72,7 +72,6 @@ function ContactFormSection({ isEn: isEnProp }) {
     async (e) => {
       e.preventDefault();
 
-      // Honeypot check: silently accept automated bot fills without sending
       if (formData.bot_field && formData.bot_field.trim().length > 0) {
         setStatusNotice({
           type: 'success',
@@ -82,7 +81,6 @@ function ContactFormSection({ isEn: isEnProp }) {
         return;
       }
 
-      // 60-second client-side cooldown
       const now = Date.now();
       if (now - lastSubmitTimeRef.current < COOLDOWN_MS) {
         setStatusNotice({
@@ -167,12 +165,11 @@ function ContactFormSection({ isEn: isEnProp }) {
 
   return (
     <div className="w-full">
-      {/* Minimal Editorial Status Strip */}
       {statusNotice && (
         <div
           role={statusNotice.type === 'success' ? 'status' : 'alert'}
           aria-live="polite"
-          className={`mb-10 border-l-2 pl-5 py-2 space-y-1 ${
+          className={`mb-8 border-l-2 pl-5 py-2 space-y-1 ${
             statusNotice.type === 'success'
               ? 'border-[#47c554]'
               : statusNotice.type === 'warning'
@@ -214,7 +211,11 @@ function ContactFormSection({ isEn: isEnProp }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-10 sm:space-y-12">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="border-t border-[var(--v2-border-strong)]"
+      >
         {/* Honeypot anti-bot field */}
         <div className="hidden" aria-hidden="true">
           <label htmlFor="v2-bot-field">Leave this empty</label>
@@ -229,20 +230,17 @@ function ContactFormSection({ isEn: isEnProp }) {
           />
         </div>
 
-        {/* Row 01 & 02: Name + Email (2-column architectural grid on desktop) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-x-12 lg:gap-x-16">
-          <div className={`v2-editorial-field ${errors.name ? 'v2-editorial-field--error' : ''}`}>
+        {/* Row 01 & 02: 2-Column Architectural Hairline Split on Desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x divide-[var(--v2-border-strong)]">
+          <div className={`v2-inquiry-row md:pr-8 ${errors.name ? 'v2-inquiry-row--error' : ''}`}>
             <div className="flex items-start gap-4 sm:gap-6">
-              <span
-                className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
-                aria-hidden="true"
-              >
+              <span className="v2-inquiry-num pt-1 shrink-0" aria-hidden="true">
                 01<span className="text-[var(--v2-accent)]">.</span>
               </span>
               <div className="flex-1 min-w-0 space-y-2">
                 <label
                   htmlFor="v2-contact-name"
-                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                  className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
                   {isEn ? "What's your name?" : 'Siapa nama Anda?'}
                 </label>
@@ -255,7 +253,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   placeholder={isEn ? 'John Doe *' : 'Nama lengkap Anda *'}
                   disabled={isSubmitting}
                   maxLength={CONTACT_LIMITS.NAME_MAX}
-                  className="v2-editorial-input"
+                  className="v2-inquiry-input w-full bg-transparent border-0 p-0 focus:outline-none"
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'v2-name-error' : undefined}
                 />
@@ -272,18 +270,15 @@ function ContactFormSection({ isEn: isEnProp }) {
             </div>
           </div>
 
-          <div className={`v2-editorial-field ${errors.email ? 'v2-editorial-field--error' : ''}`}>
+          <div className={`v2-inquiry-row md:pl-8 ${errors.email ? 'v2-inquiry-row--error' : ''}`}>
             <div className="flex items-start gap-4 sm:gap-6">
-              <span
-                className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
-                aria-hidden="true"
-              >
+              <span className="v2-inquiry-num pt-1 shrink-0" aria-hidden="true">
                 02<span className="text-[var(--v2-accent)]">.</span>
               </span>
               <div className="flex-1 min-w-0 space-y-2">
                 <label
                   htmlFor="v2-contact-email"
-                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                  className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
                   {isEn ? "What's your email?" : 'Apa alamat email Anda?'}
                 </label>
@@ -296,7 +291,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   placeholder="name@company.com *"
                   disabled={isSubmitting}
                   maxLength={CONTACT_LIMITS.EMAIL_MAX}
-                  className="v2-editorial-input"
+                  className="v2-inquiry-input w-full bg-transparent border-0 p-0 focus:outline-none"
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'v2-email-error' : undefined}
                 />
@@ -314,20 +309,17 @@ function ContactFormSection({ isEn: isEnProp }) {
           </div>
         </div>
 
-        {/* Row 03: Topic / Subject (with V2 Studio Topic Pills) */}
-        <div className={`v2-editorial-field ${errors.subject ? 'v2-editorial-field--error' : ''}`}>
+        {/* Row 03: Topic / Subject + Bordered Studio Topic Pills */}
+        <div className={`v2-inquiry-row ${errors.subject ? 'v2-inquiry-row--error' : ''}`}>
           <div className="flex items-start gap-4 sm:gap-6">
-            <span
-              className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
-              aria-hidden="true"
-            >
+            <span className="v2-inquiry-num pt-1 shrink-0" aria-hidden="true">
               03<span className="text-[var(--v2-accent)]">.</span>
             </span>
             <div className="flex-1 min-w-0 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <label
                   htmlFor="v2-contact-subject"
-                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                  className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
                   {isEn ? 'What are we discussing?' : 'Topik apa yang ingin dibahas?'}
                 </label>
@@ -346,8 +338,10 @@ function ContactFormSection({ isEn: isEnProp }) {
                         onClick={() => handlePresetClick(preset)}
                         disabled={isSubmitting}
                         aria-pressed={isSelected}
-                        className={`v2-topic-pill focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] ${
-                          isSelected ? 'v2-topic-pill--active' : ''
+                        className={`rounded-full border px-3.5 py-1.5 text-[12px] font-medium tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] ${
+                          isSelected
+                            ? 'border-[var(--v2-accent)] bg-[var(--v2-accent)] text-[var(--v2-accent-ink)]'
+                            : 'border-[var(--v2-border-strong)] bg-transparent text-[var(--v2-text-muted)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)]'
                         }`}
                       >
                         {preset}
@@ -370,7 +364,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                 }
                 disabled={isSubmitting}
                 maxLength={CONTACT_LIMITS.SUBJECT_MAX}
-                className="v2-editorial-input"
+                className="v2-inquiry-input w-full bg-transparent border-0 p-0 focus:outline-none"
                 aria-invalid={errors.subject ? 'true' : 'false'}
                 aria-describedby={errors.subject ? 'v2-subject-error' : undefined}
               />
@@ -388,24 +382,21 @@ function ContactFormSection({ isEn: isEnProp }) {
         </div>
 
         {/* Row 04: Message */}
-        <div className={`v2-editorial-field ${errors.message ? 'v2-editorial-field--error' : ''}`}>
+        <div className={`v2-inquiry-row ${errors.message ? 'v2-inquiry-row--error' : ''}`}>
           <div className="flex items-start gap-4 sm:gap-6">
-            <span
-              className="pt-0.5 text-[15px] font-semibold tracking-[-0.04em] text-[var(--v2-text-dim)] tabular-nums shrink-0"
-              aria-hidden="true"
-            >
+            <span className="v2-inquiry-num pt-1 shrink-0" aria-hidden="true">
               04<span className="text-[var(--v2-accent)]">.</span>
             </span>
-            <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex-1 min-w-0 space-y-2.5">
               <div className="flex items-center justify-between gap-2">
                 <label
                   htmlFor="v2-contact-message"
-                  className="block text-[15px] sm:text-[16px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
+                  className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
                   {isEn ? 'Tell me about your project or role' : 'Ceritakan detail proyek atau peran'}
                 </label>
                 {formData.message.length > 4000 && (
-                  <span className="text-[12px] tabular-nums text-[var(--v2-text-dim)]">
+                  <span className="text-[11px] tabular-nums text-[var(--v2-text-dim)]">
                     {formData.message.length}/{CONTACT_LIMITS.MESSAGE_MAX}
                   </span>
                 )}
@@ -424,7 +415,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                 }
                 disabled={isSubmitting}
                 maxLength={CONTACT_LIMITS.MESSAGE_MAX}
-                className="v2-editorial-input resize-y min-h-[88px]"
+                className="v2-inquiry-input w-full bg-transparent border-0 p-0 resize-y min-h-[92px] focus:outline-none"
                 aria-invalid={errors.message ? 'true' : 'false'}
                 aria-describedby={errors.message ? 'v2-message-error' : undefined}
               />
@@ -441,12 +432,12 @@ function ContactFormSection({ isEn: isEnProp }) {
           </div>
         </div>
 
-        {/* Action Row */}
-        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        {/* Editorial Action Row */}
+        <div className="pt-8 sm:pt-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="v2-pill-btn v2-pill-btn--accent !h-[60px] !px-8 !text-[15px] w-full sm:w-auto sm:min-w-[240px] justify-between disabled:opacity-50 disabled:cursor-not-allowed"
+            className="v2-pill-btn v2-pill-btn--accent !h-[60px] !px-8 !text-[15px] w-full sm:w-auto sm:min-w-[235px] justify-between disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

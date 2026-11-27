@@ -1390,8 +1390,8 @@ export default function PortfolioV2() {
               id="v2-github"
               className="relative z-[2] bg-[var(--v2-bg)] py-28 sm:py-[150px] border-t border-[var(--v2-border)]"
             >
-              <div className="v2-container">
-                <div className="h-[320px] rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] motion-safe:animate-pulse" />
+              <div className="v2-container border-t border-b border-[var(--v2-border-strong)] py-16">
+                <div className="h-[180px] rounded bg-[var(--v2-surface)] motion-safe:animate-pulse" />
               </div>
             </section>
           }
