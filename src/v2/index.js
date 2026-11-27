@@ -5,6 +5,7 @@ export { default as WorkDetailPage } from './pages/WorkDetailPage';
 
 export { default as V2SubpageShell, V2WorkGridCard } from './components/layout/V2Chrome';
 export { default as V2MenuDrawer } from './components/layout/V2MenuDrawer';
+export { default as V2ChatAssistant } from './components/layout/V2ChatAssistant';
 
 export { default as RolloverLabel } from './components/ui/RolloverLabel';
 export { default as MaskedDisplayHeading } from './components/ui/MaskedDisplayHeading';

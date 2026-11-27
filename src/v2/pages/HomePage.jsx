@@ -39,6 +39,7 @@ import '../styles/v2.css';
 
 const SeasonalEffects = lazy(() => import('../../components/SeasonalEffects'));
 const DeveloperTerminal = lazy(() => import('../../components/DeveloperTerminal'));
+const V2ChatAssistant = lazy(() => import('../components/layout/V2ChatAssistant'));
 const GithubActivityV2 = lazy(() => import('../sections/GithubActivitySection'));
 const ContactFormV2 = lazy(() => import('../sections/ContactFormSection'));
 
@@ -1872,6 +1873,7 @@ export default function PortfolioV2() {
       </main>
 
       <Suspense fallback={null}>
+        <V2ChatAssistant />
         <DeveloperTerminal />
       </Suspense>
     </div>

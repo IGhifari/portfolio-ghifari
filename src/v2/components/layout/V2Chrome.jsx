@@ -30,6 +30,7 @@ import '../../styles/v2.css';
 
 const SeasonalEffects = lazy(() => import('../../../components/SeasonalEffects'));
 const DeveloperTerminal = lazy(() => import('../../../components/DeveloperTerminal'));
+const V2ChatAssistant = lazy(() => import('./V2ChatAssistant'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
@@ -585,6 +586,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
       </footer>
 
       <Suspense fallback={null}>
+        <V2ChatAssistant />
         <DeveloperTerminal />
       </Suspense>
     </div>
