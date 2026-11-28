@@ -209,6 +209,65 @@ html.v2-scroll-root body {
   transform: translate3d(0, -50%, 0);
 }
 
+/* Smooth native View Transition crossfade for ID <-> EN language switching */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}
+
+/* Smooth hover pill for V2 ID/EN language switcher */
+.v2-nav-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  padding: 0 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--v2-text);
+  cursor: pointer;
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-lang-btn:hover,
+.v2-nav-lang-btn:focus-visible {
+  background-color: var(--v2-surface-elevated);
+  border-color: var(--v2-accent);
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-lang-btn:active {
+  transform: scale(0.96);
+}
+
+.v2-nav-lang-btn .v2-lang-inactive {
+  color: var(--v2-text-dim);
+  transition: color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-lang-btn:hover .v2-lang-inactive,
+.v2-nav-lang-btn:focus-visible .v2-lang-inactive {
+  color: var(--v2-text-bright);
+}
+
 /* Nakula Navbar Paired Pill ("LET'S TALK") & Circular Menu Button (`=`) */
 .v2-nav-talk-btn {
   height: 46px;
@@ -253,6 +312,12 @@ html.v2-scroll-root body {
 }
 
 @media (max-width: 639px) {
+  .v2-nav-lang-btn {
+    height: 40px;
+    padding: 0 0.7rem;
+    font-size: 0.6875rem;
+  }
+
   .v2-nav-talk-btn {
     height: 40px;
     padding: 0 0.9rem;

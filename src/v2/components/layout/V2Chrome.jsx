@@ -306,11 +306,11 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                 type="button"
                 onClick={() => switchLanguage(nextLanguage)}
                 aria-label={t('v2.common.switchLangAria')}
-                className="inline-flex h-[40px] sm:h-[43px] shrink-0 items-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-2.5 sm:px-3 text-[11px] sm:text-[12px] font-bold uppercase tracking-[-0.02em] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
+                className="v2-nav-lang-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
               >
-                <span className={language === 'id' ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>ID</span>
+                <span className={language === 'id' ? 'text-[var(--v2-accent)] transition-colors duration-300' : 'v2-lang-inactive'}>ID</span>
                 <span className="mx-1 text-[#444444]">/</span>
-                <span className={language === 'en' ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>EN</span>
+                <span className={language === 'en' ? 'text-[var(--v2-accent)] transition-colors duration-300' : 'v2-lang-inactive'}>EN</span>
               </button>
 
               <div className="flex items-center gap-1">

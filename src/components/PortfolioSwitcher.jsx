@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 const VERSION_OPTIONS = [
-  { id: '1', label: 'Portfolio 1' },
-  { id: '2', label: 'Portfolio 2' },
+  { id: '1', label: 'V1', fullLabel: 'Portfolio 1' },
+  { id: '2', label: 'V2', fullLabel: 'Portfolio 2' },
 ];
 
 export default function PortfolioSwitcher({ version = '2', onChange }) {
@@ -57,10 +57,11 @@ export default function PortfolioSwitcher({ version = '2', onChange }) {
               }}
               type="button"
               aria-pressed={isActive}
-              aria-label={`Switch to ${option.label}`}
+              aria-label={`Switch to ${option.fullLabel}`}
+              title={`Switch to ${option.fullLabel}`}
               onClick={() => handleSelect(option.id)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 font-mono text-[10px] sm:text-[11px] font-medium tracking-[0.02em] sm:tracking-[0.04em] transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] focus-visible:ring-offset-1 focus-visible:ring-offset-[#080808] ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 font-mono text-[10px] sm:text-[11px] font-medium tracking-[0.04em] transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] focus-visible:ring-offset-1 focus-visible:ring-offset-[#080808] ${
                 isActive
                   ? 'bg-[#f4f4f5] text-[#09090b]'
                   : 'text-[#8e8e98] hover:bg-[#18181c] hover:text-[#e4e4e7]'

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import PropTypes from 'prop-types';
 import {
   parseLocation,
@@ -179,17 +180,40 @@ export const RouterProvider = ({
   const switchLanguage = useCallback(
     (targetLang) => {
       if (targetLang !== 'id' && targetLang !== 'en') return;
-      setLanguage(targetLang);
-      if (typeof window === 'undefined') return;
 
-      const currentFull =
-        window.location.pathname + window.location.search + window.location.hash;
-      const targetUrl = buildLocalizedPath(currentFull, targetLang);
-      commitNavigation(targetUrl, {
-        replace: false,
-        scrollToTop: false,
-        handleHashScroll: false,
-      });
+      const applyLanguageSwitch = () => {
+        setLanguage(targetLang);
+        if (typeof window === 'undefined') return;
+
+        const currentFull =
+          window.location.pathname + window.location.search + window.location.hash;
+        const targetUrl = buildLocalizedPath(currentFull, targetLang);
+        commitNavigation(targetUrl, {
+          replace: false,
+          scrollToTop: false,
+          handleHashScroll: false,
+        });
+      };
+
+      const prefersReduced =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (
+        !prefersReduced &&
+        typeof document !== 'undefined' &&
+        typeof document.startViewTransition === 'function'
+      ) {
+        document.startViewTransition(() => {
+          flushSync(() => {
+            applyLanguageSwitch();
+          });
+        });
+        return;
+      }
+
+      applyLanguageSwitch();
     },
     [commitNavigation, setLanguage]
   );
