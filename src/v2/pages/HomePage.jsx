@@ -8,7 +8,7 @@ import {
   useScroll,
   useTransform,
 } from 'framer-motion';
-import { FiArrowUpRight, FiCheck, FiCopy, FiMinus, FiPlus } from 'react-icons/fi';
+import { FiArrowUpRight, FiCheck, FiCopy } from 'react-icons/fi';
 
 import { siteConfig, ENABLE_SEASONAL_THEMES } from '../../config/site';
 import { profileData } from '../../data/profile';
@@ -81,7 +81,7 @@ export default function PortfolioV2() {
   const [activeSection, setActiveSection] = useState('v2-top');
   const [activeWorkIdx, setActiveWorkIdx] = useState(0);
   const [openCapabilityIdx, setOpenCapabilityIdx] = useState(-1);
-  const [openFaqIdx, setOpenFaqIdx] = useState(0);
+  const [openFaqIdx, setOpenFaqIdx] = useState(-1);
 
   const lenisRef = useV2Lenis(Boolean(shouldReduceMotion));
   const jakartaTime = useJakartaClock();
@@ -1469,41 +1469,42 @@ export default function PortfolioV2() {
               <div className="w-full lg:max-w-[800px] space-y-3">
                 {faqItems.map((item, idx) => {
                   const isOpen = openFaqIdx === idx;
+                  const panelId = `v2-faq-panel-${idx}`;
                   return (
                     <div
                       key={item.q}
-                      className="rounded-[12px] border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] p-6 sm:p-8"
+                      data-open={isOpen ? 'true' : 'false'}
+                      className="v2-faq-card"
                     >
                       <button
                         type="button"
                         onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded"
+                        aria-controls={panelId}
+                        className="flex w-full items-center justify-between gap-6 p-6 sm:px-8 sm:py-7 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-[12px]"
                       >
-                        <span className="text-[22px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-[1.06] text-[var(--v2-text)]">
+                        <span className="text-[22px] sm:text-[30px] font-semibold tracking-[-0.045em] leading-[1.1] text-[var(--v2-text)]">
                           {item.q}
                         </span>
-                        <span className="text-[var(--v2-accent)] shrink-0" aria-hidden="true">
-                          {isOpen ? <FiMinus size={24} /> : <FiPlus size={24} />}
+                        <span className="v2-faq-icon" aria-hidden="true">
+                          <span className="v2-faq-bar v2-faq-bar--h" />
+                          <span className="v2-faq-bar v2-faq-bar--v" />
                         </span>
                       </button>
 
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            key={`faq-body-${idx}`}
-                            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                            transition={{ duration: 0.28, ease: NAKULA_EASE }}
-                            className="overflow-hidden"
-                          >
-                            <p className="pt-5 text-[16px] leading-[1.45] tracking-[-0.02em] text-[var(--v2-text-dim)]">
+                      <div
+                        id={panelId}
+                        aria-hidden={!isOpen}
+                        className="v2-faq-panel"
+                      >
+                        <div className="v2-faq-panel-inner">
+                          <div className="v2-faq-answer px-6 pb-6 sm:px-8 sm:pb-8 sm:pr-14 -mt-1">
+                            <p className="text-[15px] sm:text-[16px] leading-[1.48] tracking-[-0.015em] text-[var(--v2-text-muted)]">
                               {item.a}
                             </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

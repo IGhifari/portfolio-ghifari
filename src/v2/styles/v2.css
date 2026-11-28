@@ -698,6 +698,87 @@ html.v2-scroll-root body {
   transition: background-color 9999s ease-in-out 0s;
 }
 
+/* ==========================================================================
+   FAQ Accordion V2 — Exact Nakula Smooth Grid Expand + Spinning `+` -> `—` Morph
+   ========================================================================== */
+.v2-faq-card {
+  border-radius: 12px;
+  border: 1px solid var(--v2-border);
+  background-color: var(--v2-bg-elevated);
+  transition:
+    border-color 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card:hover,
+.v2-faq-card[data-open='true'] {
+  border-color: var(--v2-border-strong);
+}
+
+.v2-faq-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--v2-accent);
+}
+
+.v2-faq-bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-bar--h {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.v2-faq-bar--v {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-bar--h {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-bar--v {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.v2-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.v2-faq-panel-inner {
+  overflow: hidden;
+}
+
+.v2-faq-answer {
+  transform: translate3d(0, -6px, 0);
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-answer {
+  transform: translate3d(0, 0, 0);
+}
+
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
   .v2-hero-sticky {
@@ -717,7 +798,11 @@ html.v2-scroll-root body {
   .v2-gh-cell,
   .v2-inquiry-row,
   .v2-inquiry-row::after,
-  .v2-inquiry-num {
+  .v2-inquiry-num,
+  .v2-faq-card,
+  .v2-faq-bar,
+  .v2-faq-panel,
+  .v2-faq-answer {
     transition: none !important;
   }
 
