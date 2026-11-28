@@ -11,7 +11,7 @@ import { useV2Lenis } from '../hooks/useV2Lenis';
 import { useJakartaClock } from '../hooks/useJakartaClock';
 import { buildV2SeasonTokens } from '../theme/seasonPalette';
 import OpeningSequence from '../components/motion/OpeningSequence';
-import { hasCompletedV2Opening } from '../components/motion/openingState';
+import { hasCompletedV2Opening, useV2TransitionState } from '../components/motion/openingState';
 import HomeHeader from '../components/layout/HomeHeader';
 import HomeFooter from '../components/layout/HomeFooter';
 import V2MenuDrawer from '../components/layout/V2MenuDrawer';
@@ -49,11 +49,12 @@ export default function PortfolioV2() {
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { subpageRevealReady } = useV2TransitionState();
   const [showOpening, setShowOpening] = useState(
     () => !shouldReduceMotion && !hasCompletedV2Opening()
   );
   const [heroIntroComplete, setHeroIntroComplete] = useState(() =>
-    Boolean(shouldReduceMotion || hasCompletedV2Opening())
+    Boolean(shouldReduceMotion || (hasCompletedV2Opening() && subpageRevealReady))
   );
   const [isWordmarkCompact, setIsWordmarkCompact] = useState(false);
   const [isHeroExited, setIsHeroExited] = useState(false);
@@ -90,18 +91,18 @@ export default function PortfolioV2() {
   }, []);
 
   // Initial site entry plays Orbital Telemetry Opening (`showOpening`);
-  // Subsequent returns to Home are wiped seamlessly by persistent `<V2PageTransition />` in App.jsx.
+  // Subsequent returns & refreshes are wiped seamlessly by persistent `<V2PageTransition />` in App.jsx.
   useEffect(() => {
     if (shouldReduceMotion || hasCompletedV2Opening()) {
       setShowOpening(false);
-      setHeroIntroComplete(true);
+      setHeroIntroComplete(Boolean(shouldReduceMotion || subpageRevealReady));
       return undefined;
     }
 
     setShowOpening(true);
     setHeroIntroComplete(false);
     return undefined;
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, subpageRevealReady]);
 
   // Scroll to target anchor on hash arrival (e.g. `/#v2-about`); leave normal & popstate scroll to RouterContext
   useEffect(() => {

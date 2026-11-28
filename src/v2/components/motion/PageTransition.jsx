@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { siteConfig } from '@/config/site';
 import { useTheme } from '@/context/ThemeContext';
-import { useV2TransitionState } from './openingState';
+import { startV2RefreshReveal, useV2TransitionState } from './openingState';
 import { buildV2SeasonTokens } from '../../theme/seasonPalette';
 
 const CURTAIN_WIPE_EASE = [0.76, 0, 0.24, 1];
@@ -9,11 +10,18 @@ const LOGO_RISE_EASE = [0.22, 1, 0.36, 1];
 
 /**
  * Persistent Portfolio V2 Page Transition Curtain (`100% -> 0% -> -100%`)
+ * On same-session page refresh after initial opening, starts covered (`0% -> -100%`).
  * Automatically adopts the active seasonal accent & contrast ink!
  */
 export default function V2PageTransition() {
-  const { phase, showLogo, runId } = useV2TransitionState();
+  const { phase, showLogo, runId, startCovered } = useV2TransitionState();
   const { season, seasonalEnabled } = useTheme();
+
+  useEffect(() => {
+    if (startCovered && phase === 'holding') {
+      startV2RefreshReveal();
+    }
+  }, [startCovered, phase]);
 
   if (phase === 'idle') {
     return null;
@@ -31,7 +39,7 @@ export default function V2PageTransition() {
     <motion.div
       key={`v2-curtain-run-${runId}`}
       data-v2-page-curtain={phase}
-      initial={{ y: '100%' }}
+      initial={{ y: startCovered ? '0%' : '100%' }}
       animate={{ y: targetY }}
       transition={{
         duration,

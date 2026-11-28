@@ -1,12 +1,42 @@
 import { useSyncExternalStore } from 'react';
 
-let v2OpeningCompleted = false;
+const OPENING_STORAGE_KEY = 'v2_opening_completed';
+
+const readStoredOpeningCompleted = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(OPENING_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+
+const writeStoredOpeningCompleted = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(OPENING_STORAGE_KEY, '1');
+  } catch {
+    // Ignore storage quota or restricted context errors
+  }
+};
+
+const prefersReducedMotion = () => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+};
+
+let v2OpeningCompleted = readStoredOpeningCompleted();
+const shouldStartWithRefreshCurtain = v2OpeningCompleted && !prefersReducedMotion();
+let refreshRevealStarted = false;
 
 export function hasCompletedV2Opening() {
   return v2OpeningCompleted;
 }
 
 export function markV2OpeningCompleted() {
+  writeStoredOpeningCompleted();
   if (!v2OpeningCompleted) {
     v2OpeningCompleted = true;
     transitionSnapshot = { ...transitionSnapshot, openingCompleted: true };
@@ -22,10 +52,11 @@ export function markV2OpeningCompleted() {
    ========================================================================== */
 
 let transitionSnapshot = {
-  phase: 'idle', // 'idle' | 'covering' | 'holding' | 'uncovering'
+  phase: shouldStartWithRefreshCurtain ? 'holding' : 'idle', // 'idle' | 'covering' | 'holding' | 'uncovering'
   showLogo: false,
-  subpageRevealReady: true,
-  openingCompleted: false,
+  startCovered: shouldStartWithRefreshCurtain,
+  subpageRevealReady: !shouldStartWithRefreshCurtain,
+  openingCompleted: v2OpeningCompleted,
   runId: 0,
 };
 
@@ -63,14 +94,58 @@ export function useV2TransitionState() {
   );
 }
 
+export function startV2RefreshReveal() {
+  if (refreshRevealStarted || !transitionSnapshot.startCovered || transitionSnapshot.phase !== 'holding') {
+    return;
+  }
+  refreshRevealStarted = true;
+  clearTransitionTimers();
+
+  // Beat 1 (120ms): `GHIFARI®` wordmark rises into center over the blue curtain
+  activeTimers.push(
+    setTimeout(() => {
+      setSnapshot({ showLogo: true });
+    }, 120)
+  );
+
+  // Beat 2 (920ms): Blue curtain wipes upward (`0% -> -100%`) to reveal page
+  activeTimers.push(
+    setTimeout(() => {
+      setSnapshot({ phase: 'uncovering' });
+    }, 920)
+  );
+
+  // Beat 3 (1420ms): Curtain clears top -> trigger hero/navbar reveal
+  activeTimers.push(
+    setTimeout(() => {
+      setSnapshot({ subpageRevealReady: true });
+    }, 1420)
+  );
+
+  // Cleanup (1580ms): Reset overlay back to `idle`
+  activeTimers.push(
+    setTimeout(() => {
+      setSnapshot({
+        phase: 'idle',
+        showLogo: false,
+        startCovered: false,
+        subpageRevealReady: true,
+      });
+      activeTimers = [];
+    }, 1580)
+  );
+}
+
 export function runV2PageTransition(commitRouteFn) {
   clearTransitionTimers();
+  refreshRevealStarted = true;
   const nextRunId = transitionSnapshot.runId + 1;
 
   // Beat 1: Slide solid blue curtain up from bottom (`100% -> 0%`) over the OLD page
   setSnapshot({
     phase: 'covering',
     showLogo: false,
+    startCovered: false,
     subpageRevealReady: true,
     runId: nextRunId,
   });
