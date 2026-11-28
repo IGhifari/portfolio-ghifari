@@ -1,28 +1,82 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import PropTypes from 'prop-types';
-import { parseLocation, buildLocalizedPath } from '../utils/router';
-import { useLanguage } from './LanguageContext';
+import {
+  parseLocation,
+  buildLocalizedPath,
+  buildVersionedUrl,
+  withVersionParam,
+  DEFAULT_PORTFOLIO_VERSION,
+} from '../utils/router';
+import { useLanguage, DEFAULT_LANGUAGE } from './LanguageContext';
 
 const RouterContext = createContext(null);
 
-export const RouterProvider = ({ children }) => {
+export const RouterProvider = ({
+  children,
+  shouldAnimateTransition,
+  onRunTransition,
+  onPreloadRoute,
+}) => {
   const [currentLocation, setCurrentLocation] = useState(() => parseLocation());
   const { language, setLanguage } = useLanguage();
+  const currentLocationRef = useRef(currentLocation);
+  const scrollHistoryRef = useRef(new Map());
+  const transitionHooksRef = useRef({
+    shouldAnimateTransition,
+    onRunTransition,
+    onPreloadRoute,
+  });
+
+  useEffect(() => {
+    transitionHooksRef.current = {
+      shouldAnimateTransition,
+      onRunTransition,
+      onPreloadRoute,
+    };
+  }, [shouldAnimateTransition, onRunTransition, onPreloadRoute]);
+
+  useEffect(() => {
+    currentLocationRef.current = currentLocation;
+  }, [currentLocation]);
 
   const activeLang =
     currentLocation.langPrefix === 'en' || language === 'en' ? 'en' : 'id';
+  const portfolioVersion = currentLocation.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
 
   useEffect(() => {
     const handlePopState = () => {
+      const prevLoc = currentLocationRef.current;
       const nextLoc = parseLocation(window.location);
-      setCurrentLocation(nextLoc);
       const queryLang = new URLSearchParams(nextLoc.search || '').get('lang');
       const nextLang =
         nextLoc.langPrefix === 'en'
           ? 'en'
           : queryLang === 'en' || queryLang === 'id'
           ? queryLang
-          : 'id';
+          : DEFAULT_LANGUAGE;
+
+      const { shouldAnimateTransition: canAnimate, onRunTransition: runTransition, onPreloadRoute: preloadRoute } =
+        transitionHooksRef.current;
+
+      if (typeof canAnimate === 'function' && typeof runTransition === 'function' && canAnimate(prevLoc, nextLoc)) {
+        if (typeof preloadRoute === 'function') {
+          preloadRoute(nextLoc.route?.type);
+        }
+        const savedScrollY = scrollHistoryRef.current.get(nextLoc.cleanPath) ?? 0;
+        runTransition(() => {
+          currentLocationRef.current = nextLoc;
+          setCurrentLocation(nextLoc);
+          setLanguage(nextLang);
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+          });
+        });
+        return;
+      }
+
+      currentLocationRef.current = nextLoc;
+      setCurrentLocation(nextLoc);
       setLanguage(nextLang);
     };
 
@@ -31,8 +85,8 @@ export const RouterProvider = ({ children }) => {
   }, [setLanguage]);
 
   const localizePath = useCallback(
-    (to) => buildLocalizedPath(to, activeLang),
-    [activeLang]
+    (to) => withVersionParam(buildLocalizedPath(to, activeLang), portfolioVersion),
+    [activeLang, portfolioVersion]
   );
 
   const commitNavigation = useCallback(
@@ -83,12 +137,36 @@ export const RouterProvider = ({ children }) => {
       }
 
       const explicitEn = /^\/en(?=[/?#]|$)/.test(to);
-      const targetUrl =
+      const localizedUrl =
         !preserveLang || explicitEn
           ? to
           : activeLang === 'en'
           ? buildLocalizedPath(to, 'en')
           : to;
+      const targetUrl = withVersionParam(localizedUrl, portfolioVersion);
+
+      const parsedUrl = new URL(targetUrl, window.location.origin);
+      const nextParsed = parseLocation(parsedUrl);
+      const prevLoc = currentLocationRef.current;
+
+      const { shouldAnimateTransition: canAnimate, onRunTransition: runTransition, onPreloadRoute: preloadRoute } =
+        transitionHooksRef.current;
+
+      if (typeof canAnimate === 'function' && typeof runTransition === 'function' && canAnimate(prevLoc, nextParsed)) {
+        if (prevLoc?.cleanPath) {
+          scrollHistoryRef.current.set(prevLoc.cleanPath, window.scrollY || 0);
+        }
+        if (typeof preloadRoute === 'function') {
+          preloadRoute(nextParsed.route?.type);
+        }
+        runTransition(() => {
+          if (explicitEn && language !== 'en') {
+            setLanguage('en');
+          }
+          commitNavigation(targetUrl, { replace, scrollToTop, handleHashScroll: true });
+        });
+        return;
+      }
 
       if (explicitEn && language !== 'en') {
         setLanguage('en');
@@ -96,35 +174,81 @@ export const RouterProvider = ({ children }) => {
 
       commitNavigation(targetUrl, { replace, scrollToTop, handleHashScroll: true });
     },
-    [activeLang, commitNavigation, language, setLanguage]
+    [activeLang, commitNavigation, language, portfolioVersion, setLanguage]
   );
 
   const switchLanguage = useCallback(
     (targetLang) => {
       if (targetLang !== 'id' && targetLang !== 'en') return;
-      setLanguage(targetLang);
-      if (typeof window === 'undefined') return;
 
-      const currentFull =
-        window.location.pathname + window.location.search + window.location.hash;
-      const targetUrl = buildLocalizedPath(currentFull, targetLang);
+      const applyLanguageSwitch = () => {
+        setLanguage(targetLang);
+        if (typeof window === 'undefined') return;
+
+        const currentFull =
+          window.location.pathname + window.location.search + window.location.hash;
+        const targetUrl = buildLocalizedPath(currentFull, targetLang);
+        commitNavigation(targetUrl, {
+          replace: false,
+          scrollToTop: false,
+          handleHashScroll: false,
+        });
+      };
+
+      const prefersReduced =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (
+        !prefersReduced &&
+        typeof document !== 'undefined' &&
+        typeof document.startViewTransition === 'function'
+      ) {
+        document.startViewTransition(() => {
+          flushSync(() => {
+            applyLanguageSwitch();
+          });
+        });
+        return;
+      }
+
+      applyLanguageSwitch();
+    },
+    [commitNavigation, setLanguage]
+  );
+
+  const switchPortfolioVersion = useCallback(
+    (targetVersion) => {
+      if (typeof window === 'undefined') return;
+      const normalized = targetVersion === '1' ? '1' : DEFAULT_PORTFOLIO_VERSION;
+      const targetUrl = buildVersionedUrl(window.location, normalized);
       commitNavigation(targetUrl, {
         replace: false,
-        scrollToTop: false,
+        scrollToTop: true,
         handleHashScroll: false,
       });
     },
-    [commitNavigation, setLanguage]
+    [commitNavigation]
   );
 
   const contextValue = useMemo(
     () => ({
       ...currentLocation,
+      portfolioVersion,
       navigate,
       localizePath,
       switchLanguage,
+      switchPortfolioVersion,
     }),
-    [currentLocation, navigate, localizePath, switchLanguage]
+    [
+      currentLocation,
+      portfolioVersion,
+      navigate,
+      localizePath,
+      switchLanguage,
+      switchPortfolioVersion,
+    ]
   );
 
   return <RouterContext.Provider value={contextValue}>{children}</RouterContext.Provider>;
@@ -132,6 +256,9 @@ export const RouterProvider = ({ children }) => {
 
 RouterProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  shouldAnimateTransition: PropTypes.func,
+  onRunTransition: PropTypes.func,
+  onPreloadRoute: PropTypes.func,
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

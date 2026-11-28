@@ -232,7 +232,7 @@ const ChatAssistant = () => {
   };
 
   return (
-    <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 select-none">
+    <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-[45] select-none">
       {/* Floating Trigger Button (Shown when closed) */}
       {!isOpen && (
         <button

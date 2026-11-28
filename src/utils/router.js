@@ -17,8 +17,69 @@ export const isPlayRouteType = (type) =>
   type === 'play-bugs' ||
   type === 'play-runner';
 
+export const DEFAULT_PORTFOLIO_VERSION = '2';
+
+/**
+ * Parses the `?version=` query parameter.
+ * - `?version=1` -> `'1'`
+ * - `?version=2`, missing, or any invalid value -> `'2'` (Portfolio 2 default)
+ */
+export const parsePortfolioVersion = (search = '') => {
+  if (!search || typeof search !== 'string') return DEFAULT_PORTFOLIO_VERSION;
+  try {
+    const params = new URLSearchParams(search);
+    const raw = params.get('version');
+    return raw === '1' ? '1' : DEFAULT_PORTFOLIO_VERSION;
+  } catch {
+    return DEFAULT_PORTFOLIO_VERSION;
+  }
+};
+
+/**
+ * Builds an internal URL with `?version=1` or `?version=2`, preserving pathname, other query params, and hash.
+ */
+export const buildVersionedUrl = (
+  loc = { pathname: '/', search: '', hash: '' },
+  targetVersion = DEFAULT_PORTFOLIO_VERSION
+) => {
+  const normalizedVersion = targetVersion === '1' ? '1' : DEFAULT_PORTFOLIO_VERSION;
+  const pathname = loc?.pathname || '/';
+  const rawSearch = loc?.search || '';
+  const hash = loc?.hash || '';
+
+  const params = new URLSearchParams(rawSearch);
+  params.set('version', normalizedVersion);
+  const queryString = params.toString();
+  return `${pathname}${queryString ? `?${queryString}` : ''}${hash}`;
+};
+
 const NON_SPA_PREFIX_RE = /^\/(?:docs|images|audio|assets|api)(?:\/|$)/i;
 const FILE_EXT_RE = /\.[a-z0-9]{1,8}$/i;
+
+/**
+ * Preserves `?version=1` across internal SPA navigation when the user is viewing Portfolio 1,
+ * unless the target URL already specifies a `version` query parameter.
+ */
+export const withVersionParam = (to = '/', activeVersion = DEFAULT_PORTFOLIO_VERSION) => {
+  if (!to || typeof to !== 'string' || activeVersion !== '1') return to;
+  if (/^(?:https?:|mailto:|tel:)/i.test(to) || to.startsWith('#')) return to;
+
+  const match = to.match(/^([^?#]*)(\?[^#]*)?(#.*)?$/);
+  const rawPath = (match?.[1] || '/').replace(/\/+$/, '') || '/';
+  const search = match?.[2] || '';
+  const hash = match?.[3] || '';
+
+  if (NON_SPA_PREFIX_RE.test(rawPath) || FILE_EXT_RE.test(rawPath)) {
+    return to;
+  }
+
+  const params = new URLSearchParams(search);
+  if (!params.has('version')) {
+    params.set('version', '1');
+  }
+  const queryString = params.toString();
+  return `${rawPath}${queryString ? `?${queryString}` : ''}${hash}`;
+};
 
 /**
  * Converts an internal SPA URL to the target language prefix ('id' -> unprefixed, 'en' -> '/en...'),
@@ -79,12 +140,14 @@ export const parseLocation = (
   const isEnPrefix = rawCleanPath === '/en' || rawCleanPath.startsWith('/en/');
   const cleanPath = isEnPrefix ? rawCleanPath.slice(3) || '/' : rawCleanPath;
   const langPrefix = isEnPrefix ? 'en' : null;
+  const portfolioVersion = parsePortfolioVersion(search);
 
   if (cleanPath === '/') {
     return {
       pathname: isEnPrefix ? '/en' : '/',
       cleanPath: '/',
       langPrefix,
+      portfolioVersion,
       search,
       hash,
       route: { type: 'home' },
@@ -96,6 +159,7 @@ export const parseLocation = (
       pathname,
       cleanPath: '/study-case',
       langPrefix,
+      portfolioVersion,
       search,
       hash,
       route: { type: 'study-case-list' },
@@ -107,6 +171,7 @@ export const parseLocation = (
       pathname,
       cleanPath: '/recruiter',
       langPrefix,
+      portfolioVersion,
       search,
       hash,
       route: { type: 'recruiter' },
@@ -119,6 +184,7 @@ export const parseLocation = (
         pathname,
         cleanPath: '/play',
         langPrefix,
+        portfolioVersion,
         search,
         hash,
         route: { type: 'play' },
@@ -130,6 +196,7 @@ export const parseLocation = (
         pathname,
         cleanPath: '/play/explore',
         langPrefix,
+        portfolioVersion,
         search,
         hash,
         route: { type: 'play-explore' },
@@ -141,6 +208,7 @@ export const parseLocation = (
         pathname,
         cleanPath: '/play/stack',
         langPrefix,
+        portfolioVersion,
         search,
         hash,
         route: { type: 'play-stack' },
@@ -152,6 +220,7 @@ export const parseLocation = (
         pathname,
         cleanPath: '/play/bugs',
         langPrefix,
+        portfolioVersion,
         search,
         hash,
         route: { type: 'play-bugs' },
@@ -163,6 +232,7 @@ export const parseLocation = (
         pathname,
         cleanPath: '/play/runner',
         langPrefix,
+        portfolioVersion,
         search,
         hash,
         route: { type: 'play-runner' },
@@ -176,6 +246,7 @@ export const parseLocation = (
       pathname,
       cleanPath,
       langPrefix,
+      portfolioVersion,
       search,
       hash,
       route: { type: 'study-case-detail', slug: detailMatch[1] },
@@ -186,6 +257,7 @@ export const parseLocation = (
     pathname,
     cleanPath,
     langPrefix,
+    portfolioVersion,
     search,
     hash,
     route: { type: 'not-found', requestedPath: pathname },

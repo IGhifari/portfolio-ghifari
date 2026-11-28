@@ -1,50 +1,17 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FiGithub, FiArrowUpRight, FiX, FiLayers, FiCheckCircle, FiCpu, FiUserCheck, FiAlertCircle, FiBookOpen, FiTerminal } from 'react-icons/fi';
-import { SiNpm } from 'react-icons/si';
-import SpotlightCard from './reactbits/SpotlightCard';
+import { FiArrowUpRight, FiX } from 'react-icons/fi';
+
 import { selectedProjects, otherProjects } from '../data/projects';
 import { useLanguage } from '../context/LanguageContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { RouterLink } from '../context/RouterContext';
+import ProjectMasonryCard from './project/ProjectMasonryCard';
+import ProjectArchiveCard from './project/ProjectArchiveCard';
+import ProjectModalContent from './project/ProjectModalContent';
 import '../styles/Project.css';
 
 const CATEGORY_KEYS = ['all', 'fullstack', 'webapp', 'library', 'game'];
-
-const MASONRY_ASPECT_CLASSES = {
-  akseskita: 'aspect-video lg:aspect-[5/4]',
-  'project-management': 'aspect-video lg:aspect-[16/10]',
-  'id-kit': 'aspect-video',
-  'food-ecommerce': 'aspect-video lg:aspect-[16/11]',
-  'internship-journal': 'aspect-video lg:aspect-[5/4]',
-  studyflow: 'aspect-video lg:aspect-[4/3]',
-  'blue-horizon': 'aspect-video',
-};
-
-const getDisplayHost = (project) => {
-  if (project.live) {
-    try {
-      return new URL(project.live).host;
-    } catch {
-      return project.live;
-    }
-  }
-  if (project.npm) {
-    return `npmjs.com/package/${project.title}`;
-  }
-  if (project.id === 'project-management') {
-    return 'internal // pt-ama-salam';
-  }
-  if (project.github) {
-    try {
-      const parsed = new URL(project.github);
-      return `${parsed.host}${parsed.pathname}`;
-    } catch {
-      return project.github;
-    }
-  }
-  return project.id;
-};
 
 const useMasonryColumnCount = () => {
   const [cols, setCols] = useState(() => {
@@ -86,6 +53,7 @@ const Project = () => {
   const modalContainerRef = useRef(null);
 
   const easeCurve = [0.16, 1, 0.3, 1];
+  const opensNewTabLabel = t('nav.opensNewTab') || 'opens in a new tab';
 
   const getFadeMotion = (delay = 0) => {
     if (shouldReduceMotion) {
@@ -232,197 +200,19 @@ const Project = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-start">
           {masonryColumns.map((colItems, colIdx) => (
             <div key={colIdx} className="flex flex-col gap-5 lg:gap-6 min-w-0">
-              {colItems.map(({ project, orderIndex }) => {
-                const aspectClass = MASONRY_ASPECT_CLASSES[project.id] || 'aspect-video';
-                const displayHost = getDisplayHost(project);
-
-                return (
-                  <motion.article
-                    key={project.id}
-                    {...getFadeMotion(Math.min(orderIndex * 0.05, 0.25))}
-                    className="group min-w-0"
-                  >
-                    <SpotlightCard className="project-masonry-card rounded-lg flex flex-col">
-                      {/* Clickable Screenshot & Authentic Frame Header */}
-                      <button
-                        type="button"
-                        onClick={(e) => openModal(project, e.currentTarget)}
-                        aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                        data-cursor-label="Preview"
-                        className="cursor-target w-full text-left appearance-none bg-transparent border-0 p-0 m-0 cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                      >
-                        <div className="px-3.5 py-2 bg-[var(--surface-alt)] border-b border-[var(--border)] flex items-center justify-between gap-2 select-none">
-                          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
-                            <span className="w-2 h-2 rounded-full bg-[#ff5f56]/75 group-hover:bg-[#ff5f56] transition-colors" />
-                            <span className="w-2 h-2 rounded-full bg-[#ffbd2e]/75 group-hover:bg-[#ffbd2e] transition-colors" />
-                            <span className="w-2 h-2 rounded-full bg-[#27c93f]/75 group-hover:bg-[#27c93f] transition-colors" />
-                          </div>
-                          <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wide truncate">
-                            {displayHost}
-                          </span>
-                          {project.version ? (
-                            <span className="font-mono text-[9px] text-[var(--accent)] px-1.5 py-0.5 rounded bg-[var(--surface-muted)] border border-[var(--border-subtle)] font-semibold shrink-0">
-                              {project.version}
-                            </span>
-                          ) : (
-                            <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
-                              {project.number}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className={`relative ${aspectClass} w-full bg-[var(--bg-primary)] overflow-hidden border-b border-[var(--border-subtle)]`}>
-                          <img
-                            src={project.image}
-                            alt={`${project.title} interface preview`}
-                            loading={orderIndex === 0 ? 'eager' : 'lazy'}
-                            // eslint-disable-next-line react/no-unknown-property
-                            fetchpriority={orderIndex === 0 ? 'high' : undefined}
-                            decoding="async"
-                            width={1280}
-                            height={720}
-                            className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                          />
-                        </div>
-                      </button>
-
-                      {/* Restrained Editorial Metadata Body */}
-                      <div className="p-4 sm:p-5 flex flex-col gap-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="font-mono text-[11px] font-bold text-[var(--accent)] tracking-widest shrink-0">
-                              {project.number}
-                            </span>
-                            <span className="text-[var(--border)]" aria-hidden="true">/</span>
-                            <span className="font-mono text-[10px] text-[var(--text-secondary)] tracking-wider uppercase truncate">
-                              {resolve(project.category)}
-                            </span>
-                          </div>
-                          {project.year && (
-                            <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
-                              {project.year}
-                            </span>
-                          )}
-                        </div>
-
-                        <div>
-                          <h3 className="font-grotesk font-bold text-lg sm:text-xl text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
-                            {project.title}
-                          </h3>
-                          {project.subtitle && (
-                            <p className="font-mono text-[11px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5 line-clamp-1">
-                              {resolve(project.subtitle)}
-                            </p>
-                          )}
-                        </div>
-
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">
-                          {resolve(project.description)}
-                        </p>
-
-                        {/* Authentic Engineering Metrics (rendered only when present in data) */}
-                        {Array.isArray(project.metrics) && project.metrics.length > 0 && (
-                          <div className="grid grid-cols-2 gap-2 pt-0.5">
-                            {project.metrics.map((metric) => (
-                              <div
-                                key={metric.value}
-                                className="px-2.5 py-1.5 rounded bg-[var(--bg-primary)]/40 border border-[var(--border-subtle)]"
-                              >
-                                <span className="font-mono text-[11px] font-bold text-[var(--accent)] block">
-                                  {metric.value}
-                                </span>
-                                <span className="font-mono text-[10px] text-[var(--text-muted)] leading-tight block">
-                                  {resolve(metric.label)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Compact Tech Stack Tags */}
-                        <div className="flex flex-wrap gap-1.5 pt-0.5">
-                          {project.tags.slice(0, 5).map((tag) => (
-                            <span
-                              key={tag}
-                              className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Compact Footer Actions */}
-                        <div className="pt-3 mt-0.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2">
-                          <RouterLink
-                            to={`/study-case/${project.id}`}
-                            data-cursor-label="Study"
-                            className="cursor-target inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 py-0.5"
-                            aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
-                          >
-                            <FiBookOpen size={13} aria-hidden="true" />
-                            <span>{t('caseStudies.readCaseStudy')}</span>
-                          </RouterLink>
-
-                          <div className="flex items-center gap-1.5">
-                            {project.id === 'id-kit' && (
-                              <RouterLink
-                                to="/study-case/id-kit#playground"
-                                data-cursor-label="Demo"
-                                className="cursor-target inline-flex items-center gap-1 px-2 py-1 rounded bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--accent)] font-mono text-[10px] font-semibold uppercase text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                              >
-                                <FiTerminal size={11} aria-hidden="true" />
-                                <span>{language === 'id' ? 'Demo' : 'Playground'}</span>
-                              </RouterLink>
-                            )}
-                            {project.github && (
-                              <a
-                                href={project.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-cursor-label="Code"
-                                className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                                aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                                title={t('projects.sourceCode')}
-                              >
-                                <FiGithub size={15} aria-hidden="true" />
-                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                              </a>
-                            )}
-                            {project.npm && (
-                              <a
-                                href={project.npm}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-cursor-label="npm"
-                                className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                                aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                                title={t('projects.npmPackage')}
-                              >
-                                <SiNpm size={15} aria-hidden="true" />
-                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                              </a>
-                            )}
-                            {project.live && (
-                              <a
-                                href={project.live}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-cursor-label="Live Demo"
-                                className="cursor-target inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] font-mono text-[10px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                                aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                              >
-                                <span>Live</span>
-                                <FiArrowUpRight size={12} aria-hidden="true" />
-                                <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </SpotlightCard>
-                  </motion.article>
-                );
-              })}
+              {colItems.map(({ project, orderIndex }) => (
+                <ProjectMasonryCard
+                  key={project.id}
+                  project={project}
+                  orderIndex={orderIndex}
+                  fadeMotion={getFadeMotion(Math.min(orderIndex * 0.05, 0.25))}
+                  language={language}
+                  t={t}
+                  resolve={resolve}
+                  opensNewTabLabel={opensNewTabLabel}
+                  onOpenModal={openModal}
+                />
+              ))}
             </div>
           ))}
         </div>
@@ -458,137 +248,15 @@ const Project = () => {
           {/* 2x2 Responsive Grid on Desktop & Tablet */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
             {filteredOther.map((project, index) => (
-              <motion.article
+              <ProjectArchiveCard
                 key={project.id}
-                {...getFadeMotion(index * 0.06)}
-                className="group min-w-0"
-              >
-                <SpotlightCard className="other-project-card rounded-lg h-full flex flex-col justify-between">
-                  {/* Project Image Preview (MED-04 semantic button) */}
-                  <button
-                  type="button"
-                  onClick={(e) => openModal(project, e.currentTarget)}
-                  aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                  data-cursor-label="Preview"
-                  className="cursor-target w-full text-left appearance-none p-0 m-0 relative aspect-video bg-[var(--bg-primary)] overflow-hidden border-0 border-b border-[var(--border)] cursor-pointer block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                  >
-                    <img
-                      src={project.image}
-                      alt={`${project.title} thumbnail`}
-                      loading="lazy"
-                      decoding="async"
-                      width={1280}
-                      height={720}
-                      className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
-                  </button>
-
-                  {/* Card Content */}
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        {project.category && (
-                          <span className="font-mono text-[10px] text-[var(--accent)] tracking-[0.16em] uppercase truncate">
-                            {resolve(project.category)}
-                          </span>
-                        )}
-                        {project.year && (
-                          <span className="font-mono text-[10px] text-[var(--text-muted)] shrink-0">
-                            {project.year}
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="font-grotesk font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
-                        {project.title}
-                      </h4>
-                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-2 line-clamp-2">
-                        {resolve(project.description)}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] space-y-3">
-                      {/* Tech tags - Subtle Editorial Badges */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="linear-tag-pill inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-alt)]/80 border border-[var(--border-subtle)] rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Actions: Study Case link + Modal Details + External Links */}
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <RouterLink
-                          to={`/study-case/${project.id}`}
-                          data-cursor-label="Study"
-                          className="cursor-target inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded px-1 py-0.5"
-                          aria-label={`${t('caseStudies.readCaseStudy')}: ${project.title}`}
-                        >
-                          <FiBookOpen size={12} aria-hidden="true" />
-                          <span>{t('caseStudies.readCaseStudy')}</span>
-                        </RouterLink>
-
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={(e) => openModal(project, e.currentTarget)}
-                            data-cursor-label="Details"
-                            className="cursor-target px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--border)] rounded transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                            aria-label={`${t('projects.viewDetailsAria')} ${project.title}`}
-                          >
-                            {t('projects.viewDetails')}
-                          </button>
-                          {project.github && (
-                            <a
-                              href={project.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              data-cursor-label="Code"
-                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                              aria-label={`${t('projects.sourceCodeAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                              title={t('projects.githubRepo')}
-                            >
-                              <FiGithub size={15} aria-hidden="true" />
-                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                            </a>
-                          )}
-                          {project.npm && (
-                            <a
-                              href={project.npm}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              data-cursor-label="npm"
-                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                              aria-label={`${t('projects.npmPackageAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                              title={t('projects.npmPackage')}
-                            >
-                              <SiNpm size={15} aria-hidden="true" />
-                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                            </a>
-                          )}
-                          {project.live && (
-                            <a
-                              href={project.live}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              data-cursor-label="Live Demo"
-                              className="cursor-target p-1.5 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                              aria-label={`${t('projects.liveDemoAria')}: ${project.title} (${t('nav.opensNewTab') || 'opens in a new tab'})`}
-                              title={t('projects.liveDeployment')}
-                            >
-                              <FiArrowUpRight size={16} aria-hidden="true" />
-                              <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </SpotlightCard>
-              </motion.article>
+                project={project}
+                fadeMotion={getFadeMotion(index * 0.06)}
+                t={t}
+                resolve={resolve}
+                opensNewTabLabel={opensNewTabLabel}
+                onOpenModal={openModal}
+              />
             ))}
           </div>
         </>
@@ -637,7 +305,7 @@ const Project = () => {
       <AnimatePresence>
         {activeProject && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[var(--modal-backdrop)] backdrop-blur-md"
+            className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[var(--modal-backdrop)] backdrop-blur-md"
             onClick={closeModal}
             role="dialog"
             aria-modal="true"
@@ -680,172 +348,14 @@ const Project = () => {
                 </button>
               </div>
 
-              {/* Modal Body */}
-              <div className="p-5 sm:p-6 overflow-y-auto space-y-6 bg-[var(--bg-primary)]">
-                {/* Preview Banner */}
-                <div className="aspect-video w-full rounded-md overflow-hidden border border-[var(--border)] bg-[var(--surface-muted)]">
-                  <img
-                    src={activeProject.image}
-                    alt={`${activeProject.title} full preview`}
-                    loading="lazy"
-                    decoding="async"
-                    width={1280}
-                    height={720}
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-
-                {/* Overview */}
-                <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                  {resolve(activeProject.description)}
-                </p>
-
-                {/* Case Study Details */}
-                {activeProject.details && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {activeProject.details.problem && (
-                      <div className="p-4 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-1.5">
-                        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-                          <FiAlertCircle size={14} aria-hidden="true" />
-                          <span>{t('projects.modal.problem')}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                          {resolve(activeProject.details.problem)}
-                        </p>
-                      </div>
-                    )}
-
-                    {activeProject.details.solution && (
-                      <div className="p-4 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-1.5">
-                        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-                          <FiCheckCircle size={14} aria-hidden="true" />
-                          <span>{t('projects.modal.solution')}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                          {resolve(activeProject.details.solution)}
-                        </p>
-                      </div>
-                    )}
-
-                    {activeProject.details.architecture && (
-                      <div className="p-4 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-1.5 md:col-span-2">
-                        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-                          <FiCpu size={14} aria-hidden="true" />
-                          <span>{t('projects.modal.architecture')}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                          {resolve(activeProject.details.architecture)}
-                        </p>
-                      </div>
-                    )}
-
-                    {activeProject.details.features && (
-                      <div className="p-4 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-2 md:col-span-2">
-                        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-                          <FiLayers size={14} aria-hidden="true" />
-                          <span>{t('projects.modal.features')}</span>
-                        </div>
-                        <ul className="space-y-1.5 text-xs sm:text-sm text-[var(--text-secondary)] list-disc list-inside">
-                          {(resolve(activeProject.details.features) || []).map((feat) => (
-                            <li key={feat} className="leading-relaxed">
-                              {feat}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {activeProject.details.contribution && (
-                      <div className="p-4 rounded-md bg-[var(--surface-muted)] border border-[var(--border-subtle)] space-y-1.5 md:col-span-2">
-                        <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-                          <FiUserCheck size={14} aria-hidden="true" />
-                          <span>{t('projects.modal.contribution')}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                          {resolve(activeProject.details.contribution)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Tech Stack */}
-                <div className="space-y-2">
-                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] block">
-                    {t('projects.modal.techStack')}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {activeProject.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-1 text-xs font-mono text-[var(--text-primary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-sm"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="px-5 py-3.5 border-t border-[var(--border)] bg-[var(--surface-muted)] flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <RouterLink
-                    to={`/study-case/${activeProject.id}`}
-                    onClick={closeModal}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
-                  >
-                    <FiBookOpen size={14} />
-                    <span>{language === 'id' ? 'Buka Halaman Studi Kasus' : 'Open Full Case Study'}</span>
-                    <FiArrowUpRight size={13} />
-                  </RouterLink>
-                  {activeProject.github && (
-                    <a
-                      href={activeProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
-                    >
-                      <FiGithub size={14} />
-                      <span>{t('projects.sourceCode')}</span>
-                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                    </a>
-                  )}
-                  {activeProject.npm && (
-                    <a
-                      href={activeProject.npm}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] hover:text-[var(--accent)] border border-[var(--border)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
-                    >
-                      <SiNpm size={14} aria-hidden="true" />
-                      <span>{t('projects.npmPackage')}</span>
-                      <FiArrowUpRight size={13} aria-hidden="true" />
-                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                    </a>
-                  )}
-                  {activeProject.live ? (
-                    <a
-                      href={activeProject.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-contrast)] rounded text-xs font-grotesk font-bold tracking-wider uppercase transition-colors"
-                    >
-                      <span>{t('projects.liveDemo')}</span>
-                      <FiArrowUpRight size={14} />
-                      <span className="sr-only"> ({t('nav.opensNewTab') || 'opens in a new tab'})</span>
-                    </a>
-                  ) : !activeProject.npm ? (
-                    <span className="font-mono text-[11px] text-[var(--text-muted)]">
-                      {t('projects.modal.noLiveNote')}
-                    </span>
-                  ) : null}
-                </div>
-
-                <span className="font-mono text-[11px] text-[var(--text-muted)] hidden sm:inline">
-                  {t('projects.modal.dismissHint')}
-                </span>
-              </div>
+              <ProjectModalContent
+                project={activeProject}
+                language={language}
+                t={t}
+                resolve={resolve}
+                opensNewTabLabel={opensNewTabLabel}
+                onClose={closeModal}
+              />
             </motion.div>
           </div>
         )}

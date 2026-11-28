@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 const MAX_RADIUS = 38;
 

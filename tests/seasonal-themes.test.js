@@ -19,6 +19,11 @@ import {
 } from '../src/game/shared/seasonalGameTheme.js';
 import { executeTerminalCommand } from '../src/utils/terminalCommands.js';
 import { ENABLE_SEASONAL_THEMES } from '../src/config/site.js';
+import {
+  V2_DEFAULT_TOKENS,
+  V2_SEASON_OPTIONS,
+  buildV2SeasonTokens,
+} from '../src/v2/theme/seasonPalette.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -210,5 +215,33 @@ describe('Major Seasonal Events Theme System Test Suite', () => {
     // GameHub must never import three directly
     const hubSource = fs.readFileSync(path.join(rootDir, 'src', 'game', 'hub', 'GameHub.jsx'), 'utf-8');
     assert.ok(!hubSource.includes("from 'three'") && !hubSource.includes('from "three"'));
+  });
+
+  it('6. Adapts Portfolio V2 tokens across all 6 active seasons while keeping default electric blue untouched', () => {
+    assert.equal(V2_SEASON_OPTIONS.length, 8);
+
+    // Inactive months keep exact V2_DEFAULT_TOKENS
+    for (const inactive of [3, 5, 7, 8, 9, 11]) {
+      const tokens = buildV2SeasonTokens(resolveSeasonalTheme(inactive), true);
+      assert.equal(tokens, V2_DEFAULT_TOKENS);
+      assert.equal(tokens['--v2-accent'], '#3b82f6');
+      assert.equal(tokens['--v2-bg'], '#0a0a0a');
+    }
+
+    // Active 6 months adapt V2 background, accent, and WCAG contrast ink
+    for (const m of [1, 2, 4, 6, 10, 12]) {
+      const theme = resolveSeasonalTheme(m);
+      const tokens = buildV2SeasonTokens(theme, true);
+      assert.equal(tokens['--v2-accent'], theme.palette.accent);
+      assert.equal(tokens['--v2-bg'], theme.palette.bgPrimary);
+      assert.ok(
+        contrastRatio(tokens['--v2-text'], tokens['--v2-bg']) >= 7,
+        `V2 Month ${m} text contrast on bg`
+      );
+      assert.ok(
+        contrastRatio(tokens['--v2-accent'], tokens['--v2-accent-ink']) >= 4.5,
+        `V2 Month ${m} curtain/banner ink contrast`
+      );
+    }
   });
 });

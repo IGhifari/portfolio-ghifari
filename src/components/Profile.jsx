@@ -147,7 +147,7 @@ const Profile = () => {
           y: heroY,
           zIndex: 10,
         }}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[450px] pb-20 sm:pt-[480px] lg:py-24 relative"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-[580px] pb-28 lg:py-24 relative"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Primary Identity & Actions */}

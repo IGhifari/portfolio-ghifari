@@ -79,7 +79,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`dark-navbar fixed top-0 inset-x-0 z-50 transition-all duration-300 ease-out ${
+      className={`dark-navbar fixed top-0 inset-x-0 z-[60] transition-all duration-300 ease-out ${
         isScrolled
           ? 'dark-navbar-scrolled pt-2.5 sm:pt-3.5 px-3 xl:px-6 pointer-events-none'
           : 'dark-navbar-transparent pt-0 px-0'
@@ -361,14 +361,16 @@ const Navbar = () => {
         role="dialog"
         aria-modal="true"
         aria-label={t('nav.mobileMenu') || 'Mobile navigation'}
-        className={`lg:hidden fixed z-50 pointer-events-auto transition-all duration-300 ease-in-out overflow-y-auto ${
+        className={`lg:hidden fixed z-[60] pointer-events-auto transition-all duration-300 ease-in-out overflow-y-auto ${
           isScrolled
-            ? 'inset-x-3 sm:inset-x-4 top-[4.25rem] max-w-lg mx-auto rounded-2xl bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--border)] shadow-2xl'
-            : 'inset-x-0 top-16 bg-[var(--nav-bg)] backdrop-blur-xl border-b border-[var(--border)]'
+            ? 'inset-x-3 sm:inset-x-4 top-[4.25rem] max-w-lg mx-auto rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-2xl'
+            : 'inset-x-0 top-16 bg-[var(--bg-primary)] border-b border-[var(--border)] shadow-xl'
         } ${
           isMenuOpen
-            ? 'max-h-[calc(100vh-5rem)] opacity-100 py-5 visible'
-            : 'max-h-0 opacity-0 py-0 invisible'
+            ? isScrolled
+              ? 'max-h-[calc(100dvh-5rem)] opacity-100 py-5 visible'
+              : 'h-[calc(100dvh-4rem)] opacity-100 py-5 pb-24 visible'
+            : 'max-h-0 h-0 opacity-0 py-0 invisible'
         }`}
         style={{ pointerEvents: isMenuOpen ? 'auto' : 'none' }}
         aria-hidden={!isMenuOpen}

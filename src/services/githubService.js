@@ -258,9 +258,7 @@ export const fetchGithubData = async ({ force = false, fetchFn = fetch } = {}) =
 
   // 1. Try internal /api/github Cloudflare Pages proxy if available
   try {
-    const proxyOptions = force
-      ? { cache: 'no-store', headers: { 'X-Refresh': '1' } }
-      : undefined;
+    const proxyOptions = force ? { cache: 'no-store' } : undefined;
     const proxyRes = await fetchFn('/api/github', proxyOptions);
     if (proxyRes && proxyRes.ok) {
       const json = await proxyRes.json();

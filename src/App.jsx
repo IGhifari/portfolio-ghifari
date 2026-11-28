@@ -5,14 +5,23 @@ import './styles/Components.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
-import { isPlayRouteType } from './utils/router';
+import { isPlayRouteType, DEFAULT_PORTFOLIO_VERSION } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
 import { siteConfig, ENABLE_SEASONAL_THEMES } from './config/site';
 
-// Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
-import Navbar from './components/Navbar';
-import Profile from './components/Profile';
-import Project from './components/Project';
+// Eagerly loaded default V2 experience & shared chrome
+import PortfolioSwitcher from './components/PortfolioSwitcher';
+import PortfolioV2 from './v2/pages/HomePage';
+import V2PageTransition from './v2/components/motion/PageTransition';
+import {
+    hasCompletedV2Opening,
+    runV2PageTransition,
+} from './v2/components/motion/openingState';
+
+// Lazy-loaded V1 above-the-fold & below-the-fold components
+const Navbar = lazy(() => import('./components/Navbar'));
+const Profile = lazy(() => import('./components/Profile'));
+const Project = lazy(() => import('./components/Project'));
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -30,6 +39,8 @@ const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
 const CaseStudyList = lazy(() => import('./components/CaseStudyList'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const WorksListV2 = lazy(() => import('./v2/pages/WorksPage'));
+const WorkDetailV2 = lazy(() => import('./v2/pages/WorkDetailPage'));
 const RecruiterMode = lazy(() => import('./components/RecruiterMode'));
 const GameHub = lazy(() => import('./game/hub/GameHub'));
 const GamePage = lazy(() => import('./game/GamePage'));
@@ -95,10 +106,14 @@ DeferredSection.propTypes = {
     minHeight: PropTypes.string,
 };
 
+const isV2PageRouteType = (type) =>
+    type === 'home' || type === 'study-case-list' || type === 'study-case-detail';
+
 const AppContent = () => {
-    const { route, langPrefix } = useRouter();
+    const { route, langPrefix, portfolioVersion, switchPortfolioVersion } = useRouter();
     const { language, t } = useLanguage();
     const isPlayMode = isPlayRouteType(route.type);
+    const isV2Active = isV2PageRouteType(route.type) && portfolioVersion !== '1';
 
     // Restore localized home page document metadata on returning to home or toggling language
     useEffect(() => {
@@ -123,7 +138,7 @@ const AppContent = () => {
 
     // Scroll restoration for anchor links when switching back to home view
     useEffect(() => {
-        if (route.type === 'home' && window.location.hash) {
+        if (!isV2Active && route.type === 'home' && window.location.hash) {
             const id = window.location.hash.replace(/^#/, '');
             const timer = setTimeout(() => {
                 const el = document.getElementById(id);
@@ -133,11 +148,38 @@ const AppContent = () => {
             }, 80);
             return () => clearTimeout(timer);
         }
-    }, [route.type]);
+    }, [isV2Active, route.type]);
 
+    if (isV2Active) {
+        const v2FallbackBg = hasCompletedV2Opening() ? 'bg-[#0a0a0a]' : 'bg-[#0b0c0f]';
+        return (
+            <>
+                <V2PageTransition />
+                {route.type === 'home' && <PortfolioV2 />}
+                {route.type === 'study-case-list' && (
+                    <Suspense fallback={<div className={`min-h-screen ${v2FallbackBg}`} />}>
+                        <WorksListV2 />
+                    </Suspense>
+                )}
+                {route.type === 'study-case-detail' && (
+                    <Suspense fallback={<div className={`min-h-screen ${v2FallbackBg}`} />}>
+                        <WorkDetailV2 slug={route.slug} />
+                    </Suspense>
+                )}
+                <PortfolioSwitcher
+                    version={portfolioVersion}
+                    onChange={switchPortfolioVersion}
+                />
+            </>
+        );
+    }
 
     return (
-        <div className='tampilan' style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}>
+        <div
+            className='tampilan'
+            data-portfolio-version="1"
+            style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh' }}
+        >
             {/* Skip Navigation Link for Keyboard & Screen Reader Accessibility */}
             <a
                 href="#main-content"
@@ -152,7 +194,11 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            {!isPlayMode && <Navbar />}
+            {!isPlayMode && (
+                <Suspense fallback={<div className="h-16" aria-hidden="true" />}>
+                    <Navbar />
+                </Suspense>
+            )}
             {!isPlayMode && ENABLE_SEASONAL_THEMES && (
                 <Suspense fallback={null}>
                     <SeasonalEffects />
@@ -164,12 +210,16 @@ const AppContent = () => {
                     <>
                         {/* Hero */}
                         <section id="profile" className="min-h-screen bg-[var(--bg-primary)]">
-                            <Profile/>
+                            <Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)]" aria-hidden="true" />}>
+                                <Profile/>
+                            </Suspense>
                         </section>
 
-                        {/* Projects (Eagerly rendered for immediate showcase availability) */}
+                        {/* Projects */}
                         <section id="projects" className="bg-[var(--bg-primary)]">
-                            <Project/>
+                            <Suspense fallback={<div className="min-h-[420px] bg-[var(--bg-primary)]" aria-hidden="true" />}>
+                                <Project/>
+                            </Suspense>
                         </section>
 
                         {/* About */}
@@ -298,6 +348,12 @@ const AppContent = () => {
 
             {/* Floating Utilities (Placed after main content for logical tab order; DeveloperTerminal remains mounted on /play* for Ctrl+J) */}
             <aside aria-label={t('nav.floatingUtilities') || 'Floating Utilities'}>
+                {!isPlayMode && (
+                    <PortfolioSwitcher
+                        version={portfolioVersion}
+                        onChange={switchPortfolioVersion}
+                    />
+                )}
                 <Suspense fallback={null}>
                     {!isPlayMode && <SoundButton />}
                     {!isPlayMode && <ChatAssistant />}
@@ -309,11 +365,40 @@ const AppContent = () => {
     );
 };
 
+const shouldAnimateV2PageSwap = (fromLoc, toLoc) => {
+    if (typeof window === 'undefined' || !fromLoc || !toLoc) return false;
+    if (
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+        return false;
+    }
+    const fromVer = fromLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+    const toVer = toLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+    if (fromVer === '1' || toVer === '1') return false;
+    if (!isV2PageRouteType(fromLoc.route?.type) || !isV2PageRouteType(toLoc.route?.type)) {
+        return false;
+    }
+    return fromLoc.cleanPath !== toLoc.cleanPath;
+};
+
+const preloadV2RouteChunk = (routeType) => {
+    if (routeType === 'study-case-list') {
+        import('./v2/pages/WorksPage');
+    } else if (routeType === 'study-case-detail') {
+        import('./v2/pages/WorkDetailPage');
+    }
+};
+
 const App = () => {
     return (
         <ThemeProvider>
           <LanguageProvider>
-            <RouterProvider>
+            <RouterProvider
+              shouldAnimateTransition={shouldAnimateV2PageSwap}
+              onRunTransition={runV2PageTransition}
+              onPreloadRoute={preloadV2RouteChunk}
+            >
               <AppContent />
             </RouterProvider>
           </LanguageProvider>

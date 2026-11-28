@@ -9,9 +9,9 @@ import {
   FiLayers,
   FiX,
 } from 'react-icons/fi';
-import { useLanguage } from '../../context/LanguageContext';
-import { RouterLink } from '../../context/RouterContext';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { getEnabledMiniGames } from '../shared/gameUtils';
 
 const ICON_BY_ID = {

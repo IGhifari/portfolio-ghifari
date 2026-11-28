@@ -259,6 +259,33 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(cachedResult.data.profile.login, 'IGhifari');
     });
 
+    await t2.test('uses cache: no-store on force refresh without sending obsolete X-Refresh header', async () => {
+      let capturedOptions = null;
+      const mockProxyFetch = async (url, options) => {
+        if (url === '/api/github') {
+          capturedOptions = options;
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              ok: true,
+              data: {
+                profile: sanitizeUserProfile({ login: 'IGhifari', public_repos: 30 }),
+                contributions: initialContributionsData,
+              },
+              contributionsLive: true,
+            }),
+          };
+        }
+        throw new Error('Unexpected direct fetch');
+      };
+
+      const result = await fetchGithubData({ force: true, fetchFn: mockProxyFetch });
+      assert.equal(result.data.profile.login, 'IGhifari');
+      assert.deepEqual(capturedOptions, { cache: 'no-store' });
+      assert.equal(capturedOptions?.headers, undefined);
+    });
+
     await t2.test('throws RATE_LIMIT error when GitHub returns 403 or 429', async () => {
       const mockRateLimitedFetch = async (url) => {
         if (url === '/api/github') return { ok: false, status: 404 };
@@ -394,7 +421,7 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(capturedAuthHeader, 'Bearer ghp_testsecrettoken123');
     });
 
-    await t2.test('preserves live contributions and bypasses cache on explicit refresh even when user API is 429', async () => {
+    await t2.test('preserves live contributions when user API is 429 and ignores public refresh cache-bypass headers', async () => {
       let contribCallCount = 0;
       const mockFetch = async (url) => {
         if (url.includes('/users/IGhifari/contributions')) {
@@ -423,11 +450,12 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(body1.data.contributions.days[1].count, 3);
 
       const res2 = await handler({
-        request: new Request('https://www.ighifari.my.id/api/github', { method: 'GET', headers: { 'x-refresh': '1' } }),
+        request: new Request('https://www.ighifari.my.id/api/github?refresh=1', { method: 'GET', headers: { 'x-refresh': '1' } }),
       });
       const body2 = await res2.json();
-      assert.equal(contribCallCount, 2);
-      assert.equal(body2.data.contributions.days[1].count, 7);
+      assert.equal(contribCallCount, 1);
+      assert.equal(body2.fromCache, true);
+      assert.equal(body2.data.contributions.days[1].count, 3);
     });
   });
 

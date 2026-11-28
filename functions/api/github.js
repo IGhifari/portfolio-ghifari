@@ -16,13 +16,30 @@ import {
 } from '../../src/services/githubService.js';
 import { initialContributionsData } from '../../src/data/githubContributions.js';
 
+export const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+export const DEFAULT_FETCH_TIMEOUT_MS = 8_000; // 8 seconds
+
+const fetchWithTimeout = async (fetchFn, url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetchFn(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 export const createCloudflarePagesGithubHandler = ({
   fetchFn = fetch,
+  timeoutMs = DEFAULT_FETCH_TIMEOUT_MS,
+  nowFn = Date.now,
 } = {}) => {
   // Worker-scoped cache for edge runtime isolates
   let memoryCache = {
     payload: null,
     timestamp: 0,
+    contributionsLive: false,
   };
 
   return async function handleCloudflareRequest(context = {}) {
@@ -62,19 +79,10 @@ export const createCloudflarePagesGithubHandler = ({
         );
       }
 
-      const headerRefresh = typeof request?.headers?.get === 'function'
-        ? request.headers.get('x-refresh')
-        : request?.headers?.['x-refresh'];
-      const wantsRefresh =
-        Boolean(request?.url && String(request.url).includes('refresh=1')) ||
-        headerRefresh === '1';
-
-      // 1. Check module-scoped in-memory cache (15 mins TTL, bypassed on explicit refresh)
-      const CACHE_TTL_MS = 15 * 60 * 1000;
+      // 1. Check module-scoped in-memory cache (15 mins TTL; public cache-bypass params/headers are intentionally ignored)
       const isFresh =
-        !wantsRefresh &&
-        memoryCache.payload &&
-        Date.now() - memoryCache.timestamp < CACHE_TTL_MS;
+        Boolean(memoryCache.payload) &&
+        nowFn() - memoryCache.timestamp < CACHE_TTL_MS;
 
       if (isFresh) {
         return new Response(
@@ -116,16 +124,27 @@ export const createCloudflarePagesGithubHandler = ({
       const contribUrl = `https://github.com/users/${GITHUB_USERNAME}/contributions`;
 
       const [userRes, contribRes] = await Promise.all([
-        fetchFn(userUrl, { headers }).catch((err) => {
-          console.warn('[GitHub API proxy] User fetch network error:', err?.message || err);
+        fetchWithTimeout(fetchFn, userUrl, { headers }, timeoutMs).catch((err) => {
+          console.warn(
+            '[GitHub API proxy] User fetch failed:',
+            err?.name === 'AbortError' ? 'upstream_timeout' : err?.name || 'network_error'
+          );
           return null;
         }),
-        fetchFn(contribUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        fetchWithTimeout(
+          fetchFn,
+          contribUrl,
+          {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            },
           },
-        }).catch((err) => {
-          console.warn('[GitHub API proxy] Contributions fetch network error:', err?.message || err);
+          timeoutMs
+        ).catch((err) => {
+          console.warn(
+            '[GitHub API proxy] Contributions fetch failed:',
+            err?.name === 'AbortError' ? 'upstream_timeout' : err?.name || 'network_error'
+          );
           return null;
         }),
       ]);
@@ -170,7 +189,7 @@ export const createCloudflarePagesGithubHandler = ({
         if (isContribLive) {
           memoryCache = {
             payload: fallbackPayload,
-            timestamp: Date.now(),
+            timestamp: nowFn(),
             contributionsLive: true,
           };
         }
@@ -203,7 +222,7 @@ export const createCloudflarePagesGithubHandler = ({
       // Store fresh live payload in memory cache
       memoryCache = {
         payload,
-        timestamp: Date.now(),
+        timestamp: nowFn(),
         contributionsLive: isContribLive,
       };
 
@@ -223,7 +242,11 @@ export const createCloudflarePagesGithubHandler = ({
         }
       );
     } catch (err) {
-      console.error('[GitHub API proxy] Uncaught exception:', err);
+      console.error(
+        '[GitHub API proxy] Uncaught exception:',
+        err?.name || 'Error',
+        typeof err?.message === 'string' ? err.message.slice(0, 200) : ''
+      );
 
       const errorFallbackPayload = {
         profile: sanitizeUserProfile({}),
@@ -235,13 +258,13 @@ export const createCloudflarePagesGithubHandler = ({
           ok: true,
           data: errorFallbackPayload,
           fallback: true,
-          error: err.message || 'Internal proxy error',
+          error: 'Unable to fetch GitHub activity right now.',
         }),
         {
           status: 200,
           headers: {
             'Content-Type': 'application/json; charset=utf-8',
-            'Cache-Control': 'public, max-age=300',
+            'Cache-Control': 'no-store',
             'X-Data-Source': 'exception-fallback',
           },
         }

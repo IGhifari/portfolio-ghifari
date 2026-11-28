@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { FiArrowLeft, FiVolume2, FiVolumeX, FiCheck, FiCornerDownLeft, FiGrid } from 'react-icons/fi';
-import { useLanguage } from '../../context/LanguageContext';
-import { RouterLink } from '../../context/RouterContext';
-import { useAudioPlayer } from '../../hooks/useAudioPlayer';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { BUILDINGS, getWorldInteractables } from '../logic/worldConfig';
 
 const GameHUD = ({

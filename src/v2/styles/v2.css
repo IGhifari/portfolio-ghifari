@@ -1,0 +1,907 @@
+/* ==========================================================================
+   Portfolio V2 — Editorial Design System & Scroll Choreography Styles (Nakula-inspired)
+   Strictly scoped to `.v2-portfolio-root` so Portfolio 1 remains untouched.
+   ========================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+/* Restore viewport-level position:sticky inside Portfolio V2 without affecting Portfolio 1 */
+html.v2-scroll-root,
+html.v2-scroll-root body {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.v2-portfolio-root {
+  --v2-bg: #0a0a0a;
+  --v2-bg-elevated: #0e0e0e;
+  --v2-surface: #141414;
+  --v2-surface-elevated: #161616;
+  --v2-border: #262626;
+  --v2-border-strong: #333333;
+  --v2-text: #cacaca;
+  --v2-text-bright: #ffffff;
+  --v2-text-muted: #858585;
+  --v2-text-dim: #555555;
+  --v2-about-unlit: #2a2a2a;
+  --v2-big-num: #2b2b2b;
+  --v2-accent: #3b82f6;
+  --v2-accent-hover: #2563eb;
+  --v2-accent-ink: #0a0a0a;
+  --v2-glow-rgb: 59, 130, 246;
+  --v2-nav-scrim: linear-gradient(
+    180deg,
+    #0a0a0a 0%,
+    rgba(10, 10, 10, 0.7) 57.22%,
+    rgba(10, 10, 10, 0) 100%
+  );
+  --v2-online: #47c554;
+  --v2-font-display: 'Anton', 'Space Grotesk', sans-serif;
+  --v2-font-sans: 'Geist Variable', 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --v2-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  background-color: var(--v2-bg);
+  color: var(--v2-text);
+  font-family: var(--v2-font-sans);
+  position: relative;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.v2-portfolio-main {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  isolation: isolate;
+}
+
+/* Nakula wide container (max-width 1400px, 24px desktop / 16px mobile side padding) */
+.v2-container {
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 768px) {
+  .v2-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Fixed Header Top Gradient Backdrop (Nakula-inspired) */
+.v2-nav-scrim {
+  background: var(--v2-nav-scrim);
+}
+
+/* Nakula Display Typography (Anton 140px desktop / 80px mobile, 100% line-height, 0em tracking) */
+.v2-display-heading {
+  font-family: var(--v2-font-display, 'Anton', 'Space Grotesk', sans-serif);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  color: var(--v2-text, #cacaca);
+}
+
+.v2-section-heading {
+  font-family: var(--v2-font-display, 'Anton', 'Space Grotesk', sans-serif);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0em;
+  line-height: 0.98;
+  font-size: clamp(4.5rem, 9.72vw, 8.75rem);
+  color: var(--v2-text, #cacaca);
+}
+
+/* Nakula Section Tag ((ABOUT), (WHY US), (SERVICES), (PROCESS), (BLOG)) */
+.v2-section-tag {
+  font-family: var(--v2-font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--v2-text);
+}
+
+/* Nakula About Word Smooth Threshold Transition */
+.v2-about-word {
+  display: inline-block;
+  margin-right: 0.25em;
+  transition:
+    color 0.22s ease-out,
+    filter 0.22s ease-out;
+}
+
+/* Nakula Vertical Text-Rollover Pill Button */
+.v2-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: 9999px;
+  padding: 0.8rem 1.5rem;
+  font-family: var(--v2-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text);
+  transition:
+    border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.v2-pill-btn:hover {
+  border-color: var(--v2-accent);
+  color: var(--v2-text-bright);
+}
+
+.v2-pill-btn--accent {
+  background-color: var(--v2-bg);
+  border-color: var(--v2-accent);
+  color: var(--v2-accent);
+}
+
+.v2-pill-btn--accent:hover {
+  background-color: var(--v2-accent);
+  border-color: var(--v2-accent);
+  color: var(--v2-accent-ink);
+}
+
+.v2-rollover-wrap {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+  height: 1.2em;
+  line-height: 1.2em;
+}
+
+.v2-rollover-track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-rollover-line {
+  display: block;
+  height: 1.2em;
+  line-height: 1.2em;
+  white-space: nowrap;
+}
+
+.v2-pill-btn:hover .v2-rollover-track,
+.v2-pill-btn:focus-visible .v2-rollover-track {
+  transform: translate3d(0, -50%, 0);
+}
+
+/* Smooth native View Transition crossfade for ID <-> EN language switching */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}
+
+/* Smooth hover pill for V2 ID/EN language switcher */
+.v2-nav-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  padding: 0 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--v2-text);
+  cursor: pointer;
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-lang-btn:hover,
+.v2-nav-lang-btn:focus-visible {
+  background-color: var(--v2-surface-elevated);
+  border-color: var(--v2-accent);
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-lang-btn:active {
+  transform: scale(0.96);
+}
+
+.v2-nav-lang-btn .v2-lang-inactive {
+  color: var(--v2-text-dim);
+  transition: color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-lang-btn:hover .v2-lang-inactive,
+.v2-nav-lang-btn:focus-visible .v2-lang-inactive {
+  color: var(--v2-text-bright);
+}
+
+/* Nakula Navbar Paired Pill ("LET'S TALK") & Circular Menu Button (`=`) */
+.v2-nav-talk-btn {
+  height: 46px;
+  padding: 0 1.4rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-color: var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text);
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-talk-btn:hover,
+.v2-nav-talk-btn:focus-visible {
+  background-color: #282828;
+  border-color: #383838;
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  border: 1px solid var(--v2-border-strong);
+  background-color: var(--v2-bg);
+  color: var(--v2-text-bright);
+  cursor: pointer;
+  transition:
+    background-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 639px) {
+  .v2-nav-lang-btn {
+    height: 40px;
+    padding: 0 0.7rem;
+    font-size: 0.6875rem;
+  }
+
+  .v2-nav-talk-btn {
+    height: 40px;
+    padding: 0 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .v2-nav-menu-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.v2-nav-menu-btn:hover,
+.v2-nav-menu-btn:focus-visible {
+  background-color: #282828;
+  border-color: #383838;
+  color: var(--v2-text-bright);
+}
+
+.v2-nav-menu-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 21px;
+}
+
+.v2-nav-menu-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  will-change: transform;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-nav-menu-bar--top {
+  transform-origin: right center;
+}
+
+.v2-nav-menu-bar--bottom {
+  transform-origin: left center;
+}
+
+.v2-nav-menu-btn:hover .v2-nav-menu-bar--top,
+.v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--top {
+  transform: translate3d(1.5px, 0, 0) scaleX(0.68);
+}
+
+.v2-nav-menu-btn:hover .v2-nav-menu-bar--bottom,
+.v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--bottom {
+  transform: translate3d(-1.5px, 0, 0) scaleX(0.68);
+}
+
+[data-theme='light'] .v2-portfolio-root .v2-nav-talk-btn:hover,
+[data-theme='light'] .v2-portfolio-root .v2-nav-talk-btn:focus-visible,
+[data-theme='light'] .v2-portfolio-root .v2-nav-menu-btn:hover,
+[data-theme='light'] .v2-portfolio-root .v2-nav-menu-btn:focus-visible {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #020617;
+}
+
+/* Nakula Menu Drawer Link Underline */
+.v2-drawer-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.v2-drawer-nav-label {
+  position: relative;
+  display: inline-block;
+}
+
+.v2-drawer-nav-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: var(--v2-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-drawer-nav-btn:hover .v2-drawer-nav-label::after,
+.v2-drawer-nav-btn:focus-visible .v2-drawer-nav-label::after {
+  transform: scaleX(1);
+}
+
+/* ==========================================================================
+   Hero — Sticky Wrapper + Diagonal Spotlight Slit
+   ========================================================================== */
+.v2-hero-sticky {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .v2-hero-sticky {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.v2-hero-diagonal-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.v2-hero-diagonal-mask {
+  position: relative;
+  width: min(680px, 84vw);
+  height: min(520px, 58vh);
+  clip-path: polygon(0% 56%, 100% 0%, 100% 44%, 0% 100%);
+  -webkit-mask-image: radial-gradient(ellipse 76% 80% at 50% 50%, #000 54%, transparent 98%);
+  mask-image: radial-gradient(ellipse 76% 80% at 50% 50%, #000 54%, transparent 98%);
+}
+
+.v2-hero-diagonal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 78%;
+}
+
+/* Nakula Hero Bottom "TRUSTED BY / VERIFIED TRACK" Edge-Faded Infinite Marquee */
+.v2-hero-marquee-mask {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000000 14%,
+    #000000 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000000 14%,
+    #000000 86%,
+    transparent 100%
+  );
+}
+
+@keyframes v2-marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.v2-hero-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: v2-marquee-scroll 24s linear infinite;
+  will-change: transform;
+}
+
+.v2-hero-marquee-mask:hover .v2-hero-marquee-track {
+  animation-play-state: paused;
+}
+
+/* ==========================================================================
+   Latest Work — Outer Card Scale + Inverse Counter-Scaled Inner Image
+   ========================================================================== */
+.v2-work-card-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+}
+
+@media (min-width: 1024px) {
+  .v2-work-card-frame {
+    height: 80vh;
+    max-height: 680px;
+  }
+}
+
+.v2-work-card-img-wrap {
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.v2-work-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-work-card-frame:hover .v2-work-card-img {
+  transform: scale(1.03);
+}
+
+/* Nakula Translucent Frosted Pill Cursor Badge ("VIEW PROJECT ↗") */
+.v2-view-project-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 11px 20px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  font-family: var(--v2-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   Why Us / Numbers Don't Lie — Metric Columns with Top Ticks
+   ========================================================================== */
+.v2-metric-cell {
+  position: relative;
+  padding: 40px 12px 12px 20px;
+  border-left: 1px solid var(--v2-border-strong);
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-metric-ticks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90%;
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--v2-border-strong) 0px,
+    var(--v2-border-strong) 1px,
+    transparent 1px,
+    transparent 24px
+  );
+  opacity: 0.78;
+}
+
+/* ==========================================================================
+   Pre-Footer Contact Spotlight Atmospheric Layer (Season-Aware)
+   ========================================================================== */
+.v2-cta-spotlight {
+  background: radial-gradient(
+    ellipse 40% 58% at 54% 44%,
+    rgba(var(--v2-glow-rgb), 0.24) 0%,
+    rgba(var(--v2-glow-rgb), 0.08) 44%,
+    transparent 74%
+  );
+}
+
+/* ==========================================================================
+   /works & MORE WORKS Grid Card — Exact Nakula Hover Scale(0.92) + Inner Counter-Scale(1.09)
+   ========================================================================== */
+.v2-works-grid-mask {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.3518;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+  transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.v2-works-grid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v2-works-grid-card:hover .v2-works-grid-mask {
+    transform: scale(0.92);
+  }
+
+  .v2-works-grid-card:hover .v2-works-grid-img {
+    transform: scale(1.09);
+  }
+}
+
+/* ==========================================================================
+   GitHub Activity V2 — Season-Adaptive Contribution Heatmap Cells
+   ========================================================================== */
+.v2-gh-cell {
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.16s ease,
+    background-color 0.25s ease;
+}
+
+.v2-gh-cell:hover {
+  transform: scale(1.22);
+  z-index: 15;
+  border-color: var(--v2-text-bright);
+}
+
+.v2-gh-cell-0 {
+  background-color: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+}
+
+.v2-gh-cell-1 {
+  background-color: rgba(var(--v2-glow-rgb), 0.24);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.22);
+}
+
+.v2-gh-cell-2 {
+  background-color: rgba(var(--v2-glow-rgb), 0.48);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.34);
+}
+
+.v2-gh-cell-3 {
+  background-color: rgba(var(--v2-glow-rgb), 0.76);
+  border: 1px solid rgba(var(--v2-glow-rgb), 0.5);
+}
+
+.v2-gh-cell-4 {
+  background-color: var(--v2-accent);
+  border: 1px solid var(--v2-accent);
+}
+
+/* December Light Winter contrast refinement */
+[data-theme='light'] .v2-portfolio-root .v2-gh-cell-0 {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.v2-gh-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-border-strong) transparent;
+}
+
+/* ==========================================================================
+   Contact Form V2 — Nakula Architectural Hairline Inquiry Rows
+   ========================================================================== */
+.v2-inquiry-row {
+  position: relative;
+  padding: 1.5rem 0 1.65rem;
+  border-bottom: 1px solid var(--v2-border-strong);
+  transition: border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-inquiry-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1.5px;
+  background-color: var(--v2-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.v2-inquiry-row:focus-within::after {
+  transform: scaleX(1);
+}
+
+.v2-inquiry-row--error {
+  border-bottom-color: rgba(244, 63, 94, 0.65);
+}
+
+.v2-inquiry-row--error::after {
+  background-color: #f43f5e;
+  transform: scaleX(1);
+}
+
+.v2-inquiry-num {
+  font-family: var(--v2-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--v2-text-dim);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.v2-inquiry-row:focus-within .v2-inquiry-num {
+  color: var(--v2-text-bright);
+}
+
+.v2-portfolio-root input.v2-inquiry-input,
+.v2-portfolio-root textarea.v2-inquiry-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0;
+  margin: 0;
+  color: var(--v2-text-bright);
+  font-family: var(--v2-font-sans);
+  font-size: clamp(1.2rem, 1.85vw, 1.55rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+}
+
+.v2-portfolio-root input.v2-inquiry-input::placeholder,
+.v2-portfolio-root textarea.v2-inquiry-input::placeholder {
+  color: var(--v2-text-dim);
+  opacity: 0.62;
+}
+
+.v2-portfolio-root input.v2-inquiry-input:focus,
+.v2-portfolio-root textarea.v2-inquiry-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.v2-inquiry-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.v2-inquiry-input:-webkit-autofill,
+.v2-inquiry-input:-webkit-autofill:hover,
+.v2-inquiry-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--v2-text-bright);
+  -webkit-box-shadow: 0 0 0px 1000px var(--v2-bg) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ==========================================================================
+   FAQ Accordion V2 — Exact Nakula Smooth Grid Expand + Spinning `+` -> `—` Morph
+   ========================================================================== */
+.v2-faq-card {
+  border-radius: 12px;
+  border: 1px solid var(--v2-border);
+  background-color: var(--v2-bg-elevated);
+  transition:
+    border-color 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card:hover,
+.v2-faq-card[data-open='true'] {
+  border-color: var(--v2-border-strong);
+}
+
+.v2-faq-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--v2-accent);
+}
+
+.v2-faq-bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-bar--h {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.v2-faq-bar--v {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-bar--h {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-bar--v {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.v2-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.v2-faq-panel-inner {
+  overflow: hidden;
+}
+
+.v2-faq-answer {
+  transform: translate3d(0, -6px, 0);
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.v2-faq-card[data-open='true'] .v2-faq-answer {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  .v2-hero-sticky {
+    position: relative !important;
+  }
+
+  .v2-about-word,
+  .v2-rollover-track,
+  .v2-drawer-nav-label::after,
+  .v2-work-card-img,
+  .v2-works-grid-mask,
+  .v2-works-grid-img,
+  .v2-pill-btn,
+  .v2-nav-talk-btn,
+  .v2-nav-menu-btn,
+  .v2-nav-menu-bar,
+  .v2-gh-cell,
+  .v2-inquiry-row,
+  .v2-inquiry-row::after,
+  .v2-inquiry-num,
+  .v2-faq-card,
+  .v2-faq-bar,
+  .v2-faq-panel,
+  .v2-faq-answer {
+    transition: none !important;
+  }
+
+  .v2-hero-marquee-track {
+    animation: none !important;
+  }
+
+  .v2-pill-btn:hover .v2-rollover-track,
+  .v2-pill-btn:focus-visible .v2-rollover-track,
+  .v2-nav-menu-btn:hover .v2-nav-menu-bar--top,
+  .v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--top,
+  .v2-nav-menu-btn:hover .v2-nav-menu-bar--bottom,
+  .v2-nav-menu-btn:focus-visible .v2-nav-menu-bar--bottom,
+  .v2-work-card-frame:hover .v2-work-card-img,
+  .v2-works-grid-card:hover .v2-works-grid-mask,
+  .v2-works-grid-card:hover .v2-works-grid-img,
+  .v2-gh-cell:hover {
+    transform: none !important;
+  }
+}

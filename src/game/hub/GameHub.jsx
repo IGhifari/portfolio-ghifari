@@ -9,16 +9,16 @@ import {
   FiFastForward,
   FiAward,
 } from 'react-icons/fi';
-import { useLanguage } from '../../context/LanguageContext';
-import { useTheme } from '../../context/ThemeContext';
-import { RouterLink, useRouter } from '../../context/RouterContext';
-import { updateDocumentMetadata } from '../../utils/seo';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
+import { RouterLink, useRouter } from '@/context/RouterContext';
+import { updateDocumentMetadata } from '@/utils/seo';
 import {
   siteConfig,
   ENABLE_STACK_GAME,
   ENABLE_BUG_GAME,
   ENABLE_RUNNER_GAME,
-} from '../../config/site';
+} from '@/config/site';
 import { readBestScoreByKey } from '../shared/gameUtils';
 import { buildGameCssVars, getSeasonal3DTheme } from '../shared/seasonalGameTheme';
 

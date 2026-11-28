@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { useLanguage } from '../../context/LanguageContext';
-import { useTheme } from '../../context/ThemeContext';
-import { useRouter } from '../../context/RouterContext';
-import { updateDocumentMetadata } from '../../utils/seo';
-import { siteConfig } from '../../config/site';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useRouter } from '@/context/RouterContext';
+import { updateDocumentMetadata } from '@/utils/seo';
+import { siteConfig } from '@/config/site';
 import {
   GAME_STATES,
   RUNNER_CONFIG,

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiAward, FiBox } from 'react-icons/fi';
-import { useLanguage } from '../../context/LanguageContext';
-import { RouterLink, useRouter } from '../../context/RouterContext';
-import { ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '../../config/site';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink, useRouter } from '@/context/RouterContext';
+import { ENABLE_STACK_GAME, ENABLE_BUG_GAME, ENABLE_RUNNER_GAME } from '@/config/site';
 import { BUILDINGS } from '../logic/worldConfig';
 import { getEnabledMiniGames } from '../shared/gameUtils';
 
