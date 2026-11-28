@@ -8,48 +8,32 @@ import {
   DEFAULT_PORTFOLIO_VERSION,
 } from '../utils/router';
 import { useLanguage, DEFAULT_LANGUAGE } from './LanguageContext';
-import { runV2PageTransition } from '../v2/components/motion/openingState';
 
 const RouterContext = createContext(null);
 
-function isV2PageRouteType(type) {
-  return (
-    type === 'home' ||
-    type === 'study-case-list' ||
-    type === 'study-case-detail'
-  );
-}
-
-function shouldAnimateV2PageSwap(fromLoc, toLoc) {
-  if (typeof window === 'undefined' || !fromLoc || !toLoc) return false;
-  if (
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    return false;
-  }
-  const fromVer = fromLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
-  const toVer = toLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
-  if (fromVer === '1' || toVer === '1') return false;
-  if (!isV2PageRouteType(fromLoc.route?.type) || !isV2PageRouteType(toLoc.route?.type)) {
-    return false;
-  }
-  return fromLoc.cleanPath !== toLoc.cleanPath;
-}
-
-function preloadV2RouteChunk(routeType) {
-  if (routeType === 'study-case-list') {
-    import('../v2/pages/WorksPage');
-  } else if (routeType === 'study-case-detail') {
-    import('../v2/pages/WorkDetailPage');
-  }
-}
-
-export const RouterProvider = ({ children }) => {
+export const RouterProvider = ({
+  children,
+  shouldAnimateTransition,
+  onRunTransition,
+  onPreloadRoute,
+}) => {
   const [currentLocation, setCurrentLocation] = useState(() => parseLocation());
   const { language, setLanguage } = useLanguage();
   const currentLocationRef = useRef(currentLocation);
   const scrollHistoryRef = useRef(new Map());
+  const transitionHooksRef = useRef({
+    shouldAnimateTransition,
+    onRunTransition,
+    onPreloadRoute,
+  });
+
+  useEffect(() => {
+    transitionHooksRef.current = {
+      shouldAnimateTransition,
+      onRunTransition,
+      onPreloadRoute,
+    };
+  }, [shouldAnimateTransition, onRunTransition, onPreloadRoute]);
 
   useEffect(() => {
     currentLocationRef.current = currentLocation;
@@ -71,10 +55,15 @@ export const RouterProvider = ({ children }) => {
           ? queryLang
           : DEFAULT_LANGUAGE;
 
-      if (shouldAnimateV2PageSwap(prevLoc, nextLoc)) {
-        preloadV2RouteChunk(nextLoc.route?.type);
+      const { shouldAnimateTransition: canAnimate, onRunTransition: runTransition, onPreloadRoute: preloadRoute } =
+        transitionHooksRef.current;
+
+      if (typeof canAnimate === 'function' && typeof runTransition === 'function' && canAnimate(prevLoc, nextLoc)) {
+        if (typeof preloadRoute === 'function') {
+          preloadRoute(nextLoc.route?.type);
+        }
         const savedScrollY = scrollHistoryRef.current.get(nextLoc.cleanPath) ?? 0;
-        runV2PageTransition(() => {
+        runTransition(() => {
           currentLocationRef.current = nextLoc;
           setCurrentLocation(nextLoc);
           setLanguage(nextLang);
@@ -159,12 +148,17 @@ export const RouterProvider = ({ children }) => {
       const nextParsed = parseLocation(parsedUrl);
       const prevLoc = currentLocationRef.current;
 
-      if (shouldAnimateV2PageSwap(prevLoc, nextParsed)) {
+      const { shouldAnimateTransition: canAnimate, onRunTransition: runTransition, onPreloadRoute: preloadRoute } =
+        transitionHooksRef.current;
+
+      if (typeof canAnimate === 'function' && typeof runTransition === 'function' && canAnimate(prevLoc, nextParsed)) {
         if (prevLoc?.cleanPath) {
           scrollHistoryRef.current.set(prevLoc.cleanPath, window.scrollY || 0);
         }
-        preloadV2RouteChunk(nextParsed.route?.type);
-        runV2PageTransition(() => {
+        if (typeof preloadRoute === 'function') {
+          preloadRoute(nextParsed.route?.type);
+        }
+        runTransition(() => {
           if (explicitEn && language !== 'en') {
             setLanguage('en');
           }
@@ -238,6 +232,9 @@ export const RouterProvider = ({ children }) => {
 
 RouterProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  shouldAnimateTransition: PropTypes.func,
+  onRunTransition: PropTypes.func,
+  onPreloadRoute: PropTypes.func,
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

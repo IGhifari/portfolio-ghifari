@@ -5,7 +5,7 @@ import './styles/Components.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { RouterProvider, useRouter } from './context/RouterContext';
-import { isPlayRouteType } from './utils/router';
+import { isPlayRouteType, DEFAULT_PORTFOLIO_VERSION } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
 import { siteConfig, ENABLE_SEASONAL_THEMES } from './config/site';
 
@@ -16,7 +16,10 @@ import Project from './components/Project';
 import PortfolioSwitcher from './components/PortfolioSwitcher';
 import PortfolioV2 from './v2/pages/HomePage';
 import V2PageTransition from './v2/components/motion/PageTransition';
-import { hasCompletedV2Opening } from './v2/components/motion/openingState';
+import {
+    hasCompletedV2Opening,
+    runV2PageTransition,
+} from './v2/components/motion/openingState';
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -353,11 +356,43 @@ const AppContent = () => {
     );
 };
 
+const isV2PageRouteType = (type) =>
+    type === 'home' || type === 'study-case-list' || type === 'study-case-detail';
+
+const shouldAnimateV2PageSwap = (fromLoc, toLoc) => {
+    if (typeof window === 'undefined' || !fromLoc || !toLoc) return false;
+    if (
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+        return false;
+    }
+    const fromVer = fromLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+    const toVer = toLoc.portfolioVersion || DEFAULT_PORTFOLIO_VERSION;
+    if (fromVer === '1' || toVer === '1') return false;
+    if (!isV2PageRouteType(fromLoc.route?.type) || !isV2PageRouteType(toLoc.route?.type)) {
+        return false;
+    }
+    return fromLoc.cleanPath !== toLoc.cleanPath;
+};
+
+const preloadV2RouteChunk = (routeType) => {
+    if (routeType === 'study-case-list') {
+        import('./v2/pages/WorksPage');
+    } else if (routeType === 'study-case-detail') {
+        import('./v2/pages/WorkDetailPage');
+    }
+};
+
 const App = () => {
     return (
         <ThemeProvider>
           <LanguageProvider>
-            <RouterProvider>
+            <RouterProvider
+              shouldAnimateTransition={shouldAnimateV2PageSwap}
+              onRunTransition={runV2PageTransition}
+              onPreloadRoute={preloadV2RouteChunk}
+            >
               <AppContent />
             </RouterProvider>
           </LanguageProvider>

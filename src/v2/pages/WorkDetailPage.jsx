@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { FiArrowUpRight } from 'react-icons/fi';
 
-import { allProjects, getProjectBySlug } from '../../data/projects';
-import { profileData } from '../../data/profile';
-import { siteConfig } from '../../config/site';
-import { useLanguage } from '../../context/LanguageContext';
-import { RouterLink } from '../../context/RouterContext';
-import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '../../utils/seo';
+import { allProjects, getProjectBySlug } from '@/data/projects';
+import { profileData } from '@/data/profile';
+import { siteConfig } from '@/config/site';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
+import { updateDocumentMetadata, generateCaseStudyDetailSchema } from '@/utils/seo';
 import V2SubpageShell, { V2WorkGridCard } from '../components/layout/V2Chrome';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 import RolloverLabel from '../components/ui/RolloverLabel';
@@ -16,7 +16,7 @@ import { useV2TransitionState } from '../components/motion/openingState';
 
 const DETAIL_EASE = [0.22, 1, 0.36, 1];
 
-const IdKitPlayground = lazy(() => import('../../components/IdKitPlayground'));
+const IdKitPlayground = lazy(() => import('@/components/IdKitPlayground'));
 
 /**
  * Downward Scroll Parallax Image Box (Exact `/works/arjuna` `inset: -90px 0 0` downward translate)
@@ -82,10 +82,9 @@ ParallaxImageBox.propTypes = {
  * - Section 4 & 5: `"LET'S WORK TOGETHER"` CTA + Nakula Footer
  */
 export default function WorkDetailV2({ slug }) {
-  const { language } = useLanguage();
+  const { language, t, resolve } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const { subpageRevealReady, openingCompleted } = useV2TransitionState();
-  const isEn = language === 'en';
   const isHeroReady = Boolean(
     shouldReduceMotion || (openingCompleted && subpageRevealReady)
   );
@@ -94,12 +93,9 @@ export default function WorkDetailV2({ slug }) {
 
   useEffect(() => {
     if (project) {
-      const pageTitle = isEn
-        ? `Case Study: ${project.title} | ${siteConfig.name}`
-        : `Studi Kasus: ${project.title} | ${siteConfig.name}`;
+      const pageTitle = `${t('v2.workDetail.seoTitlePrefix')}: ${project.title} | ${siteConfig.name}`;
       const pageDesc =
-        project.description[language] ||
-        project.description.en ||
+        resolve(project.description) ||
         `Technical case study for ${project.title}.`;
 
       updateDocumentMetadata({
@@ -114,18 +110,16 @@ export default function WorkDetailV2({ slug }) {
         lang: language,
       });
     } else {
-      const notFoundTitle = isEn
-        ? `Case Study Not Found | ${siteConfig.name}`
-        : `Studi Kasus Tidak Ditemukan | ${siteConfig.name}`;
+      const notFoundTitle = t('v2.workDetail.notFoundSeoTitle');
       updateDocumentMetadata({
         title: notFoundTitle,
-        description: 'The requested case study could not be found.',
+        description: t('v2.workDetail.notFoundDesc').replace('{slug}', slug || ''),
         canonicalPath: `/study-case/${slug || ''}`,
         noindex: true,
         lang: language,
       });
     }
-  }, [isEn, language, project, slug]);
+  }, [language, project, resolve, slug, t]);
 
   if (!project) {
     return (
@@ -134,23 +128,21 @@ export default function WorkDetailV2({ slug }) {
           <div className="v2-container max-w-[900px] space-y-8">
             <p className="v2-section-tag !text-[var(--v2-accent)]">(404 · NOT FOUND)</p>
             <h1 className="v2-section-heading">
-              {isEn ? 'WORK NOT FOUND' : 'PROYEK TIDAK DITEMUKAN'}
+              {t('v2.workDetail.notFoundHeading')}
             </h1>
             <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] text-[var(--v2-text-muted)] max-w-xl">
-              {isEn
-                ? `We could not find a case study matching "${slug}".`
-                : `Studi kasus dengan kode "${slug}" tidak ditemukan.`}
+              {t('v2.workDetail.notFoundDesc').replace('{slug}', slug || '')}
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <RouterLink
                 to="/study-case"
                 className="v2-pill-btn v2-pill-btn--accent !h-[54px] !px-7"
               >
-                <RolloverLabel text={isEn ? 'ALL WORKS' : 'SEMUA KARYA'} />
+                <RolloverLabel text={t('v2.workDetail.allWorks')} />
                 <FiArrowUpRight size={18} />
               </RouterLink>
               <RouterLink to="/" className="v2-pill-btn !h-[54px] !px-7">
-                <RolloverLabel text={isEn ? 'BACK HOME' : 'BERANDA'} />
+                <RolloverLabel text={t('v2.workDetail.backHome')} />
               </RouterLink>
             </div>
           </div>
@@ -160,46 +152,42 @@ export default function WorkDetailV2({ slug }) {
   }
 
   const details = project.details || {};
-  const categoryRaw = project.category?.[language] || project.category?.en || 'Web Application';
+  const categoryRaw = resolve(project.category) || 'Web Application';
   const categoryParts = categoryRaw.split('/').map((s) => s.trim()).filter(Boolean);
 
-  const contributionFull =
-    details.contribution?.[language] || details.contribution?.en || 'Full-Stack Developer';
+  const contributionFull = resolve(details.contribution) || 'Full-Stack Developer';
   const roleShort = contributionFull.split('—')[0].trim();
 
-  const descriptionText = project.description?.[language] || project.description?.en || '';
-  const problemText = details.problem?.[language] || details.problem?.en || descriptionText;
-  const goalsText = details.goals?.[language] || details.goals?.en || null;
-  const solutionText = details.solution?.[language] || details.solution?.en || '';
-  const architectureText = details.architecture?.[language] || details.architecture?.en || '';
+  const descriptionText = resolve(project.description);
+  const problemText = resolve(details.problem) || descriptionText;
+  const goalsText = resolve(details.goals) || null;
+  const solutionText = resolve(details.solution);
+  const architectureText = resolve(details.architecture);
   const featuresList = details.features?.[language] || details.features?.en || [];
   const processList = details.process?.[language] || details.process?.en || [];
-  const learningsText = details.learnings?.[language] || details.learnings?.en || contributionFull;
+  const learningsText = resolve(details.learnings) || contributionFull;
 
   // Authentic 3-column Results metrics derived strictly from verified project data
   const resultMetrics = project.metrics
     ? project.metrics.slice(0, 3).map((m) => ({
         value: m.value,
-        label: typeof m.label === 'object' ? m.label[language] || m.label.en : m.label,
+        label: resolve(m.label),
       }))
     : [
         {
           value: String(featuresList.length || 3).padStart(2, '0'),
-          label: isEn ? 'Core capabilities built' : 'Fitur inti terbangun',
+          label: t('v2.workDetail.fallbackCapabilities'),
         },
         {
           value: `${project.tags?.length || 4}`,
-          label: isEn ? 'Core stack technologies' : 'Teknologi utama',
+          label: t('v2.workDetail.fallbackStack'),
         },
         {
           value: project.live ? 'Live' : 'Web',
-          label: isEn
-            ? project.id === 'project-management'
-              ? 'Internal PT. AMA Salam'
-              : 'Production architecture'
-            : project.id === 'project-management'
-            ? 'Internal PT. AMA Salam'
-            : 'Arsitektur teruji',
+          label:
+            project.id === 'project-management'
+              ? t('v2.workDetail.fallbackInternal')
+              : t('v2.workDetail.fallbackProduction'),
         },
       ];
 
@@ -268,7 +256,7 @@ export default function WorkDetailV2({ slug }) {
                   className="flex items-baseline gap-6 will-change-transform"
                 >
                   <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text-dim)] uppercase">
-                    ({isEn ? 'CATEGORY' : 'KATEGORI'})
+                    ({t('v2.workDetail.categoryLabel')})
                   </span>
                   <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                     {categoryParts.map((part, idx) => (
@@ -291,7 +279,7 @@ export default function WorkDetailV2({ slug }) {
                   className="flex items-baseline gap-6 will-change-transform"
                 >
                   <span className="w-[100px] shrink-0 text-[15px] sm:text-[16px] font-medium tracking-[-0.02em] text-[var(--v2-text-dim)] uppercase">
-                    ({isEn ? 'ROLE' : 'PERAN'})
+                    ({t('v2.workDetail.roleLabel')})
                   </span>
                   <span className="text-[20px] sm:text-[24px] font-medium tracking-[-0.05em] leading-[1.08] text-[var(--v2-text)]">
                     {roleShort}
@@ -343,7 +331,7 @@ export default function WorkDetailV2({ slug }) {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-[var(--v2-accent)] hover:opacity-85 transition-opacity"
                         >
-                          <span>{isEn ? 'Live Website' : 'Lihat Website'}</span>
+                          <span>{t('v2.workDetail.liveWebsite')}</span>
                           <FiArrowUpRight size={20} />
                         </a>
                       )}
@@ -400,7 +388,7 @@ export default function WorkDetailV2({ slug }) {
                 <div className="aspect-square rounded-[12px] border border-[var(--v2-border)] bg-[var(--v2-bg-elevated)] p-7 sm:p-10 flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <span className="text-[14px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                      ({isEn ? 'ARCHITECTURE' : 'ARSITEKTUR'})
+                      ({t('v2.workDetail.architectureLabel')})
                     </span>
                     <span className="font-mono text-[13px] text-[var(--v2-accent)]">
                       {project.number || '01'}.
@@ -438,7 +426,7 @@ export default function WorkDetailV2({ slug }) {
           {/* 2. CHALLENGES BLOCK (`330px` Left Label + `680px` Indented Right Copy) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
             <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
-              {isEn ? 'Challenges' : 'Tantangan'}
+              {t('v2.workDetail.challengesHeading')}
               <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-8">
@@ -456,7 +444,7 @@ export default function WorkDetailV2({ slug }) {
           {/* 3. SOLUTIONS BLOCK (`330px` Left Label + `680px` Indented Right Copy + Features) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
             <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
-              {isEn ? 'Solutions' : 'Solusi'}
+              {t('v2.workDetail.solutionsHeading')}
               <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-10">
@@ -529,7 +517,7 @@ export default function WorkDetailV2({ slug }) {
           {/* 5. RESULTS BLOCK (`330px` Left Label + `680px` Summary & 3-Col `72px` Metrics) */}
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 lg:gap-12">
             <h2 className="lg:w-[330px] shrink-0 text-[24px] sm:text-[32px] font-semibold tracking-[-0.05em] leading-none text-[var(--v2-text-dim)]">
-              {isEn ? 'Results' : 'Hasil'}
+              {t('v2.workDetail.resultsHeading')}
               <span className="text-[var(--v2-accent)]">.</span>
             </h2>
             <div className="w-full lg:max-w-[680px] space-y-12">
@@ -610,7 +598,7 @@ export default function WorkDetailV2({ slug }) {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <MaskedDisplayHeading
               as="h2"
-              lines={isEn ? ['MORE WORKS'] : ['KARYA LAINNYA']}
+              lines={[t('v2.works.moreWorksHeading')]}
               className="v2-section-heading"
               shouldReduceMotion={Boolean(shouldReduceMotion)}
             />
@@ -619,7 +607,7 @@ export default function WorkDetailV2({ slug }) {
               to="/study-case"
               className="v2-pill-btn !min-w-[190px] !h-[52px] justify-between !text-[var(--v2-accent)] hover:!border-[var(--v2-accent)]"
             >
-              <RolloverLabel text={isEn ? 'SEE ALL' : 'LIHAT SEMUA'} />
+              <RolloverLabel text={t('v2.common.seeAll')} />
               <FiArrowUpRight size={16} />
             </RouterLink>
           </div>
@@ -630,7 +618,6 @@ export default function WorkDetailV2({ slug }) {
                 key={item.id}
                 project={item}
                 index={idx}
-                isEn={isEn}
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
               />
             ))}

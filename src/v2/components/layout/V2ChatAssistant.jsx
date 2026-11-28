@@ -7,10 +7,10 @@ import {
   FiX,
 } from 'react-icons/fi';
 
-import { useLanguage } from '../../../context/LanguageContext';
-import { useRouter } from '../../../context/RouterContext';
-import { useFocusTrap } from '../../../hooks/useFocusTrap';
-import { siteConfig } from '../../../config/site';
+import { useLanguage } from '@/context/LanguageContext';
+import { useRouter } from '@/context/RouterContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { siteConfig } from '@/config/site';
 import RolloverLabel from '../ui/RolloverLabel';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -46,7 +46,6 @@ export default function V2ChatAssistant() {
   const { language, t } = useLanguage();
   const { navigate } = useRouter();
   const shouldReduceMotion = useReducedMotion();
-  const isEn = language !== 'id';
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -295,7 +294,7 @@ export default function V2ChatAssistant() {
               <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--v2-accent)] opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--v2-accent)]" />
             </span>
-            <RolloverLabel text={isEn ? 'ASK AI' : 'TANYA AI'} />
+            <RolloverLabel text={t('v2.chat.askAi')} />
           </motion.button>
         ) : (
           <motion.section
@@ -325,7 +324,7 @@ export default function V2ChatAssistant() {
                   {siteConfig.bot?.name || 'GHIFARI AI'}
                 </span>
                 <span className="text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)] shrink-0">
-                  ({isEn ? 'AI CONCIERGE' : 'ASISTEN AI'})
+                  ({t('v2.chat.conciergeBadge')})
                 </span>
               </div>
 
@@ -369,9 +368,7 @@ export default function V2ChatAssistant() {
                 <div className="space-y-6">
                   <div className="space-y-2.5">
                     <p className="text-[22px] sm:text-[24px] font-semibold tracking-[-0.045em] leading-[1.12] text-[var(--v2-text)]">
-                      {isEn
-                        ? 'Ask anything about my work, stack, or engineering track.'
-                        : 'Tanyakan apa saja seputar karya, stack, atau rekam jejak saya.'}
+                      {t('v2.chat.emptyHeadline')}
                     </p>
                     <p className="text-[14px] leading-[1.45] tracking-[-0.015em] text-[var(--v2-text-dim)]">
                       {t('chatbot.welcomeBody')}
@@ -381,7 +378,7 @@ export default function V2ChatAssistant() {
                   {suggestions.length > 0 && (
                     <div className="space-y-2.5">
                       <p className="text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                        ({isEn ? 'SUGGESTED INQUIRIES' : 'PERTANYAAN CEPAT'})
+                        ({t('v2.chat.suggestedInquiries')})
                       </p>
 
                       <div className="border-t border-[var(--v2-border-strong)] divide-y divide-[var(--v2-border)]">
@@ -436,7 +433,7 @@ export default function V2ChatAssistant() {
                         />
                       )}
                       <span>
-                        ({isUser ? (isEn ? 'YOU' : 'ANDA') : siteConfig.bot?.name || 'GHIFARI AI'})
+                        ({isUser ? t('v2.chat.youLabel') : siteConfig.bot?.name || 'GHIFARI AI'})
                       </span>
                     </div>
 
@@ -463,7 +460,7 @@ export default function V2ChatAssistant() {
                         {msg.isError && (
                           <div className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-rose-400">
                             <FiAlertCircle size={13} aria-hidden="true" />
-                            <span>{isEn ? 'Connection Notice' : 'Kendala Koneksi'}</span>
+                            <span>{t('v2.chat.connectionNotice')}</span>
                           </div>
                         )}
 
@@ -527,7 +524,7 @@ export default function V2ChatAssistant() {
                     <span>({siteConfig.bot?.name || 'GHIFARI AI'})</span>
                   </div>
                   <div className="pl-3.5 border-l border-[var(--v2-accent)] py-0.5 flex items-center gap-2.5 text-[14px] tracking-[-0.02em] text-[var(--v2-text-muted)]">
-                    <span>{t('chatbot.thinking') || (isEn ? 'Thinking...' : 'Menyusun jawaban...')}</span>
+                    <span>{t('chatbot.thinking', t('v2.chat.thinkingFallback'))}</span>
                     <span className="inline-flex items-center gap-1" aria-hidden="true">
                       <span className="h-1 w-1 rounded-full bg-[var(--v2-accent)] animate-bounce [animation-delay:-0.24s]" />
                       <span className="h-1 w-1 rounded-full bg-[var(--v2-accent)] animate-bounce [animation-delay:-0.12s]" />

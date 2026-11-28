@@ -11,15 +11,15 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import { SiNpm } from 'react-icons/si';
-import { useLanguage } from '../../context/LanguageContext';
-import { RouterLink } from '../../context/RouterContext';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
-import { selectedProjects } from '../../data/projects';
-import { profileData } from '../../data/profile';
-import { techCategoriesData } from '../../data/skills';
-import { experiences } from '../../data/experience';
-import { directEmail, contactChannelsData } from '../../data/contact';
-import { siteConfig } from '../../config/site';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { selectedProjects } from '@/data/projects';
+import { profileData } from '@/data/profile';
+import { techCategoriesData } from '@/data/skills';
+import { experiences } from '@/data/experience';
+import { directEmail, contactChannelsData } from '@/data/contact';
+import { siteConfig } from '@/config/site';
 
 const InfoPanel = ({ building, onClose }) => {
   const { language, t, resolve } = useLanguage();

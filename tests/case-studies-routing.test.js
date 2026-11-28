@@ -157,6 +157,23 @@ test('CONF-03 — Project Case Studies & Client-Side Routing Test Suite', async 
       assert.equal(uniqueIds.size, ids.length, 'Every project ID must be unique');
     });
 
+    await t2.test('all projects define non-empty bilingual (id & en) descriptions', () => {
+      for (const p of allProjects) {
+        assert.ok(
+          p.description && typeof p.description === 'object',
+          `Project ${p.title} must have bilingual description object`
+        );
+        assert.ok(
+          typeof p.description.id === 'string' && p.description.id.trim().length > 0,
+          `Project ${p.title} must have Indonesian description`
+        );
+        assert.ok(
+          typeof p.description.en === 'string' && p.description.en.trim().length > 0,
+          `Project ${p.title} must have English description`
+        );
+      }
+    });
+
     await t2.test('resolves projects by slug case-insensitively', () => {
       const sf = getProjectBySlug('studyflow');
       assert.ok(sf, 'StudyFlow must be found');

@@ -9,10 +9,10 @@ import {
   clearGithubCache,
   fetchGithubData,
   formatRepoDate,
-} from '../../services/githubService';
-import { initialContributionsData } from '../../data/githubContributions';
-import { siteConfig } from '../../config/site';
-import { useLanguage } from '../../context/LanguageContext';
+} from '@/services/githubService';
+import { initialContributionsData } from '@/data/githubContributions';
+import { siteConfig } from '@/config/site';
+import { useLanguage } from '@/context/LanguageContext';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 import RolloverLabel from '../components/ui/RolloverLabel';
 import CountUpMetricCell from '../components/ui/CountUpMetricCell';
@@ -89,9 +89,8 @@ GithubMetricsStrip.propTypes = {
  * Open-canvas Nakula editorial layout: zero Bento cards, hairline 12-column ledger,
  * live interactive big-numeral inspection readout on the left, frameless 53-week matrix on the right.
  */
-function GithubActivitySection({ isEn: isEnProp }) {
+function GithubActivitySection() {
   const { language, t } = useLanguage();
-  const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
   const shouldReduceMotion = useReducedMotion();
 
   const [data, setData] = useState(null);
@@ -172,14 +171,15 @@ function GithubActivitySection({ isEn: isEnProp }) {
       if (!day) return '';
       const dateStr = formatRepoDate(`${day.date}T00:00:00`, language);
       if (day.count === 0) {
-        return isEn ? `No contributions · ${dateStr}` : `Belum ada kontribusi · ${dateStr}`;
+        return `${t('v2.github.noContributions')} · ${dateStr}`;
       }
-      if (isEn) {
-        return `${day.count} contribution${day.count > 1 ? 's' : ''} · ${dateStr}`;
-      }
-      return `${day.count} kontribusi · ${dateStr}`;
+      const unit =
+        day.count === 1
+          ? t('v2.github.contributionSingular')
+          : t('v2.github.contributionPlural');
+      return `${day.count} ${unit} · ${dateStr}`;
     },
-    [isEn, language]
+    [language, t]
   );
 
   const handleCellKeyDown = useCallback(
@@ -232,47 +232,42 @@ function GithubActivitySection({ isEn: isEnProp }) {
       {
         id: 'contributions',
         target: Number(totalContributions) || 0,
-        locale: isEn ? 'en-US' : 'id-ID',
+        locale: language === 'en' ? 'en-US' : 'id-ID',
         suffix: '+',
-        label: isEn ? 'Annual Contributions' : 'Kontribusi Tahunan',
-        sub: isEn
-          ? `${stats.activeDays} active days`
-          : `${stats.activeDays} hari aktif`,
+        label: t('v2.github.annualContributions'),
+        sub: t('v2.github.activeDays').replace('{count}', String(stats.activeDays)),
       },
       {
         id: 'streak',
         target: Number(stats.currentStreak) || 0,
-        suffix: isEn ? 'd' : 'h',
-        label: isEn ? 'Current Streak' : 'Streak Saat Ini',
-        sub: isEn
-          ? `Best: ${stats.longestStreak} days`
-          : `Terpanjang: ${stats.longestStreak} hari`,
+        suffix: t('v2.github.streakSuffix'),
+        label: t('v2.github.currentStreak'),
+        sub: t('v2.github.longestStreak').replace('{count}', String(stats.longestStreak)),
       },
       {
         id: 'repos',
         target: Number(profile?.publicRepos ?? 24) || 0,
         suffix: '.',
-        label: isEn ? 'Public Repositories' : 'Repositori Publik',
+        label: t('v2.github.publicRepos'),
         sub: `@${username}`,
       },
       {
         id: 'followers',
         target: Number(profile?.followers ?? 11) || 0,
         suffix: '.',
-        label: isEn ? 'GitHub Followers' : 'Pengikut GitHub',
-        sub: isEn
-          ? `${profile?.following ?? 23} following`
-          : `${profile?.following ?? 23} mengikuti`,
+        label: t('v2.github.followers'),
+        sub: t('v2.github.following').replace('{count}', String(profile?.following ?? 23)),
       },
     ],
     [
-      isEn,
+      language,
       profile?.followers,
       profile?.following,
       profile?.publicRepos,
       stats.activeDays,
       stats.currentStreak,
       stats.longestStreak,
+      t,
       totalContributions,
       username,
     ]
@@ -290,6 +285,7 @@ function GithubActivitySection({ isEn: isEnProp }) {
   const inspectedDateLabel = hoveredDay
     ? formatRepoDate(`${hoveredDay.date}T00:00:00`, language)
     : '';
+  const headingLines = t('v2.github.headingLines');
 
   return (
     <section
@@ -304,12 +300,12 @@ function GithubActivitySection({ isEn: isEnProp }) {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="relative">
             <p className="v2-section-tag mb-4 md:mb-0 md:absolute md:top-2 md:left-0">
-              ({isEn ? 'OPEN SOURCE' : 'KODE TERBUKA'})
+              ({t('v2.github.tag')})
             </p>
             <div id="v2-github-heading">
               <MaskedDisplayHeading
                 as="h2"
-                lines={isEn ? ['GITHUB', 'ACTIVITY'] : ['AKTIVITAS', 'GITHUB']}
+                lines={Array.isArray(headingLines) ? headingLines : []}
                 lineClassNames={['md:pl-36 lg:pl-44', '']}
                 className="v2-section-heading"
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
@@ -318,9 +314,7 @@ function GithubActivitySection({ isEn: isEnProp }) {
           </div>
 
           <p className="max-w-[360px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[var(--v2-text-muted)] lg:pb-2">
-            {isEn
-              ? 'Consistent engineering output, public TypeScript tooling, and 53 weeks of verified commit history.'
-              : 'Konsistensi rekayasa perangkat lunak, paket TypeScript publik, dan riwayat komit 53 minggu terakhir.'}
+            {t('v2.github.intro')}
           </p>
         </div>
 
@@ -353,10 +347,10 @@ function GithubActivitySection({ isEn: isEnProp }) {
             <div className="space-y-2 max-w-xl">
               <div className="inline-flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[-0.02em] text-[var(--v2-accent)]">
                 <FiAlertCircle size={16} aria-hidden="true" />
-                <span>{error.isRateLimit ? t('github.rateLimitTitle') : t('github.errorTitle')}</span>
+                <span>{error.isRateLimit ? t('github.rateLimitHeading') : t('github.errorHeading')}</span>
               </div>
               <p className="text-[17px] leading-[1.4] tracking-[-0.02em] text-[var(--v2-text-muted)]">
-                {error.isRateLimit ? t('github.rateLimitDesc') : t('github.errorDesc')}
+                {error.isRateLimit ? t('github.rateLimitMessage') : t('github.errorMessage')}
               </p>
             </div>
 
@@ -375,7 +369,7 @@ function GithubActivitySection({ isEn: isEnProp }) {
                 rel="noopener noreferrer"
                 className="v2-pill-btn v2-pill-btn--accent !py-3.5 !px-6 !text-[13px]"
               >
-                <RolloverLabel text={isEn ? 'OPEN GITHUB' : 'BUKA GITHUB'} />
+                <RolloverLabel text={t('v2.github.openGithub')} />
                 <FiArrowUpRight size={15} aria-hidden="true" />
               </a>
             </div>
@@ -417,19 +411,15 @@ function GithubActivitySection({ isEn: isEnProp }) {
                           </span>
                           <span className="text-[18px] font-medium tracking-[-0.03em] text-[var(--v2-text-muted)]">
                             {hoveredDay.count === 1
-                              ? isEn
-                                ? 'contribution'
-                                : 'kontribusi'
-                              : isEn
-                                ? 'contributions'
-                                : 'kontribusi'}
+                              ? t('v2.github.contributionSingular')
+                              : t('v2.github.contributionPlural')}
                           </span>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         <p className="text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                          ({isEn ? 'DEVELOPER PROFILE' : 'PROFIL PENGEMBANG'})
+                          ({t('v2.github.profileLabel')})
                         </p>
                         <div className="flex items-center gap-3.5">
                           <img
@@ -463,7 +453,7 @@ function GithubActivitySection({ isEn: isEnProp }) {
                       rel="noopener noreferrer"
                       className="v2-pill-btn !h-[48px] !px-6 !text-[13px]"
                     >
-                      <RolloverLabel text={isEn ? 'GITHUB PROFILE' : 'PROFIL GITHUB'} />
+                      <RolloverLabel text={t('v2.github.profileCta')} />
                       <FiArrowUpRight size={15} className="text-[var(--v2-accent)]" aria-hidden="true" />
                     </a>
 
@@ -489,7 +479,7 @@ function GithubActivitySection({ isEn: isEnProp }) {
                   {/* Minimal Editorial Meta Row */}
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <p className="text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-                      ({isEn ? '53-WEEK CADENCE' : 'RITME 53 MINGGU'})
+                      ({t('v2.github.cadence')})
                     </p>
 
                     <div className="flex items-center gap-2 text-[12px] tracking-[-0.01em] text-[var(--v2-text-dim)]">
@@ -547,11 +537,9 @@ function GithubActivitySection({ isEn: isEnProp }) {
                             gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
                           }}
                           role="grid"
-                          aria-label={
-                            isEn
-                              ? `GitHub contribution heatmap for ${username} (${totalContributions} contributions). Use arrow keys to navigate days.`
-                              : `Kalender kontribusi GitHub untuk ${username} (${totalContributions} kontribusi). Gunakan tombol panah untuk berpindah hari.`
-                          }
+                          aria-label={t('v2.github.heatmapAria')
+                            .replace('{username}', username)
+                            .replace('{total}', String(totalContributions))}
                         >
                           {days.map((day, idx) => {
                             const tooltipText = formatDayTooltip(day);
@@ -594,9 +582,5 @@ function GithubActivitySection({ isEn: isEnProp }) {
     </section>
   );
 }
-
-GithubActivitySection.propTypes = {
-  isEn: PropTypes.bool,
-};
 
 export default GithubActivitySection;

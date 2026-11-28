@@ -11,10 +11,10 @@ import {
   FiVolumeX,
   FiZap,
 } from 'react-icons/fi';
-import { useLanguage } from '../../../context/LanguageContext';
-import { RouterLink } from '../../../context/RouterContext';
-import { useAudioPlayer } from '../../../hooks/useAudioPlayer';
-import { useFocusTrap } from '../../../hooks/useFocusTrap';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const stopEvent = (e) => {
   e.stopPropagation();

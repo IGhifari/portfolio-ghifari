@@ -40,7 +40,7 @@ export default function PortfolioSwitcher({ version = '2', onChange }) {
       role="group"
       aria-label="Portfolio version switcher"
       data-portfolio-switcher={activeVersion}
-      className="fixed z-50 select-none"
+      className="fixed z-[45] select-none"
       style={{
         bottom: 'max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))',
         left: 'max(1rem, calc(env(safe-area-inset-left, 0px) + 0.75rem))',

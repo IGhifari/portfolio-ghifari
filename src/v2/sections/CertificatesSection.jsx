@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   FiArrowLeft,
@@ -9,9 +8,9 @@ import {
   FiX,
 } from 'react-icons/fi';
 
-import { certificates } from '../../data/certificates';
-import { useLanguage } from '../../context/LanguageContext';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { certificates } from '@/data/certificates';
+import { useLanguage } from '@/context/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 import RolloverLabel from '../components/ui/RolloverLabel';
 
@@ -23,10 +22,10 @@ const NAKULA_EASE = [0.22, 1, 0.36, 1];
  * - Left (5 cols): live crossfading document preview stage + certified skill pills + inspect trigger
  * - Right (7 cols): numbered `01.`–`04.` hairline credential ledger (hover/focus switches preview; click opens full-res studio lightbox with prev/next cycling)
  */
-export default function CertificatesSection({ isEn: isEnProp }) {
-  const { language, t } = useLanguage();
-  const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
+export default function CertificatesSection() {
+  const { t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+  const headingLines = t('v2.certificates.headingLines');
 
   const [hoveredIdx, setHoveredIdx] = useState(0);
   const [modalIdx, setModalIdx] = useState(null);
@@ -101,12 +100,12 @@ export default function CertificatesSection({ isEn: isEnProp }) {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="relative">
             <p className="v2-section-tag mb-4 md:mb-0 md:absolute md:top-2 md:left-0">
-              ({isEn ? 'CREDENTIALS' : 'SERTIFIKASI'})
+              ({t('v2.certificates.tag')})
             </p>
             <div id="v2-certificates-heading">
               <MaskedDisplayHeading
                 as="h2"
-                lines={isEn ? ['VERIFIED', 'RECORDS'] : ['ARSIP', 'SERTIFIKAT']}
+                lines={Array.isArray(headingLines) ? headingLines : []}
                 lineClassNames={['md:pl-36 lg:pl-44', '']}
                 className="v2-section-heading"
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
@@ -115,9 +114,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
           </div>
 
           <p className="max-w-[380px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[var(--v2-text-muted)] lg:pb-2">
-            {isEn
-              ? 'Official internship completion, national competition recognition, and technical training records.'
-              : 'Bukti resmi penyelesaian magang industri, kompetisi nasional, dan pelatihan teknis.'}
+            {t('v2.certificates.intro')}
           </p>
         </div>
 
@@ -129,7 +126,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-[13px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
                   <span>
-                    ({isEn ? 'DOCUMENT PREVIEW' : 'PRATINJAU DOKUMEN'} · {activePreview.number})
+                    ({t('v2.certificates.documentPreview')} · {activePreview.number})
                   </span>
                   <span className="text-[var(--v2-accent)] font-medium">
                     {activePreview.period}
@@ -168,7 +165,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                   >
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/55 backdrop-blur-md px-4 py-2 text-[12px] font-semibold uppercase tracking-[-0.01em] text-white">
                       <FiMaximize2 size={13} />
-                      <span>{isEn ? 'EXPAND FULL VIEW' : 'PERBESAR SERTIFIKAT'}</span>
+                      <span>{t('v2.certificates.expandFullView')}</span>
                     </span>
                   </div>
                 </button>
@@ -193,9 +190,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                     onClick={(e) => openModal(hoveredIdx, e.currentTarget)}
                     className="v2-pill-btn !h-[48px] !px-6 !text-[13px]"
                   >
-                    <RolloverLabel
-                      text={isEn ? 'INSPECT CERTIFICATE' : 'LIHAT SERTIFIKAT'}
-                    />
+                    <RolloverLabel text={t('v2.certificates.inspectCta')} />
                     <FiArrowUpRight
                       size={15}
                       className="text-[var(--v2-accent)]"
@@ -210,7 +205,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                       rel="noopener noreferrer"
                       className="v2-pill-btn v2-pill-btn--accent !h-[48px] !px-6 !text-[13px]"
                     >
-                      <RolloverLabel text={isEn ? 'VERIFY' : 'VERIFIKASI'} />
+                      <RolloverLabel text={t('v2.certificates.verifyCta')} />
                       <FiArrowUpRight size={15} aria-hidden="true" />
                     </a>
                   )}
@@ -368,7 +363,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                   <button
                     type="button"
                     onClick={() => stepModal(-1)}
-                    aria-label={isEn ? 'Previous certificate' : 'Sertifikat sebelumnya'}
+                    aria-label={t('v2.certificates.prevAria')}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                   >
                     <FiArrowLeft size={16} aria-hidden="true" />
@@ -376,7 +371,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                   <button
                     type="button"
                     onClick={() => stepModal(1)}
-                    aria-label={isEn ? 'Next certificate' : 'Sertifikat berikutnya'}
+                    aria-label={t('v2.certificates.nextAria')}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                   >
                     <FiArrowRight size={16} aria-hidden="true" />
@@ -423,11 +418,7 @@ export default function CertificatesSection({ isEn: isEnProp }) {
                     </span>
                   ))}
                 </div>
-                <span>
-                  {isEn
-                    ? 'Use ← / → keys to switch · Esc to close'
-                    : 'Gunakan ← / → untuk pindah · Esc untuk tutup'}
-                </span>
+                <span>{t('v2.certificates.modalHint')}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -436,7 +427,3 @@ export default function CertificatesSection({ isEn: isEnProp }) {
     </section>
   );
 }
-
-CertificatesSection.propTypes = {
-  isEn: PropTypes.bool,
-};

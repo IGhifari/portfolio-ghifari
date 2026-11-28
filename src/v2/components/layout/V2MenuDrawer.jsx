@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiArrowUpRight, FiX } from 'react-icons/fi';
 
-import { directEmail, contactChannelsData } from '../../../data/contact';
-import { RouterLink } from '../../../context/RouterContext';
+import { directEmail, contactChannelsData } from '@/data/contact';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
 import V2SeasonDrawerPicker from '../../theme/ThemeControls';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -16,9 +17,10 @@ export default function V2MenuDrawer({
   isOpen,
   onClose,
   items,
-  isEn = true,
   shouldReduceMotion = false,
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (e) => {
@@ -40,7 +42,7 @@ export default function V2MenuDrawer({
           className="fixed inset-0 z-[130] flex justify-end bg-black/75 backdrop-blur-[2px]"
           role="dialog"
           aria-modal="true"
-          aria-label={isEn ? 'Navigation Menu' : 'Menu Navigasi'}
+          aria-label={t('v2.common.menuAria')}
           onClick={onClose}
         >
           <motion.div
@@ -49,7 +51,7 @@ export default function V2MenuDrawer({
             animate={shouldReduceMotion ? { opacity: 1 } : { x: '0%' }}
             exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
             transition={{ duration: 0.78, ease: NAKULA_EASE }}
-            className="flex h-full w-full max-w-[460px] flex-col justify-between border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
+            className="flex h-full w-full max-w-[460px] flex-col justify-between overflow-y-auto border-l border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-7 py-6 sm:px-9 sm:py-7 will-change-transform"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[var(--v2-border-strong)] pb-5">
@@ -60,7 +62,7 @@ export default function V2MenuDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label={isEn ? 'Close navigation menu' : 'Tutup menu navigasi'}
+                aria-label={t('v2.common.closeMenuAria')}
                 className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-surface)] text-[var(--v2-text)] hover:border-[var(--v2-text-dim)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
               >
                 <FiX
@@ -109,7 +111,7 @@ export default function V2MenuDrawer({
               transition={{ duration: 0.62, delay: 0.4, ease: NAKULA_EASE }}
               className="space-y-5 pt-4"
             >
-              <V2SeasonDrawerPicker isEn={isEn} />
+              <V2SeasonDrawerPicker />
 
               <div>
                 <p className="mb-1.5 text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
@@ -145,7 +147,7 @@ export default function V2MenuDrawer({
                     onClick={onClose}
                     className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
                   >
-                    <span>{isEn ? 'Recruiter' : 'Rekruter'}</span>
+                    <span>{t('v2.common.recruiter')}</span>
                     <FiArrowUpRight size={14} className="text-[var(--v2-text-dim)]" />
                   </RouterLink>
                 </div>
@@ -169,6 +171,5 @@ V2MenuDrawer.propTypes = {
       action: PropTypes.func.isRequired,
     })
   ).isRequired,
-  isEn: PropTypes.bool,
   shouldReduceMotion: PropTypes.bool,
 };

@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
-import { allProjects } from '../../data/projects';
-import { siteConfig } from '../../config/site';
-import { useLanguage } from '../../context/LanguageContext';
-import { updateDocumentMetadata, generateCaseStudyListSchema } from '../../utils/seo';
+import { allProjects } from '@/data/projects';
+import { useLanguage } from '@/context/LanguageContext';
+import { updateDocumentMetadata, generateCaseStudyListSchema } from '@/utils/seo';
 import V2SubpageShell, { V2WorkGridCard } from '../components/layout/V2Chrome';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 import { useV2TransitionState } from '../components/motion/openingState';
@@ -19,21 +18,16 @@ import { useV2TransitionState } from '../components/motion/openingState';
  * - Section 2 & 3: `"LET'S WORK TOGETHER"` CTA + Nakula Footer
  */
 export default function WorksListV2() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const { subpageRevealReady, openingCompleted } = useV2TransitionState();
-  const isEn = language === 'en';
   const isHeroReady = Boolean(
     shouldReduceMotion || (openingCompleted && subpageRevealReady)
   );
 
   useEffect(() => {
-    const title = isEn
-      ? `Selected Works & Case Studies | ${siteConfig.name}`
-      : `Semua Karya & Studi Kasus | ${siteConfig.name}`;
-    const description = isEn
-      ? `Explore software engineering projects, full-stack web applications, and open-source TypeScript packages by ${siteConfig.name}.`
-      : `Jelajahi proyek rekayasa perangkat lunak, aplikasi web full-stack, dan library TypeScript open-source oleh ${siteConfig.name}.`;
+    const title = t('v2.works.seoTitle');
+    const description = t('v2.works.seoDescription');
 
     updateDocumentMetadata({
       title,
@@ -45,7 +39,7 @@ export default function WorksListV2() {
       schemaData: generateCaseStudyListSchema(allProjects, language),
       lang: language,
     });
-  }, [isEn, language]);
+  }, [language, t]);
 
   return (
     <V2SubpageShell scrollKey="works-list">
@@ -53,7 +47,7 @@ export default function WorksListV2() {
         <div className="v2-container flex flex-col gap-[56px] md:gap-[72px]">
           <MaskedDisplayHeading
             as="h1"
-            lines={isEn ? ['SELECTED WORKS'] : ['SEMUA KARYA']}
+            lines={[t('v2.works.heading')]}
             className="v2-section-heading"
             shouldReduceMotion={Boolean(shouldReduceMotion)}
             reveal={isHeroReady}
@@ -65,7 +59,6 @@ export default function WorksListV2() {
                 key={project.id}
                 project={project}
                 index={idx}
-                isEn={isEn}
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
                 reveal={idx < 2 ? isHeroReady : undefined}
               />

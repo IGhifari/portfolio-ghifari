@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 import { markV2OpeningCompleted } from './openingState';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -137,7 +138,8 @@ function readSeasonalGlowRgb(canvas) {
  * - Multi-plane 2.5D camera push-in depth + staggered HUD entrance
  * - Classic radial luminous bloom -> silk dissolve entry into Hero (callback refs prevent parent re-render restarts)
  */
-export default function V2OpeningSequence({ isEn = true, onComplete, onRevealStart }) {
+export default function V2OpeningSequence({ onComplete, onRevealStart }) {
+  const { t } = useLanguage();
   const canvasRef = useRef(null);
   const counterRef = useRef(null);
   const progressBarRef = useRef(null);
@@ -746,9 +748,8 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
     };
   }, [finishSequence]);
 
-  const captions = isEn
-    ? ['', 'From idea', 'Through engineering', 'To real impact']
-    : ['', 'Dari gagasan', 'Melalui rekayasa', 'Menjadi solusi nyata'];
+  const translatedCaptions = t('v2.opening.captions');
+  const captions = ['', ...(Array.isArray(translatedCaptions) ? translatedCaptions : [])];
 
   const activeCaption = captions[phaseIndex] || '';
   const isDissolving = exitState === 'dissolve';
@@ -797,7 +798,7 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
           transition={{ duration: isHudExiting ? 0.38 : 0.65, delay: isHudExiting ? 0 : 0.24, ease: NAKULA_EASE }}
           className="absolute top-5 right-5 sm:top-6 sm:right-7 rounded-full border border-white/10 bg-white/[0.02] px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45 hover:border-[var(--v2-accent,#3b82f6)] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent,#3b82f6)]"
         >
-          {isEn ? 'SKIP' : 'LEWATI'}
+          {t('v2.opening.skip')}
         </motion.button>
 
         {/* Bottom-Left Sequence Stamp */}
@@ -885,7 +886,6 @@ export default function V2OpeningSequence({ isEn = true, onComplete, onRevealSta
 }
 
 V2OpeningSequence.propTypes = {
-  isEn: PropTypes.bool,
   onComplete: PropTypes.func,
   onRevealStart: PropTypes.func,
 };

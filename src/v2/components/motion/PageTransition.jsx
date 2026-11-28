@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { siteConfig } from '../../../config/site';
-import { useTheme } from '../../../context/ThemeContext';
+import { siteConfig } from '@/config/site';
+import { useTheme } from '@/context/ThemeContext';
 import { useV2TransitionState } from './openingState';
 import { buildV2SeasonTokens } from '../../theme/seasonPalette';
 

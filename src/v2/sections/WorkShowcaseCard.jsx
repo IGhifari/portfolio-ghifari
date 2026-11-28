@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
 import { FiArrowUpRight } from 'react-icons/fi';
 
-import { RouterLink } from '../../context/RouterContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { RouterLink } from '@/context/RouterContext';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
@@ -16,9 +17,9 @@ export default function WorkShowcaseCard({
   index,
   onVisible,
   isDesktop,
-  isEn,
   shouldReduceMotion = false,
 }) {
+  const { t, resolve } = useLanguage();
   const cardRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -67,8 +68,8 @@ export default function WorkShowcaseCard({
     setIsHovered(true);
   };
 
-  const subtitleText = isEn ? project.subtitle.en : project.subtitle.id;
-  const descriptionText = isEn ? project.description.en : project.description.id;
+  const subtitleText = resolve(project.subtitle);
+  const descriptionText = resolve(project.description);
   const useScaleChoreography = isDesktop && !shouldReduceMotion;
 
   return (
@@ -99,7 +100,7 @@ export default function WorkShowcaseCard({
                 transition={{ duration: 0.18, ease: NAKULA_EASE }}
                 aria-hidden="true"
               >
-                <span>{isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}</span>
+                <span>{t('v2.common.viewProject')}</span>
                 <FiArrowUpRight size={14} />
               </motion.div>
             )}
@@ -140,7 +141,7 @@ export default function WorkShowcaseCard({
             to={`/study-case/${project.id}`}
             className="inline-flex items-center gap-1 text-[var(--v2-text)] hover:text-[var(--v2-accent)]"
           >
-            <span>{isEn ? 'Case Study' : 'Studi Kasus'}</span>
+            <span>{t('v2.common.caseStudy')}</span>
             <FiArrowUpRight size={13} className="text-[var(--v2-accent)]" />
           </RouterLink>
           {project.live && (
@@ -176,6 +177,5 @@ WorkShowcaseCard.propTypes = {
   index: PropTypes.number.isRequired,
   onVisible: PropTypes.func.isRequired,
   isDesktop: PropTypes.bool.isRequired,
-  isEn: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
 };

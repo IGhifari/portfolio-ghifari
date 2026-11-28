@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { FiRotateCcw, FiTarget } from 'react-icons/fi';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 /**
  * Unobtrusive zone-scoped HUD overlay shown strictly when exploring the East Football Field.

@@ -10,12 +10,12 @@ import {
 } from 'framer-motion';
 import { FiArrowUpRight, FiCheck, FiCopy } from 'react-icons/fi';
 
-import { siteConfig, ENABLE_SEASONAL_THEMES } from '../../../config/site';
-import { directEmail, contactChannelsData } from '../../../data/contact';
-import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '../../../data/resume';
-import { useLanguage } from '../../../context/LanguageContext';
-import { useTheme } from '../../../context/ThemeContext';
-import { RouterLink, useRouter } from '../../../context/RouterContext';
+import { siteConfig, ENABLE_SEASONAL_THEMES } from '@/config/site';
+import { directEmail, contactChannelsData } from '@/data/contact';
+import { RESUME_AVAILABLE, RESUME_URL, RESUME_FILENAME } from '@/data/resume';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
+import { RouterLink, useRouter } from '@/context/RouterContext';
 import { useV2Lenis } from '../../hooks/useV2Lenis';
 import { useJakartaClock } from '../../hooks/useJakartaClock';
 import { useClipboardCopy } from '../../hooks/useClipboardCopy';
@@ -28,8 +28,8 @@ import MaskedDisplayHeading from '../ui/MaskedDisplayHeading';
 import V2MenuDrawer from './V2MenuDrawer';
 import '../../styles/v2.css';
 
-const SeasonalEffects = lazy(() => import('../../../components/SeasonalEffects'));
-const DeveloperTerminal = lazy(() => import('../../../components/DeveloperTerminal'));
+const SeasonalEffects = lazy(() => import('@/components/SeasonalEffects'));
+const DeveloperTerminal = lazy(() => import('@/components/DeveloperTerminal'));
 const V2ChatAssistant = lazy(() => import('./V2ChatAssistant'));
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -44,10 +44,10 @@ const NAKULA_EASE = [0.22, 1, 0.36, 1];
 export function V2WorkGridCard({
   project,
   index = 0,
-  isEn,
   shouldReduceMotion = false,
   reveal,
 }) {
+  const { t, resolve } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
 
   const mouseX = useMotionValue(0);
@@ -68,13 +68,7 @@ export function V2WorkGridCard({
     setIsHovered(true);
   };
 
-  const subtitleText = project.subtitle
-    ? isEn
-      ? project.subtitle.en
-      : project.subtitle.id
-    : isEn
-    ? project.description.en
-    : project.description.id;
+  const subtitleText = resolve(project.subtitle || project.description);
 
   const isControlled = typeof reveal === 'boolean';
 
@@ -120,7 +114,7 @@ export function V2WorkGridCard({
               transition={{ duration: 0.18, ease: NAKULA_EASE }}
               aria-hidden="true"
             >
-              <span>{isEn ? 'VIEW PROJECT' : 'LIHAT PROYEK'}</span>
+              <span>{t('v2.common.viewProject')}</span>
               <FiArrowUpRight size={14} />
             </motion.div>
           )}
@@ -156,7 +150,6 @@ export function V2WorkGridCard({
 V2WorkGridCard.propTypes = {
   project: PropTypes.object.isRequired,
   index: PropTypes.number,
-  isEn: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
   reveal: PropTypes.bool,
 };
@@ -170,10 +163,10 @@ V2WorkGridCard.propTypes = {
  */
 export default function V2SubpageShell({ children, scrollKey = '' }) {
   const shouldReduceMotion = useReducedMotion();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { isDark, season, seasonalEnabled } = useTheme();
   const { switchLanguage, navigate } = useRouter();
-  const isEn = language === 'en';
+  const nextLanguage = language === 'en' ? 'id' : 'en';
   const v2SeasonVars = useMemo(
     () => buildV2SeasonTokens(season, seasonalEnabled),
     [season, seasonalEnabled]
@@ -256,7 +249,6 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
           ==================================================================== */}
       {showOpening && (
         <OpeningSequence
-          isEn={isEn}
           onComplete={() => setShowOpening(false)}
         />
       )}
@@ -284,21 +276,21 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
           {/* Right Cluster (`mix-blend-difference` in dark mode; direct contrast in Light Winter) */}
           <div
-            className={`pointer-events-auto flex items-center gap-5 lg:gap-10 ${
+            className={`pointer-events-auto flex items-center gap-3 lg:gap-10 shrink-0 ${
               isDark ? 'mix-blend-difference' : ''
             }`}
           >
-            <div className="hidden md:flex flex-col text-left leading-[1.22]">
+            <div className="hidden lg:flex flex-col text-left leading-[1.22] whitespace-nowrap">
               <div className="flex items-center gap-2 text-[15px] font-bold tracking-[-0.04em] text-[var(--v2-text)]">
                 <span className="h-2 w-2 rounded-full bg-[#47c554]" aria-hidden="true" />
-                <span>{isEn ? 'Available for project' : 'Tersedia untuk proyek'}</span>
+                <span>{t('v2.common.availableForProject')}</span>
               </div>
               <span className="pl-4 text-[13px] font-normal uppercase tracking-[-0.03em] text-[var(--v2-text-muted)]">
-                {isEn ? 'OPEN FOR ROLES' : 'TERBUKA UNTUK KERJA'}
+                {t('v2.common.openForRoles')}
               </span>
             </div>
 
-            <div className="hidden lg:flex flex-col text-left leading-[1.22]">
+            <div className="hidden lg:flex flex-col text-left leading-[1.22] whitespace-nowrap">
               <span className="text-[15px] font-bold tracking-[-0.04em] text-[var(--v2-text)]">
                 {jakartaTime}
               </span>
@@ -307,18 +299,18 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <V2SeasonHeaderBadge isEn={isEn} onOpenDrawer={() => setIsMenuOpen(true)} />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <V2SeasonHeaderBadge onOpenDrawer={() => setIsMenuOpen(true)} />
 
               <button
                 type="button"
-                onClick={() => switchLanguage(isEn ? 'id' : 'en')}
-                aria-label={isEn ? 'Switch language to Indonesian' : 'Ganti bahasa ke Inggris'}
-                className="inline-flex h-[43px] items-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-3 text-[12px] font-bold uppercase tracking-[-0.02em] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
+                onClick={() => switchLanguage(nextLanguage)}
+                aria-label={t('v2.common.switchLangAria')}
+                className="inline-flex h-[40px] sm:h-[43px] shrink-0 items-center rounded-full border border-[var(--v2-border-strong)] bg-[var(--v2-bg)] px-2.5 sm:px-3 text-[11px] sm:text-[12px] font-bold uppercase tracking-[-0.02em] text-[var(--v2-text)] hover:border-[var(--v2-accent)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
               >
-                <span className={!isEn ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>ID</span>
+                <span className={language === 'id' ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>ID</span>
                 <span className="mx-1 text-[#444444]">/</span>
-                <span className={isEn ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>EN</span>
+                <span className={language === 'en' ? 'text-[var(--v2-accent)]' : 'text-[var(--v2-text-dim)]'}>EN</span>
               </button>
 
               <div className="flex items-center gap-1">
@@ -330,13 +322,13 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                   }}
                   className="v2-pill-btn v2-nav-talk-btn"
                 >
-                  <RolloverLabel text={isEn ? "LET'S TALK" : 'HUBUNGI SAYA'} />
+                  <RolloverLabel text={t('v2.common.letsTalk')} />
                 </a>
 
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(true)}
-                  aria-label={isEn ? 'Open navigation menu' : 'Buka menu navigasi'}
+                  aria-label={t('v2.common.openMenuAria')}
                   aria-expanded={isMenuOpen}
                   className="v2-nav-menu-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
                 >
@@ -358,7 +350,6 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         items={drawerItems}
-        isEn={isEn}
         shouldReduceMotion={Boolean(shouldReduceMotion)}
       />
 
@@ -384,7 +375,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
             <div className="lg:col-span-7">
               <MaskedDisplayHeading
                 as="h2"
-                lines={isEn ? ["LET'S WORK", 'TOGETHER'] : ['MARI BEKERJA', 'BERSAMA']}
+                lines={Array.isArray(t('v2.contact.headingLines')) ? t('v2.contact.headingLines') : []}
                 className="v2-section-heading"
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
               />
@@ -392,9 +383,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
             <div className="lg:col-span-5 space-y-6 lg:pb-2">
               <p className="text-[20px] sm:text-[24px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)] max-w-md">
-                {isEn
-                  ? 'Have a frontend role, web application, or collaborative project in mind? Let’s build it with clarity.'
-                  : 'Punya peluang frontend, aplikasi web, atau proyek kolaborasi? Mari bangun bersama dengan jelas dan terukur.'}
+                {t('v2.contact.subpageIntro')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -402,25 +391,25 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                   href={`mailto:${directEmail}`}
                   className="v2-pill-btn v2-pill-btn--accent flex-1 !h-[60px] !text-[16px] justify-between !px-7"
                 >
-                  <RolloverLabel text={isEn ? 'GET IN TOUCH' : 'HUBUNGI SEKARANG'} />
+                  <RolloverLabel text={t('v2.contact.getInTouch')} />
                   <FiArrowUpRight size={20} />
                 </a>
 
                 <button
                   type="button"
                   onClick={handleCopyEmail}
-                  aria-label={isEn ? 'Copy email address' : 'Salin alamat email'}
+                  aria-label={t('v2.common.copyEmailAria')}
                   className="v2-pill-btn !h-[60px] !px-5 !text-[13px]"
                 >
                   {copiedEmail ? (
                     <>
                       <FiCheck size={15} className="text-[#47c554]" />
-                      <span>{isEn ? 'COPIED' : 'TERSALIN'}</span>
+                      <span>{t('v2.common.copied')}</span>
                     </>
                   ) : (
                     <>
                       <FiCopy size={15} />
-                      <span>{isEn ? 'COPY EMAIL' : 'SALIN EMAIL'}</span>
+                      <span>{t('v2.common.copyEmail')}</span>
                     </>
                   )}
                 </button>
@@ -535,9 +524,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
 
               <div className="lg:col-span-4 space-y-6">
                 <p className="text-[15px] leading-[1.35] tracking-[-0.02em] text-[var(--v2-text)] max-w-[280px]">
-                  {isEn
-                    ? 'Download my official CV to review full experience, projects, and engineering credentials.'
-                    : 'Unduh CV resmi saya untuk meninjau pengalaman lengkap, proyek, dan kredensial rekayasa.'}
+                  {t('v2.common.downloadCvDesc')}
                 </p>
 
                 <div className="border-b border-[var(--v2-border-strong)] pb-3 flex items-center justify-between text-[16px] text-[var(--v2-text-dim)]">
@@ -553,7 +540,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                     rel="noopener noreferrer"
                     className="v2-pill-btn w-full !h-[52px] !text-[14px]"
                   >
-                    <RolloverLabel text={isEn ? 'DOWNLOAD CV' : 'UNDUH CV'} />
+                    <RolloverLabel text={t('v2.common.downloadCv')} />
                   </a>
                 )}
               </div>
@@ -577,9 +564,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
               <span className="text-[0.28em] align-top ml-1 font-sans font-normal">®</span>
             </p>
             <p className="text-left sm:text-right text-[clamp(2.1rem,3.8vw,3.35rem)] font-semibold tracking-[-0.055em] leading-[0.96] text-[var(--v2-accent-ink)] max-w-[260px]">
-              {isEn
-                ? 'Beyond Visuals. Built with Vision.'
-                : 'Melampaui Visual. Dibangun dengan Visi.'}
+              {t('v2.common.beyondVisualsTagline')}
             </p>
           </div>
         </div>

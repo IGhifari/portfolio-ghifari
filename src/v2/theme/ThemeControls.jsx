@@ -1,27 +1,25 @@
 import PropTypes from 'prop-types';
 import { FiMoon, FiSun } from 'react-icons/fi';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 /**
  * Compact Header Pill + Menu Drawer Dark/Light Switcher for Portfolio V2.
  * Seasonal themes activate automatically by calendar month; the UI exposes
  * only a clean Dark / Light appearance toggle (no manual month chips).
  */
-export function V2SeasonHeaderBadge({ isEn = true, onOpenDrawer }) {
+export function V2SeasonHeaderBadge({ onOpenDrawer }) {
   const { season, seasonalEnabled } = useTheme();
+  const { t, resolve } = useLanguage();
   if (!seasonalEnabled || !season?.isSeasonalActive) return null;
 
-  const label = isEn ? season.name.en : season.name.id;
+  const label = resolve(season.name);
 
   return (
     <button
       type="button"
       onClick={onOpenDrawer}
-      aria-label={
-        isEn
-          ? `Active season: ${label}. Open menu for Dark or Light mode`
-          : `Musim aktif: ${label}. Buka menu untuk mode Gelap atau Terang`
-      }
+      aria-label={t('v2.theme.seasonBadgeAria').replace('{season}', label)}
       className="hidden sm:inline-flex h-[43px] items-center gap-2 rounded-full border border-[var(--v2-accent)] bg-[var(--v2-bg)] px-3.5 text-[11px] font-bold uppercase tracking-[-0.02em] text-[var(--v2-text)] hover:text-[var(--v2-text-bright)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)]"
     >
       <span
@@ -34,12 +32,12 @@ export function V2SeasonHeaderBadge({ isEn = true, onOpenDrawer }) {
 }
 
 V2SeasonHeaderBadge.propTypes = {
-  isEn: PropTypes.bool,
   onOpenDrawer: PropTypes.func,
 };
 
-export default function V2SeasonDrawerPicker({ isEn = true }) {
+export default function V2SeasonDrawerPicker() {
   const { season, isDark, toggleTheme } = useTheme();
+  const { t, resolve } = useLanguage();
 
   const handleSelectMode = (targetMode) => {
     if ((targetMode === 'dark' && !isDark) || (targetMode === 'light' && isDark)) {
@@ -47,17 +45,13 @@ export default function V2SeasonDrawerPicker({ isEn = true }) {
     }
   };
 
-  const seasonTag = season?.isSeasonalActive
-    ? isEn
-      ? season.name.en
-      : season.name.id
-    : null;
+  const seasonTag = season?.isSeasonalActive ? resolve(season.name) : null;
 
   return (
     <div>
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <p className="text-[12px] uppercase tracking-[-0.02em] text-[var(--v2-text-dim)]">
-          ({isEn ? 'THEME' : 'TEMA'})
+          ({t('v2.theme.label')})
         </p>
 
         {seasonTag && (
@@ -71,7 +65,7 @@ export default function V2SeasonDrawerPicker({ isEn = true }) {
       <div
         className="inline-flex items-center gap-2"
         role="group"
-        aria-label={isEn ? 'Theme mode' : 'Mode tema'}
+        aria-label={t('v2.theme.modeAria')}
       >
         <button
           type="button"
@@ -84,7 +78,7 @@ export default function V2SeasonDrawerPicker({ isEn = true }) {
           }`}
         >
           <FiMoon size={12} aria-hidden="true" />
-          <span>{isEn ? 'Dark' : 'Gelap'}</span>
+          <span>{t('v2.theme.dark')}</span>
         </button>
 
         <button
@@ -98,13 +92,9 @@ export default function V2SeasonDrawerPicker({ isEn = true }) {
           }`}
         >
           <FiSun size={12} aria-hidden="true" />
-          <span>{isEn ? 'Light' : 'Terang'}</span>
+          <span>{t('v2.theme.light')}</span>
         </button>
       </div>
     </div>
   );
 }
-
-V2SeasonDrawerPicker.propTypes = {
-  isEn: PropTypes.bool,
-};

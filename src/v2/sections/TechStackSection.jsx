@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   SiBruno,
@@ -35,8 +34,8 @@ import { VscSparkle, VscVscode } from 'react-icons/vsc';
 import { TbTablePlus } from 'react-icons/tb';
 import { FiCpu, FiPackage } from 'react-icons/fi';
 
-import { techCategoriesData } from '../../data/skills';
-import { useLanguage } from '../../context/LanguageContext';
+import { techCategoriesData } from '@/data/skills';
+import { useLanguage } from '@/context/LanguageContext';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
@@ -99,25 +98,15 @@ const MARQUEE_ITEMS = [
   { name: 'GitHub Actions', Icon: SiGithubactions },
 ];
 
-const DOMAIN_LABELS = {
-  languages: { en: 'Programming Languages', id: 'Bahasa Pemrograman' },
-  frontend: { en: 'Frontend Engineering', id: 'Rekayasa Frontend' },
-  backend: { en: 'Backend Systems', id: 'Sistem Backend' },
-  database: { en: 'Database & ORM', id: 'Basis Data & ORM' },
-  ai: { en: 'AI & Async Pipelines', id: 'Integrasi AI & Antrean' },
-  devops: { en: 'Cloud & Deployment', id: 'Cloud & Deployment' },
-  tools: { en: 'Developer Tooling', id: 'Perangkat Pengembang' },
-};
-
 /**
  * Portfolio V2 Architectural Tech Stack Section
  * Open-canvas 7-domain hairline ledger (`01.`–`07.`) paired with icon-pill clusters
  * and an edge-faded monochrome technology ribbon (zero V1 Bento cards).
  */
-export default function TechStackSection({ isEn: isEnProp }) {
-  const { language, t } = useLanguage();
-  const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
+export default function TechStackSection() {
+  const { t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+  const headingLines = t('v2.stack.headingLines');
 
   return (
     <section
@@ -130,12 +119,12 @@ export default function TechStackSection({ isEn: isEnProp }) {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="relative">
             <p className="v2-section-tag mb-4 md:mb-0 md:absolute md:top-2 md:left-0">
-              ({isEn ? 'TECH STACK' : 'TEKNOLOGI'})
+              ({t('v2.stack.tag')})
             </p>
             <div id="v2-stack-heading">
               <MaskedDisplayHeading
                 as="h2"
-                lines={isEn ? ['CORE', 'ARSENAL'] : ['ARSENAL', 'TEKNIS']}
+                lines={Array.isArray(headingLines) ? headingLines : []}
                 lineClassNames={['md:pl-36 lg:pl-44', '']}
                 className="v2-section-heading"
                 shouldReduceMotion={Boolean(shouldReduceMotion)}
@@ -144,9 +133,7 @@ export default function TechStackSection({ isEn: isEnProp }) {
           </div>
 
           <p className="max-w-[380px] text-[20px] sm:text-[24px] font-medium tracking-[-0.045em] leading-[1.12] text-[var(--v2-text-muted)] lg:pb-2">
-            {isEn
-              ? 'Production-tested languages, frameworks, relational databases, and tooling across seven engineering domains.'
-              : 'Bahasa, framework, basis data relasional, dan perangkat teruji produksi di tujuh domain rekayasa.'}
+            {t('v2.stack.intro')}
           </p>
         </div>
 
@@ -154,9 +141,10 @@ export default function TechStackSection({ isEn: isEnProp }) {
         <div className="border-t border-[var(--v2-border-strong)] divide-y divide-[var(--v2-border-strong)]">
           {techCategoriesData.map((category, idx) => {
             const indexNum = String(idx + 1).padStart(2, '0');
-            const domainTitle =
-              DOMAIN_LABELS[category.id]?.[isEn ? 'en' : 'id'] ||
-              t(`stack.categories.${category.id}.title`, category.title);
+            const domainTitle = t(
+              `v2.stack.domains.${category.id}`,
+              t(`stack.categories.${category.id}.title`, category.title)
+            );
             const domainDesc = t(
               `stack.categories.${category.id}.description`,
               category.description
@@ -254,7 +242,3 @@ export default function TechStackSection({ isEn: isEnProp }) {
     </section>
   );
 }
-
-TechStackSection.propTypes = {
-  isEn: PropTypes.bool,
-};

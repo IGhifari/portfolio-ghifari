@@ -136,14 +136,27 @@ test('STAGE 8B Sprint 3 — Touch Targets, Reduced Motion, Contrast & Semantic C
   // ==========================================
   await t.test('4. MED-04 — Semantic Interactive Controls (Elimination of div[role="button"])', async (t2) => {
     await t2.test('Project.jsx uses semantic <button type="button"> for preview cards', () => {
-      const rawContent = fs.readFileSync(path.join(rootDir, 'src', 'components', 'Project.jsx'), 'utf-8');
-      const content = rawContent.replace(/\r\n/g, '\n');
+      const readNormalized = (...segments) =>
+        fs.readFileSync(path.join(rootDir, ...segments), 'utf-8').replace(/\r\n/g, '\n');
 
-      // No role="button" in Project.jsx
-      assert.ok(!content.includes('role="button"'), 'Project.jsx must not contain any role="button"');
+      const projectContent = readNormalized('src', 'components', 'Project.jsx');
+      const masonryCardContent = readNormalized('src', 'components', 'project', 'ProjectMasonryCard.jsx');
+      const archiveCardContent = readNormalized('src', 'components', 'project', 'ProjectArchiveCard.jsx');
+
+      // No role="button" in Project.jsx or its extracted card components
+      assert.ok(!projectContent.includes('role="button"'), 'Project.jsx must not contain any role="button"');
+      assert.ok(!masonryCardContent.includes('role="button"'), 'ProjectMasonryCard.jsx must not contain any role="button"');
+      assert.ok(!archiveCardContent.includes('role="button"'), 'ProjectArchiveCard.jsx must not contain any role="button"');
+
       // Must use native button for featured and other cards
-      assert.ok(content.includes('<button\n                        type="button"\n                        onClick={(e) => openModal(project, e.currentTarget)'), 'Featured project preview must use button');
-      assert.ok(content.includes('<button\n                  type="button"\n                  onClick={(e) => openModal(project, e.currentTarget)'), 'Other project preview must use button');
+      assert.ok(
+        masonryCardContent.includes('<button\n          type="button"\n          onClick={(e) => onOpenModal(project, e.currentTarget)'),
+        'Featured project preview must use button'
+      );
+      assert.ok(
+        archiveCardContent.includes('<button\n          type="button"\n          onClick={(e) => onOpenModal(project, e.currentTarget)'),
+        'Other project preview must use button'
+      );
     });
 
     await t2.test('Certificate.jsx uses semantic <button type="button"> for preview cards', () => {

@@ -1,20 +1,14 @@
 import { useCallback, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import emailjs from '@emailjs/browser';
 import { FiAlertCircle, FiArrowUpRight, FiCheck } from 'react-icons/fi';
 
-import { useLanguage } from '../../context/LanguageContext';
-import { directEmail } from '../../data/contact';
-import { siteConfig } from '../../config/site';
-import { CONTACT_LIMITS, validateContactForm } from '../../utils/contactValidation';
+import { useLanguage } from '@/context/LanguageContext';
+import { directEmail } from '@/data/contact';
+import { siteConfig } from '@/config/site';
+import { CONTACT_LIMITS, validateContactForm } from '@/utils/contactValidation';
 import RolloverLabel from '../components/ui/RolloverLabel';
 
 const COOLDOWN_MS = 60000;
-
-const SUBJECT_PRESETS = {
-  en: ['Frontend Role', 'Web Project', 'Collaboration'],
-  id: ['Peluang Kerja', 'Proyek Web', 'Kolaborasi'],
-};
 
 /**
  * Portfolio V2 Architectural Inquiry Form
@@ -22,9 +16,8 @@ const SUBJECT_PRESETS = {
  * frameless large-scale typography, animated left-to-right accent focus rule,
  * bordered V2 topic pills, and `SEND MESSAGE ↗` rollover CTA.
  */
-function ContactFormSection({ isEn: isEnProp }) {
-  const { t, language } = useLanguage();
-  const isEn = typeof isEnProp === 'boolean' ? isEnProp : language !== 'id';
+function ContactFormSection() {
+  const { t } = useLanguage();
 
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -85,7 +78,7 @@ function ContactFormSection({ isEn: isEnProp }) {
       if (now - lastSubmitTimeRef.current < COOLDOWN_MS) {
         setStatusNotice({
           type: 'warning',
-          title: isEn ? 'Please wait a moment' : 'Tunggu sebentar',
+          title: t('v2.contact.waitTitle'),
           body: t('contact.toastCooldown'),
         });
         return;
@@ -158,10 +151,11 @@ function ContactFormSection({ isEn: isEnProp }) {
         setIsSubmitting(false);
       }
     },
-    [formData, isEn, publicKey, serviceId, t, templateId]
+    [formData, publicKey, serviceId, t, templateId]
   );
 
-  const presets = isEn ? SUBJECT_PRESETS.en : SUBJECT_PRESETS.id;
+  const translatedPresets = t('v2.contact.subjectPresets');
+  const presets = Array.isArray(translatedPresets) ? translatedPresets : [];
 
   return (
     <div className="w-full">
@@ -242,7 +236,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   htmlFor="v2-contact-name"
                   className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
-                  {isEn ? "What's your name?" : 'Siapa nama Anda?'}
+                  {t('v2.contact.nameLabel')}
                 </label>
                 <input
                   type="text"
@@ -250,7 +244,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder={isEn ? 'John Doe *' : 'Nama lengkap Anda *'}
+                  placeholder={t('v2.contact.namePlaceholder')}
                   disabled={isSubmitting}
                   maxLength={CONTACT_LIMITS.NAME_MAX}
                   className="v2-inquiry-input w-full bg-transparent border-0 p-0 focus:outline-none"
@@ -280,7 +274,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   htmlFor="v2-contact-email"
                   className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
-                  {isEn ? "What's your email?" : 'Apa alamat email Anda?'}
+                  {t('v2.contact.emailLabel')}
                 </label>
                 <input
                   type="email"
@@ -321,13 +315,13 @@ function ContactFormSection({ isEn: isEnProp }) {
                   htmlFor="v2-contact-subject"
                   className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
-                  {isEn ? 'What are we discussing?' : 'Topik apa yang ingin dibahas?'}
+                  {t('v2.contact.subjectLabel')}
                 </label>
 
                 <div
                   className="flex flex-wrap gap-2"
                   role="group"
-                  aria-label={isEn ? 'Quick topics' : 'Pilihan topik'}
+                  aria-label={t('v2.contact.quickTopicsAria')}
                 >
                   {presets.map((preset) => {
                     const isSelected = formData.subject === preset;
@@ -357,11 +351,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder={
-                  isEn
-                    ? 'Frontend Engineer role, web platform, etc. (Optional)'
-                    : 'Posisi Frontend Engineer, proyek web, dll. (Opsional)'
-                }
+                placeholder={t('v2.contact.subjectPlaceholder')}
                 disabled={isSubmitting}
                 maxLength={CONTACT_LIMITS.SUBJECT_MAX}
                 className="v2-inquiry-input w-full bg-transparent border-0 p-0 focus:outline-none"
@@ -393,7 +383,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                   htmlFor="v2-contact-message"
                   className="block text-[15px] font-medium tracking-[-0.025em] text-[var(--v2-text-muted)]"
                 >
-                  {isEn ? 'Tell me about your project or role' : 'Ceritakan detail proyek atau peran'}
+                  {t('v2.contact.messageLabel')}
                 </label>
                 {formData.message.length > 4000 && (
                   <span className="text-[11px] tabular-nums text-[var(--v2-text-dim)]">
@@ -408,11 +398,7 @@ function ContactFormSection({ isEn: isEnProp }) {
                 value={formData.message}
                 onChange={handleChange}
                 rows={3}
-                placeholder={
-                  isEn
-                    ? 'Scope, timeline, goals, or team context... *'
-                    : 'Ruang lingkup, timeline, tujuan, atau konteks tim... *'
-                }
+                placeholder={t('v2.contact.messagePlaceholder')}
                 disabled={isSubmitting}
                 maxLength={CONTACT_LIMITS.MESSAGE_MAX}
                 className="v2-inquiry-input w-full bg-transparent border-0 p-0 resize-y min-h-[92px] focus:outline-none"
@@ -441,7 +427,7 @@ function ContactFormSection({ isEn: isEnProp }) {
           >
             {isSubmitting ? (
               <>
-                <span>{isEn ? 'SENDING...' : 'MENGIRIM...'}</span>
+                <span>{t('v2.contact.sending')}</span>
                 <span
                   className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin"
                   aria-hidden="true"
@@ -449,23 +435,19 @@ function ContactFormSection({ isEn: isEnProp }) {
               </>
             ) : (
               <>
-                <RolloverLabel text={isEn ? 'SEND MESSAGE' : 'KIRIM PESAN'} />
+                <RolloverLabel text={t('v2.contact.sendMessage')} />
                 <FiArrowUpRight size={20} aria-hidden="true" />
               </>
             )}
           </button>
 
           <p className="text-[14px] tracking-[-0.02em] text-[var(--v2-text-dim)]">
-            {isEn ? 'Usually responds within 24 hours.' : 'Biasanya membalas dalam 24 jam.'}
+            {t('v2.contact.responseHint')}
           </p>
         </div>
       </form>
     </div>
   );
 }
-
-ContactFormSection.propTypes = {
-  isEn: PropTypes.bool,
-};
 
 export default ContactFormSection;

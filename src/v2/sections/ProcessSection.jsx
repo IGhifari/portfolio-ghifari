@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
+import { useLanguage } from '@/context/LanguageContext';
 import MaskedDisplayHeading from '../components/ui/MaskedDisplayHeading';
 
 /**
  * Sticky Horizontal Pan Process Track (`285vh` desktop track, clean grid fallback on tablet/mobile).
  */
-export default function ProcessSection({ steps, isEn, isDesktop, shouldReduceMotion = false }) {
+export default function ProcessSection({ steps, isDesktop, shouldReduceMotion = false }) {
+  const { t } = useLanguage();
   const trackRef = useRef(null);
   const rowRef = useRef(null);
   const [maxPan, setMaxPan] = useState(640);
@@ -33,6 +35,8 @@ export default function ProcessSection({ steps, isEn, isDesktop, shouldReduceMot
   });
 
   const horizontalX = useTransform(scrollYProgress, [0, 1], [0, -maxPan]);
+  const headingLines = t('v2.process.headingLines');
+  const safeHeadingLines = Array.isArray(headingLines) ? headingLines : [];
 
   if (!isDesktop || shouldReduceMotion) {
     return (
@@ -40,12 +44,12 @@ export default function ProcessSection({ steps, isEn, isDesktop, shouldReduceMot
         <div className="v2-container mb-12">
           <div className="flex items-start justify-between gap-4">
             <MaskedDisplayHeading
-              lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
+              lines={safeHeadingLines}
               className="v2-section-heading"
               shouldReduceMotion={shouldReduceMotion}
             />
             <span className="v2-section-tag pt-1">
-              ({isEn ? 'PROCESS' : 'PENGALAMAN'})
+              ({t('v2.process.tag')})
             </span>
           </div>
         </div>
@@ -102,18 +106,16 @@ export default function ProcessSection({ steps, isEn, isDesktop, shouldReduceMot
           <div className="relative w-[530px] shrink-0 h-[560px] flex flex-col justify-between py-2">
             <div className="flex items-start justify-between">
               <MaskedDisplayHeading
-                lines={isEn ? ['HOW I', 'WORK'] : ['JEJAK &', 'PROSES']}
+                lines={safeHeadingLines}
                 className="v2-section-heading"
                 shouldReduceMotion={shouldReduceMotion}
               />
               <span className="v2-section-tag pt-2">
-                ({isEn ? 'PROCESS' : 'PENGALAMAN'})
+                ({t('v2.process.tag')})
               </span>
             </div>
             <p className="max-w-[360px] text-[20px] font-medium tracking-[-0.04em] leading-[1.2] text-[var(--v2-text-muted)]">
-              {isEn
-                ? 'Verified track record across industry internship, open-source engineering, and computer science education.'
-                : 'Rekam jejak terverifikasi mulai dari magang industri, library open-source, hingga pendidikan informatika.'}
+              {t('v2.process.intro')}
             </p>
           </div>
 
@@ -156,7 +158,6 @@ export default function ProcessSection({ steps, isEn, isDesktop, shouldReduceMot
 
 ProcessSection.propTypes = {
   steps: PropTypes.arrayOf(PropTypes.object).isRequired,
-  isEn: PropTypes.bool.isRequired,
   isDesktop: PropTypes.bool.isRequired,
   shouldReduceMotion: PropTypes.bool,
 };
