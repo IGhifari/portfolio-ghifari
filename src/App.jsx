@@ -9,10 +9,7 @@ import { isPlayRouteType, DEFAULT_PORTFOLIO_VERSION } from './utils/router';
 import { updateDocumentMetadata } from './utils/seo';
 import { siteConfig, ENABLE_SEASONAL_THEMES } from './config/site';
 
-// Eagerly loaded critical components (Hero & Above/Near-Fold Showcase)
-import Navbar from './components/Navbar';
-import Profile from './components/Profile';
-import Project from './components/Project';
+// Eagerly loaded default V2 experience & shared chrome
 import PortfolioSwitcher from './components/PortfolioSwitcher';
 import PortfolioV2 from './v2/pages/HomePage';
 import V2PageTransition from './v2/components/motion/PageTransition';
@@ -20,6 +17,11 @@ import {
     hasCompletedV2Opening,
     runV2PageTransition,
 } from './v2/components/motion/openingState';
+
+// Lazy-loaded V1 above-the-fold & below-the-fold components
+const Navbar = lazy(() => import('./components/Navbar'));
+const Profile = lazy(() => import('./components/Profile'));
+const Project = lazy(() => import('./components/Project'));
 
 // Lazy-loaded below-the-fold components
 const SoundButton = lazy(() => import('./components/SoundButton'));
@@ -193,7 +195,11 @@ const AppContent = () => {
             >
                 {t('nav.skipToContent') || 'Skip to main content'}
             </a>
-            {!isPlayMode && <Navbar />}
+            {!isPlayMode && (
+                <Suspense fallback={<div className="h-16" aria-hidden="true" />}>
+                    <Navbar />
+                </Suspense>
+            )}
             {!isPlayMode && ENABLE_SEASONAL_THEMES && (
                 <Suspense fallback={null}>
                     <SeasonalEffects />
@@ -205,12 +211,16 @@ const AppContent = () => {
                     <>
                         {/* Hero */}
                         <section id="profile" className="min-h-screen bg-[var(--bg-primary)]">
-                            <Profile/>
+                            <Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)]" aria-hidden="true" />}>
+                                <Profile/>
+                            </Suspense>
                         </section>
 
-                        {/* Projects (Eagerly rendered for immediate showcase availability) */}
+                        {/* Projects */}
                         <section id="projects" className="bg-[var(--bg-primary)]">
-                            <Project/>
+                            <Suspense fallback={<div className="min-h-[420px] bg-[var(--bg-primary)]" aria-hidden="true" />}>
+                                <Project/>
+                            </Suspense>
                         </section>
 
                         {/* About */}
