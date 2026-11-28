@@ -19,10 +19,12 @@ export const siteConfig = {
   author: {
     name: 'M. Ghifari Bima Khadafi',
     email: ['ighifarii05', 'gmail.com'].join(String.fromCharCode(64)),
+    location: 'Bogor / Jakarta, ID',
     github: 'https://github.com/IGhifari',
     githubUsername: 'IGhifari',
     linkedin: 'https://www.linkedin.com/in/ighifari/',
     instagram: 'https://www.instagram.com/ghfrriii/',
+    npm: 'https://www.npmjs.com/package/@ghifari29/id-kit',
     discord: 'ghifarii5',
     twitter: '@IGhifari',
   },

@@ -106,15 +106,14 @@ DeferredSection.propTypes = {
     minHeight: PropTypes.string,
 };
 
+const isV2PageRouteType = (type) =>
+    type === 'home' || type === 'study-case-list' || type === 'study-case-detail';
+
 const AppContent = () => {
     const { route, langPrefix, portfolioVersion, switchPortfolioVersion } = useRouter();
     const { language, t } = useLanguage();
     const isPlayMode = isPlayRouteType(route.type);
-    const isV2Route =
-        route.type === 'home' ||
-        route.type === 'study-case-list' ||
-        route.type === 'study-case-detail';
-    const isV2Active = isV2Route && portfolioVersion !== '1';
+    const isV2Active = isV2PageRouteType(route.type) && portfolioVersion !== '1';
 
     // Restore localized home page document metadata on returning to home or toggling language
     useEffect(() => {
@@ -365,9 +364,6 @@ const AppContent = () => {
         </div>
     );
 };
-
-const isV2PageRouteType = (type) =>
-    type === 'home' || type === 'study-case-list' || type === 'study-case-detail';
 
 const shouldAnimateV2PageSwap = (fromLoc, toLoc) => {
     if (typeof window === 'undefined' || !fromLoc || !toLoc) return false;

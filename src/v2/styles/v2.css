@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Portfolio V2 — Exact 1:1 Nakula Reference & Scroll Choreography Styles
+   Portfolio V2 — Editorial Design System & Scroll Choreography Styles (Nakula-inspired)
    Strictly scoped to `.v2-portfolio-root` so Portfolio 1 remains untouched.
    ========================================================================== */
 
@@ -94,7 +94,7 @@ html.v2-scroll-root body {
   }
 }
 
-/* Exact Nakula Fixed Header Top Gradient Backdrop */
+/* Fixed Header Top Gradient Backdrop (Nakula-inspired) */
 .v2-nav-scrim {
   background: var(--v2-nav-scrim);
 }

@@ -259,6 +259,33 @@ test('CONF-05A — GitHub Activity Integration & API Service Test Suite', async 
       assert.equal(cachedResult.data.profile.login, 'IGhifari');
     });
 
+    await t2.test('uses cache: no-store on force refresh without sending obsolete X-Refresh header', async () => {
+      let capturedOptions = null;
+      const mockProxyFetch = async (url, options) => {
+        if (url === '/api/github') {
+          capturedOptions = options;
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              ok: true,
+              data: {
+                profile: sanitizeUserProfile({ login: 'IGhifari', public_repos: 30 }),
+                contributions: initialContributionsData,
+              },
+              contributionsLive: true,
+            }),
+          };
+        }
+        throw new Error('Unexpected direct fetch');
+      };
+
+      const result = await fetchGithubData({ force: true, fetchFn: mockProxyFetch });
+      assert.equal(result.data.profile.login, 'IGhifari');
+      assert.deepEqual(capturedOptions, { cache: 'no-store' });
+      assert.equal(capturedOptions?.headers, undefined);
+    });
+
     await t2.test('throws RATE_LIMIT error when GitHub returns 403 or 429', async () => {
       const mockRateLimitedFetch = async (url) => {
         if (url === '/api/github') return { ok: false, status: 404 };

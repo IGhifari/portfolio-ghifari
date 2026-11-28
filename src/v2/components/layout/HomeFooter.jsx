@@ -28,7 +28,7 @@ export default function HomeFooter({
 
   return (
     <footer ref={footerRef} className="relative bg-[var(--v2-bg)]">
-      {/* Upper Dark Footer (`z-index: 3`, exact Nakula `.framer-11myxzf`) */}
+      {/* Upper Dark Footer (`z-index: 3`, editorial curtain-reveal layer) */}
       <div className="relative z-[3] bg-[var(--v2-bg)] border-t border-[var(--v2-border)]">
         <div className="v2-container pt-14 pb-8 space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -49,7 +49,7 @@ export default function HomeFooter({
                   (LOCATION)
                 </span>
                 <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.04em] leading-none text-[var(--v2-text)]">
-                  Bogor / Jakarta, ID
+                  {siteConfig.author.location}
                 </p>
               </div>
             </div>
@@ -132,17 +132,19 @@ export default function HomeFooter({
                       </a>
                     </li>
                   ))}
-                  <li>
-                    <a
-                      href="https://www.npmjs.com/package/@ghifari29/id-kit"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
-                    >
-                      <span>npm</span>
-                      <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
-                    </a>
-                  </li>
+                  {siteConfig.author.npm && (
+                    <li>
+                      <a
+                        href={siteConfig.author.npm}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
+                      >
+                        <span>npm</span>
+                        <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>

@@ -35,7 +35,7 @@ const V2ChatAssistant = lazy(() => import('./V2ChatAssistant'));
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
 /**
- * Exact Nakula `/works` & `MORE WORKS` Project Grid Card:
+ * Editorial `/works` & `MORE WORKS` Project Grid Card (Nakula-inspired):
  * - Image mask `aspect-ratio: 1.3518`, `border-radius: 12px`
  * - Hover: mask `scale(0.92)` + inner image `scale(1.09)` + spring frosted `"VIEW PROJECT ↗"` cursor pill
  * - Title: Geist `56px` desktop (`40px` mobile), `600`, `-0.06em`, `#cacaca`
@@ -156,10 +156,10 @@ V2WorkGridCard.propTypes = {
 
 /**
  * Shared Portfolio V2 Subpage Shell (`/study-case` & `/study-case/:slug`):
- * - Fixed compact Nakula navbar (`120x36` small wordmark at all scroll positions)
+ * - Fixed compact editorial navbar (`120x36` small wordmark at all scroll positions)
  * - Right-side slide-over drawer (`activeNav`: `'works'`)
  * - Scoped single Lenis smooth scroll instance
- * - Pre-Footer `"LET'S WORK TOGETHER"` CTA + Nakula Footer in natural document flow
+ * - Pre-Footer `"LET'S WORK TOGETHER"` CTA + Editorial Footer in natural document flow
  */
 export default function V2SubpageShell({ children, scrollKey = '' }) {
   const shouldReduceMotion = useReducedMotion();
@@ -263,7 +263,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
         className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none"
       >
         <div className="v2-container flex items-center justify-between pt-4 md:pt-5">
-          {/* Small Compact Wordmark (`~36px` tall, exact Nakula subpage navbar) */}
+          {/* Small Compact Wordmark (`~36px` tall, editorial subpage navbar) */}
           <RouterLink
             to="/"
             className="pointer-events-auto v2-display-heading text-[34px] md:text-[38px] leading-[0.88] text-[var(--v2-text)] hover:text-[var(--v2-text-bright)] transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--v2-accent)] rounded-sm"
@@ -359,7 +359,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
       <main id="main-content" tabIndex={-1} className="v2-portfolio-main focus:outline-none">
         {children}
 
-        {/* Pre-Footer Contact CTA (Exact Nakula `/works` & `/works/arjuna` CTA Wrapper) */}
+        {/* Pre-Footer Contact CTA (Editorial subpage CTA Wrapper) */}
         <section
           id="v2-subpage-contact"
           ref={ctaSectionRef}
@@ -419,7 +419,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
         </section>
       </main>
 
-      {/* Footer in normal document flow (exact `/works` & `/works/arjuna` behavior) */}
+      {/* Footer in normal document flow (subpage footer layout) */}
       <footer className="relative z-[3] bg-[var(--v2-bg)]">
         <div className="bg-[var(--v2-bg)] border-t border-[var(--v2-border)]">
           <div className="v2-container pt-14 pb-8 space-y-16">
@@ -441,7 +441,7 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                     (LOCATION)
                   </span>
                   <p className="text-[20px] sm:text-[24px] font-semibold tracking-[-0.04em] leading-none text-[var(--v2-text)]">
-                    Bogor / Jakarta, ID
+                    {siteConfig.author.location}
                   </p>
                 </div>
               </div>
@@ -507,17 +507,19 @@ export default function V2SubpageShell({ children, scrollKey = '' }) {
                         </a>
                       </li>
                     ))}
-                    <li>
-                      <a
-                        href="https://www.npmjs.com/package/@ghifari29/id-kit"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
-                      >
-                        <span>npm</span>
-                        <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
-                      </a>
-                    </li>
+                    {siteConfig.author.npm && (
+                      <li>
+                        <a
+                          href={siteConfig.author.npm}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 hover:text-[var(--v2-accent)] transition-colors"
+                        >
+                          <span>npm</span>
+                          <FiArrowUpRight size={15} className="text-[var(--v2-text-dim)]" />
+                        </a>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>

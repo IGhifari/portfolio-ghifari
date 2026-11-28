@@ -9,7 +9,7 @@ import RolloverLabel from '../ui/RolloverLabel';
 const NAKULA_EASE = [0.22, 1, 0.36, 1];
 
 /**
- * Fixed Nakula Top Header for Portfolio V2 Home:
+ * Fixed Editorial Top Header for Portfolio V2 Home (Nakula-inspired):
  * - Desktop Big -> Small wordmark variant switch at scrollY > 48px
  * - Availability, Jakarta clock, seasonal badge, ID/EN switcher, LET'S TALK + menu trigger
  */
@@ -39,7 +39,7 @@ export default function HomeHeader({
       className="v2-nav-scrim fixed top-0 left-0 right-0 h-[75px] md:h-[88px] z-[40] pointer-events-none"
     >
       <div className="v2-container flex items-start justify-between pt-4 md:pt-6">
-        {/* Desktop Wordmark: Exact Nakula Big -> Small variant switch at scrollY > 48px */}
+        {/* Desktop Wordmark: Editorial Big -> Small variant switch at scrollY > 48px */}
         <motion.a
           href="#v2-top"
           onClick={(e) => {
